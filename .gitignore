@@ -1,7 +1,7 @@
 # ignore Maven output directory
-/target
+target/
 # ignore Eclipse files
 .classpath
 .project
-# ignore Eclipse setting directory
-settings/
+# ignore Eclipse settings directory
+.settings/
