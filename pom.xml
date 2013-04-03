@@ -16,4 +16,11 @@
   		</plugin>
   	</plugins>
   </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.neo4j</groupId>
+  		<artifactId>neo4j</artifactId>
+  		<version>1.9.M05</version>
+  	</dependency>
+  </dependencies>
 </project>
