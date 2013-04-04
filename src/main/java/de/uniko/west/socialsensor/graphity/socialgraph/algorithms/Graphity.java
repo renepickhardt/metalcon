@@ -7,46 +7,48 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
-import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphOperations;
+import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
 import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
 
 /**
  * social graph implementation 'Graphity'
  * 
- * @author sebschlicht
+ * @author Rene Pickhardt, Jonas Kunze, Sebastian Schlicht
  * 
  */
-public class Graphity implements SocialGraphOperations {
+public class Graphity extends SocialGraph {
 
 	/**
-	 * graph database in Graphity format
+	 * create a new graphity social graph
+	 * 
+	 * @param graph
+	 *            graph database to operate on
 	 */
-	private AbstractGraphDatabase graphity;
+	public Graphity(final AbstractGraphDatabase graph) {
+		super(graph);
+	}
 
 	@Override
-	public boolean addStatusUpdate(long timestamp, long userID,
+	public boolean createStatusUpdate(long timestamp, long userID,
 			StatusUpdate content) {
 		// find user first
 		Node user;
 		try {
-			user = this.graphity.getNodeById(userID);
-		} catch (NotFoundException e) {
+			user = this.graph.getNodeById(userID);
+		} catch (final NotFoundException e) {
 			return false;
 		}
 
 		// get last recent status update
-		Node lastUpdate = NeoUtils.getNextSingleNode(user,
+		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
 				SocialGraphRelationshipType.UPDATE);
-		// TODO: ensure performance of having two node variables created at each
-		// call
 
 		// create new status update
-		Node crrUpdate = this.graphity.createNode();
+		final Node crrUpdate = this.graph.createNode();
 		crrUpdate.setProperty(Properties.Timestamp, timestamp);
 		crrUpdate.setProperty(Properties.ContentType, content.getType());
 		crrUpdate.setProperty(Properties.Content, content);
-		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -63,7 +65,6 @@ public class Graphity implements SocialGraphOperations {
 		// TODO: update ego network for this user
 
 		return true;
-
 	}
 
 }

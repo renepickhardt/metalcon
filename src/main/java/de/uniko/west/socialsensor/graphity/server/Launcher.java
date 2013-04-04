@@ -13,7 +13,8 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 public class Launcher {
 
 	/**
-	 * database path
+	 * database path<br>
+	 * TODO: generic
 	 */
 	private static final String DB_PATH = "target/database/location";
 
@@ -27,7 +28,7 @@ public class Launcher {
 	}
 
 	public static void main(String[] args) {
-		GraphDatabaseService graphDB = new GraphDatabaseFactory()
+		final GraphDatabaseService graphDB = new GraphDatabaseFactory()
 				.newEmbeddedDatabase(DB_PATH);
 		registerShutdownHook(graphDB);
 
