@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.graphity;
+package de.uniko.west.socialsensor.graphity.socialgraph;
 
 import java.nio.channels.NonWritableChannelException;
 

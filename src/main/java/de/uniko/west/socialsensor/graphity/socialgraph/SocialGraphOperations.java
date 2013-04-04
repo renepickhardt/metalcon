@@ -6,7 +6,7 @@ package de.uniko.west.socialsensor.graphity.socialgraph;
  * @author sebschlicht
  * 
  */
-public interface SocialGraph {
+public interface SocialGraphOperations {
 
 	/**
 	 * add a status update to a user

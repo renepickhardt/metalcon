@@ -1,12 +1,13 @@
-package de.uniko.west.socialsensor.graphity.graphity;
+package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
+import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
-import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
+import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphOperations;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
 import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
 
@@ -16,7 +17,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
  * @author sebschlicht
  * 
  */
-public class Graphity implements SocialGraph {
+public class Graphity implements SocialGraphOperations {
 
 	/**
 	 * graph database in Graphity format
@@ -47,7 +48,7 @@ public class Graphity implements SocialGraph {
 		crrUpdate.setProperty(Properties.Content, content);
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
 
-		// update references to last recent status update if existing
+		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
 			user.getSingleRelationship(SocialGraphRelationshipType.UPDATE,
 					Direction.OUTGOING).delete();
@@ -57,8 +58,8 @@ public class Graphity implements SocialGraph {
 
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
-
 		user.setProperty(Properties.LastUpdate, timestamp);
+
 		// TODO: update ego network for this user
 
 		return true;
