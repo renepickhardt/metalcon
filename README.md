@@ -260,11 +260,11 @@ Restart Eclipse after the installation.
 
 <h2>Congratulations</h2>
 
-You do fullfill all dependencies now to access the Graphity Server project!  
+You do fulfill all dependencies now to access the Graphity Server project!  
 Scroll to the top of the page and pull the project as described.
 
 You can now build the project using Maven.  
-Open an new terminal and switch to the project directory:  
+Open a new terminal and switch to the project directory:  
 `cd $HOME/git/Graphity-Server/`
 
 Build the project:  
