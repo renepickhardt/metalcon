@@ -53,7 +53,6 @@ __If you have installed Maven already, please proceed with step 2: [Install Java
 
 Download Maven from http://maven.apache.org/download.cgi#Installation using the Maven 3.0.5 Binary tar.gz first.
 
-<h3>How To:</h3>
 Now start a new terminal. [Ctrl + Alt + T]
 
 Switch to the downloads directory using  
