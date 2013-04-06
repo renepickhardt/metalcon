@@ -22,33 +22,33 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	/**
 	 * social graph database path
 	 */
-	private String databasePath;
+	public String database_path;
 
 	/**
 	 * database read only flag<br>
 	 * TODO: necessary or specified somewhere else?
 	 */
-	private boolean readOnly;
+	public boolean read_only;
 
 	/**
 	 * cache type
 	 */
-	private String cacheType;
+	public String cache_type;
 
 	/**
 	 * use memory mapped buffers flag<br>
 	 * TODO: boolean value?
 	 */
-	private String useMemoryMappedBuffers;
+	public String use_memory_mapped_buffers;
 
 	/**
 	 * social graph algorithm
 	 */
-	private String algorithm;
+	public String algorithm;
 
 	private static final long serialVersionUID = -4439565094382127683L;
 
-	static Configs instance = null;
+	private static Configs instance = null;
 
 	public Configs() {
 		String file = "config.txt";
@@ -121,22 +121,22 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 
 	@Override
 	public String databasePath() {
-		return this.databasePath;
+		return this.database_path;
 	}
 
 	@Override
 	public boolean readOnly() {
-		return this.readOnly;
+		return this.read_only;
 	}
 
 	@Override
 	public String cacheType() {
-		return this.cacheType;
+		return this.cache_type;
 	}
 
 	@Override
 	public String useMemoryMappedBuffers() {
-		return this.useMemoryMappedBuffers;
+		return this.use_memory_mapped_buffers;
 	}
 
 	/**

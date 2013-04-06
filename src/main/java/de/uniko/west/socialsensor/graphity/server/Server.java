@@ -3,6 +3,7 @@ package de.uniko.west.socialsensor.graphity.server;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
@@ -49,6 +50,7 @@ public class Server {
 		this.config = Configs.get();
 		// load social graph database
 		this.graphDatabase = NeoUtils.getSocialGraphDatabase(this.config);
+		registerShutdownHook(this.graphDatabase);
 
 		// load social graph algorithm
 		switch (this.config.algorithm()) {
@@ -83,6 +85,23 @@ public class Server {
 	 */
 	public void stop() {
 		this.commandWorker.stop();
+		this.commandWorker.waitForShutdown();
+	}
+
+	/**
+	 * register a shutdown hook for a social graph database
+	 * 
+	 * @param graphDB
+	 *            social graph database targeted
+	 */
+	private static void registerShutdownHook(
+			final GraphDatabaseService graphDatabase) {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				graphDatabase.shutdown();
+			}
+		});
 	}
 
 }

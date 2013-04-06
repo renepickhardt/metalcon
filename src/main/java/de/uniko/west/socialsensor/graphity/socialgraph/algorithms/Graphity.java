@@ -1,8 +1,10 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
@@ -62,9 +64,57 @@ public class Graphity extends SocialGraph {
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
 		user.setProperty(Properties.LastUpdate, timestamp);
 
-		// TODO: update ego network for this user
+		// update ego network for this user
+		this.UpdateEgoNetwork(user);
 
 		return true;
+	}
+
+	/**
+	 * update the ego network of a user
+	 * 
+	 * @param user
+	 *            user where changes have occurred
+	 */
+	private void UpdateEgoNetwork(final Node user) {
+		// loop through following users
+		Node follower, lastPoster;
+		DynamicRelationshipType egoType;
+		Node prevUser, nextUser;
+
+		for (Relationship relationship : user.getRelationships(
+				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)) {
+			follower = relationship.getStartNode();
+			egoType = getEgoType(follower);
+
+			// bridge user node
+			prevUser = NeoUtils.getPrevSingleNode(user, egoType);
+			if (!prevUser.equals(follower)) {
+				user.getSingleRelationship(egoType, Direction.INCOMING)
+						.delete();
+
+				nextUser = NeoUtils.getNextSingleNode(user, egoType);
+				if (nextUser != null) {
+					user.getSingleRelationship(egoType, Direction.OUTGOING)
+							.delete();
+					prevUser.createRelationshipTo(nextUser, egoType);
+				}
+			}
+
+			// insert user node at its new position
+			lastPoster = NeoUtils.getNextSingleNode(follower, egoType);
+			// TODO: let certify correctness
+			if (!lastPoster.equals(user)) {
+				follower.getSingleRelationship(egoType, Direction.OUTGOING)
+						.delete();
+				follower.createRelationshipTo(user, egoType);
+				user.createRelationshipTo(lastPoster, egoType);
+			}
+		}
+	}
+
+	private static DynamicRelationshipType getEgoType(final Node user) {
+		return DynamicRelationshipType.withName("ego:" + user.getId());
 	}
 
 }

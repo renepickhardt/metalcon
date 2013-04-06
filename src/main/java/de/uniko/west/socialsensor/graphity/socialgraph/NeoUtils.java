@@ -66,6 +66,25 @@ public class NeoUtils {
 	}
 
 	/**
+	 * find an incoming relation from the user passed of the specified type
+	 * 
+	 * @param user
+	 *            destination user node
+	 * @param relationshipType
+	 *            relationship type of the relation being searched
+	 * @return source node of the relation<br>
+	 *         null - if there is no relation of the type specified
+	 */
+	public static Node getPrevSingleNode(final Node user,
+			RelationshipType relationshipType) {
+		// find an incoming relation of the type specified
+		final Relationship rel = user.getSingleRelationship(relationshipType,
+				Direction.INCOMING);
+
+		return (rel == null) ? (null) : (rel.getStartNode());
+	}
+
+	/**
 	 * find an outgoing relation from the user passed of the specified type
 	 * 
 	 * @param user
@@ -76,11 +95,12 @@ public class NeoUtils {
 	 *         null - if there is no relation of the type specified
 	 */
 	public static Node getNextSingleNode(final Node user,
-			RelationshipType relType) {
+			RelationshipType relationshipType) {
 		// find an outgoing relation of the type specified
 		Relationship rel = null;
 		try {
-			rel = user.getSingleRelationship(relType, Direction.OUTGOING);
+			rel = user.getSingleRelationship(relationshipType,
+					Direction.OUTGOING);
 		} catch (NonWritableChannelException e) {
 			// TODO: why is this here? Bug for read-only databases in previous
 			// version?

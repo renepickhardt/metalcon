@@ -34,6 +34,11 @@ public class Worker implements Runnable {
 	private boolean running;
 
 	/**
+	 * worker stopping flag
+	 */
+	private boolean stopping;
+
+	/**
 	 * create a new command worker for a social graph
 	 * 
 	 * @param commands
@@ -53,7 +58,7 @@ public class Worker implements Runnable {
 
 		// exit execution loop if worker has been stopped
 		SocialGraphOperation command = null;
-		while (this.running) {
+		while (!this.stopping) {
 			command = this.commands.poll();
 
 			// run first command (if existing)
@@ -61,6 +66,10 @@ public class Worker implements Runnable {
 				command.run(this.graph);
 			}
 		}
+
+		// reset worker flags
+		this.running = false;
+		this.stopping = false;
 	}
 
 	/**
@@ -72,15 +81,20 @@ public class Worker implements Runnable {
 	}
 
 	/**
-	 * stop the worker thread and wait for it to shut down
+	 * stop the worker thread
 	 */
 	public void stop() {
-		this.running = false;
+		this.stopping = true;
+	}
 
-		try {
-			this.workerThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	/**
+	 * wait until the worker has shut down
+	 */
+	public void waitForShutdown() {
+		if (this.stopping) {
+			while (this.running) {
+				// wait for the worker thread to finish
+			}
 		}
 	}
 
