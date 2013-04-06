@@ -113,6 +113,13 @@ public class Graphity extends SocialGraph {
 		}
 	}
 
+	/**
+	 * generate ego network relationship type
+	 * 
+	 * @param user
+	 *            user to generate the type for
+	 * @return ego network relationship type of the user passed
+	 */
 	private static DynamicRelationshipType getEgoType(final Node user) {
 		return DynamicRelationshipType.withName("ego:" + user.getId());
 	}
