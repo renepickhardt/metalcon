@@ -50,4 +50,19 @@ public abstract class SocialGraph {
 	public abstract boolean createStatusUpdate(long timestamp, long userID,
 			StatusUpdate content);
 
+	/**
+	 * create a new friendship from a user to another
+	 * 
+	 * @param timestamp
+	 *            time stamp of the friendship
+	 * @param followingId
+	 *            identifier of the user following
+	 * @param followedId
+	 *            identifier of the user being followed
+	 * @return true - friendship has been added successfully<br>
+	 *         false otherwise
+	 */
+	public abstract boolean createFriendship(long timestamp, long followingId,
+			long followedId);
+
 }

@@ -32,6 +32,65 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
+	public boolean createFriendship(long timestamp, long followingId,
+			long followedId) {
+		// find users first
+		Node following, followed;
+		try {
+			following = this.graph.getNodeById(followingId);
+			followed = this.graph.getNodeById(followedId);
+		} catch (final NotFoundException e) {
+			return false;
+		}
+
+		// create start topology
+		following.createRelationshipTo(followed,
+				SocialGraphRelationshipType.FOLLOW);
+
+		// load user's Graphity ego type
+		final DynamicRelationshipType egoType = getEgoType(following);
+
+		// check if followed user is the first in following's ego network
+		if (NeoUtils.getNextSingleNode(following, egoType) == null) {
+			following.createRelationshipTo(followed, egoType);
+		} else {
+			// search for insertion index within following's ego network
+			final long followedTimestamp = getLastUpdate(followed);
+			long crrTimestamp;
+			Node prev = following;
+			Node next = null;
+			while (true) {
+				// get next user
+				next = NeoUtils.getNextSingleNode(prev, egoType);
+				if (next != null) {
+					crrTimestamp = getLastUpdate(next);
+
+					// step on if current user has newer status updates
+					if (crrTimestamp > followedTimestamp) {
+						prev = next;
+						continue;
+					}
+				}
+
+				// insertion position has been found
+				break;
+			}
+
+			// insert followed user into following's ego network
+			if (next != null) {
+				prev.getSingleRelationship(egoType, Direction.OUTGOING)
+						.delete();
+			}
+			prev.createRelationshipTo(followed, egoType);
+			if (next != null) {
+				followed.createRelationshipTo(next, egoType);
+			}
+		}
+
+		return true;
+	}
+
+	@Override
 	public boolean createStatusUpdate(long timestamp, long userID,
 			StatusUpdate content) {
 		// find user first
@@ -77,13 +136,14 @@ public class Graphity extends SocialGraph {
 	 *            user where changes have occurred
 	 */
 	private void UpdateEgoNetwork(final Node user) {
-		// loop through following users
 		Node follower, lastPoster;
 		DynamicRelationshipType egoType;
 		Node prevUser, nextUser;
 
+		// loop through users following
 		for (Relationship relationship : user.getRelationships(
 				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)) {
+			// load each user and its Graphity ego type
 			follower = relationship.getStartNode();
 			egoType = getEgoType(follower);
 
@@ -122,6 +182,20 @@ public class Graphity extends SocialGraph {
 	 */
 	private static DynamicRelationshipType getEgoType(final Node user) {
 		return DynamicRelationshipType.withName("ego:" + user.getId());
+	}
+
+	/**
+	 * get a user's last recent status update's time stamp
+	 * 
+	 * @param user
+	 *            user targeted
+	 * @return last recent status update's time stamp
+	 */
+	private static long getLastUpdate(final Node user) {
+		if (user.hasProperty(Properties.LastUpdate)) {
+			return (long) user.getProperty(Properties.LastUpdate);
+		}
+		return 0;
 	}
 
 }
