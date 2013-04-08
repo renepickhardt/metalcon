@@ -1,6 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import java.util.LinkedList;
+import java.util.TreeSet;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -14,6 +15,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
 import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdateWrapper;
 
 /**
  * social graph implementation 'Graphity'
@@ -174,13 +176,73 @@ public class Graphity extends SocialGraph {
 		}
 	}
 
-	public LinkedList<StatusUpdate> readStatusUpdates(final Node user,
-			final int numItems, final boolean ownUpdates) {
-		final DynamicRelationshipType egoType = getEgoType(user);
+	public LinkedList<StatusUpdateWrapper> readStatusUpdates(
+			final long posterId, final long readerId, final int numItems,
+			boolean ownUpdates) {
+		// find users first
+		Node poster, reader;
+		try {
+			poster = this.graph.getNodeById(posterId);
+			if (posterId == readerId) {
+				reader = poster;
+			} else {
+				ownUpdates = true;
+				reader = this.graph.getNodeById(readerId);
+			}
+		} catch (final NotFoundException e) {
+			// TODO: catch all exceptions in network responder
+			return null;
+		}
 
-		// TODO: understand reading process and write own implementation
-		System.err.println("reading not implemented yet!");
-		return null;
+		final LinkedList<StatusUpdateWrapper> statusUpdates = new LinkedList<StatusUpdateWrapper>();
+
+		// check if ego network stream is being accessed
+		if (!ownUpdates) {
+			final DynamicRelationshipType egoType = getEgoType(poster);
+			final TreeSet<GraphityUserNode> users = new TreeSet<GraphityUserNode>();
+
+			// load first user
+			Node newUser = NeoUtils.getNextSingleNode(poster, egoType);
+			GraphityUserNode crrUser, lastUser = null;
+			if (newUser != null) {
+				crrUser = new GraphityUserNode(newUser);
+				if (crrUser.hasStatusUpdate()) {
+					lastUser = crrUser;
+					users.add(crrUser);
+				}
+			}
+
+			// handle user queue
+			while ((statusUpdates.size() < numItems) && !users.isEmpty()) {
+				crrUser = users.pollFirst();
+
+				// add last recent status update of current user
+				statusUpdates.add(crrUser.getStatusUpdateWrapper());
+
+				// re-add current user if more status updates available
+				if (crrUser.hasStatusUpdate()) {
+					users.add(crrUser);
+				}
+
+				// // load additional user if necessary and existing
+				if (crrUser == lastUser) {
+					newUser = NeoUtils.getNextSingleNode(lastUser.getUser(),
+							egoType);
+					if (newUser != null) {
+						lastUser = new GraphityUserNode(newUser);
+						users.add(lastUser);
+					}
+				}
+			}
+		} else {
+			// access single stream only
+			final GraphityUserNode posterNode = new GraphityUserNode(poster);
+			while (posterNode.hasStatusUpdate()) {
+				statusUpdates.add(posterNode.getStatusUpdateWrapper());
+			}
+		}
+
+		return statusUpdates;
 	}
 
 	/**

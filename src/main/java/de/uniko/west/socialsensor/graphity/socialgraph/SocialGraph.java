@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph;
 
+import java.util.LinkedList;
+
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
@@ -64,5 +66,21 @@ public abstract class SocialGraph {
 	 */
 	public abstract boolean createFriendship(long timestamp, long followingId,
 			long followedId);
+
+	/**
+	 * read some status updates for/from a user
+	 * 
+	 * @param posterId
+	 *            identifier of the targeted stream's owner
+	 * @param readerId
+	 *            identifier of the reading user
+	 * @param numItems
+	 *            number of items to be read
+	 * @param ownUpdates
+	 *            single stream flag
+	 * @return
+	 */
+	public abstract LinkedList<StatusUpdateWrapper> readStatusUpdates(
+			long posterId, long readerId, int numItems, boolean ownUpdates);
 
 }
