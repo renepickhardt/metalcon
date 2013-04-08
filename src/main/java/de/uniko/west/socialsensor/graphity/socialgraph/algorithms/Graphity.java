@@ -226,16 +226,24 @@ public class Graphity extends SocialGraph {
 					users.add(crrUser);
 				}
 
-				// // load additional user if necessary and existing
+				// load additional user if necessary
 				if (crrUser == lastUser) {
 					newUser = NeoUtils.getNextSingleNode(lastUser.getUser(),
 							egoType);
 					if (newUser != null) {
 						lastUser = new GraphityUserNode(newUser);
-						users.add(lastUser);
+
+						// add new user if updates available only
+						if (lastUser.hasStatusUpdate()) {
+							users.add(lastUser);
+						} else {
+							// further users do not need to be loaded
+							lastUser = null;
+						}
 					}
 				}
 			}
+
 		} else {
 			// access single stream only
 			final GraphityUserNode posterNode = new GraphityUserNode(poster);
