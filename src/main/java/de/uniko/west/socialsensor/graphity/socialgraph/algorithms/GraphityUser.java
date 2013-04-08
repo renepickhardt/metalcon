@@ -9,22 +9,22 @@ import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdateWrapper;
 
 /**
- * user node used within Gravity reading process
+ * user used within Gravity reading process
  * 
  * @author Sebastian Schlicht
  * 
  */
-public class GraphityUserNode {
+public class GraphityUser {
 
 	/**
-	 * user the node is representing
+	 * user node represented
 	 */
-	private final Node user;
+	private final Node userNode;
 
 	/**
-	 * last recent status update of the user
+	 * last recent status update node of the user
 	 */
-	private Node nextStatusUpdate;
+	private Node nextStatusUpdateNode;
 
 	/**
 	 * current status update's time stamp
@@ -32,13 +32,14 @@ public class GraphityUserNode {
 	private long statusUpdateTimestamp;
 
 	/**
-	 * create a new user node for the Graphity reading process
+	 * create a new user for the Graphity reading process
 	 * 
 	 * @param user
+	 *            user node represented
 	 */
-	public GraphityUserNode(final Node user) {
-		this.user = user;
-		this.nextStatusUpdate = user;
+	public GraphityUser(final Node user) {
+		this.userNode = user;
+		this.nextStatusUpdateNode = user;
 
 		this.nextStatusUpdate();
 	}
@@ -49,7 +50,7 @@ public class GraphityUserNode {
 	 * @return user the node is representing
 	 */
 	public Node getUser() {
-		return this.user;
+		return this.userNode;
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class GraphityUserNode {
 	 *         false otherwise
 	 */
 	public boolean hasStatusUpdate() {
-		return (this.nextStatusUpdate != null);
+		return (this.nextStatusUpdateNode != null);
 	}
 
 	/**
@@ -67,12 +68,12 @@ public class GraphityUserNode {
 	 * (will cause an exception if called twice while none available)
 	 */
 	private void nextStatusUpdate() {
-		this.nextStatusUpdate = NeoUtils.getNextSingleNode(
-				this.nextStatusUpdate, SocialGraphRelationshipType.UPDATE);
+		this.nextStatusUpdateNode = NeoUtils.getNextSingleNode(
+				this.nextStatusUpdateNode, SocialGraphRelationshipType.UPDATE);
 
 		// load status update time stamp if existing
-		if (this.nextStatusUpdate != null) {
-			this.statusUpdateTimestamp = (long) this.nextStatusUpdate
+		if (this.nextStatusUpdateNode != null) {
+			this.statusUpdateTimestamp = (long) this.nextStatusUpdateNode
 					.getProperty(Properties.Timestamp);
 		}
 	}
@@ -85,7 +86,7 @@ public class GraphityUserNode {
 	 * @return status update loaded before
 	 */
 	private StatusUpdate getStatusUpdate() {
-		return (StatusUpdate) this.nextStatusUpdate
+		return (StatusUpdate) this.nextStatusUpdateNode
 				.getProperty(Properties.Content);
 	}
 
@@ -109,7 +110,7 @@ public class GraphityUserNode {
 	 */
 	public StatusUpdateWrapper getStatusUpdateWrapper() {
 		final StatusUpdateWrapper wrapper = new StatusUpdateWrapper(
-				this.statusUpdateTimestamp, this.user.getId(),
+				this.statusUpdateTimestamp, this.userNode.getId(),
 				this.getStatusUpdate());
 		this.nextStatusUpdate();
 		return wrapper;

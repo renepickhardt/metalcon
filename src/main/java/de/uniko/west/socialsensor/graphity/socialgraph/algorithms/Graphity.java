@@ -200,14 +200,14 @@ public class Graphity extends SocialGraph {
 		// check if ego network stream is being accessed
 		if (!ownUpdates) {
 			final DynamicRelationshipType egoType = getEgoType(poster);
-			final TreeSet<GraphityUserNode> users = new TreeSet<GraphityUserNode>(
-					new GraphityUserNodeComparator());
+			final TreeSet<GraphityUser> users = new TreeSet<GraphityUser>(
+					new GraphityUserComparator());
 
 			// load first user
 			Node newUser = NeoUtils.getNextSingleNode(poster, egoType);
-			GraphityUserNode crrUser, lastUser = null;
+			GraphityUser crrUser, lastUser = null;
 			if (newUser != null) {
-				crrUser = new GraphityUserNode(newUser);
+				crrUser = new GraphityUser(newUser);
 				if (crrUser.hasStatusUpdate()) {
 					lastUser = crrUser;
 					users.add(crrUser);
@@ -231,22 +231,23 @@ public class Graphity extends SocialGraph {
 					newUser = NeoUtils.getNextSingleNode(lastUser.getUser(),
 							egoType);
 					if (newUser != null) {
-						lastUser = new GraphityUserNode(newUser);
+						lastUser = new GraphityUser(newUser);
 
 						// add new user if updates available only
 						if (lastUser.hasStatusUpdate()) {
 							users.add(lastUser);
-						} else {
-							// further users do not need to be loaded
-							lastUser = null;
+							continue;
 						}
 					}
+
+					// further users do not need to be loaded
+					lastUser = null;
 				}
 			}
 
 		} else {
 			// access single stream only
-			final GraphityUserNode posterNode = new GraphityUserNode(poster);
+			final GraphityUser posterNode = new GraphityUser(poster);
 			while (posterNode.hasStatusUpdate()) {
 				statusUpdates.add(posterNode.getStatusUpdateWrapper());
 			}
