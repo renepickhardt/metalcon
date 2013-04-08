@@ -13,6 +13,29 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 public abstract class SocialGraphOperation {
 
 	/**
+	 * time stamp of the operation
+	 */
+	protected final long timestamp;
+
+	/**
+	 * executing user's identifier
+	 */
+	protected final long userId;
+
+	/**
+	 * create a new basic social graph operation
+	 * 
+	 * @param timestamp
+	 *            time stamp of the operation
+	 * @param userId
+	 *            executing user's identifier
+	 */
+	public SocialGraphOperation(final long timestamp, final long userId) {
+		this.timestamp = timestamp;
+		this.userId = userId;
+	}
+
+	/**
 	 * execute the transaction<br>
 	 * for impacts see concrete graph operations
 	 * 

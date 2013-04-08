@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
+import java.util.LinkedList;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -32,8 +34,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean createFriendship(long timestamp, long followingId,
-			long followedId) {
+	public boolean createFriendship(final long timestamp,
+			final long followingId, final long followedId) {
 		// find users first
 		Node following, followed;
 		try {
@@ -91,7 +93,7 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean createStatusUpdate(long timestamp, long userID,
+	public boolean createStatusUpdate(final long timestamp, final long userID,
 			StatusUpdate content) {
 		// find user first
 		Node user;
@@ -163,7 +165,6 @@ public class Graphity extends SocialGraph {
 
 			// insert user node at its new position
 			lastPoster = NeoUtils.getNextSingleNode(follower, egoType);
-			// TODO: let certify correctness
 			if (!lastPoster.equals(user)) {
 				follower.getSingleRelationship(egoType, Direction.OUTGOING)
 						.delete();
@@ -171,6 +172,15 @@ public class Graphity extends SocialGraph {
 				user.createRelationshipTo(lastPoster, egoType);
 			}
 		}
+	}
+
+	public LinkedList<StatusUpdate> readStatusUpdates(final Node user,
+			final int numItems, final boolean ownUpdates) {
+		final DynamicRelationshipType egoType = getEgoType(user);
+
+		// TODO: understand reading process and write own implementation
+		System.err.println("reading not implemented yet!");
+		return null;
 	}
 
 	/**

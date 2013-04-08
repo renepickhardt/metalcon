@@ -12,16 +12,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
 public class CreateStatusUpdate extends SocialGraphOperation {
 
 	/**
-	 * time stamp of the status update
-	 */
-	private final long timestamp;
-
-	/**
-	 * user identifier
-	 */
-	private final long userId;
-
-	/**
 	 * status update content object
 	 */
 	private final StatusUpdate content;
@@ -31,21 +21,21 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	 * 
 	 * @param timestamp
 	 *            time stamp of the status update
-	 * @param userId
-	 *            user identifier
+	 * @param posterId
+	 *            posting user's identifier
 	 * @param content
 	 *            status update content object
 	 */
-	public CreateStatusUpdate(final long timestamp, final long userId,
+	public CreateStatusUpdate(final long timestamp, final long posterId,
 			final StatusUpdate content) {
-		this.timestamp = timestamp;
-		this.userId = userId;
+		super(timestamp, posterId);
 		this.content = content;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		return graph.createStatusUpdate(this.timestamp, this.userId, this.content);
+		return graph.createStatusUpdate(this.timestamp, this.userId,
+				this.content);
 	}
 
 }
