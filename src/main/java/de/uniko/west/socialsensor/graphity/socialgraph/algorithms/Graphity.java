@@ -176,6 +176,7 @@ public class Graphity extends SocialGraph {
 		}
 	}
 
+	@Override
 	public LinkedList<StatusUpdateWrapper> readStatusUpdates(
 			final long posterId, final long readerId, final int numItems,
 			boolean ownUpdates) {
@@ -199,7 +200,8 @@ public class Graphity extends SocialGraph {
 		// check if ego network stream is being accessed
 		if (!ownUpdates) {
 			final DynamicRelationshipType egoType = getEgoType(poster);
-			final TreeSet<GraphityUserNode> users = new TreeSet<GraphityUserNode>();
+			final TreeSet<GraphityUserNode> users = new TreeSet<GraphityUserNode>(
+					new GraphityUserNodeComparator());
 
 			// load first user
 			Node newUser = NeoUtils.getNextSingleNode(poster, egoType);

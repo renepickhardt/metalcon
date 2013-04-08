@@ -39,6 +39,8 @@ public class GraphityUserNode {
 	public GraphityUserNode(final Node user) {
 		this.user = user;
 		this.nextStatusUpdate = user;
+
+		this.nextStatusUpdate();
 	}
 
 	/**
@@ -51,21 +53,28 @@ public class GraphityUserNode {
 	}
 
 	/**
-	 * load another status update
+	 * check if another status update is available
 	 * 
-	 * @return true - if another status update is existing<br>
-	 *         false otherwise (another call will cause an exception!)
+	 * @return true - if another status update is available<br>
+	 *         false otherwise
 	 */
 	public boolean hasStatusUpdate() {
+		return (this.nextStatusUpdate != null);
+	}
+
+	/**
+	 * load another status update<br>
+	 * (will cause an exception if called twice while none available)
+	 */
+	private void nextStatusUpdate() {
 		this.nextStatusUpdate = NeoUtils.getNextSingleNode(
 				this.nextStatusUpdate, SocialGraphRelationshipType.UPDATE);
 
+		// load status update time stamp if existing
 		if (this.nextStatusUpdate != null) {
 			this.statusUpdateTimestamp = (long) this.nextStatusUpdate
 					.getProperty(Properties.Timestamp);
-			return true;
 		}
-		return false;
 	}
 
 	/**
@@ -99,8 +108,11 @@ public class GraphityUserNode {
 	 * @return status update wrapper for the status update loaded before
 	 */
 	public StatusUpdateWrapper getStatusUpdateWrapper() {
-		return new StatusUpdateWrapper(this.statusUpdateTimestamp,
-				this.user.getId(), this.getStatusUpdate());
+		final StatusUpdateWrapper wrapper = new StatusUpdateWrapper(
+				this.statusUpdateTimestamp, this.user.getId(),
+				this.getStatusUpdate());
+		this.nextStatusUpdate();
+		return wrapper;
 	}
 
 }
