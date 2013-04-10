@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph;
 
+import java.io.File;
 import java.nio.channels.NonWritableChannelException;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +64,29 @@ public class NeoUtils {
 		}
 
 		return database;
+	}
+
+	/**
+	 * delete file or directory
+	 * 
+	 * @param file
+	 *            file path
+	 * @return true - if the file/directory has been deleted<br>
+	 *         false otherwise
+	 */
+	public static boolean deleteFile(final File file) {
+		// delete directory content recursively
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			for (File child : children) {
+				if (!deleteFile(child)) {
+					return false;
+				}
+			}
+		}
+
+		// delete file/empty directory
+		return file.delete();
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.socialgraph;
+package de.uniko.west.socialsensor.graphity.socialgraph.statusupdates;
 
 /**
  * basic status update class
@@ -11,7 +11,17 @@ public abstract class StatusUpdate {
 	/**
 	 * status update type identifier
 	 */
-	protected String type;
+	protected final String type;
+
+	/**
+	 * create a basic status update
+	 * 
+	 * @param type
+	 *            status update type identifier
+	 */
+	public StatusUpdate(final String type) {
+		this.type = type;
+	}
 
 	/**
 	 * get status update type

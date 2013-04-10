@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.socialgraph;
+package de.uniko.west.socialsensor.graphity.socialgraph.statusupdates;
 
 /**
  * wrapper for status updates and their creators

@@ -1,7 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
-import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
 
 /**
  * create command: status update

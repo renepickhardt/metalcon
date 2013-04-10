@@ -5,8 +5,8 @@ import org.neo4j.graphdb.Node;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
-import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdateWrapper;
+import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
 /**
  * user used within Gravity reading process

@@ -14,8 +14,8 @@ import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
-import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.StatusUpdateWrapper;
+import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
 /**
  * social graph implementation 'Graphity'
@@ -263,7 +263,7 @@ public class Graphity extends SocialGraph {
 	 *            user to generate the type for
 	 * @return ego network relationship type of the user passed
 	 */
-	private static DynamicRelationshipType getEgoType(final Node user) {
+	public static DynamicRelationshipType getEgoType(final Node user) {
 		return DynamicRelationshipType.withName("ego:" + user.getId());
 	}
 
