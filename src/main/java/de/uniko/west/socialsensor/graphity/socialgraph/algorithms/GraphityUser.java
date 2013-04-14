@@ -5,8 +5,6 @@ import org.neo4j.graphdb.Node;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
 /**
  * user used within Gravity reading process
@@ -85,9 +83,11 @@ public class GraphityUser {
 	 * 
 	 * @return status update loaded before
 	 */
-	private StatusUpdate getStatusUpdate() {
-		return (StatusUpdate) this.nextStatusUpdateNode
+	public String getStatusUpdate() {
+		final String statusUpdate = (String) this.nextStatusUpdateNode
 				.getProperty(Properties.Content);
+		this.nextStatusUpdate();
+		return statusUpdate;
 	}
 
 	/**
@@ -99,21 +99,6 @@ public class GraphityUser {
 	 */
 	public long getStatusUpdateTimestamp() {
 		return this.statusUpdateTimestamp;
-	}
-
-	/**
-	 * generate a status update wrapper for the status update loaded before<br>
-	 * (calls will cause an exception if you did not successfully load one
-	 * before)
-	 * 
-	 * @return status update wrapper for the status update loaded before
-	 */
-	public StatusUpdateWrapper getStatusUpdateWrapper() {
-		final StatusUpdateWrapper wrapper = new StatusUpdateWrapper(
-				this.statusUpdateTimestamp, this.userNode.getId(),
-				this.getStatusUpdate());
-		this.nextStatusUpdate();
-		return wrapper;
 	}
 
 }

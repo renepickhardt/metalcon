@@ -1,6 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.neo4j.graphdb.Direction;
@@ -16,7 +17,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
 import de.uniko.west.socialsensor.graphity.socialgraph.User;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
 /**
  * social graph implementation 'Graphity'
@@ -96,14 +96,14 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean createStatusUpdate(final long timestamp, final long userID,
+	public long createStatusUpdate(final long timestamp, final long userID,
 			final StatusUpdate content) {
 		// find user first
 		Node user;
 		try {
 			user = this.graph.getNodeById(userID);
 		} catch (final NotFoundException e) {
-			return false;
+			return 0;
 		}
 
 		// get last recent status update
@@ -138,7 +138,7 @@ public class Graphity extends SocialGraph {
 		// update ego network for this user
 		this.UpdateEgoNetwork(user);
 
-		return true;
+		return crrUpdate.getId();
 	}
 
 	/**
@@ -185,9 +185,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public LinkedList<StatusUpdateWrapper> readStatusUpdates(
-			final long posterId, final long readerId, final int numItems,
-			boolean ownUpdates) {
+	public List<String> readStatusUpdates(final long posterId,
+			final long readerId, final int numItems, boolean ownUpdates) {
 		// find users first
 		Node poster, reader;
 		try {
@@ -203,7 +202,7 @@ public class Graphity extends SocialGraph {
 			return null;
 		}
 
-		final LinkedList<StatusUpdateWrapper> statusUpdates = new LinkedList<StatusUpdateWrapper>();
+		final List<String> statusUpdates = new LinkedList<String>();
 
 		// check if ego network stream is being accessed
 		if (!ownUpdates) {
@@ -227,7 +226,7 @@ public class Graphity extends SocialGraph {
 				crrUser = users.pollFirst();
 
 				// add last recent status update of current user
-				statusUpdates.add(crrUser.getStatusUpdateWrapper());
+				statusUpdates.add(crrUser.getStatusUpdate());
 
 				// re-add current user if more status updates available
 				if (crrUser.hasStatusUpdate()) {
@@ -257,7 +256,7 @@ public class Graphity extends SocialGraph {
 			// access single stream only
 			final GraphityUser posterNode = new GraphityUser(poster);
 			while (posterNode.hasStatusUpdate()) {
-				statusUpdates.add(posterNode.getStatusUpdateWrapper());
+				statusUpdates.add(posterNode.getStatusUpdate());
 			}
 		}
 

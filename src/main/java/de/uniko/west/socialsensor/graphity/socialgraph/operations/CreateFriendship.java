@@ -33,6 +33,7 @@ public class CreateFriendship extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(SocialGraph graph) {
+		// TODO: send error code (may be zero)
 		return graph.createFriendship(this.timestamp, this.userId,
 				this.followedId);
 	}

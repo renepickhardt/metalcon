@@ -1,12 +1,11 @@
 package de.uniko.west.socialsensor.graphity.socialgraph;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
 /**
  * basic social graph algorithm implementation
@@ -49,10 +48,10 @@ public abstract class SocialGraph {
 	 *            user identifier
 	 * @param content
 	 *            status update content object
-	 * @return true - status update has been added successfully<br>
-	 *         false otherwise
+	 * @return status update node identifier if created successfully<br>
+	 *         zero otherwise
 	 */
-	public abstract boolean createStatusUpdate(long timestamp, long userID,
+	public abstract long createStatusUpdate(long timestamp, long userID,
 			StatusUpdate content);
 
 	/**
@@ -81,9 +80,10 @@ public abstract class SocialGraph {
 	 *            number of items to be read
 	 * @param ownUpdates
 	 *            single stream flag
-	 * @return
+	 * @return list containing numItems status update Activities<br>
+	 *         (Activitystrea.ms)
 	 */
-	public abstract LinkedList<StatusUpdateWrapper> readStatusUpdates(
-			long posterId, long readerId, int numItems, boolean ownUpdates);
+	public abstract List<String> readStatusUpdates(long posterId,
+			long readerId, int numItems, boolean ownUpdates);
 
 }

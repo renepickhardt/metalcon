@@ -34,8 +34,17 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		return graph.createStatusUpdate(this.timestamp, this.userId,
-				this.content);
+		final long nodeIdentifier = graph.createStatusUpdate(this.timestamp,
+				this.userId, this.content);
+
+		if (nodeIdentifier != 0) {
+			// TODO: send status update node identifier
+
+			return true;
+		} else {
+			// TODO: send error code
+			return false;
+		}
 	}
 
 }
