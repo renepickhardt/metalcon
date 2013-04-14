@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
+import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.PlainText;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
@@ -73,8 +75,8 @@ public class GraphityTest {
 	@Test
 	public void testCreateFriendship_Regular() {
 		// assert the creation to success if providing valid user identifiers
-		assertTrue(this.gravity.createFriendship(123, AlgorithmTests.USER_ID1,
-				AlgorithmTests.USER_ID2));
+		assertTrue(this.gravity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID1, AlgorithmTests.USER_ID2));
 
 		// check if relationship has been created successfully
 		final Node user1 = AlgorithmTests.DATABASE
@@ -93,8 +95,21 @@ public class GraphityTest {
 
 	@Test
 	public void testCreateStatusUpdate_Regular() {
-		assertTrue(this.gravity.createStatusUpdate(123,
+		// TODO: let createStatusUpdate return node identifier
+		final long timestamp = System.currentTimeMillis();
+		assertTrue(this.gravity.createStatusUpdate(timestamp,
 				AlgorithmTests.USER_ID1, this.statusUpdate));
+
+		// TODO: replace node identifier with method result
+		final Node statusUpdateNode = AlgorithmTests.DATABASE.getNodeById(3);
+		assertEquals((long) statusUpdateNode.getProperty(Properties.Timestamp),
+				timestamp);
+		assertEquals(statusUpdateNode.getProperty(Properties.ContentType),
+				this.statusUpdate.getType());
+		final String activityJSON = (String) statusUpdateNode
+				.getProperty(Properties.Content);
+		System.out.println(activityJSON);
+
 		this.transaction.success();
 	}
 }

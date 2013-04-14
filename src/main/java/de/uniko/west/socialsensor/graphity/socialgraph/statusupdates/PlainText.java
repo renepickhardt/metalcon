@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.statusupdates;
 
+import java.util.Map;
+
 /**
  * plain text status update
  * 
@@ -27,6 +29,13 @@ public class PlainText extends StatusUpdate {
 	public PlainText(final String message) {
 		super(TYPE_IDENTIFIER);
 		this.message = message;
+	}
+
+	@Override
+	protected Map<String, Object> toObjectJSON() {
+		final Map<String, Object> statusUpdate = super.toObjectJSON();
+		statusUpdate.put("message", this.message);
+		return statusUpdate;
 	}
 
 }

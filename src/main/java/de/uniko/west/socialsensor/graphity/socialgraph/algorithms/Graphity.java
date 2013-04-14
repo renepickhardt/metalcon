@@ -14,6 +14,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
+import de.uniko.west.socialsensor.graphity.socialgraph.User;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdateWrapper;
 
@@ -96,7 +97,7 @@ public class Graphity extends SocialGraph {
 
 	@Override
 	public boolean createStatusUpdate(final long timestamp, final long userID,
-			StatusUpdate content) {
+			final StatusUpdate content) {
 		// find user first
 		Node user;
 		try {
@@ -109,11 +110,18 @@ public class Graphity extends SocialGraph {
 		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
 				SocialGraphRelationshipType.UPDATE);
 
-		// create new status update
+		// create new status update node
 		final Node crrUpdate = this.graph.createNode();
+
+		// prepare status update for JSON parsing
+		content.setTimestamp(timestamp);
+		content.setId(crrUpdate.getId());
+		content.setCreator(new User(user));
+
+		// fill status update node
 		crrUpdate.setProperty(Properties.Timestamp, timestamp);
 		crrUpdate.setProperty(Properties.ContentType, content.getType());
-		crrUpdate.setProperty(Properties.Content, content);
+		crrUpdate.setProperty(Properties.Content, content.toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
