@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
@@ -107,11 +107,20 @@ public class GraphityTest {
 		assertFalse(this.gravity.createFriendship(0, -1, -1));
 	}
 
+	/**
+	 * count the number of relationships of an iterable
+	 * 
+	 * @param relationships
+	 *            iterable relationships
+	 * @return number of relationships available
+	 */
 	private static int getNumberOfRelationships(
 			final Iterable<Relationship> relationships) {
+		final Iterator<Relationship> iter = relationships.iterator();
 		int result = 0;
-		for (Relationship relationship : relationships) {
+		while (iter.hasNext()) {
 			result += 1;
+			iter.next();
 		}
 		return result;
 	}
@@ -197,16 +206,6 @@ public class GraphityTest {
 		// assert the creation to fail if providing invalid user identifier
 		assertEquals(this.gravity.createStatusUpdate(
 				System.currentTimeMillis(), -1, this.statusUpdate), 0);
-	}
-
-	private static int getLength(final Node node,
-			final RelationshipType relationshipType) {
-		int length = 0;
-		Node tmp = node;
-		while ((tmp = NeoUtils.getNextSingleNode(tmp, relationshipType)) != null) {
-			length += 1;
-		}
-		return length;
 	}
 
 	@Test
