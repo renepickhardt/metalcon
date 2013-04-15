@@ -297,7 +297,7 @@ public class GraphityTest {
 		// assert success even if trying to gain more status updates than
 		// available
 		List<String> activities = this.gravity.readStatusUpdates(
-				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_B, 15, false);
+				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_B, 15, false);
 		assertNotNull(activities);
 
 		// display complete Activity stream

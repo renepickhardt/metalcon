@@ -223,7 +223,7 @@ public class Graphity extends SocialGraph {
 
 			// handle user queue
 			while ((statusUpdates.size() < numItems) && !users.isEmpty()) {
-				crrUser = users.pollFirst();
+				crrUser = users.pollLast();
 
 				// add last recent status update of current user
 				statusUpdates.add(crrUser.getStatusUpdate());
