@@ -100,11 +100,12 @@ public class GraphityTest {
 	@Test
 	public void testCreateFriendship_NotFoundException() {
 		// assert the creation to fail if providing invalid user identifier(s)
-		assertFalse(this.gravity.createFriendship(0, -1,
-				AlgorithmTests.USER_ID_B));
-		assertFalse(this.gravity.createFriendship(0, AlgorithmTests.USER_ID_A,
-				-1));
-		assertFalse(this.gravity.createFriendship(0, -1, -1));
+		assertFalse(this.gravity.createFriendship(System.currentTimeMillis(),
+				-1, AlgorithmTests.USER_ID_B));
+		assertFalse(this.gravity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, -1));
+		assertFalse(this.gravity.createFriendship(System.currentTimeMillis(),
+				-1, -1));
 	}
 
 	/**
