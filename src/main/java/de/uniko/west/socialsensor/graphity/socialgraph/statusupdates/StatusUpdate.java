@@ -63,6 +63,15 @@ public abstract class StatusUpdate {
 	}
 
 	/**
+	 * get status update publishing time stamp
+	 * 
+	 * @return status update publishing time stamp
+	 */
+	public long getTimestamp() {
+		return this.timestamp;
+	}
+
+	/**
 	 * set status update publishing time stamp for JSON parsing
 	 * 
 	 * @param timestamp

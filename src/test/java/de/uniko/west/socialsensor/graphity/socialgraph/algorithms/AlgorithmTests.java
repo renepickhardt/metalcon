@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.File;
 
 import org.junit.AfterClass;
@@ -36,7 +38,7 @@ public class AlgorithmTests {
 	/**
 	 * test user identifiers
 	 */
-	public static long USER_ID1, USER_ID2;
+	public static long USER_ID_A, USER_ID_B, USER_ID_C, USER_ID_D, USER_ID_E;
 
 	@BeforeClass
 	public static void setUp() {
@@ -49,17 +51,33 @@ public class AlgorithmTests {
 		config.database_path = DATABASE_PATH;
 		DATABASE = NeoUtils.getSocialGraphDatabase(config);
 
-		// fill the database with the test scenario
+		// fill the database with the test users
 		final Transaction transaction = DATABASE.beginTx();
 
 		Node tmp = DATABASE.createNode();
-		USER_ID1 = tmp.getId();
+		USER_ID_A = tmp.getId();
 
 		tmp = DATABASE.createNode();
-		USER_ID2 = tmp.getId();
+		USER_ID_B = tmp.getId();
+
+		tmp = DATABASE.createNode();
+		USER_ID_C = tmp.getId();
+
+		tmp = DATABASE.createNode();
+		USER_ID_D = tmp.getId();
+
+		tmp = DATABASE.createNode();
+		USER_ID_E = tmp.getId();
 
 		transaction.success();
 		transaction.finish();
+
+		// assert the test user nodes to be existing
+		assertFalse(USER_ID_A == 0);
+		assertFalse(USER_ID_B == 0);
+		assertFalse(USER_ID_C == 0);
+		assertFalse(USER_ID_D == 0);
+		assertFalse(USER_ID_E == 0);
 	}
 
 	@AfterClass
