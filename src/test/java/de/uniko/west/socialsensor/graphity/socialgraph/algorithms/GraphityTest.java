@@ -25,7 +25,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
-import de.uniko.west.socialsensor.graphity.socialgraph.operations.ReadStatusUpdates;
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
 
 /**
@@ -159,45 +158,41 @@ public class GraphityTest {
 
 		// E follows none
 
-		// check relationships for A: 1 ego out, 4 out, 2 in
-		assertEquals(getNumberOfRelationships(this.users[0].getRelationships(
-				this.egoTypes[0], Direction.OUTGOING)), 1);
-		assertEquals(getNumberOfRelationships(this.users[0].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)), 4);
-		assertEquals(getNumberOfRelationships(this.users[0].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)), 2);
+		// prepare for relationship count check
+		final Map<Long, int[]> sortedCounts = new HashMap<Long, int[]>();
 
-		// check relationships for B: 1 ego out, 2 out, 1 in
-		assertEquals(getNumberOfRelationships(this.users[1].getRelationships(
-				this.egoTypes[1], Direction.OUTGOING)), 1);
-		assertEquals(getNumberOfRelationships(this.users[1].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)), 2);
-		assertEquals(getNumberOfRelationships(this.users[1].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)), 1);
+		// A: 4 out, 2 in
+		sortedCounts.put(AlgorithmTests.USER_ID_A, new int[] { 4, 2 });
+		// B: 2 out, 1 in
+		sortedCounts.put(AlgorithmTests.USER_ID_B, new int[] { 2, 1 });
+		// C: 2 out, 2 in
+		sortedCounts.put(AlgorithmTests.USER_ID_C, new int[] { 2, 2 });
+		// D: 1 out, 2 in
+		sortedCounts.put(AlgorithmTests.USER_ID_D, new int[] { 1, 2 });
+		// E: 0 out, 2 in
+		sortedCounts.put(AlgorithmTests.USER_ID_E, new int[] { 0, 2 });
 
-		// check relationships for C: 1 ego out, 2 out, 2 in
-		assertEquals(getNumberOfRelationships(this.users[2].getRelationships(
-				this.egoTypes[2], Direction.OUTGOING)), 1);
-		assertEquals(getNumberOfRelationships(this.users[2].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)), 2);
-		assertEquals(getNumberOfRelationships(this.users[2].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)), 2);
+		// check number of relationships for each user
+		int[] relationshipCount;
+		for (int i = 0; i < this.userIds.length; i++) {
+			relationshipCount = sortedCounts.get(this.userIds[i]);
 
-		// check relationships for D: 1 ego out, 1 out, 2 in
-		assertEquals(getNumberOfRelationships(this.users[3].getRelationships(
-				this.egoTypes[3], Direction.OUTGOING)), 1);
-		assertEquals(getNumberOfRelationships(this.users[3].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)), 1);
-		assertEquals(getNumberOfRelationships(this.users[3].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)), 2);
+			// ego type: 1 (or 0 if not following any users)
+			assertEquals(
+					getNumberOfRelationships(this.users[i].getRelationships(
+							this.egoTypes[i], Direction.OUTGOING)),
+					(relationshipCount[0] != 0) ? 1 : 0);
 
-		// check relationships for E: 0 ego out, 0 out, 2 in
-		assertEquals(getNumberOfRelationships(this.users[4].getRelationships(
-				this.egoTypes[4], Direction.OUTGOING)), 0);
-		assertEquals(getNumberOfRelationships(this.users[4].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)), 0);
-		assertEquals(getNumberOfRelationships(this.users[4].getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)), 2);
+			// assume matching relationship counts
+			assertEquals(
+					getNumberOfRelationships(this.users[i].getRelationships(
+							SocialGraphRelationshipType.FOLLOW,
+							Direction.OUTGOING)), relationshipCount[0]);
+			assertEquals(
+					getNumberOfRelationships(this.users[i].getRelationships(
+							SocialGraphRelationshipType.FOLLOW,
+							Direction.INCOMING)), relationshipCount[1]);
+		}
 
 		this.transaction.success();
 	}
@@ -207,6 +202,13 @@ public class GraphityTest {
 		// assert the creation to fail if providing invalid user identifier
 		assertEquals(this.gravity.createStatusUpdate(
 				System.currentTimeMillis(), -1, this.statusUpdate), 0);
+	}
+
+	private static void waitMs(final long ms) {
+		final long targetMs = System.currentTimeMillis() + ms;
+		while (System.currentTimeMillis() < targetMs) {
+			// wait
+		}
 	}
 
 	@Test
@@ -246,24 +248,26 @@ public class GraphityTest {
 					creationItem.getStatusUpdate().getType());
 			assertEquals(statusUpdateNode.getProperty(Properties.Content),
 					creationItem.getStatusUpdate().toJSONString());
+
+			// prevent the time stamps from being equal
+			waitMs(2);
 		}
 
 		// sort creation items by user identifiers
-		final Map<Long, LinkedList<StatusUpdateCreationItem>> userSorted = new HashMap<Long, LinkedList<StatusUpdateCreationItem>>();
+		final Map<Long, LinkedList<StatusUpdateCreationItem>> sortedItems = new HashMap<Long, LinkedList<StatusUpdateCreationItem>>();
 		for (long userId : this.userIds) {
-			userSorted.put(userId, new LinkedList<StatusUpdateCreationItem>());
+			sortedItems.put(userId, new LinkedList<StatusUpdateCreationItem>());
 		}
 		for (StatusUpdateCreationItem creationItem : creates) {
-			userSorted.get(creationItem.getUserId()).add(creationItem);
+			sortedItems.get(creationItem.getUserId()).add(creationItem);
 		}
 
 		// compare status update node structure with the creation set
-		int userIndex = 0;
 		LinkedList<StatusUpdateCreationItem> userItems;
 		StatusUpdateCreationItem currentItem;
-		for (long userId : this.userIds) {
-			userItems = userSorted.get(userId);
-			statusUpdateNode = this.users[userIndex];
+		for (int i = 0; i < this.userIds.length; i++) {
+			userItems = sortedItems.get(this.userIds[i]);
+			statusUpdateNode = this.users[i];
 
 			// loop through existing status update nodes
 			while ((statusUpdateNode = NeoUtils.getNextSingleNode(
@@ -279,8 +283,6 @@ public class GraphityTest {
 
 			// assume that the list is empty now, too
 			assertTrue(userItems.isEmpty());
-
-			userIndex += 1;
 		}
 
 		this.transaction.success();
@@ -293,17 +295,108 @@ public class GraphityTest {
 				15, true));
 	}
 
+	/**
+	 * extract the messages of the status updates
+	 * 
+	 * @param activities
+	 *            list of status updates in Activity JSON format
+	 * @return list containing the status update messages
+	 */
+	private static List<Long> extractStatusUpdateMessages(
+			final List<String> activities) {
+		final List<Long> statusUpdateMessages = new LinkedList<Long>();
+
+		int index;
+		String message;
+		for (String activity : activities) {
+			index = activity.indexOf("message");
+			message = activity.substring(index + 10,
+					activity.indexOf("}", index) - 1);
+			statusUpdateMessages.add(Long.valueOf(message));
+		}
+
+		return statusUpdateMessages;
+	}
+
+	/**
+	 * compare the expected messages with the ones in the activities
+	 * 
+	 * @param messages
+	 *            status update messages expected
+	 * @param activities
+	 *            list of status updates in Activity JSON format
+	 */
+	private static void compareValues(final long[] messages,
+			final List<String> activities) {
+		final List<Long> statusUpdateNodeMessages = extractStatusUpdateMessages(activities);
+		assertEquals(statusUpdateNodeMessages.size(), messages.length);
+
+		int i = 0;
+		for (long message : statusUpdateNodeMessages) {
+			assertEquals(message, messages[i]);
+			i += 1;
+		}
+	}
+
 	@Test
 	public void testReadStatusUpdates_Regular() {
-		// assert success even if trying to gain more status updates than
-		// available
-		List<String> activities = this.gravity.readStatusUpdates(
-				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_B, 15, false);
-		assertNotNull(activities);
+		List<String> activities;
 
-		// display complete Activity stream
-		final String activityStream = ReadStatusUpdates
-				.getActivityStream(activities);
-		System.out.println(activityStream);
+		// assert success if more status updates available than read
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_A,
+				AlgorithmTests.USER_ID_A, 7, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 13, 12, 11, 10, 8, 7, 6 }, activities);
+
+		// assert success if reading from users without status updates
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_A,
+				AlgorithmTests.USER_ID_A, 10, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 13, 12, 11, 10, 8, 7, 6, 5, 4 }, activities);
+
+		// assert success if reading some status updates from one user in a row
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_A,
+				AlgorithmTests.USER_ID_B, 2, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 17, 14 }, activities);
+
+		// assert success if reading from one user directly
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_A,
+				AlgorithmTests.USER_ID_B, 2, true);
+		assertNotNull(activities);
+		compareValues(new long[] { 17, 14 }, activities);
+
+		// assert success, even if reading too many status updates from multiple
+		// nodes in ego network mode
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_C,
+				AlgorithmTests.USER_ID_C, 4, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 17, 14, 9 }, activities);
+
+		// assert success, even if reading too many status updates from one user
+		// directly
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_A,
+				AlgorithmTests.USER_ID_C, 4, true);
+		assertNotNull(activities);
+		compareValues(new long[] { 17, 14, 9 }, activities);
+
+		// assert success if reading from a single node in ego network mode
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_D,
+				AlgorithmTests.USER_ID_D, 2, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 13, 7 }, activities);
+
+		// assert success, even if reading too many status updates from a single
+		// node in ego network mode
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_D,
+				AlgorithmTests.USER_ID_D, 4, false);
+		assertNotNull(activities);
+		compareValues(new long[] { 13, 7, 6 }, activities);
+
+		// assert success, even if reading from an empty ego network
+		activities = this.gravity.readStatusUpdates(AlgorithmTests.USER_ID_E,
+				AlgorithmTests.USER_ID_E, 10, false);
+		assertNotNull(activities);
+		compareValues(new long[] {}, activities);
 	}
 }

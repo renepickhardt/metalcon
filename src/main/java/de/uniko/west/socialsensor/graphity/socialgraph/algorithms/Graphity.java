@@ -255,7 +255,8 @@ public class Graphity extends SocialGraph {
 		} else {
 			// access single stream only
 			final GraphityUser posterNode = new GraphityUser(poster);
-			while (posterNode.hasStatusUpdate()) {
+			while ((statusUpdates.size() < numItems)
+					&& posterNode.hasStatusUpdate()) {
 				statusUpdates.add(posterNode.getStatusUpdate());
 			}
 		}
