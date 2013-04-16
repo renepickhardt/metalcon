@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
@@ -28,12 +25,12 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipTy
 import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.PlainText;
 
 /**
- * social graph algorithm Gravity test
+ * social graph first approach test
  * 
  * @author Sebastian Schlicht
  * 
  */
-public class GraphityTest {
+public class BaselineTest {
 
 	/**
 	 * class testing flag
@@ -56,17 +53,12 @@ public class GraphityTest {
 	private Node[] users;
 
 	/**
-	 * test user ego types
-	 */
-	private DynamicRelationshipType[] egoTypes;
-
-	/**
 	 * test transaction
 	 */
 	private Transaction transaction;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		if (!TESTING) {
 			if (AlgorithmTests.wasUsed()) {
 				// reset database
@@ -85,23 +77,21 @@ public class GraphityTest {
 				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_C,
 				AlgorithmTests.USER_ID_D, AlgorithmTests.USER_ID_E };
 		this.users = new Node[this.userIds.length];
-		this.egoTypes = new DynamicRelationshipType[this.userIds.length];
 		for (int i = 0; i < this.userIds.length; i++) {
 			this.users[i] = AlgorithmTests.DATABASE
 					.getNodeById(this.userIds[i]);
 			assertNotNull(this.users[i]);
-			this.egoTypes[i] = Graphity.getEgoType(this.users[i]);
 		}
 
 		// load the Gravity algorithm
-		this.graphity = new Graphity(AlgorithmTests.DATABASE);
+		this.graphity = new Baseline(AlgorithmTests.DATABASE);
 
 		// initialize test transaction
 		this.transaction = AlgorithmTests.DATABASE.beginTx();
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		// finish the running test transaction
 		this.transaction.finish();
 	}
@@ -115,24 +105,6 @@ public class GraphityTest {
 				AlgorithmTests.USER_ID_A, -1));
 		assertFalse(this.graphity.createFriendship(System.currentTimeMillis(),
 				-1, -1));
-	}
-
-	/**
-	 * count the number of relationships of an iterable
-	 * 
-	 * @param relationships
-	 *            iterable relationships
-	 * @return number of relationships available
-	 */
-	public static int getNumberOfRelationships(
-			final Iterable<Relationship> relationships) {
-		final Iterator<Relationship> iter = relationships.iterator();
-		int result = 0;
-		while (iter.hasNext()) {
-			result += 1;
-			iter.next();
-		}
-		return result;
 	}
 
 	@Test
@@ -187,20 +159,12 @@ public class GraphityTest {
 		for (int i = 0; i < this.userIds.length; i++) {
 			relationshipCount = sortedCounts.get(this.userIds[i]);
 
-			// ego type: 1 (or 0 if not following any users)
-			assertEquals(
-					getNumberOfRelationships(this.users[i].getRelationships(
-							this.egoTypes[i], Direction.OUTGOING)),
-					(relationshipCount[0] != 0) ? 1 : 0);
-
 			// assume matching relationship counts
-			assertEquals(
-					getNumberOfRelationships(this.users[i].getRelationships(
-							SocialGraphRelationshipType.FOLLOW,
+			assertEquals(GraphityTest.getNumberOfRelationships(this.users[i]
+					.getRelationships(SocialGraphRelationshipType.FOLLOW,
 							Direction.OUTGOING)), relationshipCount[0]);
-			assertEquals(
-					getNumberOfRelationships(this.users[i].getRelationships(
-							SocialGraphRelationshipType.FOLLOW,
+			assertEquals(GraphityTest.getNumberOfRelationships(this.users[i]
+					.getRelationships(SocialGraphRelationshipType.FOLLOW,
 							Direction.INCOMING)), relationshipCount[1]);
 		}
 
@@ -213,19 +177,6 @@ public class GraphityTest {
 		assertEquals(this.graphity.createStatusUpdate(System
 				.currentTimeMillis(), -1, new PlainText(
 				"this is not the reason why!")), 0);
-	}
-
-	/**
-	 * wait the number of milliseconds specified
-	 * 
-	 * @param ms
-	 *            delay in milliseconds
-	 */
-	public static void waitMs(final long ms) {
-		final long targetMs = System.currentTimeMillis() + ms;
-		while (System.currentTimeMillis() < targetMs) {
-			// wait
-		}
 	}
 
 	@Test
@@ -267,7 +218,7 @@ public class GraphityTest {
 					creationItem.getStatusUpdate().toJSONString());
 
 			// prevent the time stamps from being equal
-			waitMs(2);
+			GraphityTest.waitMs(2);
 		}
 
 		// sort creation items by user identifiers
@@ -312,49 +263,6 @@ public class GraphityTest {
 				AlgorithmTests.USER_ID_A, 15, true));
 	}
 
-	/**
-	 * extract the messages of the status updates
-	 * 
-	 * @param activities
-	 *            list of status updates in Activity JSON format
-	 * @return list containing the status update messages
-	 */
-	private static List<Long> extractStatusUpdateMessages(
-			final List<String> activities) {
-		final List<Long> statusUpdateMessages = new LinkedList<Long>();
-
-		int index;
-		String message;
-		for (String activity : activities) {
-			index = activity.indexOf("message");
-			message = activity.substring(index + 10,
-					activity.indexOf("}", index) - 1);
-			statusUpdateMessages.add(Long.valueOf(message));
-		}
-
-		return statusUpdateMessages;
-	}
-
-	/**
-	 * compare the expected messages with the ones in the activities
-	 * 
-	 * @param messages
-	 *            status update messages expected
-	 * @param activities
-	 *            list of status updates in Activity JSON format
-	 */
-	public static void compareValues(final long[] messages,
-			final List<String> activities) {
-		final List<Long> statusUpdateNodeMessages = extractStatusUpdateMessages(activities);
-		assertEquals(statusUpdateNodeMessages.size(), messages.length);
-
-		int i = 0;
-		for (long message : statusUpdateNodeMessages) {
-			assertEquals(message, messages[i]);
-			i += 1;
-		}
-	}
-
 	@Test
 	public void testReadStatusUpdates_Regular() {
 		List<String> activities;
@@ -363,57 +271,60 @@ public class GraphityTest {
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_A,
 				AlgorithmTests.USER_ID_A, 7, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 13, 12, 11, 10, 8, 7, 6 }, activities);
+		GraphityTest.compareValues(new long[] { 13, 12, 11, 10, 8, 7, 6 },
+				activities);
 
 		// assert success if reading from users without status updates
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_A,
 				AlgorithmTests.USER_ID_A, 10, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 13, 12, 11, 10, 8, 7, 6, 5, 4 }, activities);
+		GraphityTest.compareValues(
+				new long[] { 13, 12, 11, 10, 8, 7, 6, 5, 4 }, activities);
 
 		// assert success if reading some status updates from one user in a row
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_A,
 				AlgorithmTests.USER_ID_B, 2, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 17, 14 }, activities);
+		GraphityTest.compareValues(new long[] { 17, 14 }, activities);
 
 		// assert success if reading from one user directly
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_A,
 				AlgorithmTests.USER_ID_B, 2, true);
 		assertNotNull(activities);
-		compareValues(new long[] { 17, 14 }, activities);
+		GraphityTest.compareValues(new long[] { 17, 14 }, activities);
 
 		// assert success, even if reading too many status updates from multiple
 		// nodes in ego network mode
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_C,
 				AlgorithmTests.USER_ID_C, 4, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 17, 14, 9 }, activities);
+		GraphityTest.compareValues(new long[] { 17, 14, 9 }, activities);
 
 		// assert success, even if reading too many status updates from one user
 		// directly
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_A,
 				AlgorithmTests.USER_ID_C, 4, true);
 		assertNotNull(activities);
-		compareValues(new long[] { 17, 14, 9 }, activities);
+		GraphityTest.compareValues(new long[] { 17, 14, 9 }, activities);
 
 		// assert success if reading from a single node in ego network mode
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_D,
 				AlgorithmTests.USER_ID_D, 2, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 13, 7 }, activities);
+		GraphityTest.compareValues(new long[] { 13, 7 }, activities);
 
 		// assert success, even if reading too many status updates from a single
 		// node in ego network mode
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_D,
 				AlgorithmTests.USER_ID_D, 4, false);
 		assertNotNull(activities);
-		compareValues(new long[] { 13, 7, 6 }, activities);
+		GraphityTest.compareValues(new long[] { 13, 7, 6 }, activities);
 
 		// assert success, even if reading from an empty ego network
 		activities = this.graphity.readStatusUpdates(AlgorithmTests.USER_ID_E,
 				AlgorithmTests.USER_ID_E, 10, false);
 		assertNotNull(activities);
-		compareValues(new long[] {}, activities);
+		GraphityTest.compareValues(new long[] {}, activities);
 	}
+
 }

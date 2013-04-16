@@ -48,7 +48,7 @@ public class Graphity extends SocialGraph {
 			return false;
 		}
 
-		// create start topology
+		// create star topology
 		following.createRelationshipTo(followed,
 				SocialGraphRelationshipType.FOLLOW);
 
@@ -208,7 +208,7 @@ public class Graphity extends SocialGraph {
 		if (!ownUpdates) {
 			final DynamicRelationshipType egoType = getEgoType(poster);
 			final TreeSet<GraphityUser> users = new TreeSet<GraphityUser>(
-					new GraphityUserComparator());
+					new StatusUpdateUserComparator());
 
 			// load first user
 			Node newUser = NeoUtils.getNextSingleNode(poster, egoType);

@@ -17,7 +17,7 @@ import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 
 @RunWith(Suite.class)
-@SuiteClasses({ GraphityTest.class })
+@SuiteClasses({ BaselineTest.class, GraphityTest.class })
 /**
  * test all social graph CRUD algorithms 
  * @author Sebastian Schlicht
@@ -29,6 +29,11 @@ public class AlgorithmTests {
 	 * test database path
 	 */
 	private static final String DATABASE_PATH = "target/database/testlocation";
+
+	/**
+	 * database used flag
+	 */
+	private static boolean USED = false;
 
 	/**
 	 * test database
@@ -78,12 +83,28 @@ public class AlgorithmTests {
 		assertFalse(USER_ID_C == 0);
 		assertFalse(USER_ID_D == 0);
 		assertFalse(USER_ID_E == 0);
+
+		USED = false;
 	}
 
 	@AfterClass
 	public static void tearDown() {
 		// close the test database
 		DATABASE.shutdown();
+	}
+
+	/**
+	 * check if the database has been used after initialization
+	 * 
+	 * @return database usage flag
+	 */
+	public static boolean wasUsed() {
+		if (USED) {
+			return true;
+		} else {
+			USED = true;
+			return false;
+		}
 	}
 
 }
