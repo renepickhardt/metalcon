@@ -19,7 +19,8 @@ import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 @RunWith(Suite.class)
 @SuiteClasses({ BaselineTest.class, GraphityTest.class })
 /**
- * test all social graph CRUD algorithms 
+ * test all social graph CRUD algorithms
+ * 
  * @author Sebastian Schlicht
  *
  */
