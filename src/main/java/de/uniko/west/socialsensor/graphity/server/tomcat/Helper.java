@@ -1,6 +1,9 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * helper class for Tomcat requests/responses
@@ -36,9 +39,19 @@ public class Helper {
 		return (Long) getAttribute(request, attributeName);
 	}
 
-	public static void sendErrorMessage(final int errorCode,
-			final String message) {
-		// TODO
+	public static String getString(final HttpServletRequest request,
+			final String attributeName) {
+		return (String) getAttribute(request, attributeName);
+	}
+
+	public static void sendErrorMessage(final HttpServletResponse response,
+			final int errorCode, final String message) {
+		try {
+			response.sendError(errorCode, message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -52,12 +52,14 @@ public class Read extends HttpServlet {
 		} catch (final IllegalArgumentException missing) {
 			// send error - field missing
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"numItems\" is missing!<br>please specify how many items should be retrieved.");
 			return;
 		} catch (final ClassCastException invalid) {
 			// send error - field type invalid
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"numItems\" is corrupted!<br>please provide a number greater than zero.");
 			return;
@@ -69,12 +71,14 @@ public class Read extends HttpServlet {
 		} catch (final IllegalArgumentException missing) {
 			// send error - field missing
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"userId\" is missing!<br>please specify the user you want to retrieve status updates from.");
 			return;
 		} catch (final ClassCastException invalid) {
 			// send error - field type invalid
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"userId\" is corrupted!<br>please provide a number greater than zero.");
 			return;
@@ -91,12 +95,14 @@ public class Read extends HttpServlet {
 		} catch (final IllegalArgumentException missing) {
 			// send error - field missing
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"ownUpdates\" is missing!<br>please specify whether you want to retrieve an ego network or a single stream.");
 			return;
 		} catch (final ClassCastException invalid) {
 			// send error - field type invalid
 			Helper.sendErrorMessage(
+					response,
 					400,
 					"the field \"ownUpdates\" is corrupted!<br>please type \"0\" to retrieve an ego network stream or \"1\" for a single stream only.");
 			return;
