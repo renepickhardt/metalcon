@@ -50,11 +50,10 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 
 	private static Configs instance = null;
 
-	public Configs() {
-		String file = "config.txt";
+	public Configs(final String configPath) {
 		try {
 			BufferedInputStream stream = new BufferedInputStream(
-					new FileInputStream(file));
+					new FileInputStream(configPath));
 			this.load(stream);
 			stream.close();
 		} catch (IOException e) {
@@ -112,9 +111,9 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 		}
 	}
 
-	public static Configs get() {
+	public static Configs get(final String configPath) {
 		if (instance == null) {
-			instance = new Configs();
+			instance = new Configs(configPath);
 		}
 		return instance;
 	}

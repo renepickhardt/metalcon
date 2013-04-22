@@ -53,7 +53,7 @@ public class AlgorithmTests {
 		NeoUtils.deleteFile(databaseDir);
 
 		// load the database from the test location
-		final Configs config = new Configs();
+		final Configs config = new Configs("config.txt");
 		config.database_path = DATABASE_PATH;
 		DATABASE = NeoUtils.getSocialGraphDatabase(config);
 

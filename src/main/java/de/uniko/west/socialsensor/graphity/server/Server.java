@@ -3,7 +3,10 @@ package de.uniko.west.socialsensor.graphity.server;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
@@ -18,7 +21,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  * @author sebschlicht
  * 
  */
-public class Server {
+public class Server implements ServletContextListener {
 
 	/**
 	 * server configuration
@@ -47,10 +50,11 @@ public class Server {
 
 	public Server() {
 		// load server configuration
-		this.config = Configs.get();
+		this.config = Configs
+				.get("/usr/local/apache-tomcat-7.0.39/webapps/Graphity-Server-0.0.1-SNAPSHOT/config.txt");
+
 		// load social graph database
 		this.graphDatabase = NeoUtils.getSocialGraphDatabase(this.config);
-		registerShutdownHook(this.graphDatabase);
 
 		// load social graph algorithm
 		switch (this.config.algorithm()) {
@@ -89,19 +93,23 @@ public class Server {
 	}
 
 	/**
-	 * register a shutdown hook for a social graph database
+	 * access command queue to add commands
 	 * 
-	 * @param graphDB
-	 *            social graph database targeted
+	 * @return queued commands being executed by the command worker
 	 */
-	private static void registerShutdownHook(
-			final GraphDatabaseService graphDatabase) {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				graphDatabase.shutdown();
-			}
-		});
+	public Queue<SocialGraphOperation> getCommandQueue() {
+		return this.commands;
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent arg0) {
+		this.graphDatabase.shutdown();
+	}
+
+	@Override
+	public void contextInitialized(ServletContextEvent arg0) {
+		final ServletContext context = arg0.getServletContext();
+		context.setAttribute("server", this);
 	}
 
 }

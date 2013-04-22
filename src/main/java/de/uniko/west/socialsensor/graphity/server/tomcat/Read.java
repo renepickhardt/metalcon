@@ -2,7 +2,9 @@ package de.uniko.west.socialsensor.graphity.server.tomcat;
 
 import java.util.Queue;
 
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +18,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  * @author Sebastian Schlicht
  * 
  */
-@WebServlet("/read")
 public class Read extends HttpServlet {
 
 	/**
@@ -27,17 +28,14 @@ public class Read extends HttpServlet {
 	/**
 	 * command queue to stack commands created
 	 */
-	private final Queue<SocialGraphOperation> commandQueue;
+	private Queue<SocialGraphOperation> commandQueue;
 
-	/**
-	 * create a new Tomcat read operation handler
-	 * 
-	 * @param commandQueue
-	 *            command queue to stack commands created
-	 */
-	public Read(final Queue<SocialGraphOperation> commandQueue) {
-		super();
-		this.commandQueue = commandQueue;
+	@Override
+	public void init(final ServletConfig config) throws ServletException {
+		super.init(config);
+		final ServletContext context = this.getServletContext();
+		this.commandQueue = ((de.uniko.west.socialsensor.graphity.server.Server) context
+				.getAttribute("server")).getCommandQueue();
 	}
 
 	@Override
@@ -114,5 +112,4 @@ public class Read extends HttpServlet {
 				ownUpdates);
 		this.commandQueue.add(readStatusUpdatesCommand);
 	}
-
 }
