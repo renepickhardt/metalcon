@@ -277,6 +277,9 @@ Build the project:
 
 <h2>7. Install Tomcat 7.0.39</h2>
 
+Source:  
+http://linuxdrops.com/install-tomcat-7-with-jdk-7-on-centosrhel-fedora-debian-ubuntu/
+
 To start an own server using Graphity you will need to have a running Tomcat 7 server.  
 Download Tomcat 7 from: http://tomcat.apache.org/download-70.cgi  
 
