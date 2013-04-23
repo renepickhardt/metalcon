@@ -61,13 +61,19 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 			System.out.println("[CMD-READ]: " + activities.size()
 					+ " status updates found.");
 
-			// build Activity stream
-			final String activityStream = getActivityStream(activities);
-
-			System.out.println("[CMD-READ]: stream=" + activityStream);
-
 			// send stream to client
-			this.responder.addLine(activityStream);
+			int i = 0;
+			int lastActivity = activities.size() - 1;
+			this.responder.addLine("{\"items\":[");
+			for (String activity : activities) {
+
+				if (i != lastActivity) {
+					this.responder.addLine(activity + ",");
+				} else {
+					this.responder.addLine(activity);
+				}
+			}
+			this.responder.addLine("]}");
 			this.responder.finish();
 
 			System.out.println("[CMD-READ]: stream has been written.");
