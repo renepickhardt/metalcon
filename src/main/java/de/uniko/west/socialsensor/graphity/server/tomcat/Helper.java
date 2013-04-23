@@ -13,35 +13,30 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Helper {
 
-	private static Object getAttribute(final HttpServletRequest request,
-			final String attributeName) {
-		final Object object = request.getAttribute(attributeName);
-		if (object != null) {
-			return object;
+	private static String getAttribute(final HttpServletRequest request,
+			final String paramName) {
+		final String param = request.getParameter(paramName);
+		if (param != null) {
+			return param;
 		}
 
-		throw new IllegalArgumentException("attribute \"" + attributeName
+		throw new IllegalArgumentException("parameter \"" + paramName
 				+ "\" is missing!");
 	}
 
-	public static boolean getBoolean(final HttpServletRequest request,
-			final String attributeName) {
-		return (Boolean) getAttribute(request, attributeName);
-	}
-
 	public static int getInt(final HttpServletRequest request,
-			final String attributeName) {
-		return (Integer) getAttribute(request, attributeName);
+			final String paramName) {
+		return Integer.valueOf(getAttribute(request, paramName));
 	}
 
 	public static long getLong(final HttpServletRequest request,
-			final String attributeName) {
-		return (Long) getAttribute(request, attributeName);
+			final String paramName) {
+		return Long.valueOf(getAttribute(request, paramName));
 	}
 
 	public static String getString(final HttpServletRequest request,
-			final String attributeName) {
-		return (String) getAttribute(request, attributeName);
+			final String paramName) {
+		return getAttribute(request, paramName);
 	}
 
 	public static void sendErrorMessage(final HttpServletResponse response,

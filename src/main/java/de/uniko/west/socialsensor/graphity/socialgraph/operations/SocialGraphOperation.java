@@ -13,6 +13,11 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 public abstract class SocialGraphOperation {
 
 	/**
+	 * client responder
+	 */
+	protected final ClientResponder responder;
+
+	/**
 	 * time stamp of the operation
 	 */
 	protected final long timestamp;
@@ -25,12 +30,16 @@ public abstract class SocialGraphOperation {
 	/**
 	 * create a new basic social graph operation
 	 * 
+	 * @param responder
+	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the operation
 	 * @param userId
 	 *            executing user's identifier
 	 */
-	public SocialGraphOperation(final long timestamp, final long userId) {
+	public SocialGraphOperation(final ClientResponder responder,
+			final long timestamp, final long userId) {
+		this.responder = responder;
 		this.timestamp = timestamp;
 		this.userId = userId;
 	}

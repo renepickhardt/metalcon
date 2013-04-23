@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
+import java.io.IOException;
 import java.util.Queue;
 
 import javax.servlet.ServletConfig;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ReadStatusUpdates;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
 
@@ -40,7 +42,7 @@ public class Read extends HttpServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request,
-			final HttpServletResponse response) {
+			final HttpServletResponse response) throws IOException {
 		int numItems;
 		try {
 			numItems = Helper.getInt(request, "numItems");
@@ -106,10 +108,14 @@ public class Read extends HttpServlet {
 			return;
 		}
 
-		// TODO: store response item for the server response creation
+		// store response item for the server response creation
+		final ClientResponder responder = new TomcatClientResponder(response);
 		final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
-				System.currentTimeMillis(), userId, userId, numItems,
-				ownUpdates);
+				responder, System.currentTimeMillis(), userId, userId,
+				numItems, ownUpdates);
+
+		System.out.println("[READ]: numItems=" + numItems + " userId=" + userId
+				+ " ownUpdates=" + ownUpdates);
 		this.commandQueue.add(readStatusUpdatesCommand);
 	}
 }

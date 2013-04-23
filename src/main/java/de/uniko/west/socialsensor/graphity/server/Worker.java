@@ -63,7 +63,9 @@ public class Worker implements Runnable {
 
 			// run first command (if existing)
 			if (command != null) {
+				System.out.println("[WORKER]: executing command...");
 				command.run(this.graph);
+				System.out.println("[WORKER]: command has been executed.");
 			}
 		}
 

@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
+import java.io.IOException;
 import java.util.Queue;
 
 import javax.servlet.ServletConfig;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
@@ -41,8 +43,8 @@ public class Create extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(final HttpServletRequest request,
-			final HttpServletResponse response) {
+	protected void doPost(final HttpServletRequest request,
+			final HttpServletResponse response) throws IOException {
 		CreateType type;
 		try {
 			final String identifier = Helper.getString(request, "createType");
@@ -65,6 +67,9 @@ public class Create extends HttpServlet {
 					"the field \"createType\" is corrupted!<br>please type in a valid create type identifier.");
 			return;
 		}
+
+		// store response item for the server response creation
+		final ClientResponder responder = new TomcatClientResponder(response);
 
 		// TODO: use OAuth
 		final long userId = Helper.getLong(request, "user_id");
@@ -89,9 +94,8 @@ public class Create extends HttpServlet {
 				return;
 			}
 
-			// TODO: store response item for the server response creation
 			final CreateFriendship createFriendshipCommand = new CreateFriendship(
-					System.currentTimeMillis(), userId, targetId);
+					responder, System.currentTimeMillis(), userId, targetId);
 			this.commandQueue.add(createFriendshipCommand);
 		} else {
 			// TODO: read and check status update type (may be disallowed),
@@ -99,9 +103,8 @@ public class Create extends HttpServlet {
 			final String message = Helper.getString(request, "message");
 			final StatusUpdate statusUpdate = new PlainText(message);
 
-			// TODO: store response item for the server response creation
 			final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-					System.currentTimeMillis(), userId, statusUpdate);
+					responder, System.currentTimeMillis(), userId, statusUpdate);
 			this.commandQueue.add(createStatusUpdateCommand);
 		}
 	}

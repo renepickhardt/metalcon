@@ -19,6 +19,8 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	/**
 	 * create a new create status update command
 	 * 
+	 * @param responder
+	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the status update
 	 * @param posterId
@@ -26,9 +28,10 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	 * @param content
 	 *            status update content object
 	 */
-	public CreateStatusUpdate(final long timestamp, final long posterId,
+	public CreateStatusUpdate(final ClientResponder responder,
+			final long timestamp, final long posterId,
 			final StatusUpdate content) {
-		super(timestamp, posterId);
+		super(responder, timestamp, posterId);
 		this.content = content;
 	}
 
@@ -38,11 +41,17 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 				this.userId, this.content);
 
 		if (nodeIdentifier != 0) {
-			// TODO: send status update node identifier
+			// send status update node identifier
+			this.responder.addLine(String.valueOf(nodeIdentifier));
+			this.responder.finish();
 
 			return true;
 		} else {
-			// TODO: send error code
+			// TODO: create own exceptions to catch
+			// send error code
+			this.responder.error(500,
+					"thrown exceptions are not specified yet!");
+
 			return false;
 		}
 	}
