@@ -15,6 +15,9 @@ Make sure you have installed and configured:
 + [m2e](#5-install-maven-plugin-for-eclipse-m2e)
 + [EGit](#6-install-git-plugin-for-eclipse-egit)
 
+To run an own server you will also need:
++ [Tomcat 7](#7-install-tomcat-7039)
+
 <h2>Pull Graphity Server</h2>
 
 At first we have to pull the remote repository.  
@@ -242,6 +245,8 @@ Restart Eclipse after the installation.
 
 <h2>6. Install Git Plugin for Eclipse (EGit)</h2>
 
+__If you have installed EGit already, you can proceed with step 7: [Install Tomcat 7.0.39](#7-install-tomcat-7039)__
+
 Open a terminal and install git first.  
 `sudo apt-get install git`
 
@@ -269,3 +274,71 @@ Open a new terminal and switch to the project directory:
 
 Build the project:  
 `mvn package`
+
+<h2>7. Install Tomcat 7.0.39</h2>
+
+Source:  
+http://linuxdrops.com/install-tomcat-7-with-jdk-7-on-centosrhel-fedora-debian-ubuntu/
+
+To start an own server using Graphity you will need to have a running Tomcat 7 server.  
+Download Tomcat 7 from: http://tomcat.apache.org/download-70.cgi  
+
+I do not suggest to use apt-get, while it tried to download OpenJDK 1.6 when I used it.  
+Since we installed the JDK 1.7 before, I want Tomcat to use this JDK.  
+If you switch to the download directory you will recognize the archive: 'apache-tomcat-7.0.39.tar.gz'.  
+
+Unpack it  
+`tar zxvf apache-tomcat-7.0.39.tar.gz`
+
+Move the unpacked archive to an own directory  
+`sudo mv apache-tomcat-7.0.39 /usr/local/`
+
+As long as you do not want to run Tomcat with root privileges, create a new user having the Tomcat directory as its home directory:  
+<pre><code>groupadd tomcat  
+adduser tomcat --home /usr/local/apache-tomcat-7.0.39/ --ingroup tomcat  
+tomcat (when asked for password, you may change that to anything else)</code></pre>
+
+Now we must grant Tomcat the rights to make changes to the directory by setting the new user as the directorie's owner:  
+`chown -R tomcat.tomcat /usr/local/apache-tomcat-7.0.39/`  
+
+To control Tomcat easily we will create a little start/stop script.  
+Create it:  
+`sudo nano /etc/init.d/tomcat`  
+
+Fill the script with:  
+>\#!/bin/bash  
+>\# description: Tomcat control script  
+>
+>case $1 in  
+>start)  
+>/bin/su tomcat $CATALINA_HOME/bin/startup.sh  
+>;;  
+>stop)  
+>/bin/su tomcat $CATALINA_HOME/bin/shutdown.sh  
+>;;  
+>restart)  
+>/bin/su tomcat $CATALINA_HOME/bin/shutdown.sh  
+>/bin/su tomcat $CATALINA_HOME/bin/startup.sh  
+>;;  
+>esac  
+>exit 0
+
+You will recognize the usage of a new environment variable 'CATALINA_HOME'.
+Add it to the ~/.pam_environment file as described in [Set environment variables](#3-set-environment-variables).
+>CATALINA_HOME=/usr/local/apache-tomcat-7.0.39/
+
+Open the sudoers:  
+`sudo visudo`
+
+Append the following line to let the user execute the Tomcat scripts with root privileges without promting for a password:  
+>tomcat ALL=/usr/local/apache-tomcat-7.0.39/bin/shutdown.sh, /usr/local/apache-tomcat-7.0.39/bin/startup.sh</code></pre>
+
+To change the permissions of the script created type in:  
+`sudo chmod 755 /etc/init.d/tomcat`
+
+Remember to relog before using Tomcat, while its scripts depend on this variable.  
+
+You will then be able to start Tomcat with:  
+`/etc/init.d/tomcat start`
+
+Replace 'start' with #stop' to... guess what.
