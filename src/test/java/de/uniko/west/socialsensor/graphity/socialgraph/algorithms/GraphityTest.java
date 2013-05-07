@@ -21,11 +21,11 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraphRelationshipType;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.PlainText;
 
 /**
  * social graph algorithm Gravity test
@@ -210,9 +210,10 @@ public class GraphityTest {
 	@Test
 	public void testCreateStatusUpdate_NotFoundException() {
 		// assert the creation to fail if providing invalid user identifier
-		assertEquals(this.graphity.createStatusUpdate(System
-				.currentTimeMillis(), -1, new PlainText(
-				"this is not the reason why!")), 0);
+		final PlainText statusUpdate = new PlainText();
+		statusUpdate.message = "this is not the reason why!";
+		assertEquals(this.graphity.createStatusUpdate(
+				System.currentTimeMillis(), -1, statusUpdate), 0);
 	}
 
 	/**

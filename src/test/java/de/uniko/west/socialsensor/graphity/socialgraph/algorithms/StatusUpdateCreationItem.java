@@ -1,7 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.PlainText;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
 
 /**
  * status update creation item
@@ -31,7 +31,8 @@ public class StatusUpdateCreationItem {
 	 */
 	public StatusUpdateCreationItem(final long userId, final long timestamp) {
 		this.userId = userId;
-		this.statusUpdate = new PlainText(String.valueOf(timestamp));
+		this.statusUpdate = new PlainText();
+		((PlainText) this.statusUpdate).message = String.valueOf(timestamp);
 	}
 
 	/**

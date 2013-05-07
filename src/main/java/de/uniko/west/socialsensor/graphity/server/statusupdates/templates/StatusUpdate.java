@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.socialgraph.statusupdates;
+package de.uniko.west.socialsensor.graphity.server.statusupdates.templates;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -135,12 +135,13 @@ public abstract class StatusUpdate {
 	 *         (Activitystrea.ms)
 	 */
 	protected Map<String, Object> toObjectJSON() {
-		final Map<String, Object> statusUpdate = new LinkedHashMap<String, Object>();
+		final Map<String, Object> objectJSON = new LinkedHashMap<String, Object>();
 		// TODO: select correct object type - usage of own types allowed?
-		statusUpdate.put("objectType", "article");
-		statusUpdate.put("type", this.type);
-		statusUpdate.put("id", this.id);
-		return statusUpdate;
+		objectJSON.put("objectType", "article");
+		objectJSON.put("type", this.type);
+		objectJSON.put("id", this.id);
+
+		return objectJSON;
 	}
 
 }

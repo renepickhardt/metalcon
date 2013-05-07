@@ -10,12 +10,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.PlainText;
-import de.uniko.west.socialsensor.graphity.socialgraph.statusupdates.StatusUpdate;
 
 /**
  * Tomcat create operation handler
@@ -98,14 +98,20 @@ public class Create extends HttpServlet {
 					responder, System.currentTimeMillis(), userId, targetId);
 			this.commandQueue.add(createFriendshipCommand);
 		} else {
-			// TODO: read and check status update type (may be disallowed),
-			// changes field to load
-			final String message = Helper.getString(request, "message");
-			final StatusUpdate statusUpdate = new PlainText(message);
+			// create a new status update of the type specified
+			try {
+				final StatusUpdate statusUpdate = StatusUpdateManager
+						.instantiateStatusUpdate(
+								Helper.getString(request, "type"),
+								request.getParameterMap());
 
-			final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-					responder, System.currentTimeMillis(), userId, statusUpdate);
-			this.commandQueue.add(createStatusUpdateCommand);
+				final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
+						responder, System.currentTimeMillis(), userId,
+						statusUpdate);
+				this.commandQueue.add(createStatusUpdateCommand);
+			} catch (IllegalArgumentException e) {
+				Helper.sendErrorMessage(response, 400, e.getMessage());
+			}
 		}
 	}
 
