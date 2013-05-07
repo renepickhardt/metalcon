@@ -200,6 +200,9 @@ public class Server implements ServletContextListener {
 			transaction.finish();
 		}
 
+		// load status update types
+		StatusUpdateManager.loadStatusUpdateTemplates(this.graphDatabase);
+
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("server", this);
 	}

@@ -1,7 +1,11 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
 
 /**
  * status update creation item
@@ -31,8 +35,12 @@ public class StatusUpdateCreationItem {
 	 */
 	public StatusUpdateCreationItem(final long userId, final long timestamp) {
 		this.userId = userId;
-		this.statusUpdate = new PlainText();
-		((PlainText) this.statusUpdate).message = String.valueOf(timestamp);
+
+		final Map<String, String[]> values = new HashMap<String, String[]>();
+		values.put("message", new String[] { String.valueOf(timestamp) });
+
+		this.statusUpdate = StatusUpdateManager.instantiateStatusUpdate(
+				PlainText.TYPE_IDENTIFIER, values);
 	}
 
 	/**
