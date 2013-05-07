@@ -5,7 +5,7 @@ import java.util.List;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 
 /**
  * basic social graph algorithm implementation

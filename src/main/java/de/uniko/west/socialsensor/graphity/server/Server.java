@@ -16,7 +16,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -201,7 +201,8 @@ public class Server implements ServletContextListener {
 		}
 
 		// load status update types
-		StatusUpdateManager.loadStatusUpdateTemplates(this.graphDatabase);
+		StatusUpdateManager.loadStatusUpdateTemplates(this.config,
+				this.graphDatabase);
 
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("server", this);

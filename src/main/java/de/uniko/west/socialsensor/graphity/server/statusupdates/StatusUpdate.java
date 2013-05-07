@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.server.statusupdates.templates;
+package de.uniko.west.socialsensor.graphity.server.statusupdates;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;

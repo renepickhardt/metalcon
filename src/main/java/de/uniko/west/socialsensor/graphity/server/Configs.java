@@ -25,6 +25,11 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	public String database_path;
 
 	/**
+	 * path for status update templates (XML files)
+	 */
+	public String templates_path;
+
+	/**
 	 * database read only flag<br>
 	 * TODO: necessary or specified somewhere else?
 	 */
@@ -145,5 +150,14 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	 */
 	public String algorithm() {
 		return this.algorithm;
+	}
+
+	/**
+	 * access path for status update templates
+	 * 
+	 * @return path for status update templates
+	 */
+	public String templatesPath() {
+		return this.templates_path;
 	}
 }

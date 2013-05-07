@@ -2,6 +2,8 @@ package de.uniko.west.socialsensor.graphity.server.statusupdates.templates;
 
 import java.util.Map;
 
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
+
 /**
  * plain text status update
  * 

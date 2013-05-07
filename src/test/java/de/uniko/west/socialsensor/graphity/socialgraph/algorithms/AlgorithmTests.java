@@ -14,7 +14,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 
 @RunWith(Suite.class)
@@ -87,7 +87,7 @@ public class AlgorithmTests {
 		assertFalse(USER_ID_E == 0);
 
 		// DEBUG
-		StatusUpdateManager.loadStatusUpdateTemplates(DATABASE);
+		StatusUpdateManager.loadStatusUpdateTemplates(config, DATABASE);
 
 		USED = false;
 	}

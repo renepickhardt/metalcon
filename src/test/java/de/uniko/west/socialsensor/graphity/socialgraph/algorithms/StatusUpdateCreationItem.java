@@ -3,9 +3,9 @@ package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdateManager;
 
 /**
  * status update creation item

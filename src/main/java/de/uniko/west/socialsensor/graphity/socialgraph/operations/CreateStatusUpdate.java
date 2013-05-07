@@ -1,6 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
