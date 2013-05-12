@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,22 +63,37 @@ public class StatusUpdateManager {
 			final StatusUpdateTemplateNode templateNode)
 			throws FileNotFoundException {
 		final File file = new File(templateNode.getIdentifier() + ".java");
-		final String[] optionsAndSources = { "-source", "1.7", "-target",
-				"1.7", templateNode.getIdentifier() + ".java" };
+		final String[] optionsAndSources = { "-proc:none", "-source", "1.7",
+				"-target", "1.7", templateNode.getIdentifier() + ".java" };
 
 		// write java file
-		final FileOutputStream outputStream = new FileOutputStream(file);
-		PrintWriter writer = new PrintWriter(outputStream);
+		final FileOutputStream javaOutput = new FileOutputStream(file);
+		PrintWriter writer = new PrintWriter(javaOutput);
 		writer.write(templateNode.getCode());
 		writer.flush();
 		writer.close();
 
-		final FileInputStream reader = new FileInputStream(file);
+		final FileInputStream javaInput = new FileInputStream(file);
 
 		// compile to class file
-		writer = new PrintWriter(templateNode.getIdentifier() + ".cass");
+		String statusUpdatePath = "target/classes/"
+				+ StatusUpdate.class.getName();
+		statusUpdatePath = statusUpdatePath.substring(0,
+				statusUpdatePath.lastIndexOf("."))
+				+ ".templates.";
+		statusUpdatePath = statusUpdatePath.replace(".", "/")
+				+ templateNode.getIdentifier() + ".class";
+		final File classFile = new File(statusUpdatePath);
+		classFile.delete();
+		final FileOutputStream classOutput = new FileOutputStream(
+				statusUpdatePath);
+
+		writer = new PrintWriter(statusUpdatePath);
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		compiler.run(reader, outputStream, System.err, optionsAndSources);
+		compiler.run(javaInput, classOutput, System.err, optionsAndSources);
+
+		// delete .java file
+		file.delete();
 	}
 
 	/**
@@ -96,6 +113,12 @@ public class StatusUpdateManager {
 	public static void loadStatusUpdateTemplates(final Configs config,
 			final AbstractGraphDatabase graphDatabase)
 			throws ParserConfigurationException, SAXException, IOException {
+		// create class loader
+		final URLClassLoader loader = new URLClassLoader(
+				new URL[] { new File(
+						"/home/sebschlicht/git/Graphity-Server/target/classes/de/uniko/west/socialsensor/graphity/server/statusupdates/")
+						.toURI().toURL() });
+
 		// load / create status update template manager node
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
 
@@ -122,20 +145,14 @@ public class StatusUpdateManager {
 
 			generateJavaFiles(templateNode);
 			try {
-				STATUS_UPDATE_TYPES.put(
-						templateNode.getIdentifier(),
-						ClassLoader.getSystemClassLoader().loadClass(
-								templateNode.getIdentifier()));
+				STATUS_UPDATE_TYPES.put(templateNode.getIdentifier(),
+						loader.loadClass(templateNode.getIdentifier()));
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-
-			// TODO: create java class file from code for enabled types
-			// TODO: add enabled classes to hash map
 		}
 
-		// DEBUG
-		// STATUS_UPDATE_TYPES.put(PlainText.TYPE_IDENTIFIER, PlainText.class);
+		loader.close();
 	}
 
 	/**

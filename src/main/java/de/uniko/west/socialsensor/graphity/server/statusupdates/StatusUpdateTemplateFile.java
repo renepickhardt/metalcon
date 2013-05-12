@@ -141,8 +141,7 @@ public class StatusUpdateTemplateFile implements TemplateComparison {
 
 		// package information
 		builder.append(StatusUpdateTemplateFile.class.getPackage().toString());
-		builder.append(".templates.");
-		builder.append(this.name);
+		builder.append(".templates");
 		builder.append(";");
 		builder.append(newLine);
 		builder.append(newLine);
