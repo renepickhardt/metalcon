@@ -72,9 +72,9 @@ public class Baseline extends SocialGraph {
 		content.setCreator(new User(user));
 
 		// fill status update node
-		crrUpdate.setProperty(Properties.Timestamp, timestamp);
-		crrUpdate.setProperty(Properties.ContentType, content.getType());
-		crrUpdate.setProperty(Properties.Content, content.toJSONString());
+		crrUpdate.setProperty(Properties.TIMESTAMP, timestamp);
+		crrUpdate.setProperty(Properties.CONTENT_TYPE, content.getType());
+		crrUpdate.setProperty(Properties.CONTENT, content.toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -86,7 +86,7 @@ public class Baseline extends SocialGraph {
 
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
-		user.setProperty(Properties.LastUpdate, timestamp);
+		user.setProperty(Properties.LAST_UPDATE, timestamp);
 
 		return crrUpdate.getId();
 	}

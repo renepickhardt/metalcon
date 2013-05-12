@@ -1,5 +1,6 @@
 #social graph settings
 database_path = target/database/location
+templates_path = target/templates
 read_only = false
 algorithm = graphity
 

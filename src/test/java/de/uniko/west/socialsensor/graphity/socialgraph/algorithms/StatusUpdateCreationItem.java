@@ -5,7 +5,6 @@ import java.util.Map;
 
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
 
 /**
  * status update creation item
@@ -40,7 +39,7 @@ public class StatusUpdateCreationItem {
 		values.put("message", new String[] { String.valueOf(timestamp) });
 
 		this.statusUpdate = StatusUpdateManager.instantiateStatusUpdate(
-				PlainText.TYPE_IDENTIFIER, values);
+				"PlainText", values);
 	}
 
 	/**

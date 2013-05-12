@@ -10,12 +10,12 @@ import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
  * @author Sebastian Schlicht
  * 
  */
-public class PlainText extends StatusUpdate {
+public class PlainText_Cmpl extends StatusUpdate {
 
 	/**
 	 * status update type identifier
 	 */
-	public static final String TYPE_IDENTIFIER = PlainText.class.getName();
+	public static final String TYPE_IDENTIFIER = PlainText_Cmpl.class.getName();
 
 	/**
 	 * user message
@@ -25,7 +25,7 @@ public class PlainText extends StatusUpdate {
 	/**
 	 * create a new plain text status update
 	 */
-	public PlainText() {
+	public PlainText_Cmpl() {
 		super(TYPE_IDENTIFIER);
 	}
 

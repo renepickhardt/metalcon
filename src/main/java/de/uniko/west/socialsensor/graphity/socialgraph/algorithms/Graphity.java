@@ -119,9 +119,9 @@ public class Graphity extends SocialGraph {
 		content.setCreator(new User(user));
 
 		// fill status update node
-		crrUpdate.setProperty(Properties.Timestamp, timestamp);
-		crrUpdate.setProperty(Properties.ContentType, content.getType());
-		crrUpdate.setProperty(Properties.Content, content.toJSONString());
+		crrUpdate.setProperty(Properties.TIMESTAMP, timestamp);
+		crrUpdate.setProperty(Properties.CONTENT_TYPE, content.getType());
+		crrUpdate.setProperty(Properties.CONTENT, content.toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -133,7 +133,7 @@ public class Graphity extends SocialGraph {
 
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
-		user.setProperty(Properties.LastUpdate, timestamp);
+		user.setProperty(Properties.LAST_UPDATE, timestamp);
 
 		// update ego network for this user
 		this.UpdateEgoNetwork(user);
@@ -283,8 +283,8 @@ public class Graphity extends SocialGraph {
 	 * @return last recent status update's time stamp
 	 */
 	private static long getLastUpdate(final Node user) {
-		if (user.hasProperty(Properties.LastUpdate)) {
-			return (long) user.getProperty(Properties.LastUpdate);
+		if (user.hasProperty(Properties.LAST_UPDATE)) {
+			return (long) user.getProperty(Properties.LAST_UPDATE);
 		}
 		return 0;
 	}

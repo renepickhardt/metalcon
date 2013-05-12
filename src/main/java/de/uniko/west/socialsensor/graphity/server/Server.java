@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.server;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -10,11 +11,13 @@ import java.util.TreeMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.xml.sax.SAXException;
 
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
@@ -201,8 +204,13 @@ public class Server implements ServletContextListener {
 		}
 
 		// load status update types
-		StatusUpdateManager.loadStatusUpdateTemplates(this.config,
-				this.graphDatabase);
+		try {
+			StatusUpdateManager.loadStatusUpdateTemplates(this.config,
+					this.graphDatabase);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			System.err.println("failed to load status update templates!");
+			e.printStackTrace();
+		}
 
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("server", this);

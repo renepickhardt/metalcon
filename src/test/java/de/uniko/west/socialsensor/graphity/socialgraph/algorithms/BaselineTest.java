@@ -18,7 +18,8 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -174,8 +175,10 @@ public class BaselineTest {
 	@Test
 	public void testCreateStatusUpdate_NotFoundException() {
 		// assert the creation to fail if providing invalid user identifier
-		final PlainText statusUpdate = new PlainText();
-		statusUpdate.message = "this is not the reason why!";
+		final Map<String, String[]> values = new HashMap<String, String[]>();
+		values.put("message", new String[] { "this is not the reason why!" });
+		final StatusUpdate statusUpdate = StatusUpdateManager
+				.instantiateStatusUpdate("PlainText", values);
 		assertEquals(this.graphity.createStatusUpdate(
 				System.currentTimeMillis(), -1, statusUpdate), 0);
 	}
@@ -211,11 +214,11 @@ public class BaselineTest {
 			statusUpdateNode = AlgorithmTests.DATABASE.getNodeById(nodeId);
 			assertNotNull(statusUpdateNode);
 
-			assertEquals(statusUpdateNode.getProperty(Properties.Timestamp),
+			assertEquals(statusUpdateNode.getProperty(Properties.TIMESTAMP),
 					timestamp);
-			assertEquals(statusUpdateNode.getProperty(Properties.ContentType),
+			assertEquals(statusUpdateNode.getProperty(Properties.CONTENT_TYPE),
 					creationItem.getStatusUpdate().getType());
-			assertEquals(statusUpdateNode.getProperty(Properties.Content),
+			assertEquals(statusUpdateNode.getProperty(Properties.CONTENT),
 					creationItem.getStatusUpdate().toJSONString());
 
 			// prevent the time stamps from being equal
@@ -246,7 +249,7 @@ public class BaselineTest {
 				assertNotNull(currentItem);
 
 				assertEquals(
-						statusUpdateNode.getProperty(Properties.Timestamp),
+						statusUpdateNode.getProperty(Properties.TIMESTAMP),
 						currentItem.getStatusUpdate().getTimestamp());
 			}
 

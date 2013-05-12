@@ -2,15 +2,24 @@ package de.uniko.west.socialsensor.graphity.server.statusupdates;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.xml.sax.SAXException;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
-import de.uniko.west.socialsensor.graphity.server.statusupdates.templates.PlainText;
 
 /**
  * status update manager to load
@@ -48,6 +57,28 @@ public class StatusUpdateManager {
 		});
 	}
 
+	private static void generateJavaFiles(
+			final StatusUpdateTemplateNode templateNode)
+			throws FileNotFoundException {
+		final File file = new File(templateNode.getIdentifier() + ".java");
+		final String[] optionsAndSources = { "-source", "1.7", "-target",
+				"1.7", templateNode.getIdentifier() + ".java" };
+
+		// write java file
+		final FileOutputStream outputStream = new FileOutputStream(file);
+		PrintWriter writer = new PrintWriter(outputStream);
+		writer.write(templateNode.getCode());
+		writer.flush();
+		writer.close();
+
+		final FileInputStream reader = new FileInputStream(file);
+
+		// compile to class file
+		writer = new PrintWriter(templateNode.getIdentifier() + ".cass");
+		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		compiler.run(reader, outputStream, System.err, optionsAndSources);
+	}
+
 	/**
 	 * load the status update allowed
 	 * 
@@ -55,9 +86,16 @@ public class StatusUpdateManager {
 	 *            server configuration
 	 * @param graphDatabase
 	 *            graph database to store status update version control
+	 * @throws IOException
+	 *             - IO error
+	 * @throws SAXException
+	 *             - parse error
+	 * @throws ParserConfigurationException
+	 *             - DocumentBuilder cannot match the current configuration
 	 */
 	public static void loadStatusUpdateTemplates(final Configs config,
-			final AbstractGraphDatabase graphDatabase) {
+			final AbstractGraphDatabase graphDatabase)
+			throws ParserConfigurationException, SAXException, IOException {
 		// load / create status update template manager node
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
 
@@ -68,7 +106,7 @@ public class StatusUpdateManager {
 		for (File xmlFile : xmlFiles) {
 			templateFile = new StatusUpdateTemplateFile(xmlFile);
 			templateNode = NODE.getStatusUpdateTemplateNode(templateFile
-					.getName());
+					.getIdentifier());
 
 			if (templateNode != null) {
 				if (!templateFile.getVersion()
@@ -77,17 +115,27 @@ public class StatusUpdateManager {
 					// next file if ignoring the XML file
 				}
 			} else {
+				// create the new template
 				templateNode = NODE
 						.createStatusUpdateTemplateNode(templateFile);
 			}
 
-			// TODO: create java code from XML file, store code in node
+			generateJavaFiles(templateNode);
+			try {
+				STATUS_UPDATE_TYPES.put(
+						templateNode.getIdentifier(),
+						ClassLoader.getSystemClassLoader().loadClass(
+								templateNode.getIdentifier()));
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+
 			// TODO: create java class file from code for enabled types
 			// TODO: add enabled classes to hash map
 		}
 
 		// DEBUG
-		STATUS_UPDATE_TYPES.put(PlainText.TYPE_IDENTIFIER, PlainText.class);
+		// STATUS_UPDATE_TYPES.put(PlainText.TYPE_IDENTIFIER, PlainText.class);
 	}
 
 	/**

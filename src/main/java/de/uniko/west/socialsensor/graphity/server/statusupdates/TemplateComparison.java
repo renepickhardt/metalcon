@@ -13,7 +13,7 @@ public interface TemplateComparison {
 	 * 
 	 * @return status update template identifier
 	 */
-	String getName();
+	String getIdentifier();
 
 	/**
 	 * get the template version

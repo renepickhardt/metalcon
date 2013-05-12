@@ -1,8 +1,12 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -12,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.xml.sax.SAXException;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
@@ -86,8 +91,14 @@ public class AlgorithmTests {
 		assertFalse(USER_ID_D == 0);
 		assertFalse(USER_ID_E == 0);
 
-		// DEBUG
-		StatusUpdateManager.loadStatusUpdateTemplates(config, DATABASE);
+		// load status update templates
+		try {
+			StatusUpdateManager.loadStatusUpdateTemplates(config, DATABASE);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			System.err.println("failed to load status update templates!");
+			e.printStackTrace();
+			fail();
+		}
 
 		USED = false;
 	}
