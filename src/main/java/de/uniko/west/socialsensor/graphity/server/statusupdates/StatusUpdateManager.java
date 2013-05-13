@@ -139,8 +139,7 @@ public class StatusUpdateManager {
 			if (templateNode != null) {
 				if (!templateFile.getVersion()
 						.equals(templateNode.getVersion())) {
-					// TODO: ask which template shall be used, continue with
-					// next file if ignoring the XML file
+					// TODO: ask which template shall be used
 				}
 			}
 
@@ -158,8 +157,6 @@ public class StatusUpdateManager {
 								+ templateNode.getIdentifier()));
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 
@@ -176,7 +173,7 @@ public class StatusUpdateManager {
 	 * @return status update instance of type specified
 	 */
 	public static StatusUpdate instantiateStatusUpdate(
-			final String typeIdentifier, final Map<String, String[]> values) {
+			final String typeIdentifier, final Map<String, String> values) {
 		Class<?> statusUpdateClass = STATUS_UPDATE_TYPES.get(typeIdentifier);
 
 		// check if status update type is existing and allowed
@@ -187,17 +184,12 @@ public class StatusUpdateManager {
 						.newInstance();
 
 				// set status update fields
-				String[] object;
+				String object;
 				for (Field field : statusUpdateClass.getFields()) {
 					if (!Modifier.isFinal(field.getModifiers())) {
 						object = values.get(field.getName());
 						if (object != null) {
-							if (object.length == 1) {
-								field.set(statusUpdate, object[0]);
-							} else {
-								throw new IllegalArgumentException("field \""
-										+ field.getName() + "\" is corrupted!");
-							}
+							field.set(statusUpdate, object);
 						} else {
 							throw new IllegalArgumentException("field \""
 									+ field.getName() + "\" is missing!");

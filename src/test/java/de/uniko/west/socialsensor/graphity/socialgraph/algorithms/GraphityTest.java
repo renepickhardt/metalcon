@@ -211,8 +211,8 @@ public class GraphityTest {
 	@Test
 	public void testCreateStatusUpdate_NotFoundException() {
 		// assert the creation to fail if providing invalid user identifier
-		final Map<String, String[]> values = new HashMap<String, String[]>();
-		values.put("message", new String[] { "this is not the reason why!" });
+		final Map<String, String> values = new HashMap<String, String>();
+		values.put("message", "this is not the reason why!");
 		final StatusUpdate statusUpdate = StatusUpdateManager
 				.instantiateStatusUpdate("PlainText", values);
 		assertEquals(this.graphity.createStatusUpdate(

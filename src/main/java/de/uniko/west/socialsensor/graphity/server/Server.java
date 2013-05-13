@@ -112,6 +112,15 @@ public class Server implements ServletContextListener {
 		return this.commands;
 	}
 
+	/**
+	 * access server configuration
+	 * 
+	 * @return server configuration
+	 */
+	public Configs getConfig() {
+		return this.config;
+	}
+
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		this.graphDatabase.shutdown();
@@ -185,11 +194,11 @@ public class Server implements ServletContextListener {
 
 			long timestamp;
 			int message;
-			final Map<String, String[]> values = new HashMap<String, String[]>();
+			final Map<String, String> values = new HashMap<String, String>();
 			while (!statusUpdates.isEmpty()) {
 				timestamp = System.currentTimeMillis();
 				message = statusUpdates.firstKey();
-				values.put("message", new String[] { String.valueOf(message) });
+				values.put("message", String.valueOf(message));
 
 				this.graph.createStatusUpdate(timestamp, statusUpdates
 						.remove(message), StatusUpdateManager

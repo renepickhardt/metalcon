@@ -30,6 +30,11 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	public String templates_path;
 
 	/**
+	 * path including picture files
+	 */
+	public String picture_path;
+
+	/**
 	 * database read only flag<br>
 	 * TODO: necessary or specified somewhere else?
 	 */

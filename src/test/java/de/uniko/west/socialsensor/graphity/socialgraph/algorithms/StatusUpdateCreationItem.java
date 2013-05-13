@@ -35,8 +35,8 @@ public class StatusUpdateCreationItem {
 	public StatusUpdateCreationItem(final long userId, final long timestamp) {
 		this.userId = userId;
 
-		final Map<String, String[]> values = new HashMap<String, String[]>();
-		values.put("message", new String[] { String.valueOf(timestamp) });
+		final Map<String, String> values = new HashMap<String, String>();
+		values.put("message", String.valueOf(timestamp));
 
 		this.statusUpdate = StatusUpdateManager.instantiateStatusUpdate(
 				"PlainText", values);

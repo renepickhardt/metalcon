@@ -83,6 +83,8 @@ public class StatusUpdateTemplateManagerNode {
 				.getIdentifier());
 		final Node previousTemplate = NeoUtils.getNextSingleNode(
 				this.managerNode, templateRelationshipType);
+
+		final Transaction transaction = this.graphDatabase.beginTx();
 		if (previousTemplate != null) {
 			// remove relationship
 			this.managerNode.getSingleRelationship(templateRelationshipType,
@@ -90,7 +92,6 @@ public class StatusUpdateTemplateManagerNode {
 		}
 
 		// create and fill status update template node
-		final Transaction transaction = this.graphDatabase.beginTx();
 		Node templateNode = null;
 		try {
 			templateNode = this.graphDatabase.createNode();
@@ -104,15 +105,16 @@ public class StatusUpdateTemplateManagerNode {
 					.createRelationshipTo(templateNode,
 							getStatusUpdateTemplateNodeRT(templateFile
 									.getIdentifier()));
+
+			// append previous version line
+			if (previousTemplate != null) {
+				templateNode.createRelationshipTo(previousTemplate,
+						templateRelationshipType);
+			}
+
 			transaction.success();
 		} finally {
 			transaction.finish();
-		}
-
-		// append previous version line
-		if (previousTemplate != null) {
-			templateNode.createRelationshipTo(previousTemplate,
-					templateRelationshipType);
 		}
 
 		// load status update template node
