@@ -42,6 +42,11 @@ public class StatusUpdateManager {
 	private static Map<String, Class<?>> STATUS_UPDATE_TYPES = new HashMap<String, Class<?>>();
 
 	/**
+	 * compiler working directory
+	 */
+	private static String WORKING_DIR;
+
+	/**
 	 * load all XML files listed in the directory specified
 	 * 
 	 * @param directory
@@ -62,38 +67,33 @@ public class StatusUpdateManager {
 	private static void generateJavaFiles(
 			final StatusUpdateTemplateNode templateNode)
 			throws FileNotFoundException {
-		final File file = new File(templateNode.getIdentifier() + ".java");
+		final String javaPath = WORKING_DIR + templateNode.getIdentifier()
+				+ ".java";
+		final File javaFile = new File(javaPath);
 		final String[] optionsAndSources = { "-proc:none", "-source", "1.7",
-				"-target", "1.7", templateNode.getIdentifier() + ".java" };
+				"-target", "1.7", javaPath };
 
 		// write java file
-		final FileOutputStream javaOutput = new FileOutputStream(file);
-		PrintWriter writer = new PrintWriter(javaOutput);
+		final FileOutputStream javaOutput = new FileOutputStream(javaFile);
+		final PrintWriter writer = new PrintWriter(javaOutput);
 		writer.write(templateNode.getCode());
 		writer.flush();
 		writer.close();
 
-		final FileInputStream javaInput = new FileInputStream(file);
+		// TODO: delete
+		final FileInputStream javaInput = new FileInputStream(javaFile);
 
-		// compile to class file
-		String statusUpdatePath = "target/classes/"
-				+ StatusUpdate.class.getName();
-		statusUpdatePath = statusUpdatePath.substring(0,
-				statusUpdatePath.lastIndexOf("."))
-				+ ".templates.";
-		statusUpdatePath = statusUpdatePath.replace(".", "/")
-				+ templateNode.getIdentifier() + ".class";
-		final File classFile = new File(statusUpdatePath);
+		// delete previous class file
+		final File classFile = new File(WORKING_DIR
+				+ templateNode.getIdentifier() + ".class");
 		classFile.delete();
-		final FileOutputStream classOutput = new FileOutputStream(
-				statusUpdatePath);
 
-		writer = new PrintWriter(statusUpdatePath);
+		// compile java file to class file
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		compiler.run(javaInput, classOutput, System.err, optionsAndSources);
+		compiler.run(javaInput, System.out, System.err, optionsAndSources);
 
-		// delete .java file
-		file.delete();
+		// delete java file
+		javaFile.delete();
 	}
 
 	/**
@@ -113,16 +113,19 @@ public class StatusUpdateManager {
 	public static void loadStatusUpdateTemplates(final Configs config,
 			final AbstractGraphDatabase graphDatabase)
 			throws ParserConfigurationException, SAXException, IOException {
+		// set working directory
+		final String targetPackage = StatusUpdate.class.getPackage().getName()
+				+ ".templates.";
+		WORKING_DIR = "target/classes/" + targetPackage.replace(".", "/");
+
 		// create class loader
-		final URLClassLoader loader = new URLClassLoader(
-				new URL[] { new File(
-						"/home/sebschlicht/git/Graphity-Server/target/classes/de/uniko/west/socialsensor/graphity/server/statusupdates/")
-						.toURI().toURL() });
+		final URLClassLoader loader = new URLClassLoader(new URL[] { new File(
+				WORKING_DIR).toURI().toURL() });
 
 		// load / create status update template manager node
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
 
-		// load XML files
+		// crawl XML files
 		StatusUpdateTemplateFile templateFile;
 		StatusUpdateTemplateNode templateNode;
 		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
@@ -131,23 +134,30 @@ public class StatusUpdateManager {
 			templateNode = NODE.getStatusUpdateTemplateNode(templateFile
 					.getIdentifier());
 
+			// check for previous template versions
 			if (templateNode != null) {
 				if (!templateFile.getVersion()
 						.equals(templateNode.getVersion())) {
 					// TODO: ask which template shall be used, continue with
 					// next file if ignoring the XML file
 				}
-			} else {
-				// create the new template
-				templateNode = NODE
-						.createStatusUpdateTemplateNode(templateFile);
 			}
 
+			// create the new template (referring to previous versions)
+			templateNode = NODE.createStatusUpdateTemplateNode(templateFile);
+
+			// generate class file
 			generateJavaFiles(templateNode);
+
+			// register the new template
 			try {
-				STATUS_UPDATE_TYPES.put(templateNode.getIdentifier(),
-						loader.loadClass(templateNode.getIdentifier()));
+				STATUS_UPDATE_TYPES.put(
+						templateNode.getIdentifier(),
+						loader.loadClass(targetPackage
+								+ templateNode.getIdentifier()));
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
