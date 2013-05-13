@@ -2,9 +2,7 @@ package de.uniko.west.socialsensor.graphity.server.statusupdates;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
@@ -42,7 +40,7 @@ public class StatusUpdateManager {
 	private static Map<String, Class<?>> STATUS_UPDATE_TYPES = new HashMap<String, Class<?>>();
 
 	/**
-	 * compiler working directory
+	 * working directory for template generation
 	 */
 	private static String WORKING_DIR;
 
@@ -64,6 +62,13 @@ public class StatusUpdateManager {
 		});
 	}
 
+	/**
+	 * generate a java class file for the template specified
+	 * 
+	 * @param templateNode
+	 *            template node representing the template
+	 * @throws FileNotFoundException
+	 */
 	private static void generateJavaFiles(
 			final StatusUpdateTemplateNode templateNode)
 			throws FileNotFoundException {
@@ -74,14 +79,10 @@ public class StatusUpdateManager {
 				"-target", "1.7", javaPath };
 
 		// write java file
-		final FileOutputStream javaOutput = new FileOutputStream(javaFile);
-		final PrintWriter writer = new PrintWriter(javaOutput);
+		final PrintWriter writer = new PrintWriter(javaFile);
 		writer.write(templateNode.getCode());
 		writer.flush();
 		writer.close();
-
-		// TODO: delete
-		final FileInputStream javaInput = new FileInputStream(javaFile);
 
 		// delete previous class file
 		final File classFile = new File(WORKING_DIR
@@ -90,7 +91,7 @@ public class StatusUpdateManager {
 
 		// compile java file to class file
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		compiler.run(javaInput, System.out, System.err, optionsAndSources);
+		compiler.run(System.in, System.out, System.err, optionsAndSources);
 
 		// delete java file
 		javaFile.delete();
