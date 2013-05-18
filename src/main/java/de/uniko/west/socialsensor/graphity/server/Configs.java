@@ -30,6 +30,11 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	public String templates_path;
 
 	/**
+	 * path to class directory to work in
+	 */
+	public String working_path;
+
+	/**
 	 * path including picture files
 	 */
 	public String picture_path;
@@ -164,5 +169,14 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	 */
 	public String templatesPath() {
 		return this.templates_path;
+	}
+
+	/**
+	 * access path to working directory
+	 * 
+	 * @return path to class directory to work in
+	 */
+	public String workingPath() {
+		return this.working_path;
 	}
 }

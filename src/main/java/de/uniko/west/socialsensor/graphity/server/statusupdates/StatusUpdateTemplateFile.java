@@ -90,7 +90,6 @@ public class StatusUpdateTemplateFile implements TemplateComparison {
 					"xml file malformed! root element must contain attribute \"version\"!");
 		}
 
-		// TODO: handle files also
 		final NodeList fields = root.getChildNodes();
 		Node node;
 		Element element;
@@ -100,22 +99,32 @@ public class StatusUpdateTemplateFile implements TemplateComparison {
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				element = (Element) node;
 
-				fieldName = element.getAttribute("name");
-				if (fieldName.equals("")) {
-					throw new IllegalArgumentException(
-							"xml file malformed! param element must contain attribute \"name\"!");
-				}
+				if (element.getNodeName().equals("param")) {
+					fieldName = element.getAttribute("name");
+					if (fieldName.equals("")) {
+						throw new IllegalArgumentException(
+								"xml file malformed! param element must contain attribute \"name\"!");
+					}
 
-				fieldType = element.getAttribute("type");
-				if (fieldType.equals("")
-						|| !(fieldType.equals("String") || fieldType
-								.equals("Integer"))) {
-					throw new IllegalArgumentException(
-							"xml file malformed! param element must contain attribute \"type\"!\n"
-									+ "valid types: String, Integer");
-				}
+					fieldType = element.getAttribute("type");
+					if (fieldType.equals("")
+							|| !(fieldType.equals("String") || fieldType
+									.equals("Integer"))) {
+						throw new IllegalArgumentException(
+								"xml file malformed! param element must contain attribute \"type\"!\n"
+										+ "valid types: String, Integer");
+					}
 
-				this.fields.put(fieldName, fieldType);
+					this.fields.put(fieldName, fieldType);
+				} else if (element.getNodeName().equals("file")) {
+					fieldName = element.getAttribute("name");
+					if (fieldName.equals("")) {
+						throw new IllegalArgumentException(
+								"xml file malformed! file element must contain attribute \"name\"!");
+					}
+
+					this.fields.put(fieldName, "String");
+				}
 			}
 		}
 	}

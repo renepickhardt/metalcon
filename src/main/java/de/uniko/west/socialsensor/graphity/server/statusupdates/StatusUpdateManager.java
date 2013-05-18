@@ -117,7 +117,8 @@ public class StatusUpdateManager {
 		// set working directory
 		final String targetPackage = StatusUpdate.class.getPackage().getName()
 				+ ".templates.";
-		WORKING_DIR = "target/classes/" + targetPackage.replace(".", "/");
+		WORKING_DIR = config.workingPath() + targetPackage.replace(".", "/");
+		System.out.println("WORKING_DIR:" + WORKING_DIR);
 
 		// create class loader
 		final URLClassLoader loader = new URLClassLoader(new URL[] { new File(
@@ -130,6 +131,7 @@ public class StatusUpdateManager {
 		StatusUpdateTemplateFile templateFile;
 		StatusUpdateTemplateNode templateNode;
 		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
+		System.out.println("TEMPLATES:" + xmlFiles.length);
 		for (File xmlFile : xmlFiles) {
 			templateFile = new StatusUpdateTemplateFile(xmlFile);
 			templateNode = NODE.getStatusUpdateTemplateNode(templateFile
@@ -209,8 +211,8 @@ public class StatusUpdateManager {
 						"failed to load the status update type specified!");
 			}
 		} else {
-			throw new IllegalArgumentException(
-					"status update type not existing or allowed!");
+			throw new IllegalArgumentException("status update type \""
+					+ typeIdentifier + "\" not existing or allowed!");
 		}
 	}
 
