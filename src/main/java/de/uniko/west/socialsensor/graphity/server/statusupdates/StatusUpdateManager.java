@@ -70,12 +70,13 @@ public class StatusUpdateManager {
 	 * @throws FileNotFoundException
 	 */
 	private static void generateJavaFiles(
-			final StatusUpdateTemplateNode templateNode)
+			final StatusUpdateTemplateNode templateNode, final Configs config)
 			throws FileNotFoundException {
 		final String javaPath = WORKING_DIR + templateNode.getIdentifier()
 				+ ".java";
 		final File javaFile = new File(javaPath);
-		final String[] optionsAndSources = { "-proc:none", "-source", "1.7",
+		final String[] optionsAndSources = { "-classpath",
+				config.workingPath(), "-proc:none", "-source", "1.7",
 				"-target", "1.7", javaPath };
 
 		// write java file
@@ -122,7 +123,7 @@ public class StatusUpdateManager {
 
 		// create class loader
 		final URLClassLoader loader = new URLClassLoader(new URL[] { new File(
-				WORKING_DIR).toURI().toURL() });
+				config.workingPath()).toURI().toURL() });
 
 		// load / create status update template manager node
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
@@ -149,7 +150,7 @@ public class StatusUpdateManager {
 			templateNode = NODE.createStatusUpdateTemplateNode(templateFile);
 
 			// generate class file
-			generateJavaFiles(templateNode);
+			generateJavaFiles(templateNode, config);
 
 			// register the new template
 			try {
