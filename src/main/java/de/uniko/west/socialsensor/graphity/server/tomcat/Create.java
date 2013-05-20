@@ -3,6 +3,7 @@ package de.uniko.west.socialsensor.graphity.server.tomcat;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -198,6 +199,7 @@ public class Create extends HttpServlet {
 					}
 
 					// parse files
+					List<File> fileList = new LinkedList<File>();
 					String fileDir;
 					File file;
 					FileItem fileItem;
@@ -209,6 +211,7 @@ public class Create extends HttpServlet {
 
 						file = new File(fileDir + userId + "-" + timestamp
 								+ "-" + fileItem.getName());
+						fileList.add(file);
 
 						// create the file
 						try {
@@ -231,6 +234,11 @@ public class Create extends HttpServlet {
 								responder, timestamp, userId, statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
 					} catch (IllegalArgumentException e) {
+						// remove the files
+						for (File tempFile : fileList) {
+							tempFile.delete();
+						}
+
 						Helper.sendErrorMessage(response, 400, e.getMessage());
 					}
 				}
