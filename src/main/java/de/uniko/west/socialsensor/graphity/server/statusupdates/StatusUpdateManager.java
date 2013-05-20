@@ -122,8 +122,9 @@ public class StatusUpdateManager {
 		System.out.println("WORKING_DIR:" + WORKING_DIR);
 
 		// create class loader
+		final ClassLoader classLoader = StatusUpdate.class.getClassLoader();
 		final URLClassLoader loader = new URLClassLoader(new URL[] { new File(
-				config.workingPath()).toURI().toURL() });
+				config.workingPath()).toURI().toURL() }, classLoader);
 
 		// load / create status update template manager node
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
