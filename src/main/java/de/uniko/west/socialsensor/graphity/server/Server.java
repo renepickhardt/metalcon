@@ -23,6 +23,7 @@ import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateMana
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
+import de.uniko.west.socialsensor.graphity.socialgraph.algorithms.Baseline;
 import de.uniko.west.socialsensor.graphity.socialgraph.algorithms.Graphity;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
 
@@ -72,6 +73,10 @@ public class Server implements ServletContextListener {
 
 		case Algorithm.Graphity:
 			this.graph = new Graphity(this.graphDatabase);
+			break;
+
+		case Algorithm.Baseline:
+			this.graph = new Baseline(this.graphDatabase);
 			break;
 
 		default:

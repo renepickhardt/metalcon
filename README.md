@@ -325,13 +325,13 @@ Fill the script with:
 
 You will recognize the usage of a new environment variable 'CATALINA_HOME'.
 Add it to the ~/.pam_environment file as described in [Set environment variables](#3-set-environment-variables).
->CATALINA_HOME=/usr/local/apache-tomcat-7.0.39/
+>CATALINA_HOME DEFAULT=/usr/local/apache-tomcat-7.0.39
 
 Open the sudoers:  
 `sudo visudo`
 
 Append the following line to let the user execute the Tomcat scripts with root privileges without promting for a password:  
->tomcat ALL=/usr/local/apache-tomcat-7.0.39/bin/shutdown.sh, /usr/local/apache-tomcat-7.0.39/bin/startup.sh</code></pre>
+>tomcat ALL=/usr/local/apache-tomcat-7.0.39/bin/shutdown.sh, /usr/local/apache-tomcat-7.0.39/bin/startup.sh
 
 To change the permissions of the script created type in:  
 `sudo chmod 755 /etc/init.d/tomcat`
@@ -341,4 +341,32 @@ Remember to relog before using Tomcat, while its scripts depend on this variable
 You will then be able to start Tomcat with:  
 `/etc/init.d/tomcat start`
 
-Replace 'start' with #stop' to... guess what.
+Replace 'start' with 'stop' to... guess what.  
+Now you have a running but empty Tomcat server. To deploy the Graphity server as a web application you need the WAR file.  
+To deploy the file you need to prepare the server for the application execution.  
+You have to create a configuration file for the server. At the moment you will have to type in its location manually in the constructor of the 'Server' class. (package: de.uniko.west.socialsensor.server).
+
+This configuration file has to contain:
++ database_path: target directory for the graph database
++ templates_path: directory with XML templates for status updates (TODO: guide will follow!)
++ working_path: target directory for class files
++ picture_path: directory to store pictures (example for the usage of own config file parameters)
++ read_only: database read-only flag (boolean)
++ algorithm: social network algorithm (graphity | baseline)
++ use_memory_mapped_buffers (Neo4j setting)
++ cache_type (Neo4j setting)
+
+Syntax:
+>property = value
+
+When you created the configuration file and specified its path in the constructor you can create the WAR file by executing  
+`mvn war:war`
+
+in the project directory. Its default location is '<project>/target/<name>.war'.  
+You can delopy the web application using the 'Manager App'.
+If it is a local Tomcat server open
+>localhost:8080
+
+and click 'Manager App'.
+In the section 'WAR file to deploy' click 'Deploy' next and select the WAR file created before.
+The Graphity server should now be running.

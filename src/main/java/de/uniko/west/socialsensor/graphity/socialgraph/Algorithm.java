@@ -13,4 +13,9 @@ public class Algorithm {
 	 */
 	public static final String Graphity = "graphity";
 
+	/**
+	 * social graph algorithm 'Graphity' by René Pickhardt (write optimized)
+	 */
+	public static final String Baseline = "baseline";
+
 }

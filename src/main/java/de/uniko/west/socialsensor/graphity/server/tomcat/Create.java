@@ -199,7 +199,7 @@ public class Create extends HttpServlet {
 					}
 
 					// parse files
-					List<File> fileList = new LinkedList<File>();
+					final List<File> fileList = new LinkedList<File>();
 					String fileDir;
 					File file;
 					FileItem fileItem;
