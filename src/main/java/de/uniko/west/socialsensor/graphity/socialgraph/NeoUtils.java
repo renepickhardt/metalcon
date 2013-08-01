@@ -133,4 +133,53 @@ public class NeoUtils {
 		return (rel == null) ? (null) : (rel.getEndNode());
 	}
 
+	/**
+	 * Search for a relationship between two nodes
+	 * 
+	 * @param source
+	 *            source node to loop through relationships
+	 * @param target
+	 *            target node of the relationship
+	 * @param relationshipType
+	 *            relationship type of the relation being searched
+	 * @param direction
+	 *            direction of the relationship being searched
+	 * @return relationship instance matching the passed arguments if existing<br>
+	 *         <b>null</b> - otherwise
+	 */
+	public static Relationship getRelationshipBetween(final Node source,
+			final Node target, final RelationshipType relationshipType,
+			final Direction direction) {
+		for (Relationship relationship : source.getRelationships(
+				relationshipType, direction)) {
+			if (relationship.getEndNode().equals(target)) {
+				return relationship;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * search for a status update of a user
+	 * 
+	 * @param user
+	 *            identifier of the user owning the status update
+	 * @param statusUpdateId
+	 *            identifier of the status update
+	 * @return status update node if ownership has been proved<br>
+	 *         <b>null</b> - otherwise
+	 */
+	public static Node getStatusUpdate(final Node user,
+			final long statusUpdateId) {
+		Node statusUpdate = user;
+		do {
+			statusUpdate = NeoUtils.getNextSingleNode(statusUpdate,
+					SocialGraphRelationshipType.UPDATE);
+		} while ((statusUpdate != null)
+				&& (statusUpdate.getId() != statusUpdateId));
+
+		return statusUpdate;
+	}
+
 }

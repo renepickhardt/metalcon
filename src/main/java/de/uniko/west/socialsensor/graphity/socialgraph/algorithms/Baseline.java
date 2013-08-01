@@ -154,4 +154,70 @@ public class Baseline extends SocialGraph {
 		return statusUpdates;
 	}
 
+	@Override
+	public boolean removeFriendship(long followingId, long followedId) {
+		// find users first
+		Node following, followed;
+		try {
+			following = this.graph.getNodeById(followingId);
+			followed = this.graph.getNodeById(followedId);
+		} catch (final NotFoundException e) {
+			return false;
+		}
+
+		// delete the followship if existing
+		final Relationship followship = NeoUtils.getRelationshipBetween(
+				following, followed, SocialGraphRelationshipType.FOLLOW,
+				Direction.OUTGOING);
+		if (followship != null) {
+			followship.delete();
+			return true;
+		}
+
+		// there is no such followship existing
+		return false;
+	}
+
+	@Override
+	public boolean removeStatusUpdate(long userId, long statusUpdateId) {
+		// find user first
+		Node user;
+		try {
+			user = this.graph.getNodeById(userId);
+		} catch (final NotFoundException e) {
+			return false;
+		}
+
+		final Node statusUpdate = NeoUtils
+				.getStatusUpdate(user, statusUpdateId);
+
+		// remove the status update if the ownership has been proved
+		if (statusUpdate != null) {
+			// remove reference from previous status update
+			final Node previousUpdate = NeoUtils.getPrevSingleNode(
+					statusUpdate, SocialGraphRelationshipType.UPDATE);
+			previousUpdate.getSingleRelationship(
+					SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+					.delete();
+
+			// update references to the next status update (if existing)
+			final Node nextUpdate = NeoUtils.getNextSingleNode(statusUpdate,
+					SocialGraphRelationshipType.UPDATE);
+			if (nextUpdate != null) {
+				statusUpdate.getSingleRelationship(
+						SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+						.delete();
+				previousUpdate.createRelationshipTo(nextUpdate,
+						SocialGraphRelationshipType.UPDATE);
+			}
+
+			// delete the status update node
+			statusUpdate.delete();
+
+			return true;
+		}
+
+		// the status update is not owned by the user passed
+		return false;
+	}
 }

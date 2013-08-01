@@ -136,7 +136,7 @@ public class Graphity extends SocialGraph {
 		user.setProperty(Properties.LAST_UPDATE, timestamp);
 
 		// update ego network for this user
-		this.UpdateEgoNetwork(user);
+		this.updateEgoNetwork(user);
 
 		return crrUpdate.getId();
 	}
@@ -147,7 +147,7 @@ public class Graphity extends SocialGraph {
 	 * @param user
 	 *            user where changes have occurred
 	 */
-	private void UpdateEgoNetwork(final Node user) {
+	private void updateEgoNetwork(final Node user) {
 		Node follower, lastPoster;
 		DynamicRelationshipType egoType;
 		Node prevUser, nextUser;
@@ -262,6 +262,101 @@ public class Graphity extends SocialGraph {
 		}
 
 		return statusUpdates;
+	}
+
+	/**
+	 * remove a followed user from the ego network of the user following
+	 * 
+	 * @param following
+	 *            user following the user that will be removed
+	 * @param followed
+	 *            user that will be removed from the ego network
+	 */
+	private void removeFromEgoNetwork(final Node following, final Node followed) {
+		final DynamicRelationshipType egoType = getEgoType(following);
+		final Node prev = NeoUtils.getPrevSingleNode(followed, egoType);
+		final Node next = NeoUtils.getNextSingleNode(followed, egoType);
+
+		// update references
+		prev.getSingleRelationship(egoType, Direction.OUTGOING).delete();
+		if (next != null) {
+			next.getSingleRelationship(egoType, Direction.INCOMING).delete();
+			prev.createRelationshipTo(next, egoType);
+		}
+	}
+
+	@Override
+	public boolean removeFriendship(final long followingId,
+			final long followedId) {
+		// find users first
+		Node following, followed;
+		try {
+			following = this.graph.getNodeById(followingId);
+			followed = this.graph.getNodeById(followedId);
+		} catch (final NotFoundException e) {
+			return false;
+		}
+
+		// delete the followship if existing
+		final Relationship followship = NeoUtils.getRelationshipBetween(
+				following, followed, SocialGraphRelationshipType.FOLLOW,
+				Direction.OUTGOING);
+		if (followship != null) {
+			followship.delete();
+
+			// remove followship from ego network of the user following
+			this.removeFromEgoNetwork(following, followed);
+
+			return true;
+		}
+
+		// there is no such followship existing
+		return false;
+	}
+
+	@Override
+	public boolean removeStatusUpdate(long userId, long statusUpdateId) {
+		// find user first
+		Node user;
+		try {
+			user = this.graph.getNodeById(userId);
+		} catch (final NotFoundException e) {
+			return false;
+		}
+
+		final Node statusUpdate = NeoUtils
+				.getStatusUpdate(user, statusUpdateId);
+
+		// remove the status update if the ownership has been proved
+		if (statusUpdate != null) {
+			// remove reference from previous status update
+			final Node previousUpdate = NeoUtils.getPrevSingleNode(
+					statusUpdate, SocialGraphRelationshipType.UPDATE);
+			previousUpdate.getSingleRelationship(
+					SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+					.delete();
+
+			// update references to the next status update (if existing)
+			final Node nextUpdate = NeoUtils.getNextSingleNode(statusUpdate,
+					SocialGraphRelationshipType.UPDATE);
+			if (nextUpdate != null) {
+				statusUpdate.getSingleRelationship(
+						SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+						.delete();
+				previousUpdate.createRelationshipTo(nextUpdate,
+						SocialGraphRelationshipType.UPDATE);
+			}
+
+			// delete the status update node
+			statusUpdate.delete();
+
+			// TODO: update ego network
+
+			return true;
+		}
+
+		// the status update is not owned by the user passed
+		return false;
 	}
 
 	/**

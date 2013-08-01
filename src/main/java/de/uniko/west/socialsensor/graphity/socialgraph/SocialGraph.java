@@ -49,7 +49,7 @@ public abstract class SocialGraph {
 	 * @param content
 	 *            status update content object
 	 * @return status update node identifier if created successfully<br>
-	 *         zero otherwise
+	 *         zero - otherwise
 	 */
 	public abstract long createStatusUpdate(long timestamp, long userID,
 			StatusUpdate content);
@@ -64,7 +64,7 @@ public abstract class SocialGraph {
 	 * @param followedId
 	 *            identifier of the user being followed
 	 * @return true - friendship has been added successfully<br>
-	 *         false otherwise
+	 *         false - otherwise
 	 */
 	public abstract boolean createFriendship(long timestamp, long followingId,
 			long followedId);
@@ -85,5 +85,29 @@ public abstract class SocialGraph {
 	 */
 	public abstract List<String> readStatusUpdates(long posterId,
 			long readerId, int numItems, boolean ownUpdates);
+
+	/**
+	 * remove a friendship from one user to another
+	 * 
+	 * @param followingId
+	 *            identifier of the user following, requesting the deletion
+	 * @param followedId
+	 *            identifier of the user followed
+	 * @return true - if the friendship has been removed successfully<br>
+	 *         false - otherwise
+	 */
+	public abstract boolean removeFriendship(long followingId, long followedId);
+
+	/**
+	 * remove a status update from a user
+	 * 
+	 * @param userId
+	 *            identifier of the user owning the status update
+	 * @param statusUpdateId
+	 *            identifier of the status update
+	 * @return true - if the status update has been removed successfully<br>
+	 *         false - otherwise
+	 */
+	public abstract boolean removeStatusUpdate(long userId, long statusUpdateId);
 
 }
