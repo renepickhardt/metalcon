@@ -16,7 +16,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -57,11 +56,6 @@ public class GraphityTest {
 	private Node[] users;
 
 	/**
-	 * test user ego types
-	 */
-	private DynamicRelationshipType[] egoTypes;
-
-	/**
 	 * test transaction
 	 */
 	private Transaction transaction;
@@ -86,12 +80,10 @@ public class GraphityTest {
 				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_C,
 				AlgorithmTests.USER_ID_D, AlgorithmTests.USER_ID_E };
 		this.users = new Node[this.userIds.length];
-		this.egoTypes = new DynamicRelationshipType[this.userIds.length];
 		for (int i = 0; i < this.userIds.length; i++) {
 			this.users[i] = AlgorithmTests.DATABASE
 					.getNodeById(this.userIds[i]);
 			assertNotNull(this.users[i]);
-			this.egoTypes[i] = Graphity.getEgoType(this.users[i]);
 		}
 
 		// load the Gravity algorithm
@@ -191,7 +183,8 @@ public class GraphityTest {
 			// ego type: 1 (or 0 if not following any users)
 			assertEquals(
 					getNumberOfRelationships(this.users[i].getRelationships(
-							this.egoTypes[i], Direction.OUTGOING)),
+							SocialGraphRelationshipType.GRAPHITY,
+							Direction.OUTGOING)),
 					(relationshipCount[0] != 0) ? 1 : 0);
 
 			// assume matching relationship counts
@@ -201,7 +194,7 @@ public class GraphityTest {
 							Direction.OUTGOING)), relationshipCount[0]);
 			assertEquals(
 					getNumberOfRelationships(this.users[i].getRelationships(
-							SocialGraphRelationshipType.FOLLOW,
+							SocialGraphRelationshipType.REPLICA,
 							Direction.INCOMING)), relationshipCount[1]);
 		}
 

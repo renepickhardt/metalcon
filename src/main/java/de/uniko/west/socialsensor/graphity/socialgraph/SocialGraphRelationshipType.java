@@ -18,6 +18,16 @@ public enum SocialGraphRelationshipType implements RelationshipType {
 	/**
 	 * user's followers
 	 */
-	FOLLOW;
+	FOLLOW,
+
+	/**
+	 * graphity ego network links
+	 */
+	GRAPHITY,
+
+	/**
+	 * replica layer links
+	 */
+	REPLICA;
 
 }

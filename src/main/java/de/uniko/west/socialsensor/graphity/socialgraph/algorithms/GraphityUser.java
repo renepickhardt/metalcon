@@ -11,28 +11,30 @@ import org.neo4j.graphdb.Node;
 public class GraphityUser extends StatusUpdateUser {
 
 	/**
-	 * user node represented
+	 * replica node of the user represented
 	 */
-	private final Node userNode;
+	private final Node userReplicaNode;
 
 	/**
 	 * create a new user for the Graphity reading process
 	 * 
 	 * @param user
-	 *            user node represented
+	 *            node of the user represented
+	 * @param userReplica
+	 *            replica node of the user represented
 	 */
-	public GraphityUser(final Node user) {
+	public GraphityUser(final Node user, final Node userReplica) {
 		super(user);
-		this.userNode = user;
+		this.userReplicaNode = userReplica;
 	}
 
 	/**
-	 * access the user being represented
+	 * access the replica node of the user represented
 	 * 
-	 * @return user the node is representing
+	 * @return replica node of the user represented
 	 */
-	public Node getUser() {
-		return this.userNode;
+	public Node getUserReplica() {
+		return this.userReplicaNode;
 	}
 
 }

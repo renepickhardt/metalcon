@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
@@ -48,31 +47,34 @@ public class Graphity extends SocialGraph {
 			return false;
 		}
 
-		// create star topology
-		following.createRelationshipTo(followed,
+		// create replica
+		final Node newReplica = this.graph.createNode();
+		following.createRelationshipTo(newReplica,
 				SocialGraphRelationshipType.FOLLOW);
-
-		// load user's Graphity ego type
-		final DynamicRelationshipType egoType = getEgoType(following);
+		newReplica.createRelationshipTo(followed,
+				SocialGraphRelationshipType.REPLICA);
 
 		// check if followed user is the first in following's ego network
-		if (NeoUtils.getNextSingleNode(following, egoType) == null) {
-			following.createRelationshipTo(followed, egoType);
+		if (NeoUtils.getNextSingleNode(following,
+				SocialGraphRelationshipType.GRAPHITY) == null) {
+			following.createRelationshipTo(newReplica,
+					SocialGraphRelationshipType.GRAPHITY);
 		} else {
-			// search for insertion index within following's ego network
-			final long followedTimestamp = getLastUpdate(followed);
+			// search for insertion index within following replica layer
+			final long followedTimestamp = getLastUpdateByReplica(newReplica);
 			long crrTimestamp;
-			Node prev = following;
-			Node next = null;
+			Node prevReplica = following;
+			Node nextReplica = null;
 			while (true) {
 				// get next user
-				next = NeoUtils.getNextSingleNode(prev, egoType);
-				if (next != null) {
-					crrTimestamp = getLastUpdate(next);
+				nextReplica = NeoUtils.getNextSingleNode(prevReplica,
+						SocialGraphRelationshipType.GRAPHITY);
+				if (nextReplica != null) {
+					crrTimestamp = getLastUpdateByReplica(nextReplica);
 
 					// step on if current user has newer status updates
 					if (crrTimestamp > followedTimestamp) {
-						prev = next;
+						prevReplica = nextReplica;
 						continue;
 					}
 				}
@@ -81,14 +83,17 @@ public class Graphity extends SocialGraph {
 				break;
 			}
 
-			// insert followed user into following's ego network
-			if (next != null) {
-				prev.getSingleRelationship(egoType, Direction.OUTGOING)
-						.delete();
+			// insert followed user's replica into following's ego network
+			if (nextReplica != null) {
+				prevReplica.getSingleRelationship(
+						SocialGraphRelationshipType.GRAPHITY,
+						Direction.OUTGOING).delete();
 			}
-			prev.createRelationshipTo(followed, egoType);
-			if (next != null) {
-				followed.createRelationshipTo(next, egoType);
+			prevReplica.createRelationshipTo(newReplica,
+					SocialGraphRelationshipType.GRAPHITY);
+			if (nextReplica != null) {
+				newReplica.createRelationshipTo(nextReplica,
+						SocialGraphRelationshipType.GRAPHITY);
 			}
 		}
 
@@ -148,38 +153,47 @@ public class Graphity extends SocialGraph {
 	 *            user where changes have occurred
 	 */
 	private void updateEgoNetwork(final Node user) {
-		Node follower, lastPoster;
-		DynamicRelationshipType egoType;
-		Node prevUser, nextUser;
+		Node followedReplica, followingUser, lastPosterReplica;
+		Node prevReplica, nextReplica;
 
 		// loop through users following
 		for (Relationship relationship : user.getRelationships(
-				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)) {
-			// load each user and its Graphity ego type
-			follower = relationship.getStartNode();
-			egoType = getEgoType(follower);
+				SocialGraphRelationshipType.REPLICA, Direction.INCOMING)) {
+			// load each replica and the user corresponding
+			followedReplica = relationship.getStartNode();
+			followingUser = NeoUtils.getPrevSingleNode(followedReplica,
+					SocialGraphRelationshipType.FOLLOW);
 
 			// bridge user node
-			prevUser = NeoUtils.getPrevSingleNode(user, egoType);
-			if (!prevUser.equals(follower)) {
-				user.getSingleRelationship(egoType, Direction.INCOMING)
-						.delete();
+			prevReplica = NeoUtils.getPrevSingleNode(followedReplica,
+					SocialGraphRelationshipType.GRAPHITY);
+			if (!prevReplica.equals(followingUser)) {
+				followedReplica.getSingleRelationship(
+						SocialGraphRelationshipType.GRAPHITY,
+						Direction.INCOMING).delete();
 
-				nextUser = NeoUtils.getNextSingleNode(user, egoType);
-				if (nextUser != null) {
-					user.getSingleRelationship(egoType, Direction.OUTGOING)
-							.delete();
-					prevUser.createRelationshipTo(nextUser, egoType);
+				nextReplica = NeoUtils.getNextSingleNode(followedReplica,
+						SocialGraphRelationshipType.GRAPHITY);
+				if (nextReplica != null) {
+					followedReplica.getSingleRelationship(
+							SocialGraphRelationshipType.GRAPHITY,
+							Direction.OUTGOING).delete();
+					prevReplica.createRelationshipTo(nextReplica,
+							SocialGraphRelationshipType.GRAPHITY);
 				}
 			}
 
-			// insert user node at its new position
-			lastPoster = NeoUtils.getNextSingleNode(follower, egoType);
-			if (!lastPoster.equals(user)) {
-				follower.getSingleRelationship(egoType, Direction.OUTGOING)
-						.delete();
-				follower.createRelationshipTo(user, egoType);
-				user.createRelationshipTo(lastPoster, egoType);
+			// insert user's replica at its new position
+			lastPosterReplica = NeoUtils.getNextSingleNode(followingUser,
+					SocialGraphRelationshipType.GRAPHITY);
+			if (!lastPosterReplica.equals(followedReplica)) {
+				followingUser.getSingleRelationship(
+						SocialGraphRelationshipType.GRAPHITY,
+						Direction.OUTGOING).delete();
+				followingUser.createRelationshipTo(followedReplica,
+						SocialGraphRelationshipType.GRAPHITY);
+				followedReplica.createRelationshipTo(lastPosterReplica,
+						SocialGraphRelationshipType.GRAPHITY);
 			}
 		}
 	}
@@ -206,15 +220,18 @@ public class Graphity extends SocialGraph {
 
 		// check if ego network stream is being accessed
 		if (!ownUpdates) {
-			final DynamicRelationshipType egoType = getEgoType(poster);
 			final TreeSet<GraphityUser> users = new TreeSet<GraphityUser>(
 					new StatusUpdateUserComparator());
 
-			// load first user
-			Node newUser = NeoUtils.getNextSingleNode(poster, egoType);
+			// load first user by the replica
+			Node replicaAdded = NeoUtils.getNextSingleNode(poster,
+					SocialGraphRelationshipType.GRAPHITY);
+			Node userAdded;
 			GraphityUser crrUser, lastUser = null;
-			if (newUser != null) {
-				crrUser = new GraphityUser(newUser);
+			if (replicaAdded != null) {
+				userAdded = NeoUtils.getNextSingleNode(replicaAdded,
+						SocialGraphRelationshipType.REPLICA);
+				crrUser = new GraphityUser(userAdded, replicaAdded);
 				if (crrUser.hasStatusUpdate()) {
 					lastUser = crrUser;
 					users.add(crrUser);
@@ -235,10 +252,13 @@ public class Graphity extends SocialGraph {
 
 				// load additional user if necessary
 				if (crrUser == lastUser) {
-					newUser = NeoUtils.getNextSingleNode(lastUser.getUser(),
-							egoType);
-					if (newUser != null) {
-						lastUser = new GraphityUser(newUser);
+					replicaAdded = NeoUtils.getNextSingleNode(
+							lastUser.getUserReplica(),
+							SocialGraphRelationshipType.GRAPHITY);
+					if (replicaAdded != null) {
+						userAdded = NeoUtils.getNextSingleNode(replicaAdded,
+								SocialGraphRelationshipType.REPLICA);
+						lastUser = new GraphityUser(userAdded, replicaAdded);
 
 						// add new user if updates available only
 						if (lastUser.hasStatusUpdate()) {
@@ -254,10 +274,10 @@ public class Graphity extends SocialGraph {
 
 		} else {
 			// access single stream only
-			final GraphityUser posterNode = new GraphityUser(poster);
+			final GraphityUser posterUser = new GraphityUser(poster, null);
 			while ((statusUpdates.size() < numItems)
-					&& posterNode.hasStatusUpdate()) {
-				statusUpdates.add(posterNode.getStatusUpdate());
+					&& posterUser.hasStatusUpdate()) {
+				statusUpdates.add(posterUser.getStatusUpdate());
 			}
 		}
 
@@ -265,24 +285,34 @@ public class Graphity extends SocialGraph {
 	}
 
 	/**
-	 * remove a followed user from the ego network of the user following
+	 * remove a followed user from the replica layer
 	 * 
-	 * @param following
-	 *            user following the user that will be removed
-	 * @param followed
-	 *            user that will be removed from the ego network
+	 * @param followedReplica
+	 *            replica of the user that will be removed
 	 */
-	private void removeFromEgoNetwork(final Node following, final Node followed) {
-		final DynamicRelationshipType egoType = getEgoType(following);
-		final Node prev = NeoUtils.getPrevSingleNode(followed, egoType);
-		final Node next = NeoUtils.getNextSingleNode(followed, egoType);
+	private void removeFromReplicaLayer(final Node followedReplica) {
+		final Node prev = NeoUtils.getPrevSingleNode(followedReplica,
+				SocialGraphRelationshipType.GRAPHITY);
+		final Node next = NeoUtils.getNextSingleNode(followedReplica,
+				SocialGraphRelationshipType.GRAPHITY);
 
-		// update references
-		prev.getSingleRelationship(egoType, Direction.OUTGOING).delete();
+		// bridge the user replica in the replica layer
+		prev.getSingleRelationship(SocialGraphRelationshipType.GRAPHITY,
+				Direction.OUTGOING).delete();
 		if (next != null) {
-			next.getSingleRelationship(egoType, Direction.INCOMING).delete();
-			prev.createRelationshipTo(next, egoType);
+			next.getSingleRelationship(SocialGraphRelationshipType.GRAPHITY,
+					Direction.INCOMING).delete();
+			prev.createRelationshipTo(next,
+					SocialGraphRelationshipType.GRAPHITY);
 		}
+
+		// remove the followship
+		followedReplica.getSingleRelationship(
+				SocialGraphRelationshipType.FOLLOW, Direction.INCOMING)
+				.delete();
+
+		// remove the replica node itself
+		followedReplica.delete();
 	}
 
 	@Override
@@ -297,21 +327,122 @@ public class Graphity extends SocialGraph {
 			return false;
 		}
 
-		// delete the followship if existing
-		final Relationship followship = NeoUtils.getRelationshipBetween(
-				following, followed, SocialGraphRelationshipType.FOLLOW,
-				Direction.OUTGOING);
-		if (followship != null) {
-			followship.delete();
+		// find the replica node of the user followed
+		Node followedReplica = null;
+		for (Relationship followship : following.getRelationships(
+				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)) {
+			followedReplica = followship.getEndNode();
+			if (NeoUtils.getNextSingleNode(followedReplica,
+					SocialGraphRelationshipType.REPLICA).equals(followed)) {
+				break;
+			} else {
+				followedReplica = null;
+			}
+		}
 
-			// remove followship from ego network of the user following
-			this.removeFromEgoNetwork(following, followed);
-
+		if (followedReplica != null) {
+			this.removeFromReplicaLayer(followedReplica);
 			return true;
 		}
 
 		// there is no such followship existing
 		return false;
+	}
+
+	/**
+	 * update the replica layer for status update deletion
+	 * 
+	 * @param user
+	 *            owner of the status update being deleted
+	 * @param statusUpdate
+	 *            status update being deleted
+	 */
+	private void updateReplicaLayerStatusUpdateDeletion(final Node user,
+			final Node statusUpdate) {
+		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
+				SocialGraphRelationshipType.UPDATE);
+
+		// update the ego network if the removal targets the last recent status
+		// update
+		if (statusUpdate.equals(lastUpdate)) {
+			// get timestamp of the last recent status update in future
+			long newTimestamp = 0;
+			final Node nextStatusUpdate = NeoUtils.getNextSingleNode(
+					statusUpdate, SocialGraphRelationshipType.UPDATE);
+			if (nextStatusUpdate != null) {
+				newTimestamp = (long) nextStatusUpdate
+						.getProperty(Properties.TIMESTAMP);
+			}
+
+			// loop through followers
+			Node replicaNode, following;
+			for (Relationship replicated : user.getRelationships(
+					SocialGraphRelationshipType.REPLICA, Direction.INCOMING)) {
+				replicaNode = replicated.getEndNode();
+				following = NeoUtils.getPrevSingleNode(replicaNode,
+						SocialGraphRelationshipType.FOLLOW);
+
+				// search for insertion index within following replica layer
+				long crrTimestamp;
+				Node prevReplica = following;
+				Node nextReplica = null;
+				while (true) {
+					// get next user
+					nextReplica = NeoUtils.getNextSingleNode(prevReplica,
+							SocialGraphRelationshipType.GRAPHITY);
+					if (nextReplica != null) {
+						// ignore replica of the status update owner
+						if (nextReplica.equals(replicaNode)) {
+							prevReplica = nextReplica;
+							continue;
+						}
+
+						crrTimestamp = getLastUpdateByReplica(nextReplica);
+
+						// step on if current user has newer status updates
+						if (crrTimestamp > newTimestamp) {
+							prevReplica = nextReplica;
+							continue;
+						}
+					}
+
+					// insertion position has been found
+					break;
+				}
+
+				// insert the replica
+				if (nextReplica != null) {
+					// bride the replica node
+					final Node oldPrevReplica = NeoUtils.getNextSingleNode(
+							replicaNode, SocialGraphRelationshipType.GRAPHITY);
+					final Node oldNextReplica = NeoUtils.getNextSingleNode(
+							replicaNode, SocialGraphRelationshipType.GRAPHITY);
+					replicaNode.getSingleRelationship(
+							SocialGraphRelationshipType.GRAPHITY,
+							Direction.INCOMING).delete();
+
+					if (oldNextReplica != null) {
+						oldNextReplica.getSingleRelationship(
+								SocialGraphRelationshipType.GRAPHITY,
+								Direction.INCOMING).delete();
+						oldPrevReplica.createRelationshipTo(oldNextReplica,
+								SocialGraphRelationshipType.GRAPHITY);
+					}
+
+					// link to new neighbored nodes
+					if (nextReplica != null) {
+						replicaNode.createRelationshipTo(nextReplica,
+								SocialGraphRelationshipType.GRAPHITY);
+						prevReplica.getSingleRelationship(
+								SocialGraphRelationshipType.GRAPHITY,
+								Direction.OUTGOING);
+					}
+					prevReplica.createRelationshipTo(replicaNode,
+							SocialGraphRelationshipType.GRAPHITY);
+				}
+			}
+
+		}
 	}
 
 	@Override
@@ -324,11 +455,15 @@ public class Graphity extends SocialGraph {
 			return false;
 		}
 
+		// search for the user's replica node
 		final Node statusUpdate = NeoUtils
 				.getStatusUpdate(user, statusUpdateId);
 
 		// remove the status update if the ownership has been proved
 		if (statusUpdate != null) {
+			// update ego network
+			this.updateReplicaLayerStatusUpdateDeletion(user, statusUpdate);
+
 			// remove reference from previous status update
 			final Node previousUpdate = NeoUtils.getPrevSingleNode(
 					statusUpdate, SocialGraphRelationshipType.UPDATE);
@@ -350,8 +485,6 @@ public class Graphity extends SocialGraph {
 			// delete the status update node
 			statusUpdate.delete();
 
-			// TODO: update ego network
-
 			return true;
 		}
 
@@ -360,24 +493,15 @@ public class Graphity extends SocialGraph {
 	}
 
 	/**
-	 * generate ego network relationship type
-	 * 
-	 * @param user
-	 *            user to generate the type for
-	 * @return ego network relationship type of the user passed
-	 */
-	public static DynamicRelationshipType getEgoType(final Node user) {
-		return DynamicRelationshipType.withName("ego:" + user.getId());
-	}
-
-	/**
 	 * get a user's last recent status update's time stamp
 	 * 
-	 * @param user
-	 *            user targeted
+	 * @param userReplica
+	 *            replica of the user targeted
 	 * @return last recent status update's time stamp
 	 */
-	private static long getLastUpdate(final Node user) {
+	private static long getLastUpdateByReplica(final Node userReplica) {
+		final Node user = NeoUtils.getNextSingleNode(userReplica,
+				SocialGraphRelationshipType.REPLICA);
 		if (user.hasProperty(Properties.LAST_UPDATE)) {
 			return (long) user.getProperty(Properties.LAST_UPDATE);
 		}
