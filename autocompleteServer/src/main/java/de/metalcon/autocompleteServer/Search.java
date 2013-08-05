@@ -9,6 +9,7 @@ public class Search {
 
 	public static String treeSearch(String input) {
 		if (suggestTree == null) {
+			suggestTree = new SuggestTree(7);
 			int priority = 100000;
 			String filename = "/var/lib/datasets/metalcon/Band.csv";
 			// there must be a way to use relative paths!
