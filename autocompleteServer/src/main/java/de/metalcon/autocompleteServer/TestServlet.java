@@ -49,7 +49,8 @@ public class TestServlet extends HttpServlet {
 		//actual HTML output is constructed and sent here
 		
 		PrintWriter out = response.getWriter();
-		out.println("{" + SearchResult + "," + timeSpent + "}");
+		out.println("{" + SearchResult + timeSpent + "}");
+		out.flush();
 	}
 }
 
