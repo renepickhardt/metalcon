@@ -1,0 +1,58 @@
+<html><body>
+  <div id="mapdiv"></div>
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+  <script>
+    map = new OpenLayers.Map("mapdiv");
+    map.addLayer(new OpenLayers.Layer.OSM());
+ 
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+ 
+    var festivals = [{name: 'Musikbunker Aachen', lon: 50.7579, lat: 6.10804, website:'http://www.musikbunker-aachen.de',image:'bunker.jpg'}, 
+		     {name: 'K17', lon: 52.5184, lat: 13.468, website:'http://www.musikbunker-aachen.de'}, 
+		     {name: 'Access', lon: 52.5368, lat: 13.4268, website:'http://www.musikbunker-aachen.de'},
+		     {name: 'Hof 23', lon: 52.557, lat: 13.4504, website:'http://www.musikbunker-aachen.de'},
+	 	     {name: 'Matrix', lon: 51.4701, lat: 7.31927, website:'http://www.musikbunker-aachen.de'},
+       		     {name: 'Steinbruch Theater', lon: 49.809, lat: 8.69412, website:'http://www.musikbunker-aachen.de'}];
+    
+    var lonlat;
+    //Set start centrepoint and zoom    
+    var lonLat = new OpenLayers.LonLat(9.0000, 51.0000 )
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+    var zoom=5;
+    map.setCenter (lonLat, zoom); 
+ 
+    for (i in festivals) {
+    // The overlay layer for our marker, with a simple diamond as symbol
+    var overlay = new OpenLayers.Layer.Vector('Overlay', {
+        styleMap: new OpenLayers.StyleMap({
+            externalGraphic: 'file:///home/tobi/metalcon/metalcon/mapsClient/marker.png',
+            graphicWidth: 20, graphicHeight: 24, graphicYOffset: -24,
+            title: '${tooltip}'
+        })
+    });
+
+    // The location of our marker and popup. We usually think in geographic
+    // coordinates ('EPSG:4326'), but the map is projected ('EPSG:3857').
+    var myLocation = new OpenLayers.Geometry.Point(festivals[i].lat, festivals[i].lon)
+        .transform('EPSG:4326', 'EPSG:3857');
+
+    // We add the marker with a tooltip text to the overlay
+    overlay.addFeatures([
+        new OpenLayers.Feature.Vector(myLocation, {tooltip: 'OpenLayers'})
+    ]);
+//	alert("Hallo " + 'Welt');
+    // A popup with some information about our location
+    var popup = new OpenLayers.Popup.FramedCloud("Popup", 
+        myLocation.getBounds().getCenterLonLat(), null,
+        '<a target="_blank" href="'+(festivals[i].website)+'">'+(festivals[i].name)+'</a> ', null,
+        true // <-- true if we want a close (X) button, false otherwise
+    );
+    map.addPopup(popup);	    
+}
+    
+  </script>
+</body></html>

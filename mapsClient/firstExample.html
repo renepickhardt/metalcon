@@ -1,0 +1,40 @@
+<html><body>
+  <div id="mapdiv"></div>
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+  <script>
+    map = new OpenLayers.Map("mapdiv");
+    map.addLayer(new OpenLayers.Layer.OSM());
+ 
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+ 
+    var festivals = [{name: 'Musikbunker Aachen', lon: 50.7579, lat: 6.10804}, 
+		     {name: 'K17', lon: 52.5184, lat: 13.468}, 
+		     {name: 'Access', lon: 52.5368, lat: 13.4268},
+		     {name: 'Hof 23', lon: 52.557, lat: 13.4504},
+	 	     {name: 'Matrix', lon: 51.4701, lat: 7.31927},
+       		     {name: 'Steinbruch Theater', lon: 49.809, lat: 8.69412}];
+    
+    var lonlat;
+    for (i in festivals) {
+	    lonLat = new OpenLayers.LonLat(festivals[i].lon, festivals[i].lat )
+            .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+    markers.addMarker(new OpenLayers.Marker(lonLat));
+	}
+    
+    //Set start centrepoint and zoom    
+    var lonLat = new OpenLayers.LonLat(9.0000, 51.0000 )
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+    var zoom=5;
+    map.setCenter (lonLat, zoom);  
+ 
+  </script>
+</body></html>
+
+<img src = "festivals[i].image">
