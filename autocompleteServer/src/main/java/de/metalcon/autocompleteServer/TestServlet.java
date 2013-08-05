@@ -36,15 +36,20 @@ public class TestServlet extends HttpServlet {
 		
 		//this must be modified so it calls the Search-class methods I'm working on now
 		
+		String SearchResult = null;
+		
 		String SearchRequest = request.getParameter("Search_Term");
-		
-		
+		long timePre = 0;
+		long timePost = 0;
+		long timeSpent = 0;
 		//TODO: Find an approach wo not only change but to eleminate null-Pointer problems, which occur if there is no search term GET parameter
-		if (!(SearchRequest.equals(null)))
-			SearchRequest = ("NoBand");	
-		String SearchResult = Search.treeSearch(request.getParameter("Search_Term"));
-
-
+		if (SearchRequest != null ){
+		//	SearchRequest = ("NoBand");	
+		// String SearchResult = Search.treeSearch(SearchRequest);
+		timePre = System.nanoTime();
+		SearchResult = Search.treeSearch(request.getParameter("Search_Term"));
+		timePost = System.nanoTime();
+		timeSpent = timePost - timePre;}
 		//actual HTML output is constructed and sent here
 		
 		PrintWriter out = response.getWriter();
@@ -55,7 +60,7 @@ public class TestServlet extends HttpServlet {
 				"<h1 align=\"center\">" + " Titel " + "</h1>\n" +
 				"<b>Search Term</b>: "
 				+ request.getParameter("Search_Term") + "\n" +
-				"  <b>Search Result</b>: " + SearchResult +
+				"  <b>Search Result</b>: " + SearchResult + "  <b> Search time: </b>" + timeSpent +
 				"</body></html>");
 	}
 
@@ -67,3 +72,4 @@ public class TestServlet extends HttpServlet {
 	}
 
 }
+
