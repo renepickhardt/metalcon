@@ -53,15 +53,7 @@ public class TestServlet extends HttpServlet {
 		//actual HTML output is constructed and sent here
 		
 		PrintWriter out = response.getWriter();
-		out.println(docType +
-				"<html>\n" +
-				"<head><title>" + " Test-Servlet for SuggestTree-Search " + "</title></head>\n" +
-				"<body bgcolor=\"#f0f0f0\">\n" +
-				"<h1 align=\"center\">" + " Titel " + "</h1>\n" +
-				"<b>Search Term</b>: "
-				+ request.getParameter("Search_Term") + "\n" +
-				"  <b>Search Result</b>: " + SearchResult + "  <b> Search time: </b>" + timeSpent +
-				"</body></html>");
+		out.println("{" + SearchResult + "," + timeSpent + "}");
 	}
 
 	/**

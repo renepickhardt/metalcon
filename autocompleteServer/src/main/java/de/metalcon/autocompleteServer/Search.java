@@ -9,7 +9,7 @@ import de.metalcon.autocompleteServer.SuggestTree.*;
 public class Search {
 
 	public static String treeSearch(String input){
-		SuggestTree Suggestions = new SuggestTree(3);
+		SuggestTree Suggestions = new SuggestTree(7);
 		int priority = 100000;
 		String filename = "/var/lib/datasets/metalcon/Band.csv";	//there must be a way to use relative paths!
 
@@ -34,18 +34,14 @@ public class Search {
 				}
 			}
 
-			//TODO: find a working way to return multiple results
-			
+			//TODO: find a working way to return multiple results			
 			Node result = Suggestions.getBestSuggestions(input);
-			//StringBuffer resultList = null;
-			String singleResult = null;
-			//for ( int i=0;i < result.listLength();++i){
-			//	System.out.println(result.getSuggestion(i));
-			//	resultList = resultList.append(result.getSuggestion(i));
-				singleResult = result.getSuggestion(0);
-			//}
+			StringBuffer resultList = null;
+			for ( int i=0;i < result.listLength();++i){
+				resultList = resultList.append(result.getSuggestion(i)+",");
+			}
 			//return resultList.toString();
-			return singleResult;
+			return resultList.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
