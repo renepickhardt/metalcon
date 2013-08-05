@@ -11,7 +11,7 @@ public class Search {
 	public static String treeSearch(String input){
 		SuggestTree Suggestions = new SuggestTree(3);
 		int priority = 100000;
-		String filename = "/home/nVentor/workspace2/AutoComplete/WebContent/WEB-INF/Band.csv";	//there must be a way to use relative paths!
+		String filename = "/var/lib/datasets/metalcon/Band.csv";	//there must be a way to use relative paths!
 
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(filename));
