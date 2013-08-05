@@ -1,4 +1,4 @@
-package de.metalcon.autocomplete;
+package de.metalcon.autocompleteServer;
 
 /*
  * Copyright 2011-2013 Nicolai Diethelm
