@@ -28,12 +28,8 @@ public class TestServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");	//is this necessary?
+		response.setContentType("text/json");	//is this necessary?
 
-		String docType =
-				"<!doctype html public \"-//w3c//dtd html 4.0 " +
-						"transitional//en\">\n";
-		
 		//this must be modified so it calls the Search-class methods I'm working on now
 		
 		String SearchResult = null;
@@ -55,13 +51,5 @@ public class TestServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		out.println("{" + SearchResult + "," + timeSpent + "}");
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
 }
 
