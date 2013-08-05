@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+ <title>OpenLayers Simplest Example</title>
+ <div id="demoMap" style="height:250px"></div>
+ <script src="openLayers.js"></script>
+ <script>
+     map = new OpenLayers.Map("demoMap");
+     map.addLayer(new OpenLayers.Layer.OSM());
+     map.zoomToMaxExtent();
+     festivalList = [{"lon": 3.5, "lat": 10, "eventname":"wacken"},
+     "lon": 4.5, "lat": 11, "eventname":"breez"}]
+     var mapStructure = {"key1": "irgendwas", "key2": "was anderes"};
+
+     mapStructure["key1"] = 15;
+     for (var i = 0 ; i< 3 ; i++){
+			 b = i;
+			 alert("this is a test: " + b);
+	}
+     alert(mapStructure["key2"]);
+ </script>
