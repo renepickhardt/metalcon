@@ -1,8 +1,8 @@
 package de.metalcon.autocompleteServer;
 
 import java.io.*;
-import de.metalcon.autocomplete.SuggestTree;
-import de.metalcon.autocomplete.SuggestTree.*;
+import de.metalcon.autocompleteServer.SuggestTree;
+import de.metalcon.autocompleteServer.SuggestTree.*;
 
 
 
