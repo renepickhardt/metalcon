@@ -8,7 +8,7 @@ public class Search {
 	public static SuggestTree suggestTree = null;
 
 	public static String treeSearch(String input) {
-		if (suggestTree == null) {
+		if (suggestTree == null) {	//When the ContextListener works as intended, the initalization should already be done before calling this method
 			initilizeSuggestTree();
 		}
 		Node result = suggestTree.getBestSuggestions(input);
@@ -19,7 +19,7 @@ public class Search {
 		return resultList.toString();
 	}
 
-	private static void initilizeSuggestTree() {
+	public static void initilizeSuggestTree() {	//can't be private now, because ContextListener needs access
 		suggestTree = new SuggestTree(7);
 		int priority = 100000;
 		String filename = "/var/lib/datasets/metalcon/Band.csv";

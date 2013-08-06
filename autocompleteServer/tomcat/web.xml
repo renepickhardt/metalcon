@@ -4,6 +4,7 @@
     <servlet-name>suggest</servlet-name>
     <description>Read status update of users.</description>
     <servlet-class>de.metalcon.autocompleteServer.TestServlet</servlet-class>
+    <listener>de.metalcon.autocompleteServer.ContextListener</listener>
   </servlet>
   <servlet-mapping>
     <servlet-name>suggest</servlet-name>
