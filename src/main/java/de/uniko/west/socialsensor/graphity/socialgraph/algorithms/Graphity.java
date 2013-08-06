@@ -312,6 +312,9 @@ public class Graphity extends SocialGraph {
 				.delete();
 
 		// remove the replica node itself
+		followedReplica.getSingleRelationship(
+				SocialGraphRelationshipType.REPLICA, Direction.OUTGOING)
+				.delete();
 		followedReplica.delete();
 	}
 
@@ -335,9 +338,8 @@ public class Graphity extends SocialGraph {
 			if (NeoUtils.getNextSingleNode(followedReplica,
 					SocialGraphRelationshipType.REPLICA).equals(followed)) {
 				break;
-			} else {
-				followedReplica = null;
 			}
+			followedReplica = null;
 		}
 
 		if (followedReplica != null) {

@@ -130,12 +130,12 @@ public class StatusUpdateManager {
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
 
 		// crawl XML files
-		StatusUpdateTemplateFile templateFile;
+		StatusUpdateTemplate templateFile;
 		StatusUpdateTemplateNode templateNode;
 		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
 		System.out.println("TEMPLATES:" + xmlFiles.length);
 		for (File xmlFile : xmlFiles) {
-			templateFile = new StatusUpdateTemplateFile(xmlFile);
+			templateFile = new StatusUpdateTemplate(xmlFile);
 			templateNode = NODE.getStatusUpdateTemplateNode(templateFile
 					.getIdentifier());
 

@@ -11,6 +11,16 @@ import org.neo4j.graphdb.RelationshipType;
 public enum SocialGraphRelationshipType implements RelationshipType {
 
 	/**
+	 * template field information
+	 */
+	FIELD,
+
+	/**
+	 * template file information
+	 */
+	FILE,
+
+	/**
 	 * user's status update
 	 */
 	UPDATE,

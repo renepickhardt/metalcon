@@ -1,4 +1,4 @@
-package de.uniko.west.socialsensor.graphity.server.tomcat;
+package de.uniko.west.socialsensor.graphity.server.tomcat.create;
 
 /**
  * type of a creation request
@@ -42,14 +42,24 @@ public enum CreateType {
 		return this.identifier;
 	}
 
+	/**
+	 * get the creation type matching to the identifier passed
+	 * 
+	 * @param identifier
+	 *            creation type identifier
+	 * @return creation type
+	 * @throws IllegalArgumentException
+	 *             if the identifier is invalid
+	 */
 	public static CreateType GetCreateType(final String identifier) {
 		if (FRIENDSHIP.getIdentifier().equals(identifier)) {
 			return FRIENDSHIP;
 		} else if (STATUS_UPDATE.getIdentifier().equals(identifier)) {
 			return STATUS_UPDATE;
-		} else {
-			return null;
 		}
+
+		throw new IllegalArgumentException("\"" + identifier
+				+ "\" is not a valid creation type identifier!");
 	}
 
 }

@@ -2,10 +2,6 @@ package de.uniko.west.socialsensor.graphity.server.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 import javax.servlet.ServletConfig;
@@ -24,6 +20,11 @@ import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.server.Server;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateTemplate;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreateType;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormFile;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsage;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;
@@ -51,6 +52,11 @@ public class Create extends HttpServlet {
 	 */
 	private Configs config;
 
+	/**
+	 * file item factory
+	 */
+	private DiskFileItemFactory factory = new DiskFileItemFactory();
+
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
@@ -58,205 +64,173 @@ public class Create extends HttpServlet {
 		final Server server = (Server) context.getAttribute("server");
 		this.commandQueue = server.getCommandQueue();
 		this.config = server.getConfig();
+
+		// load file factory in temporary directory
+		final File tempDir = (File) context
+				.getAttribute("javax.servlet.context.tempdir");
+		this.factory.setRepository(tempDir);
 	}
 
 	@Override
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
+		// store response item for the server response creation
+		final ClientResponder responder = new TomcatClientResponder(response);
+
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
-		// TODO: check if always when posting multi-data forms
+		// TODO: check if always (automatically) when posting multi-data forms
 		if (isMultipart) {
-			// create file factory in a temporary directory
-			final DiskFileItemFactory factory = new DiskFileItemFactory();
-			final ServletContext context = this.getServletConfig()
-					.getServletContext();
-			final File tempDir = (File) context
-					.getAttribute("javax.servlet.context.tempdir");
-			factory.setRepository(tempDir);
-
-			final ServletFileUpload upload = new ServletFileUpload(factory);
-			List<FileItem> items = null;
-
 			try {
-				items = upload.parseRequest(request);
-			} catch (FileUploadException e) {
-				e.printStackTrace();
-			}
+				// read multi-part form items
+				final FormItemList items = this.extractFormItems(request);
 
-			// store response item for the server response creation
-			final ClientResponder responder = new TomcatClientResponder(
-					response);
+				// TODO: OAuth, stop manual determining of user id
+				final long userId = Long.parseLong(items
+						.getField(FormFields.USER_ID));
 
-			// create the map for status update instantiation
-			if (items != null) {
-				long timestamp = System.currentTimeMillis();
-				final Map<String, String> fields = new HashMap<String, String>();
-				final Map<String, FileItem> files = new HashMap<String, FileItem>();
+				// read essential form fields
+				final long timestamp = System.currentTimeMillis();
+				final CreateType createType = CreateType.GetCreateType(items
+						.getField(FormFields.Create.CREATE_TYPE));
 
-				for (FileItem item : items) {
-					if (item.isFormField()) {
-						// add form value to fields map
-						if (!fields.containsKey(item.getFieldName())) {
-							fields.put(item.getFieldName(), item.getString());
-						}
-					} else {
-						// add file item to files map
-						if (!files.containsKey(item.getFieldName())) {
-							files.put(item.getFieldName(), item);
-						}
-					}
-				}
+				if (createType == CreateType.FRIENDSHIP) {
+					// read followship specific fields
+					final long followedId = Long.parseLong(items
+							.getField(FormFields.Create.FOLLOWSHIP_TARGET));
 
-				CreateType type;
-				String temp = fields.get("createType");
-				if (temp != null) {
-					try {
-						type = CreateType.GetCreateType(temp);
-						if (type == null) {
-							throw new ClassCastException();
-						}
-					} catch (final ClassCastException invalid) {
-						// send error - field type invalid
-						Helper.sendErrorMessage(
-								response,
-								400,
-								"the field \"createType\" is corrupted!<br>please type in a valid create type identifier.");
-						return;
-					}
-				} else {
-					// send error - field missing
-					Helper.sendErrorMessage(
-							response,
-							400,
-							"the field \"createType\" is missing!<br>please specify what you want to create.");
-					return;
-				}
-
-				// TODO: OAuth
-				long userId;
-				temp = fields.get("user_id");
-				if (temp != null) {
-					try {
-						userId = Long.parseLong(temp);
-					} catch (NumberFormatException e) {
-						// send error - field type invalid
-						Helper.sendErrorMessage(
-								response,
-								400,
-								"the field \"user_id\" is corrupted!<br>please type in a valid identification number.");
-						return;
-					}
-				} else {
-					// send error - field missing
-					Helper.sendErrorMessage(
-							response,
-							400,
-							"the field \"user_id\" is missing!<br>please specify your identification number.");
-					return;
-				}
-
-				// create friendship command
-				if (type == CreateType.FRIENDSHIP) {
-					long targetId;
-					temp = fields.get("targetId");
-					if (temp != null) {
-						try {
-							targetId = Long.parseLong(temp);
-						} catch (NumberFormatException e) {
-							// send error - field type invalid
-							Helper.sendErrorMessage(
-									response,
-									400,
-									"the field \"targetId\" is corrupted!<br>please provide a number greater than zero.");
-
-							return;
-						}
-					} else {
-						// send error - field missing
-						Helper.sendErrorMessage(
-								response,
-								400,
-								"the field \"targetId\" is missing!<br>please specify the user you want to follow.");
-						return;
-					}
-
+					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(
-							responder, timestamp, userId, targetId);
+							responder, timestamp, userId, followedId);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {
-					String statusUpdateType;
-					temp = fields.get("type");
-					if (temp != null) {
-						statusUpdateType = temp;
-					} else {
-						// send error - field missing
-						Helper.sendErrorMessage(
-								response,
-								400,
-								"the field \"type\" is missing!<br>please specify the status update type you want to create.");
-						return;
-					}
-
-					// parse files
-					final List<File> fileList = new LinkedList<File>();
-					String fileDir;
-					File file;
-					FileItem fileItem;
-					for (String fieldName : files.keySet()) {
-						// get the target directory
-						fileItem = files.get(fieldName);
-						fileDir = getFileDir(this.config,
-								fileItem.getContentType());
-
-						file = new File(fileDir + userId + "-" + timestamp
-								+ "-" + fileItem.getName());
-						fileList.add(file);
-
-						// create the file
-						try {
-							fileItem.write(file);
-
-							// store file path in fields map
-							fields.put(fieldName, file.getAbsolutePath());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
+					// TODO: create status update
+					// read status update specific fields and files
+					final String statusUpdateType = items
+							.getField(FormFields.Create.STATUS_UPDATE_TYPE);
+					final StatusUpdateTemplate template = StatusUpdateManager
+							.getStatusUpdateTemplate(statusUpdateType);
+					this.writeFiles(template, items);
 
 					// create a new status update of the type specified
 					try {
 						final StatusUpdate statusUpdate = StatusUpdateManager
 								.instantiateStatusUpdate(statusUpdateType,
-										fields);
+										items);
 
 						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
 								responder, timestamp, userId, statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
-					} catch (IllegalArgumentException e) {
+					} catch (final IllegalArgumentException e) {
 						// remove the files
-						for (File tempFile : fileList) {
-							tempFile.delete();
+						FormFile fileItem;
+						File file;
+						for (String fileIdentifier : items.getFileIdentifiers()) {
+							fileItem = items.getFile(fileIdentifier);
+							file = fileItem.getFile();
+
+							if (file != null) {
+								file.delete();
+							}
 						}
 
-						Helper.sendErrorMessage(response, 400, e.getMessage());
+						// delegate the error to show error message to the user
+						throw e;
 					}
 				}
+			} catch (final FileUploadException e) {
+				// TODO: error log target management
+				e.printStackTrace();
+			} catch (final FormItemDoubleUsage e) {
+				// TODO: error log target management, REFACTOR exception
+				System.out.println(e.getMessage());
+			} catch (final IllegalArgumentException e) {
+				responder.error(500, e.getMessage());
+				e.printStackTrace();
+			}
+		} else {
+			// TODO: error - no multi-part form
+		}
+	}
+
+	/**
+	 * extract fields and files from the multi-part form in the request
+	 * 
+	 * @param request
+	 *            HTTP servlet request
+	 * @return form fields and files wrapped in a form item list
+	 * @throws FormItemDoubleUsage
+	 *             if form items use the same identifier
+	 * @throws FileUploadException
+	 *             if the form item parsing fails
+	 */
+	private FormItemList extractFormItems(final HttpServletRequest request)
+			throws FileUploadException, FormItemDoubleUsage {
+		final ServletFileUpload upload = new ServletFileUpload(this.factory);
+		final FormItemList formItems = new FormItemList();
+
+		for (FileItem item : upload.parseRequest(request)) {
+			if (item.isFormField()) {
+				formItems.addField(item.getFieldName(), item.getString());
+			} else {
+				formItems.addFile(item.getFieldName(), item);
+			}
+		}
+
+		return formItems;
+	}
+
+	/**
+	 * 
+	 * @param template
+	 * @param items
+	 */
+	private void writeFiles(final StatusUpdateTemplate template,
+			final FormItemList items) {
+		FormFile fileItem;
+		FileTemplateInfo fileInfo;
+		for (String fileIdentifier : items.getFileIdentifiers()) {
+			fileItem = items.getFile(fileIdentifier);
+			fileInfo = template.getFileTemplateInfo(fileIdentifier);
+
+			if (fileInfo.getContentType().equals(fileItem.getContentType())) {
+				// write the file and store it within the instantiation item
+				final File file = this.writeFile(fileItem);
+				fileItem.setFile(file);
+			} else {
+				throw new IllegalArgumentException("file \"" + fileIdentifier
+						+ "\" must have content type "
+						+ fileInfo.getContentType());
 			}
 		}
 	}
 
 	/**
+	 * write a file to the directory matching its content type
+	 * 
+	 * @param fileItem
+	 *            form file
+	 * @return instance of the file written
+	 * @throws Exception
+	 *             if the file could not be written
+	 */
+	private File writeFile(final FormFile fileItem) throws Exception {
+		final String directory = this.getFileDir(fileItem.getContentType());
+
+		// TODO: ensure unique file names
+		final File file = new File(directory + System.currentTimeMillis() + "-"
+				+ fileItem.getOriginalFileName());
+		fileItem.getFormItem().write(file);
+		return file;
+	}
+
+	/**
 	 * get the directory for a file of the content type specified
 	 * 
-	 * @param config
-	 *            server configuration
 	 * @param contentType
 	 *            file item content type
 	 * @return directory for this content type
 	 */
-	private static String getFileDir(final Configs config,
-			final String contentType) {
-		return config.picture_path;
+	private String getFileDir(final String contentType) {
+		return this.config.picture_path;
 	}
 }

@@ -77,7 +77,7 @@ public class StatusUpdateTemplateManagerNode {
 	}
 
 	public StatusUpdateTemplateNode createStatusUpdateTemplateNode(
-			final StatusUpdateTemplateFile templateFile) {
+			final StatusUpdateTemplate templateFile) {
 		// check for previous versions
 		final DynamicRelationshipType templateRelationshipType = getStatusUpdateTemplateNodeRT(templateFile
 				.getIdentifier());

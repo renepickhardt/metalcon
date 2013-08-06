@@ -51,6 +51,21 @@ public final class Properties {
 		 */
 		public static final String CODE = "code";
 
+		/**
+		 * template item name
+		 */
+		public static final String ITEM_NAME = "name";
+
+		/**
+		 * template field type
+		 */
+		public static final String FIELD_TYPE = "type";
+
+		/**
+		 * template file content type
+		 */
+		public static final String FILE_CONTENT_TYPE = "contentType";
+
 	}
 
 }
