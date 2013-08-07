@@ -8,18 +8,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import de.metalcon.autocompleteServer.Search;
+import de.metalcon.autocompleteServer.Helper.ProcessRetrieveRequest;
 
 /**
  * Servlet implementation class TestServlet
  */
 //@WebServlet("/suggest")
-public class TestServlet extends HttpServlet {
+public class RetrieveServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public TestServlet() {
+	public RetrieveServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -28,12 +29,13 @@ public class TestServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ProcessRetrieveRequest.checkRequestParameter(request);
 		response.setContentType("text/json");	//is this necessary?
 
 		//this must be modified so it calls the Search-class methods I'm working on now
 		
 		String SearchResult = null;
-		
+				
 		String SearchRequest = request.getParameter("Search_Term");
 		long timePre = 0;
 		long timePost = 0;
@@ -49,8 +51,9 @@ public class TestServlet extends HttpServlet {
 		//actual HTML output is constructed and sent here
 		
 		PrintWriter out = response.getWriter();
-		out.println("{" + SearchResult + timeSpent + "}");
+		out.println("[" + SearchResult + timeSpent + "]");
 		out.flush();
 	}
+	
 }
 
