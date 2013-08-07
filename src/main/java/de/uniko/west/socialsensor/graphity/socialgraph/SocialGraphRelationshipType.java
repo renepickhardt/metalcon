@@ -11,16 +11,6 @@ import org.neo4j.graphdb.RelationshipType;
 public enum SocialGraphRelationshipType implements RelationshipType {
 
 	/**
-	 * template field information
-	 */
-	FIELD,
-
-	/**
-	 * template file information
-	 */
-	FILE,
-
-	/**
 	 * user's status update
 	 */
 	UPDATE,
@@ -39,5 +29,24 @@ public enum SocialGraphRelationshipType implements RelationshipType {
 	 * replica layer links
 	 */
 	REPLICA;
+
+	/**
+	 * relationship types used for template management
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public enum Templates implements RelationshipType {
+
+		/**
+		 * template field information
+		 */
+		FIELD,
+
+		/**
+		 * template file information
+		 */
+		FILE,
+	}
 
 }

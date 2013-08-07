@@ -3,7 +3,6 @@ package de.uniko.west.socialsensor.graphity.server;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -20,6 +19,8 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import org.xml.sax.SAXException;
 
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 import de.uniko.west.socialsensor.graphity.socialgraph.Algorithm;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -199,11 +200,15 @@ public class Server implements ServletContextListener {
 
 			long timestamp;
 			int message;
-			final Map<String, String> values = new HashMap<String, String>();
+			final FormItemList values = new FormItemList();
 			while (!statusUpdates.isEmpty()) {
 				timestamp = System.currentTimeMillis();
 				message = statusUpdates.firstKey();
-				values.put("message", String.valueOf(message));
+				try {
+					values.addField("message", String.valueOf(message));
+				} catch (final FormItemDoubleUsageException e) {
+					e.printStackTrace();
+				}
 
 				this.graph.createStatusUpdate(timestamp, statusUpdates
 						.remove(message), StatusUpdateManager

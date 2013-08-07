@@ -5,8 +5,6 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
@@ -20,6 +18,7 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 
 /**
  * status update manager to load
@@ -35,9 +34,9 @@ public class StatusUpdateManager {
 	private static StatusUpdateTemplateManagerNode NODE;
 
 	/**
-	 * status update classes allowed
+	 * status update templates loaded
 	 */
-	private static Map<String, Class<?>> STATUS_UPDATE_TYPES = new HashMap<String, Class<?>>();
+	private static Map<String, StatusUpdateTemplate> STATUS_UPDATE_TYPES = new HashMap<String, StatusUpdateTemplate>();
 
 	/**
 	 * working directory for template generation
@@ -65,15 +64,13 @@ public class StatusUpdateManager {
 	/**
 	 * generate a java class file for the template specified
 	 * 
-	 * @param templateNode
-	 *            template node representing the template
+	 * @param template
+	 *            status update template
 	 * @throws FileNotFoundException
 	 */
-	private static void generateJavaFiles(
-			final StatusUpdateTemplateNode templateNode, final Configs config)
-			throws FileNotFoundException {
-		final String javaPath = WORKING_DIR + templateNode.getIdentifier()
-				+ ".java";
+	private static void generateJavaFiles(final StatusUpdateTemplate template,
+			final Configs config) throws FileNotFoundException {
+		final String javaPath = WORKING_DIR + template.getName() + ".java";
 		final File javaFile = new File(javaPath);
 		final String[] optionsAndSources = { "-classpath",
 				config.workingPath(), "-proc:none", "-source", "1.7",
@@ -81,13 +78,13 @@ public class StatusUpdateManager {
 
 		// write java file
 		final PrintWriter writer = new PrintWriter(javaFile);
-		writer.write(templateNode.getCode());
+		writer.write(template.getJavaCode());
 		writer.flush();
 		writer.close();
 
 		// delete previous class file
-		final File classFile = new File(WORKING_DIR
-				+ templateNode.getIdentifier() + ".class");
+		final File classFile = new File(WORKING_DIR + template.getName()
+				+ ".class");
 		classFile.delete();
 
 		// compile java file to class file
@@ -130,36 +127,35 @@ public class StatusUpdateManager {
 		NODE = new StatusUpdateTemplateManagerNode(graphDatabase);
 
 		// crawl XML files
-		StatusUpdateTemplate templateFile;
-		StatusUpdateTemplateNode templateNode;
+		StatusUpdateTemplate template;
 		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
 		System.out.println("TEMPLATES:" + xmlFiles.length);
 		for (File xmlFile : xmlFiles) {
-			templateFile = new StatusUpdateTemplate(xmlFile);
-			templateNode = NODE.getStatusUpdateTemplateNode(templateFile
-					.getIdentifier());
+			template = new StatusUpdateTemplate(xmlFile);
+			final StatusUpdateTemplate previousTemplate = NODE
+					.getStatusUpdateTemplate(template.getName());
 
 			// check for previous template versions
-			if (templateNode != null) {
-				if (!templateFile.getVersion()
-						.equals(templateNode.getVersion())) {
-					// TODO: ask which template shall be used
+			if (previousTemplate != null) {
+				if (!template.getVersion()
+						.equals(previousTemplate.getVersion())) {
+					// TODO: ask which template shall be used, for the moment
+					// overwrite previous versions
 				}
 			}
 
 			// create the new template (referring to previous versions)
-			templateNode = NODE.createStatusUpdateTemplateNode(templateFile);
+			NODE.storeStatusUpdateTemplate(template);
 
 			// generate class file
-			generateJavaFiles(templateNode, config);
+			generateJavaFiles(template, config);
 
 			// register the new template
 			try {
-				STATUS_UPDATE_TYPES.put(
-						templateNode.getIdentifier(),
-						loader.loadClass(targetPackage
-								+ templateNode.getIdentifier()));
-			} catch (ClassNotFoundException e) {
+				template.setInstantiationClass(loader.loadClass(targetPackage
+						+ template.getName()));
+				STATUS_UPDATE_TYPES.put(template.getName(), template);
+			} catch (final ClassNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
@@ -168,53 +164,72 @@ public class StatusUpdateManager {
 	}
 
 	/**
+	 * get the status update template with the name passed
+	 * 
+	 * @param templateName
+	 *            name of status update template being searched
+	 * @return status update template
+	 */
+	public static StatusUpdateTemplate getStatusUpdateTemplate(
+			final String templateName) {
+		final StatusUpdateTemplate template = STATUS_UPDATE_TYPES
+				.get(templateName);
+		if (template != null) {
+			return template;
+		}
+
+		throw new IllegalArgumentException("status update type \""
+				+ templateName + "\" not existing or allowed!");
+	}
+
+	/**
 	 * instantiate a status update
 	 * 
 	 * @param typeIdentifier
 	 *            status update type identifier
 	 * @param values
-	 *            parameter map containing all status update fields necessary
+	 *            form item list containing all status update items necessary
 	 * @return status update instance of type specified
 	 */
 	public static StatusUpdate instantiateStatusUpdate(
-			final String typeIdentifier, final Map<String, String> values) {
-		Class<?> statusUpdateClass = STATUS_UPDATE_TYPES.get(typeIdentifier);
+			final String typeIdentifier, final FormItemList values) {
+		final StatusUpdateTemplate template = getStatusUpdateTemplate(typeIdentifier);
+		final Class<?> templateInstantiationClass = template
+				.getInstantiationClass();
 
-		// check if status update type is existing and allowed
-		if (statusUpdateClass != null) {
-			try {
-				// instantiate status update
-				StatusUpdate statusUpdate = (StatusUpdate) statusUpdateClass
-						.newInstance();
+		try {
+			// instantiate status update
+			final StatusUpdate statusUpdate = (StatusUpdate) templateInstantiationClass
+					.newInstance();
 
-				// set status update fields
-				String object;
-				for (Field field : statusUpdateClass.getFields()) {
-					if (!Modifier.isFinal(field.getModifiers())) {
-						object = values.get(field.getName());
-						if (object != null) {
-							field.set(statusUpdate, object);
-						} else {
-							throw new IllegalArgumentException("field \""
-									+ field.getName() + "\" is missing!");
-						}
-					}
-				}
-
-				return statusUpdate;
-			} catch (SecurityException e) {
-				throw new IllegalArgumentException(
-						"failed to load the status update type specified!");
-			} catch (InstantiationException e) {
-				throw new IllegalArgumentException(
-						"failed to load the status update type specified!");
-			} catch (IllegalAccessException e) {
-				throw new IllegalArgumentException(
-						"failed to load the status update type specified!");
+			// set status update fields
+			String value;
+			for (String fieldName : template.getFields().keySet()) {
+				value = values.getField(fieldName);
+				templateInstantiationClass.getField(fieldName).set(
+						statusUpdate, value);
 			}
-		} else {
-			throw new IllegalArgumentException("status update type \""
-					+ typeIdentifier + "\" not existing or allowed!");
+
+			// set status update file paths
+			for (String fileName : template.getFiles().keySet()) {
+				value = values.getFile(fileName).getAbsoluteFilePath();
+				templateInstantiationClass.getField(fileName).set(statusUpdate,
+						value);
+			}
+
+			return statusUpdate;
+		} catch (final SecurityException e) {
+			throw new IllegalArgumentException(
+					"failed to load the status update type specified, SecurityException occurred!");
+		} catch (final InstantiationException e) {
+			throw new IllegalArgumentException(
+					"failed to load the status update type specified, InstantiationException occurred!");
+		} catch (final IllegalAccessException e) {
+			throw new IllegalArgumentException(
+					"failed to load the status update type specified, IllegalAccessException occurred!");
+		} catch (final NoSuchFieldException e) {
+			throw new IllegalArgumentException(
+					"failed to load the status update type specified, NoSuchFieldException occurred!");
 		}
 	}
 

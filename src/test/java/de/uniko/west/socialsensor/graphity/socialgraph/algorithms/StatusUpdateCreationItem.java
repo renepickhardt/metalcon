@@ -1,10 +1,9 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 
 /**
  * status update creation item
@@ -35,8 +34,12 @@ public class StatusUpdateCreationItem {
 	public StatusUpdateCreationItem(final long userId, final long timestamp) {
 		this.userId = userId;
 
-		final Map<String, String> values = new HashMap<String, String>();
-		values.put("message", String.valueOf(timestamp));
+		final FormItemList values = new FormItemList();
+		try {
+			values.addField("message", String.valueOf(timestamp));
+		} catch (final FormItemDoubleUsageException e) {
+			e.printStackTrace();
+		}
 
 		this.statusUpdate = StatusUpdateManager.instantiateStatusUpdate(
 				"PlainText", values);

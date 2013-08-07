@@ -21,9 +21,10 @@ import de.uniko.west.socialsensor.graphity.server.Server;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateTemplate;
+import de.uniko.west.socialsensor.graphity.server.statusupdates.TemplateFileInfo;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreateType;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormFile;
-import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsage;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
@@ -103,16 +104,16 @@ public class Create extends HttpServlet {
 							responder, timestamp, userId, followedId);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {
-					// TODO: create status update
 					// read status update specific fields and files
 					final String statusUpdateType = items
 							.getField(FormFields.Create.STATUS_UPDATE_TYPE);
 					final StatusUpdateTemplate template = StatusUpdateManager
 							.getStatusUpdateTemplate(statusUpdateType);
-					this.writeFiles(template, items);
 
-					// create a new status update of the type specified
 					try {
+						this.writeFiles(template, items);
+
+						// create a new status update of the type specified
 						final StatusUpdate statusUpdate = StatusUpdateManager
 								.instantiateStatusUpdate(statusUpdateType,
 										items);
@@ -135,13 +136,16 @@ public class Create extends HttpServlet {
 
 						// delegate the error to show error message to the user
 						throw e;
+					} catch (final Exception e) {
+						throw new IllegalArgumentException(
+								"file writing failed!");
 					}
 				}
 			} catch (final FileUploadException e) {
 				// TODO: error log target management
 				e.printStackTrace();
-			} catch (final FormItemDoubleUsage e) {
-				// TODO: error log target management, REFACTOR exception
+			} catch (final FormItemDoubleUsageException e) {
+				// TODO: error log target management
 				System.out.println(e.getMessage());
 			} catch (final IllegalArgumentException e) {
 				responder.error(500, e.getMessage());
@@ -158,13 +162,13 @@ public class Create extends HttpServlet {
 	 * @param request
 	 *            HTTP servlet request
 	 * @return form fields and files wrapped in a form item list
-	 * @throws FormItemDoubleUsage
+	 * @throws FormItemDoubleUsageException
 	 *             if form items use the same identifier
 	 * @throws FileUploadException
 	 *             if the form item parsing fails
 	 */
 	private FormItemList extractFormItems(final HttpServletRequest request)
-			throws FileUploadException, FormItemDoubleUsage {
+			throws FileUploadException, FormItemDoubleUsageException {
 		final ServletFileUpload upload = new ServletFileUpload(this.factory);
 		final FormItemList formItems = new FormItemList();
 
@@ -180,17 +184,24 @@ public class Create extends HttpServlet {
 	}
 
 	/**
+	 * write the files posted if they are matching to the template targeted
 	 * 
 	 * @param template
+	 *            status update template targeted
 	 * @param items
+	 *            form item list
+	 * @throws IllegalArgumentException
+	 *             if a file is not matching the content type set
+	 * @throws Exception
+	 *             if a file could not be written
 	 */
 	private void writeFiles(final StatusUpdateTemplate template,
-			final FormItemList items) {
+			final FormItemList items) throws Exception {
 		FormFile fileItem;
-		FileTemplateInfo fileInfo;
+		TemplateFileInfo fileInfo;
 		for (String fileIdentifier : items.getFileIdentifiers()) {
 			fileItem = items.getFile(fileIdentifier);
-			fileInfo = template.getFileTemplateInfo(fileIdentifier);
+			fileInfo = template.getFiles().get(fileIdentifier);
 
 			if (fileInfo.getContentType().equals(fileItem.getContentType())) {
 				// write the file and store it within the instantiation item

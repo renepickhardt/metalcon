@@ -20,6 +20,8 @@ import org.neo4j.graphdb.Transaction;
 
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -175,8 +177,12 @@ public class BaselineTest {
 	@Test
 	public void testCreateStatusUpdate_NotFoundException() {
 		// assert the creation to fail if providing invalid user identifier
-		final Map<String, String> values = new HashMap<String, String>();
-		values.put("message", "this is not the reason why!");
+		final FormItemList values = new FormItemList();
+		try {
+			values.addField("message", "this is not the reason why!");
+		} catch (final FormItemDoubleUsageException e) {
+			e.printStackTrace();
+		}
 		final StatusUpdate statusUpdate = StatusUpdateManager
 				.instantiateStatusUpdate("PlainText", values);
 		assertEquals(this.graphity.createStatusUpdate(

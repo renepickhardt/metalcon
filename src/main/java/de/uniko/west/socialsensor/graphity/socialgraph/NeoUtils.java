@@ -182,4 +182,34 @@ public class NeoUtils {
 		return statusUpdate;
 	}
 
+	/**
+	 * get a specific node from a database via its identifier
+	 * 
+	 * @param graphDB
+	 *            social graph database to search in
+	 * @param nodeId
+	 *            node identifier
+	 * @return node with the identifier passed
+	 */
+	public static Node getNodeByIdentifier(final AbstractGraphDatabase graphDB,
+			final long nodeId) {
+		// TODO: use lucene index
+		return graphDB.getNodeById(nodeId);
+	}
+
+	/**
+	 * fixed identifiers for special nodes
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public class NodeIdentifiers {
+
+		/**
+		 * database root node
+		 */
+		public static final long ROOT = 0;
+
+	}
+
 }
