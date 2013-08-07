@@ -1,9 +1,6 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * helper class for Tomcat requests/responses
@@ -13,40 +10,101 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Helper {
 
-	private static String getAttribute(final HttpServletRequest request,
-			final String paramName) {
-		final String param = request.getParameter(paramName);
-		if (param != null) {
-			return param;
+	/**
+	 * read a form parameter from the Tomcat request
+	 * 
+	 * @param request
+	 *            Tomcat request
+	 * @param name
+	 *            parameter name
+	 * @return parameter value
+	 * @throws IllegalArgumentException
+	 *             if the parameter is missing
+	 */
+	private static String getFormParameter(final HttpServletRequest request,
+			final String name) {
+		final String attribute = request.getParameter(name);
+		if (attribute != null) {
+			return attribute;
 		}
 
-		throw new IllegalArgumentException("parameter \"" + paramName
+		throw new IllegalArgumentException("parameter \"" + name
 				+ "\" is missing!");
 	}
 
-	public static int getInt(final HttpServletRequest request,
-			final String paramName) {
-		return Integer.valueOf(getAttribute(request, paramName));
+	/**
+	 * read a boolean parameter from the form of the Tomcat request
+	 * 
+	 * @param request
+	 *            Tomcat request
+	 * @param name
+	 *            boolean parameter name
+	 * @return boolean parameter value
+	 * @throws IllegalArgumentException
+	 *             if the parameter is missing or no integer that could be
+	 *             parsed
+	 */
+	public static boolean getBool(final HttpServletRequest request,
+			final String name) {
+		int value = getInt(request, name);
+		return (value != 0);
 	}
 
-	public static long getLong(final HttpServletRequest request,
-			final String paramName) {
-		return Long.valueOf(getAttribute(request, paramName));
-	}
-
-	public static String getString(final HttpServletRequest request,
-			final String paramName) {
-		return getAttribute(request, paramName);
-	}
-
-	public static void sendErrorMessage(final HttpServletResponse response,
-			final int errorCode, final String message) {
+	/**
+	 * read an integer parameter from the form of the Tomcat request
+	 * 
+	 * @param request
+	 *            Tomcat request
+	 * @param name
+	 *            integer parameter name
+	 * @return integer parameter value
+	 * @throws IllegalArgumentException
+	 *             if the parameter is missing or no integer
+	 */
+	public static int getInt(final HttpServletRequest request, final String name) {
 		try {
-			response.sendError(errorCode, message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return Integer.valueOf(getFormParameter(request, name));
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("parameter \"" + name
+					+ "\" is not a valid integer!");
 		}
+	}
+
+	/**
+	 * read a long parameter from the form of the Tomcat request
+	 * 
+	 * @param request
+	 *            Tomcat request
+	 * @param name
+	 *            long parameter name
+	 * @return long parameter value
+	 * @throws IllegalArgumentException
+	 *             if the parameter is missing or no long
+	 */
+	public static long getLong(final HttpServletRequest request,
+			final String name) {
+		try {
+			return Long.valueOf(getFormParameter(request, name));
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("parameter \"" + name
+					+ "\" is not a valid long!");
+		}
+	}
+
+	/**
+	 * read a String parameter from the form of the Tomcat request
+	 * 
+	 * @param request
+	 *            Tomcat request
+	 * @param name
+	 *            String parameter value
+	 * @return String parameter value
+	 * @throws IllegalArgumentException
+	 *             if the parameter is missing
+	 */
+	public static String getString(final HttpServletRequest request,
+			final String name) {
+		return getFormParameter(request, name);
 	}
 
 }

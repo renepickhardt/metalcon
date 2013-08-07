@@ -22,7 +22,7 @@ import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateTemplate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.TemplateFileInfo;
-import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreateType;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreationType;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormFile;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
@@ -39,10 +39,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  */
 public class Create extends HttpServlet {
 
-	/**
-	 * generated serial version UID
-	 */
-	private static final long serialVersionUID = 4435622251859808192L;
 	/**
 	 * command queue to stack commands created
 	 */
@@ -91,10 +87,10 @@ public class Create extends HttpServlet {
 
 				// read essential form fields
 				final long timestamp = System.currentTimeMillis();
-				final CreateType createType = CreateType.GetCreateType(items
+				final CreationType createType = CreationType.GetCreationType(items
 						.getField(FormFields.Create.CREATE_TYPE));
 
-				if (createType == CreateType.FRIENDSHIP) {
+				if (createType == CreationType.FRIENDSHIP) {
 					// read followship specific fields
 					final long followedId = Long.parseLong(items
 							.getField(FormFields.Create.FOLLOWSHIP_TARGET));

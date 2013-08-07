@@ -3,29 +3,19 @@ package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
- * create command: friendship
+ * remove command: friendship
  * 
  * @author Sebastian Schlicht
  * 
  */
-public class CreateFriendship extends SocialGraphOperation {
+public class RemoveFriendship extends SocialGraphOperation {
 
 	/**
 	 * followed user's identifier
 	 */
 	private final long followedId;
 
-	/**
-	 * create a new create friendship command
-	 * 
-	 * @param timestamp
-	 *            time stamp of the friendship
-	 * @param followingId
-	 *            following user's identifier
-	 * @param followedId
-	 *            followed user's identifier
-	 */
-	public CreateFriendship(final ClientResponder responder,
+	public RemoveFriendship(final ClientResponder responder,
 			final long timestamp, final long followingId, final long followedId) {
 		super(responder, timestamp, followingId);
 		this.followedId = followedId;
@@ -33,7 +23,7 @@ public class CreateFriendship extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		boolean success = graph.createFriendship(this.timestamp, this.userId,
+		boolean success = graph.removeFriendship(this.timestamp, this.userId,
 				this.followedId);
 
 		if (success) {
@@ -42,10 +32,8 @@ public class CreateFriendship extends SocialGraphOperation {
 
 			return true;
 		} else {
-			// TODO: create own exceptions to catch
-			// send error code
-			this.responder.error(500,
-					"thrown exceptions are not specified yet!");
+			// TODO: send error code as the friendship did not exist
+			this.responder.error(404, "friendship not existing!");
 
 			return false;
 		}

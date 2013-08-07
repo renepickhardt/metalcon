@@ -49,7 +49,7 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public long createStatusUpdate(long timestamp, long userID,
+	public long createStatusUpdate(final long timestamp, final long userID,
 			StatusUpdate content) {
 		// find user first
 		Node user;
@@ -92,8 +92,8 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public List<String> readStatusUpdates(long posterId, long readerId,
-			int numItems, boolean ownUpdates) {
+	public List<String> readStatusUpdates(final long posterId,
+			final long readerId, final int numItems, boolean ownUpdates) {
 		// find users first
 		Node poster, reader;
 		try {
@@ -154,7 +154,8 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public boolean removeFriendship(long followingId, long followedId) {
+	public boolean removeFriendship(final long timestamp,
+			final long followingId, final long followedId) {
 		// find users first
 		Node following, followed;
 		try {
@@ -178,7 +179,8 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public boolean removeStatusUpdate(long userId, long statusUpdateId) {
+	public boolean removeStatusUpdate(final long userId,
+			final long statusUpdateId) {
 		// find user first
 		Node user;
 		try {

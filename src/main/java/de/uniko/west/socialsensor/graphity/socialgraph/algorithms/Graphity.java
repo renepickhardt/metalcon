@@ -318,8 +318,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean removeFriendship(final long followingId,
-			final long followedId) {
+	public boolean removeFriendship(final long timestamp,
+			final long followingId, final long followedId) {
 		// find users first
 		Node following, followed;
 		try {

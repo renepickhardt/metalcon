@@ -116,6 +116,10 @@ public class StatusUpdateManager {
 		final String targetPackage = StatusUpdate.class.getPackage().getName()
 				+ ".templates.";
 		WORKING_DIR = config.workingPath() + targetPackage.replace(".", "/");
+		final File dirWorking = new File(WORKING_DIR);
+		if (!dirWorking.exists()) {
+			dirWorking.mkdir();
+		}
 		System.out.println("WORKING_DIR:" + WORKING_DIR);
 
 		// create class loader

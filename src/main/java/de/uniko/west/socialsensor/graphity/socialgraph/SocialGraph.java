@@ -89,6 +89,8 @@ public abstract class SocialGraph {
 	/**
 	 * remove a friendship from one user to another
 	 * 
+	 * @param timestamp
+	 *            time stamp of the friendship removal
 	 * @param followingId
 	 *            identifier of the user following, requesting the deletion
 	 * @param followedId
@@ -96,7 +98,8 @@ public abstract class SocialGraph {
 	 * @return true - if the friendship has been removed successfully<br>
 	 *         false - otherwise
 	 */
-	public abstract boolean removeFriendship(long followingId, long followedId);
+	public abstract boolean removeFriendship(long timestamp, long followingId,
+			long followedId);
 
 	/**
 	 * remove a status update from a user
