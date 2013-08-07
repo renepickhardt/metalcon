@@ -124,9 +124,11 @@ public class Graphity extends SocialGraph {
 		content.setCreator(new User(user));
 
 		// fill status update node
-		crrUpdate.setProperty(Properties.TIMESTAMP, timestamp);
-		crrUpdate.setProperty(Properties.CONTENT_TYPE, content.getType());
-		crrUpdate.setProperty(Properties.CONTENT, content.toJSONString());
+		crrUpdate.setProperty(Properties.StatusUpdate.TIMESTAMP, timestamp);
+		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT_TYPE,
+				content.getType());
+		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT,
+				content.toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -138,7 +140,7 @@ public class Graphity extends SocialGraph {
 
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
-		user.setProperty(Properties.LAST_UPDATE, timestamp);
+		user.setProperty(Properties.User.LAST_UPDATE, timestamp);
 
 		// update ego network for this user
 		this.updateEgoNetwork(user);
@@ -372,7 +374,7 @@ public class Graphity extends SocialGraph {
 					statusUpdate, SocialGraphRelationshipType.UPDATE);
 			if (nextStatusUpdate != null) {
 				newTimestamp = (long) nextStatusUpdate
-						.getProperty(Properties.TIMESTAMP);
+						.getProperty(Properties.StatusUpdate.TIMESTAMP);
 			}
 
 			// loop through followers
@@ -448,20 +450,22 @@ public class Graphity extends SocialGraph {
 
 	@Override
 	public boolean removeStatusUpdate(long userId, long statusUpdateId) {
-		// find user first
-		Node user;
+		// find user and status update first
+		Node user, statusUpdate;
 		try {
 			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
+			statusUpdate = NeoUtils.getNodeByIdentifier(this.graph,
+					statusUpdateId);
 		} catch (final NotFoundException e) {
 			return false;
 		}
 
-		// search for the user's replica node
-		final Node statusUpdate = NeoUtils
-				.getStatusUpdate(user, statusUpdateId);
+		// get the status update owner
+		final Node statusUpdateAuthor = NeoUtils.getPrevSingleNode(
+				statusUpdate, SocialGraphRelationshipType.UPDATE);
 
 		// remove the status update if the ownership has been proved
-		if (statusUpdate != null) {
+		if (user.equals(statusUpdateAuthor)) {
 			// update ego network
 			this.updateReplicaLayerStatusUpdateDeletion(user, statusUpdate);
 
@@ -503,8 +507,8 @@ public class Graphity extends SocialGraph {
 	private static long getLastUpdateByReplica(final Node userReplica) {
 		final Node user = NeoUtils.getNextSingleNode(userReplica,
 				SocialGraphRelationshipType.REPLICA);
-		if (user.hasProperty(Properties.LAST_UPDATE)) {
-			return (long) user.getProperty(Properties.LAST_UPDATE);
+		if (user.hasProperty(Properties.User.LAST_UPDATE)) {
+			return (long) user.getProperty(Properties.User.LAST_UPDATE);
 		}
 		return 0;
 	}

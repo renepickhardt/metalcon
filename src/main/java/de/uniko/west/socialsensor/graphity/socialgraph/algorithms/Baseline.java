@@ -72,9 +72,11 @@ public class Baseline extends SocialGraph {
 		content.setCreator(new User(user));
 
 		// fill status update node
-		crrUpdate.setProperty(Properties.TIMESTAMP, timestamp);
-		crrUpdate.setProperty(Properties.CONTENT_TYPE, content.getType());
-		crrUpdate.setProperty(Properties.CONTENT, content.toJSONString());
+		crrUpdate.setProperty(Properties.StatusUpdate.TIMESTAMP, timestamp);
+		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT_TYPE,
+				content.getType());
+		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT,
+				content.toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -86,7 +88,7 @@ public class Baseline extends SocialGraph {
 
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
-		user.setProperty(Properties.LAST_UPDATE, timestamp);
+		user.setProperty(Properties.User.LAST_UPDATE, timestamp);
 
 		return crrUpdate.getId();
 	}
@@ -181,19 +183,22 @@ public class Baseline extends SocialGraph {
 	@Override
 	public boolean removeStatusUpdate(final long userId,
 			final long statusUpdateId) {
-		// find user first
-		Node user;
+		// find user and status update first
+		Node user, statusUpdate;
 		try {
 			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
+			statusUpdate = NeoUtils.getNodeByIdentifier(this.graph,
+					statusUpdateId);
 		} catch (final NotFoundException e) {
 			return false;
 		}
 
-		final Node statusUpdate = NeoUtils
-				.getStatusUpdate(user, statusUpdateId);
+		// get the status update owner
+		final Node statusUpdateAuthor = NeoUtils.getPrevSingleNode(
+				statusUpdate, SocialGraphRelationshipType.UPDATE);
 
 		// remove the status update if the ownership has been proved
-		if (statusUpdate != null) {
+		if (user.equals(statusUpdateAuthor)) {
 			// remove reference from previous status update
 			final Node previousUpdate = NeoUtils.getPrevSingleNode(
 					statusUpdate, SocialGraphRelationshipType.UPDATE);

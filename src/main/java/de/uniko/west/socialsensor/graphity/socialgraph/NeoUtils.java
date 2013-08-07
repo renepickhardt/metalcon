@@ -161,28 +161,6 @@ public class NeoUtils {
 	}
 
 	/**
-	 * search for a status update of a user
-	 * 
-	 * @param user
-	 *            identifier of the user owning the status update
-	 * @param statusUpdateId
-	 *            identifier of the status update
-	 * @return status update node if ownership has been proved<br>
-	 *         <b>null</b> - otherwise
-	 */
-	public static Node getStatusUpdate(final Node user,
-			final long statusUpdateId) {
-		Node statusUpdate = user;
-		do {
-			statusUpdate = NeoUtils.getNextSingleNode(statusUpdate,
-					SocialGraphRelationshipType.UPDATE);
-		} while ((statusUpdate != null)
-				&& (statusUpdate.getId() != statusUpdateId));
-
-		return statusUpdate;
-	}
-
-	/**
 	 * get a specific node from a database via its identifier
 	 * 
 	 * @param graphDB

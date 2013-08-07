@@ -263,11 +263,17 @@ public class GraphityTest {
 					AlgorithmTests.DATABASE, nodeId);
 			assertNotNull(statusUpdateNode);
 
-			assertEquals(statusUpdateNode.getProperty(Properties.TIMESTAMP),
+			assertEquals(
+					statusUpdateNode
+							.getProperty(Properties.StatusUpdate.TIMESTAMP),
 					timestamp);
-			assertEquals(statusUpdateNode.getProperty(Properties.CONTENT_TYPE),
+			assertEquals(
+					statusUpdateNode
+							.getProperty(Properties.StatusUpdate.CONTENT_TYPE),
 					creationItem.getStatusUpdate().getType());
-			assertEquals(statusUpdateNode.getProperty(Properties.CONTENT),
+			assertEquals(
+					statusUpdateNode
+							.getProperty(Properties.StatusUpdate.CONTENT),
 					creationItem.getStatusUpdate().toJSONString());
 
 			// prevent the time stamps from being equal
@@ -298,7 +304,8 @@ public class GraphityTest {
 				assertNotNull(currentItem);
 
 				assertEquals(
-						statusUpdateNode.getProperty(Properties.TIMESTAMP),
+						statusUpdateNode
+								.getProperty(Properties.StatusUpdate.TIMESTAMP),
 						currentItem.getStatusUpdate().getTimestamp());
 			}
 

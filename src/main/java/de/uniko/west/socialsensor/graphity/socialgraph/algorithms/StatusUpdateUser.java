@@ -57,7 +57,7 @@ public class StatusUpdateUser {
 		// load status update time stamp if existing
 		if (this.nextStatusUpdateNode != null) {
 			this.statusUpdateTimestamp = (long) this.nextStatusUpdateNode
-					.getProperty(Properties.TIMESTAMP);
+					.getProperty(Properties.StatusUpdate.TIMESTAMP);
 		}
 	}
 
@@ -70,7 +70,7 @@ public class StatusUpdateUser {
 	 */
 	public String getStatusUpdate() {
 		final String statusUpdate = (String) this.nextStatusUpdateNode
-				.getProperty(Properties.CONTENT);
+				.getProperty(Properties.StatusUpdate.CONTENT);
 		this.nextStatusUpdate();
 		return statusUpdate;
 	}
