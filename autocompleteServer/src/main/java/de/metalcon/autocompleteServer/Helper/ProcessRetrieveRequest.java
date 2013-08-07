@@ -22,7 +22,7 @@ public class ProcessRetrieveRequest {
 		Integer numItems = checkNumItems(request);
 		SuggestTree index = checkIndexName(request, context);
 		if (index == null){
-			ProcessRetrieveResponse.addError(StatusCodes.NO_INDEX_AVAILABLE);
+			ProcessRetrieveResponse.addError(RetrieveStatusCodes.NO_INDEX_AVAILABLE);
 		}
 		Node result = checkTerm(request, index);
 		for (int i = 0; i < Math.min(result.listLength(), numItems); ++i) {
@@ -46,16 +46,16 @@ public class ProcessRetrieveRequest {
 			if (numItems != null){
 				if (numItems < 1 || numItems > ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS){
 					numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
-					ProcessRetrieveResponse.addNumItemsWarning(StatusCodes.NUMITEMS_OUT_OF_RANGE);
+					ProcessRetrieveResponse.addNumItemsWarning(RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE);
 				}
 			}else {
 				numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
-				ProcessRetrieveResponse.addNumItemsWarning(StatusCodes.NUMITEMS_NOT_AN_INTEGER);
+				ProcessRetrieveResponse.addNumItemsWarning(RetrieveStatusCodes.NUMITEMS_NOT_AN_INTEGER);
 
 			}
 		}else{
 			numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
-			ProcessRetrieveResponse.addNumItemsWarning(StatusCodes.NUMITEMS_NOT_GIVEN);
+			ProcessRetrieveResponse.addNumItemsWarning(RetrieveStatusCodes.NUMITEMS_NOT_GIVEN);
 		}
 		return numItems;
 	}
@@ -72,7 +72,7 @@ public class ProcessRetrieveRequest {
 		// if no indexName Parameter was provided use the default index.
 		if (indexName==null){
 			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
-			ProcessRetrieveResponse.addIndexWarning(StatusCodes.NO_INDEX_GIVEN);
+			ProcessRetrieveResponse.addIndexWarning(RetrieveStatusCodes.NO_INDEX_GIVEN);
 			index = ContextListener.getIndex(indexName, context);
 		}
 		// if an indexName Parameter was provided use this one
@@ -81,7 +81,7 @@ public class ProcessRetrieveRequest {
 			// if the indexName given is unknown to the server use the default.
 			if (index==null){
 				indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
-				ProcessRetrieveResponse.addIndexWarning(StatusCodes.INDEX_UNKNOWN);
+				ProcessRetrieveResponse.addIndexWarning(RetrieveStatusCodes.INDEX_UNKNOWN);
 				index = ContextListener.getIndex(indexName, context);
 			}
 		}
@@ -95,7 +95,7 @@ public class ProcessRetrieveRequest {
 		String term = request.getParameter(ProtocolConstants.QUERY_PARAMETER);
 		Node bestSuggestions = null;
 		if (term == null){
-			ProcessRetrieveResponse.addError(StatusCodes.NO_TERM_GIVEN);
+			ProcessRetrieveResponse.addError(RetrieveStatusCodes.NO_TERM_GIVEN);
 		}
 		else {
 			bestSuggestions = index.getBestSuggestions(term);

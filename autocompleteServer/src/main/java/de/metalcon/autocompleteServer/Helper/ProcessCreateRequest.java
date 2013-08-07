@@ -37,7 +37,7 @@ public class ProcessCreateRequest {
 		if (indexName != null){
 			
 		}else{
-			ProcessCreateResponse.addIndexNameWarning(StatusCodes.INDEXNAME_NOT_GIVEN);
+			ProcessCreateResponse.addIndexNameWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			
 		}
 	}
@@ -46,7 +46,7 @@ public class ProcessCreateRequest {
 		if (queryName != null){
 			
 		}else{
-			ProcessCreateResponse.addQueryNameWarning(StatusCodes.QUERYNAME_NOT_GIVEN);
+			ProcessCreateResponse.addQueryNameWarning(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 		}
 	}
 	private static void checkTerm(HttpServletRequest request) {
