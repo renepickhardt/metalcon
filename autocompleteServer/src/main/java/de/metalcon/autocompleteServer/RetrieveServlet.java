@@ -29,7 +29,7 @@ public class RetrieveServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ProcessRetrieveRequest.checkRequestParameter(request);
+		ProcessRetrieveRequest.checkRequestParameter(request, getServletContext());
 		response.setContentType("text/json");	//is this necessary?
 
 		//this must be modified so it calls the Search-class methods I'm working on now

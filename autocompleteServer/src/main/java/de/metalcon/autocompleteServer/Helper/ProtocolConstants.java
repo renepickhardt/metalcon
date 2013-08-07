@@ -14,5 +14,6 @@ public class ProtocolConstants {
 	/**
 	 * the default Number of Items which can be retrieved from the Suggest Server 
 	 */
-	public static final  Integer MAX_NUMBER_OF_SUGGESTIONS = 7;
+	public static final Integer MAX_NUMBER_OF_SUGGESTIONS = 7;
+	public static final String DEFAULT_INDEX_NAME = "generalindex"; 
 }
