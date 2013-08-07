@@ -217,7 +217,8 @@ public class BaselineTest {
 			assertTrue(nodeId != 0);
 
 			// check if status update node exists and contains correct data
-			statusUpdateNode = AlgorithmTests.DATABASE.getNodeById(nodeId);
+			statusUpdateNode = NeoUtils.getNodeByIdentifier(
+					AlgorithmTests.DATABASE, nodeId);
 			assertNotNull(statusUpdateNode);
 
 			assertEquals(statusUpdateNode.getProperty(Properties.TIMESTAMP),

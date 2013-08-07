@@ -41,8 +41,8 @@ public class Graphity extends SocialGraph {
 		// find users first
 		Node following, followed;
 		try {
-			following = this.graph.getNodeById(followingId);
-			followed = this.graph.getNodeById(followedId);
+			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
+			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
 		} catch (final NotFoundException e) {
 			return false;
 		}
@@ -106,7 +106,7 @@ public class Graphity extends SocialGraph {
 		// find user first
 		Node user;
 		try {
-			user = this.graph.getNodeById(userID);
+			user = NeoUtils.getNodeByIdentifier(this.graph, userID);
 		} catch (final NotFoundException e) {
 			return 0;
 		}
@@ -204,15 +204,14 @@ public class Graphity extends SocialGraph {
 		// find users first
 		Node poster, reader;
 		try {
-			poster = this.graph.getNodeById(posterId);
+			poster = NeoUtils.getNodeByIdentifier(this.graph, posterId);
 			if (posterId == readerId) {
 				reader = poster;
 			} else {
 				ownUpdates = true;
-				reader = this.graph.getNodeById(readerId);
+				reader = NeoUtils.getNodeByIdentifier(this.graph, readerId);
 			}
 		} catch (final NotFoundException e) {
-			// TODO: catch all exceptions in network responder
 			return null;
 		}
 
@@ -324,8 +323,8 @@ public class Graphity extends SocialGraph {
 		// find users first
 		Node following, followed;
 		try {
-			following = this.graph.getNodeById(followingId);
-			followed = this.graph.getNodeById(followedId);
+			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
+			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
 		} catch (final NotFoundException e) {
 			return false;
 		}
@@ -452,7 +451,7 @@ public class Graphity extends SocialGraph {
 		// find user first
 		Node user;
 		try {
-			user = this.graph.getNodeById(userId);
+			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
 		} catch (final NotFoundException e) {
 			return false;
 		}
