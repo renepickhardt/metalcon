@@ -2,10 +2,11 @@ package de.uniko.west.socialsensor.graphity.server;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -54,7 +55,7 @@ public class Server implements ServletContextListener {
 	/**
 	 * queued commands being executed by the command worker
 	 */
-	private Queue<SocialGraphOperation> commands;
+	private BlockingQueue<SocialGraphOperation> commands;
 
 	/**
 	 * server's social graph command worker
@@ -86,7 +87,7 @@ public class Server implements ServletContextListener {
 		}
 
 		// create and start command worker
-		this.commands = new LinkedList<SocialGraphOperation>();
+		this.commands = new LinkedBlockingQueue<SocialGraphOperation>();
 		this.commandWorker = new Worker(this.commands, this.graph);
 	}
 

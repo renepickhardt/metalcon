@@ -1,6 +1,6 @@
 package de.uniko.west.socialsensor.graphity.server;
 
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
@@ -19,9 +19,9 @@ public class Worker implements Runnable {
 	private Thread workerThread;
 
 	/**
-	 * social graph command queue being filled with commands
+	 * thread-safe social graph command queue being filled with commands
 	 */
-	private final Queue<SocialGraphOperation> commands;
+	private final BlockingQueue<SocialGraphOperation> commands;
 
 	/**
 	 * graph targeted by the commands
@@ -42,11 +42,12 @@ public class Worker implements Runnable {
 	 * create a new command worker for a social graph
 	 * 
 	 * @param commands
-	 *            social graph command queue being filled with commands
+	 *            thread-safe social graph command queue being filled with
+	 *            commands
 	 * @param graph
 	 *            graph targeted by the commands
 	 */
-	public Worker(final Queue<SocialGraphOperation> commands,
+	public Worker(final BlockingQueue<SocialGraphOperation> commands,
 			final SocialGraph graph) {
 		this.commands = commands;
 		this.graph = graph;
@@ -56,17 +57,15 @@ public class Worker implements Runnable {
 	public void run() {
 		this.running = true;
 
-		// exit execution loop if worker has been stopped
-		SocialGraphOperation command = null;
-		while (!this.stopping) {
-			command = this.commands.poll();
-
-			// run first command (if existing)
-			if (command != null) {
-				System.out.println("[WORKER]: executing command...");
+		try {
+			// exit execution loop if worker has been stopped
+			SocialGraphOperation command = null;
+			while (!this.stopping) {
+				command = this.commands.take();
 				command.run(this.graph);
-				System.out.println("[WORKER]: command has been executed.");
 			}
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		// reset worker flags
