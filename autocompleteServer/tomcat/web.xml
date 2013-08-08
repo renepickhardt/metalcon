@@ -6,7 +6,7 @@
 	<servlet> 
 		<servlet-name>suggest</servlet-name>
    		<description>Retrieve Suggestions for an Autocomplete service</description>
-   		<servlet-class>de.metalcon.autocompleteServer.RetrieveServlet</servlet-class>
+   		<servlet-class>de.metalcon.autocompleteServer.Retrieve.RetrieveServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
    		<servlet-name>suggest</servlet-name>

@@ -1,4 +1,4 @@
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Create;
 
 /**
  * Status codes that are used for the Create responses of the Auto Suggest Transfer Protocol (ASTP)

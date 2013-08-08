@@ -1,4 +1,4 @@
-package de.metalcon.autocompleteServer;
+package de.metalcon.autocompleteServer.Helper;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;

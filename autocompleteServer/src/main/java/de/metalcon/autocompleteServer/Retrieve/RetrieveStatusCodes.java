@@ -1,7 +1,9 @@
 /**
  * 
  */
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Retrieve;
+
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 
 /**
  * Status codes that are used in the Auto Suggest Transfer Protocol (ASTP)

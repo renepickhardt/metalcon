@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Retrieve;
 
 /**
  * @author Rene Pickhardt

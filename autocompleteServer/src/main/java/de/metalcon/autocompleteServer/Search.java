@@ -1,8 +1,9 @@
 package de.metalcon.autocompleteServer;
 
 import java.io.*;
-import de.metalcon.autocompleteServer.SuggestTree;
-import de.metalcon.autocompleteServer.SuggestTree.*;
+
+import de.metalcon.autocompleteServer.Helper.SuggestTree;
+import de.metalcon.autocompleteServer.Helper.SuggestTree.*;
 
 public class Search {
 	public static SuggestTree suggestTree = null;

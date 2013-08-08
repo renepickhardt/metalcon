@@ -1,11 +1,12 @@
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Retrieve;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import de.metalcon.autocompleteServer.ContextListener;
-import de.metalcon.autocompleteServer.SuggestTree;
-import de.metalcon.autocompleteServer.SuggestTree.Node;
+import de.metalcon.autocompleteServer.Helper.ContextListener;
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
+import de.metalcon.autocompleteServer.Helper.SuggestTree;
+import de.metalcon.autocompleteServer.Helper.SuggestTree.Node;
 
 /**
  * This class is a helper class to process the Read Requests

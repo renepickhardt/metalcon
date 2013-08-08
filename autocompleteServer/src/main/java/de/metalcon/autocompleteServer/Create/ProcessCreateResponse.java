@@ -1,4 +1,4 @@
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Create;
 
 public class ProcessCreateResponse {
 

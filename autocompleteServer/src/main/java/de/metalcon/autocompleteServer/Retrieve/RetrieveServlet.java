@@ -1,4 +1,4 @@
-package de.metalcon.autocompleteServer;
+package de.metalcon.autocompleteServer.Retrieve;
 
 import java.io.*;
 
@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import de.metalcon.autocompleteServer.Search;
-import de.metalcon.autocompleteServer.Helper.ProcessRetrieveRequest;
 
 /**
  * Servlet implementation class TestServlet

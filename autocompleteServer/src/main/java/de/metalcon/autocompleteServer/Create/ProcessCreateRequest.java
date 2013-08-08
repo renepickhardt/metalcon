@@ -1,6 +1,8 @@
-package de.metalcon.autocompleteServer.Helper;
+package de.metalcon.autocompleteServer.Create;
 
 import javax.servlet.http.HttpServletRequest;
+
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 
 /**
  * 
