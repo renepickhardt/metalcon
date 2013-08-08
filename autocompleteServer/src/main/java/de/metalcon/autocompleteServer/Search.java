@@ -42,7 +42,7 @@ public class Search {
 							+ "</a>" + "<br>";
 					newZeileMyspace = "<a href=" + parts[2] + ">"
 							+ parts[0] + "</a>" + "<br>";
-					suggestTree.put(parts[0], priority);
+					suggestTree.put(parts[0], priority, parts[1]);
 					--priority;
 				}
 			}

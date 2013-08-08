@@ -187,11 +187,11 @@ public class SuggestTree {
      * string or the specified weight is negative
      * @throws NullPointerException if the specified suggestion is {@code null}
      */
-    public void put(String suggestion, int weight) {
+    public void put(String suggestion, int weight, String key) {
         if(suggestion.isEmpty() || weight < 0)
             throw new IllegalArgumentException();
         if(root == null) {
-            root = new Node(suggestion, weight, 0, null);
+            root = new Node(suggestion, weight, key, 0, null);
             size++;
             return;
         }
@@ -202,7 +202,7 @@ public class SuggestTree {
                 if(n.left != null)
                     n = n.left;
                 else{
-                    n.left = new Node(suggestion, weight, i, n);
+                    n.left = new Node(suggestion, weight, key, i, n);
                     insertIntoLists(n.left);
                     size++;
                     return;
@@ -211,7 +211,7 @@ public class SuggestTree {
                 if(n.right != null)
                     n = n.right;
                 else{
-                    n.right = new Node(suggestion, weight, i, n);
+                    n.right = new Node(suggestion, weight, key, i, n);
                     insertIntoLists(n.right);
                     size++;
                     return;
@@ -228,7 +228,7 @@ public class SuggestTree {
                     if(n.mid != null)
                         n = n.mid;
                     else{
-                        n.mid = new Node(suggestion, weight, i, n);
+                        n.mid = new Node(suggestion, weight, key, i, n);
                         insertIntoLists(n.mid);
                         size++;
                         return;
@@ -628,15 +628,17 @@ public class SuggestTree {
         
         private Node[] list;
         private String suggestion;
+        private String key;
         private int weight;
         private char firstChar;
         private final short charEnd;
         private Node left, mid, right, parent;
         
-        private Node(String suggestion, int weight, int index, Node parent) {
+        private Node(String suggestion, int weight,String key, int index, Node parent) {
             list = new Node[] {this};
             this.suggestion = suggestion;
             this.weight = weight;
+            this.key = key;
             firstChar = suggestion.charAt(index);
             charEnd = (short) suggestion.length();
             left = mid = right = null;
@@ -672,6 +674,16 @@ public class SuggestTree {
          */
         public int getWeight(int index) {
             return list[index].weight;
+        }
+        
+        /**
+         * Returns the key of the suggestion at the specified position in the list
+         * @throws IndexOutOfBoundsException if the {@code index} argument is
+         * negative or not less than the list length
+         * @author Rene Pickhardt
+         */
+        public String getKey(int index){
+        	return list[index].key;
         }
         
         /**
