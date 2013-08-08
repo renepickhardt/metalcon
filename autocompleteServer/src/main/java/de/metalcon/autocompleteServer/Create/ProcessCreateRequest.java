@@ -1,5 +1,8 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
@@ -21,13 +24,15 @@ public class ProcessCreateRequest {
 	/**
 	 * checks if the request parameters follow the protocol or corrects them.
 	 * @param request
+	 * @throws IOException 
 	 */
-	public static void checkRequestBody(HttpServletRequest request){
-		checkTerm(request);
-		checkKey(request);
-		checkIndex(request);
-		checkImage(request);
-
+	public static void checkRequestBody(HttpServletRequest request) throws IOException{
+		String line = null;
+		BufferedReader reader = request.getReader();
+		while ((line = reader.readLine()) != null) {
+			String[] parts = line.split("--ASTP-Boundary");
+			
+		}
 
 	}
 	private static void checkImage(HttpServletRequest request) {
@@ -35,21 +40,10 @@ public class ProcessCreateRequest {
 		
 	}
 	private static void checkIndex(HttpServletRequest request) {
-		String indexName = request.getParameter(ProtocolConstants.INDEX_PARAMETER);
-		if (indexName != null){
-			
-		}else{
-			ProcessCreateResponse.addIndexNameWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
-			
-		}
+
 	}
 	private static void checkKey(HttpServletRequest request) {
-		String queryName = request.getParameter(ProtocolConstants.QUERY_PARAMETER);
-		if (queryName != null){
-			
-		}else{
-			ProcessCreateResponse.addQueryNameWarning(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
-		}
+
 	}
 	private static void checkTerm(HttpServletRequest request) {
 		// TODO Auto-generated method stub
