@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.uniko.west.socialsensor.graphity.server.Server;
-import de.uniko.west.socialsensor.graphity.server.tomcat.delete.RemovalType;
+import de.uniko.west.socialsensor.graphity.server.tomcat.delete.DeleteType;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveStatusUpdate;
@@ -51,13 +51,13 @@ public class Delete extends HttpServlet {
 
 			// read essential form fields
 			final long timestamp = System.currentTimeMillis();
-			final RemovalType removalType = RemovalType.GetRemovalType(Helper
-					.getString(request, FormFields.Delete.REMOVAL_TYPE));
+			final DeleteType removalType = DeleteType.GetDeleteType(Helper
+					.getString(request, FormFields.Delete.TYPE));
 
-			if (removalType == RemovalType.FOLLOWSHIP) {
+			if (removalType == DeleteType.FOLLOWSHIP) {
 				// read followship specific fields
 				final long followedId = Helper.getLong(request,
-						FormFields.Delete.FOLLOWSHIP_REMOVAL_TARGET);
+						FormFields.Delete.FOLLOWED);
 
 				// remove followship
 				final RemoveFriendship removeFriendshipCommand = new RemoveFriendship(

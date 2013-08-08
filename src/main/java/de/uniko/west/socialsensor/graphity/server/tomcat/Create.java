@@ -22,7 +22,7 @@ import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateTemplate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.TemplateFileInfo;
-import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreationType;
+import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreateType;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormFile;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
@@ -87,13 +87,13 @@ public class Create extends HttpServlet {
 
 				// read essential form fields
 				final long timestamp = System.currentTimeMillis();
-				final CreationType createType = CreationType.GetCreationType(items
-						.getField(FormFields.Create.CREATE_TYPE));
+				final CreateType createType = CreateType.GetCreateType(items
+						.getField(FormFields.Create.TYPE));
 
-				if (createType == CreationType.FRIENDSHIP) {
+				if (createType == CreateType.FOLLOW) {
 					// read followship specific fields
 					final long followedId = Long.parseLong(items
-							.getField(FormFields.Create.FOLLOWSHIP_TARGET));
+							.getField(FormFields.Create.FOLLOW_TARGET));
 
 					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(

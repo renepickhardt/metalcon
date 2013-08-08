@@ -22,19 +22,19 @@ public class FormFields {
 	public class Create {
 
 		/**
-		 * creation type (followship/status update)
+		 * creation type
 		 */
-		public static final String CREATE_TYPE = "creation_type";
+		public static final String TYPE = "type";
 
 		/**
-		 * identifier of the user a followship shall be created to
+		 * identifier of the user the follow edge shall be created to
 		 */
-		public static final String FOLLOWSHIP_TARGET = "target_id";
+		public static final String FOLLOW_TARGET = "followed_id";
 
 		/**
 		 * status update type identifier
 		 */
-		public static final String STATUS_UPDATE_TYPE = "type";
+		public static final String STATUS_UPDATE_TYPE = "status_update_type";
 
 	}
 
@@ -49,12 +49,12 @@ public class FormFields {
 		/**
 		 * number of status updates to be retrieved
 		 */
-		public static final String NUM_ITEMS = "numItems";
+		public static final String NUM_ITEMS = "num_items";
 
 		/**
 		 * own status updates/social network switch
 		 */
-		public static final String OWN_UPDATES = "ownUpdates";
+		public static final String OWN_UPDATES = "own_updates";
 
 	}
 
@@ -67,19 +67,19 @@ public class FormFields {
 	public class Delete {
 
 		/**
-		 * removal type (followship/status update)
+		 * deletion type
 		 */
-		public static final String REMOVAL_TYPE = "removal_type";
+		public static final String TYPE = "type";
 
 		/**
-		 * identifier of the user the followship to shall be removed from
+		 * identifier of the user the follow edge shall be deleted from
 		 */
-		public static final String FOLLOWSHIP_REMOVAL_TARGET = "target_id";
+		public static final String FOLLOWED = "followed_id";
 
 		/**
 		 * identifier of the status update that is to be deleted
 		 */
-		public static final String STATUS_UPDATE_ID = "object_id";
+		public static final String STATUS_UPDATE_ID = "status_update_id";
 
 	}
 

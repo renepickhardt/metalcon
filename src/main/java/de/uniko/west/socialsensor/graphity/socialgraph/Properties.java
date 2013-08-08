@@ -14,7 +14,7 @@ public final class Properties {
 	 * @author Sebastian Schlicht
 	 * 
 	 */
-	public static final class Templates {
+	public static class Templates {
 
 		/**
 		 * template identifier
@@ -54,7 +54,7 @@ public final class Properties {
 	 * @author sebschlicht
 	 * 
 	 */
-	public static final class User {
+	public static class User {
 
 		/**
 		 * user display name
@@ -74,7 +74,7 @@ public final class Properties {
 	 * @author sebschlicht
 	 * 
 	 */
-	public static final class StatusUpdate {
+	public static class StatusUpdate {
 
 		/**
 		 * time stamp in milliseconds of the creation
