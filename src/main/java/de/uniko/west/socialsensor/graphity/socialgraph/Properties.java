@@ -57,6 +57,11 @@ public final class Properties {
 	public static class User {
 
 		/**
+		 * unique user identifier
+		 */
+		public static final String IDENTIFIER = "identifier";
+
+		/**
 		 * user display name
 		 */
 		public static final String DISPLAY_NAME = "displayName";
@@ -75,6 +80,11 @@ public final class Properties {
 	 * 
 	 */
 	public static class StatusUpdate {
+
+		/**
+		 * unique status update identifier
+		 */
+		public static final String IDENTIFIER = "identifier";
 
 		/**
 		 * time stamp in milliseconds of the creation

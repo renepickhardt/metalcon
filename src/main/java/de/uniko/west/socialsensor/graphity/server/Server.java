@@ -111,6 +111,15 @@ public class Server implements ServletContextListener {
 	}
 
 	/**
+	 * access graph database to read users
+	 * 
+	 * @return social graph database
+	 */
+	public AbstractGraphDatabase getGraphDatabase() {
+		return this.graphDatabase;
+	}
+
+	/**
 	 * access command queue to add commands
 	 * 
 	 * @return queued commands being executed by the command worker

@@ -1,23 +1,18 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
 import java.io.IOException;
-import java.util.Queue;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import org.neo4j.graphdb.Node;
+
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.read.InvalidItemNumberException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.read.InvalidRetrievalFlag;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ReadStatusUpdates;
-import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
 
 /**
  * Tomcat read operation handler
@@ -25,20 +20,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  * @author Sebastian Schlicht
  * 
  */
-public class Read extends HttpServlet {
-
-	/**
-	 * command queue to stack commands created
-	 */
-	private Queue<SocialGraphOperation> commandQueue;
-
-	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
-		final ServletContext context = this.getServletContext();
-		this.commandQueue = ((de.uniko.west.socialsensor.graphity.server.Server) context
-				.getAttribute("server")).getCommandQueue();
-	}
+public class Read extends GraphityHttpServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request,
@@ -48,16 +30,14 @@ public class Read extends HttpServlet {
 
 		try {
 			// TODO: OAuth, stop manual determining of user id
-			long userId;
-			try {
-				userId = Helper.getLong(request, FormFields.USER_ID);
-				if (!NeoUtils.isValidUserIdentifier(userId)) {
-					throw new NumberFormatException();
-				}
-			} catch (final NumberFormatException e) {
-				throw new InvalidUserIdentifierException(
-						"user identifier has to be greater than zero.");
-			}
+			final String userId = Helper.getString(request, FormFields.USER_ID);
+			final Node user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
+					userId);
+
+			final String posterId = Helper.getString(request,
+					FormFields.Read.POSTER_ID);
+			final Node poster = NeoUtils.getUserNodeByIdentifier(this.graphDB,
+					posterId);
 
 			int numItems;
 			try {
@@ -80,7 +60,7 @@ public class Read extends HttpServlet {
 
 			// read status updates
 			final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
-					responder, System.currentTimeMillis(), userId, userId,
+					responder, System.currentTimeMillis(), user, poster,
 					numItems, ownUpdates);
 			this.commandQueue.add(readStatusUpdatesCommand);
 		} catch (final IllegalArgumentException e) {

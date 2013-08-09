@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import org.neo4j.graphdb.Node;
+
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -24,15 +26,14 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the status update
-	 * @param posterId
-	 *            posting user's identifier
+	 * @param poster
+	 *            posting user
 	 * @param content
 	 *            status update content object
 	 */
 	public CreateStatusUpdate(final ClientResponder responder,
-			final long timestamp, final long posterId,
-			final StatusUpdate content) {
-		super(responder, timestamp, posterId);
+			final long timestamp, final Node poster, final StatusUpdate content) {
+		super(responder, timestamp, poster);
 		this.content = content;
 	}
 
@@ -42,7 +43,7 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 
 		try {
 			final long nodeIdentifier = graph.createStatusUpdate(
-					this.timestamp, this.userId, this.content);
+					this.timestamp, this.user, this.content);
 
 			// send status update node identifier
 			this.responder.addLine(String.valueOf(nodeIdentifier));

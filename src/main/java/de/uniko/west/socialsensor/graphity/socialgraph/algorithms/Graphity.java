@@ -9,14 +9,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
-import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.FollowEdgeExistingException;
-import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.FollowEdgeNotExistingException;
-import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.InvalidDeleteFollowedIdentifier;
-import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.StatusUpdateNotOwnedException;
-import de.uniko.west.socialsensor.graphity.server.exceptions.read.InvalidPosterIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
@@ -43,25 +38,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public void createFriendship(final long timestamp, final long followingId,
-			final long followedId) {
-		// find users first
-		Node following, followed;
-		try {
-			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
-
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidUserIdentifierException("user with id \""
-					+ followingId + "\" is not existing.");
-		}
-
-		try {
-			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidCreateFollowedIdentifier("user with id \""
-					+ followedId + "\" is not existing.");
-		}
-
+	public void createFriendship(final long timestamp, final Node following,
+			final Node followed) {
 		// try to find the replica node of the user followed
 		Node followedReplica = null;
 		for (Relationship followship : following.getRelationships(
@@ -134,17 +112,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public long createStatusUpdate(final long timestamp, final long userID,
+	public long createStatusUpdate(final long timestamp, final Node user,
 			final StatusUpdate content) {
-		// find user first
-		Node user;
-		try {
-			user = NeoUtils.getNodeByIdentifier(this.graph, userID);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidUserIdentifierException("user with id \"" + userID
-					+ "\" is not existing.");
-		}
-
 		// get last recent status update
 		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
 				SocialGraphRelationshipType.UPDATE);
@@ -235,27 +204,10 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public List<String> readStatusUpdates(final long posterId,
-			final long userId, final int numItems, boolean ownUpdates) {
-		// find users first
-		Node user, poster;
-		try {
-			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidUserIdentifierException("user with id \"" + userId
-					+ "\" is not existing.");
-		}
-
-		if (userId == posterId) {
-			poster = user;
-		} else {
+	public List<String> readStatusUpdates(final Node poster, final Node user,
+			final int numItems, boolean ownUpdates) {
+		if (!poster.equals(user)) {
 			ownUpdates = true;
-			try {
-				poster = NeoUtils.getNodeByIdentifier(this.graph, posterId);
-			} catch (final IllegalArgumentException e) {
-				throw new InvalidPosterIdentifierException("user with id \""
-						+ posterId + "\" is not existing.");
-			}
 		}
 
 		final List<String> statusUpdates = new LinkedList<String>();
@@ -361,25 +313,8 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeFriendship(final long timestamp, final long followingId,
-			final long followedId) {
-		// find users first
-		Node following, followed;
-		try {
-			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
-
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidUserIdentifierException("user with id \""
-					+ followingId + "\" is not existing.");
-		}
-
-		try {
-			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidDeleteFollowedIdentifier("user with id \""
-					+ followedId + "\" is not existing.");
-		}
-
+	public void removeFriendship(final long timestamp, final Node following,
+			final Node followed) {
 		// find the replica node of the user followed
 		Node followedReplica = null;
 		for (Relationship followship : following.getRelationships(
@@ -500,25 +435,7 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeStatusUpdate(long userId, long statusUpdateId) {
-		// find user and status update first
-		Node user, statusUpdate;
-		try {
-			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidUserIdentifierException("user with id \"" + userId
-					+ "\" is not existing.");
-		}
-
-		try {
-			statusUpdate = NeoUtils.getNodeByIdentifier(this.graph,
-					statusUpdateId);
-		} catch (final IllegalArgumentException e) {
-			throw new InvalidStatusUpdateIdentifierException(
-					"status update with id \"" + statusUpdateId
-							+ "\" is not existing.");
-		}
-
+	public void removeStatusUpdate(final Node user, final Node statusUpdate) {
 		// get the status update owner
 		final Node statusUpdateAuthor = NeoUtils.getPrevSingleNode(
 				statusUpdate, SocialGraphRelationshipType.UPDATE);
@@ -527,7 +444,9 @@ public class Graphity extends SocialGraph {
 		if (!user.equals(statusUpdateAuthor)) {
 			throw new StatusUpdateNotOwnedException(
 					"you do not own the status update with the id \""
-							+ statusUpdateId + "\".");
+							+ statusUpdate
+									.getProperty(Properties.StatusUpdate.IDENTIFIER)
+							+ "\".");
 		}
 
 		// update ego network

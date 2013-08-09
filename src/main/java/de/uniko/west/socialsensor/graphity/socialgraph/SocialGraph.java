@@ -2,6 +2,7 @@ package de.uniko.west.socialsensor.graphity.socialgraph;
 
 import java.util.List;
 
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
@@ -44,34 +45,34 @@ public abstract class SocialGraph {
 	 * 
 	 * @param timestamp
 	 *            time stamp of the status update
-	 * @param userID
-	 *            user identifier
+	 * @param user
+	 *            user
 	 * @param content
 	 *            status update content object
 	 * @return status update node identifier if created successfully<br>
 	 *         zero - otherwise
 	 */
-	public abstract long createStatusUpdate(long timestamp, long userID,
+	public abstract long createStatusUpdate(long timestamp, Node user,
 			StatusUpdate content);
 
 	/**
 	 * create a new friendship from a user to another
 	 * 
-	 * @param followingId
-	 *            identifier of the user following
-	 * @param followedId
-	 *            identifier of the user being followed
+	 * @param following
+	 *            user following
+	 * @param followed
+	 *            user being followed
 	 */
-	public abstract void createFriendship(long timestamp, long followingId,
-			long followedId);
+	public abstract void createFriendship(long timestamp, Node following,
+			Node followed);
 
 	/**
 	 * read some status updates for/from a user
 	 * 
-	 * @param posterId
-	 *            identifier of the targeted stream's owner
-	 * @param userId
-	 *            identifier of the reading user
+	 * @param poster
+	 *            owner of the stream targeted
+	 * @param user
+	 *            reading user
 	 * @param numItems
 	 *            number of items to be read
 	 * @param ownUpdates
@@ -79,30 +80,30 @@ public abstract class SocialGraph {
 	 * @return list containing numItems status update Activities<br>
 	 *         (Activitystrea.ms)
 	 */
-	public abstract List<String> readStatusUpdates(long posterId,
-			long userId, int numItems, boolean ownUpdates);
+	public abstract List<String> readStatusUpdates(Node poster, Node user,
+			int numItems, boolean ownUpdates);
 
 	/**
 	 * remove a friendship from one user to another
 	 * 
 	 * @param timestamp
 	 *            time stamp of the friendship removal
-	 * @param followingId
-	 *            identifier of the user following, requesting the deletion
-	 * @param followedId
-	 *            identifier of the user followed
+	 * @param following
+	 *            user following, requesting the deletion
+	 * @param followed
+	 *            user followed
 	 */
-	public abstract void removeFriendship(long timestamp, long followingId,
-			long followedId);
+	public abstract void removeFriendship(long timestamp, Node following,
+			Node followed);
 
 	/**
 	 * remove a status update from a user
 	 * 
-	 * @param userId
-	 *            identifier of the user owning the status update
-	 * @param statusUpdateId
-	 *            identifier of the status update
+	 * @param user
+	 *            user requesting
+	 * @param statusUpdate
+	 *            status update
 	 */
-	public abstract void removeStatusUpdate(long userId, long statusUpdateId);
+	public abstract void removeStatusUpdate(Node user, Node statusUpdate);
 
 }

@@ -36,7 +36,7 @@ public class StatusUpdateTemplateManagerNode {
 	public StatusUpdateTemplateManagerNode(
 			final AbstractGraphDatabase graphDatabase) {
 		this.graphDatabase = graphDatabase;
-		final Node root = NeoUtils.getNodeByIdentifier(graphDatabase,
+		final Node root = NeoUtils.getUserNodeByIdentifier(graphDatabase,
 				NeoUtils.NodeIdentifiers.ROOT);
 
 		final RelationshipType templateManager = DynamicRelationshipType

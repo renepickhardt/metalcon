@@ -2,6 +2,8 @@ package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
 import java.util.List;
 
+import org.neo4j.graphdb.Node;
+
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
@@ -14,9 +16,9 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 public class ReadStatusUpdates extends SocialGraphOperation {
 
 	/**
-	 * identifier of the targeted stream's owner
+	 * owner of the stream targeted
 	 */
-	private final long posterId;
+	private final Node poster;
 
 	/**
 	 * number of items to be read
@@ -35,20 +37,20 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the access
-	 * @param readerId
-	 *            identifier of the reading user
-	 * @param posterId
-	 *            identifier of the targeted stream's owner
+	 * @param reader
+	 *            reading user
+	 * @param poster
+	 *            owner of the stream targeted
 	 * @param numItems
 	 *            number of items to be read
 	 * @param ownUpdates
 	 *            single stream flag
 	 */
 	public ReadStatusUpdates(final ClientResponder responder,
-			final long timestamp, final long readerId, final long posterId,
+			final long timestamp, final Node reader, final Node poster,
 			final int numItems, final boolean ownUpdates) {
-		super(responder, timestamp, readerId);
-		this.posterId = posterId;
+		super(responder, timestamp, reader);
+		this.poster = poster;
 		this.numItems = numItems;
 		this.ownUpdates = ownUpdates;
 	}
@@ -57,7 +59,7 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	protected boolean execute(final SocialGraph graph) {
 		try {
 			final List<String> activities = graph.readStatusUpdates(
-					this.posterId, this.userId, this.numItems, this.ownUpdates);
+					this.poster, this.user, this.numItems, this.ownUpdates);
 
 			// send stream to client
 			int i = 0;

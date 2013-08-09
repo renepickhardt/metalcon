@@ -2,12 +2,10 @@ package de.uniko.west.socialsensor.graphity.server.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Queue;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,12 +13,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.neo4j.graphdb.Node;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.server.Server;
-import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
-import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.InvalidStatusUpdateTypeException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
@@ -35,7 +32,6 @@ import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
 
 /**
  * Tomcat create operation handler
@@ -43,12 +39,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  * @author Sebastian Schlicht
  * 
  */
-public class Create extends HttpServlet {
-
-	/**
-	 * command queue to stack commands created
-	 */
-	private Queue<SocialGraphOperation> commandQueue;
+public class Create extends GraphityHttpServlet {
 
 	/**
 	 * server configuration containing file paths
@@ -65,7 +56,6 @@ public class Create extends HttpServlet {
 		super.init(config);
 		final ServletContext context = this.getServletContext();
 		final Server server = (Server) context.getAttribute("server");
-		this.commandQueue = server.getCommandQueue();
 		this.config = server.getConfig();
 
 		// load file factory in temporary directory
@@ -85,17 +75,10 @@ public class Create extends HttpServlet {
 				// read multi-part form items
 				final FormItemList items = this.extractFormItems(request);
 
-				long userId;
-				try {
-					// TODO: OAuth, stop manual determining of user id
-					userId = Long.parseLong(items.getField(FormFields.USER_ID));
-					if (!NeoUtils.isValidUserIdentifier(userId)) {
-						throw new NumberFormatException();
-					}
-				} catch (final NumberFormatException e) {
-					throw new InvalidUserIdentifierException(
-							"user identifier has to be greater than zero.");
-				}
+				// TODO: OAuth, stop manual determining of user id
+				final String userId = items.getField(FormFields.USER_ID);
+				final Node user = NeoUtils.getUserNodeByIdentifier(
+						this.graphDB, userId);
 
 				// read essential form fields
 				final long timestamp = System.currentTimeMillis();
@@ -104,21 +87,14 @@ public class Create extends HttpServlet {
 
 				if (createType == CreateType.FOLLOW) {
 					// read followship specific fields
-					long followedId;
-					try {
-						followedId = Long.parseLong(items
-								.getField(FormFields.Create.FOLLOW_TARGET));
-						if (!NeoUtils.isValidUserIdentifier(followedId)) {
-							throw new NumberFormatException();
-						}
-					} catch (final NumberFormatException e) {
-						throw new InvalidCreateFollowedIdentifier(
-								"user identifier has to be greater than zero.");
-					}
+					final String followedId = items
+							.getField(FormFields.Create.FOLLOW_TARGET);
+					final Node followed = NeoUtils.getUserNodeByIdentifier(
+							this.graphDB, followedId);
 
 					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(
-							responder, timestamp, userId, followedId);
+							responder, timestamp, user, followed);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {
 					// read status update specific fields and files
@@ -144,7 +120,7 @@ public class Create extends HttpServlet {
 										items);
 
 						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-								responder, timestamp, userId, statusUpdate);
+								responder, timestamp, user, statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
 					} catch (final StatusUpdateInstantiationFailedException e) {
 						// remove the files

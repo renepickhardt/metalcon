@@ -1,26 +1,18 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat;
 
 import java.io.IOException;
-import java.util.Queue;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.uniko.west.socialsensor.graphity.server.Server;
-import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import org.neo4j.graphdb.Node;
+
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
-import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.InvalidDeleteFollowedIdentifier;
-import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.delete.DeleteType;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveStatusUpdate;
-import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOperation;
 
 /**
  * Tomcat delete operation handler
@@ -28,20 +20,7 @@ import de.uniko.west.socialsensor.graphity.socialgraph.operations.SocialGraphOpe
  * @author sebschlicht
  * 
  */
-public class Delete extends HttpServlet {
-
-	/**
-	 * command queue to stack commands created
-	 */
-	private Queue<SocialGraphOperation> commandQueue;
-
-	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
-		final ServletContext context = this.getServletContext();
-		final Server server = (Server) context.getAttribute("server");
-		this.commandQueue = server.getCommandQueue();
-	}
+public class Delete extends GraphityHttpServlet {
 
 	@Override
 	protected void doPost(final HttpServletRequest request,
@@ -52,16 +31,9 @@ public class Delete extends HttpServlet {
 		try {
 
 			// TODO: OAuth, stop manual determining of user id
-			long userId;
-			try {
-				userId = Helper.getLong(request, FormFields.USER_ID);
-				if (!NeoUtils.isValidUserIdentifier(userId)) {
-					throw new NumberFormatException();
-				}
-			} catch (final NumberFormatException e) {
-				throw new InvalidUserIdentifierException(
-						"user identifier has to be greater than zero.");
-			}
+			final String userId = Helper.getString(request, FormFields.USER_ID);
+			final Node user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
+					userId);
 
 			// read essential form fields
 			final long timestamp = System.currentTimeMillis();
@@ -70,39 +42,26 @@ public class Delete extends HttpServlet {
 
 			if (removalType == DeleteType.FOLLOW) {
 				// read followship specific fields
-				long followedId;
-				try {
-					followedId = Helper.getLong(request,
-							FormFields.Delete.FOLLOWED);
-					if (!NeoUtils.isValidUserIdentifier(followedId)) {
-						throw new NumberFormatException();
-					}
-				} catch (final NumberFormatException e) {
-					throw new InvalidDeleteFollowedIdentifier(
-							"user identifier has to be greater than zero.");
-				}
+				final String followedId = Helper.getString(request,
+						FormFields.Delete.FOLLOWED);
+				final Node followed = NeoUtils.getUserNodeByIdentifier(
+						this.graphDB, followedId);
 
 				// remove followship
 				final RemoveFriendship removeFriendshipCommand = new RemoveFriendship(
-						responder, timestamp, userId, followedId);
+						responder, timestamp, user, followed);
 				this.commandQueue.add(removeFriendshipCommand);
 			} else {
 				// read status update specific fields
-				long statusUpdateId;
-				try {
-					statusUpdateId = Helper.getLong(request,
-							FormFields.Delete.STATUS_UPDATE_ID);
-					if (!NeoUtils.isValidStatusUpdateIdentifier(statusUpdateId)) {
-						throw new NumberFormatException();
-					}
-				} catch (final NumberFormatException e) {
-					throw new InvalidStatusUpdateIdentifierException(
-							"status update identifier has to be greater than zero");
-				}
+				final String statusUpdateId = Helper.getString(request,
+						FormFields.Delete.STATUS_UPDATE_ID);
+				final Node statusUpdate = NeoUtils
+						.getStatusUpdateNodeByIdentifier(this.graphDB,
+								statusUpdateId);
 
 				// remove status update
 				final RemoveStatusUpdate removeStatusUpdate = new RemoveStatusUpdate(
-						responder, timestamp, userId, statusUpdateId);
+						responder, timestamp, user, statusUpdate);
 				this.commandQueue.add(removeStatusUpdate);
 			}
 

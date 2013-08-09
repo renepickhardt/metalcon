@@ -47,6 +47,11 @@ public class FormFields {
 	public class Read {
 
 		/**
+		 * identifier of the user whose status updates are requested
+		 */
+		public static final String POSTER_ID = "poster_id";
+
+		/**
 		 * number of status updates to be retrieved
 		 */
 		public static final String NUM_ITEMS = "num_items";

@@ -263,7 +263,7 @@ public class GraphityTest {
 			assertTrue(nodeId != 0);
 
 			// check if status update node exists and contains correct data
-			statusUpdateNode = NeoUtils.getNodeByIdentifier(
+			statusUpdateNode = NeoUtils.getUserNodeByIdentifier(
 					AlgorithmTests.DATABASE, nodeId);
 			assertNotNull(statusUpdateNode);
 

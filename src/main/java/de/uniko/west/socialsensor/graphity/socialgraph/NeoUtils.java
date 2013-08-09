@@ -7,12 +7,14 @@ import java.util.Map;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
 
 /**
  * collection of useful functions for neo4j
@@ -21,6 +23,16 @@ import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
  * 
  */
 public class NeoUtils {
+
+	/**
+	 * lucene user node index name
+	 */
+	private static final String INDEX_USER = "user";
+
+	/**
+	 * lucene status update node index name
+	 */
+	private static final String INDEX_STATUS_UPDATE = "stup";
 
 	/**
 	 * create the database configuration map for neo4j databases
@@ -162,50 +174,101 @@ public class NeoUtils {
 	}
 
 	/**
-	 * get a specific node from a database via its identifier
+	 * create a user node in a database
+	 * 
+	 * @param graphDB
+	 *            social graph database to operate on
+	 * @param userId
+	 *            user identifier
+	 * @return user node having its identifier stored
+	 * @throws IllegalArgumentException
+	 *             if the identifier is already in use
+	 */
+	public static Node createUserNode(final AbstractGraphDatabase graphDB,
+			final String userId) {
+		if (graphDB.index().forNodes(INDEX_USER).get("id", userId).getSingle() == null) {
+			final Node user = graphDB.createNode();
+			user.setProperty(Properties.User.IDENTIFIER, userId);
+			return user;
+		}
+
+		throw new IllegalArgumentException("user node with identifier \""
+				+ userId + "\" already existing!");
+	}
+
+	/**
+	 * create a status update node in a database
+	 * 
+	 * @param graphDB
+	 *            social graph database to operate on
+	 * @param statusUpdateId
+	 *            status update identifier
+	 * @return status update node having its identifier stored
+	 * @throws IllegalArgumentException
+	 *             if the identifier is already in use
+	 */
+	public static Node createStatusUpdateNode(
+			final AbstractGraphDatabase graphDB, final String statusUpdateId) {
+		if (graphDB.index().forNodes(INDEX_STATUS_UPDATE)
+				.get("id", statusUpdateId).getSingle() == null) {
+			final Node statusUpdate = graphDB.createNode();
+			statusUpdate.setProperty(Properties.StatusUpdate.IDENTIFIER,
+					statusUpdateId);
+			return statusUpdate;
+		}
+
+		throw new IllegalArgumentException(
+				"status update node with identifier \"" + statusUpdateId
+						+ "\" already existing!");
+	}
+
+	/**
+	 * get a user node from a database via its identifier
 	 * 
 	 * @param graphDB
 	 *            social graph database to search in
-	 * @param nodeId
-	 *            node identifier
-	 * @return node with the identifier passed
-	 * @throws IllegalArgumentException
-	 *             if there is node with the identifier passed
-	 */
-	public static Node getNodeByIdentifier(final AbstractGraphDatabase graphDB,
-			final long nodeId) {
-		// TODO: use lucene index
-		try {
-			return graphDB.getNodeById(nodeId);
-		} catch (final NotFoundException e) {
-			throw new IllegalArgumentException("node with identifier \""
-					+ nodeId + "\" not existing!");
-		}
-	}
-
-	/**
-	 * check if a user identifier is valid
-	 * 
 	 * @param userId
-	 *            user identifier
-	 * @return true - if the user identifier is valid<br>
-	 *         false - otherwise
+	 *            user node identifier
+	 * @return user node with the identifier passed
+	 * @throws InvalidUserIdentifierException
+	 *             if there is no user node with the identifier passed
 	 */
-	public static boolean isValidUserIdentifier(final long userId) {
-		return (userId > 0);
+	public static Node getUserNodeByIdentifier(
+			final AbstractGraphDatabase graphDB, final String userId) {
+		final Node user = graphDB.index().forNodes(INDEX_USER)
+				.get("id", userId).getSingle();
+
+		if (user != null) {
+			return user;
+		}
+
+		throw new InvalidUserIdentifierException("user with identifier \""
+				+ userId + "\" not existing!");
 	}
 
 	/**
-	 * check if a status update identifier is valid
+	 * get a status update node from a database via its identifier
 	 * 
+	 * @param graphDB
+	 *            social graph database to search in
 	 * @param statusUpdateId
-	 *            status update identifier
-	 * @return true - if the status update identifier is valid<br>
-	 *         false - otherwise
+	 *            status update node identifier
+	 * @return status update node with the identifier passed
+	 * @throws InvalidStatusUpdateIdentifierException
+	 *             if there is no status update node with the identifier passed
 	 */
-	public static boolean isValidStatusUpdateIdentifier(
-			final long statusUpdateId) {
-		return (statusUpdateId > 0);
+	public static Node getStatusUpdateNodeByIdentifier(
+			final AbstractGraphDatabase graphDB, final String statusUpdateId) {
+		final Node statusUpdate = graphDB.index().forNodes(INDEX_STATUS_UPDATE)
+				.get("id", statusUpdateId).getSingle();
+
+		if (statusUpdate != null) {
+			return statusUpdate;
+		}
+
+		throw new InvalidStatusUpdateIdentifierException(
+				"status update with identifier \"" + statusUpdateId
+						+ "\" not existing!");
 	}
 
 	/**

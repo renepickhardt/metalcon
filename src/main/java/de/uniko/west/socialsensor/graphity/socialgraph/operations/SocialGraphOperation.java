@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
@@ -23,9 +24,9 @@ public abstract class SocialGraphOperation {
 	protected final long timestamp;
 
 	/**
-	 * executing user's identifier
+	 * executing user
 	 */
-	protected final long userId;
+	protected final Node user;
 
 	/**
 	 * create a new basic social graph operation
@@ -34,14 +35,14 @@ public abstract class SocialGraphOperation {
 	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the operation
-	 * @param userId
-	 *            executing user's identifier
+	 * @param user
+	 *            executing user
 	 */
 	public SocialGraphOperation(final ClientResponder responder,
-			final long timestamp, final long userId) {
+			final long timestamp, final Node user) {
 		this.responder = responder;
 		this.timestamp = timestamp;
-		this.userId = userId;
+		this.user = user;
 	}
 
 	/**

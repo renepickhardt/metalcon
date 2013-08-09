@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import org.neo4j.graphdb.Node;
+
 import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
@@ -12,9 +14,9 @@ import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 public class RemoveStatusUpdate extends SocialGraphOperation {
 
 	/**
-	 * status update identifier
+	 * status update
 	 */
-	private final long statusUpdateId;
+	private final Node statusUpdate;
 
 	/**
 	 * create a new remove status update command
@@ -23,15 +25,15 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 	 *            client responder
 	 * @param timestamp
 	 *            time stamp of the status update removal
-	 * @param posterId
-	 *            posting user's identifier
-	 * @param statusUpdateId
-	 *            status update identifier
+	 * @param poster
+	 *            posting user
+	 * @param statusUpdate
+	 *            status update
 	 */
 	public RemoveStatusUpdate(final ClientResponder responder,
-			final long timestamp, final long posterId, final long statusUpdateId) {
-		super(responder, timestamp, posterId);
-		this.statusUpdateId = statusUpdateId;
+			final long timestamp, final Node poster, final Node statusUpdate) {
+		super(responder, timestamp, poster);
+		this.statusUpdate = statusUpdate;
 	}
 
 	@Override
@@ -39,7 +41,7 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 		boolean success = false;
 
 		try {
-			graph.removeStatusUpdate(this.userId, this.statusUpdateId);
+			graph.removeStatusUpdate(this.user, this.statusUpdate);
 			this.responder.addLine("ok");
 
 			success = true;
