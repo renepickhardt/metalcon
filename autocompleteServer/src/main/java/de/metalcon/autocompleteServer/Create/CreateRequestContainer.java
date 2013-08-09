@@ -1,6 +1,9 @@
 package de.metalcon.autocompleteServer.Create;
 
-public class CreateRequestContainer {
+import de.metalcon.autocompleteServer.Command;
+import de.metalcon.autocompleteServer.Search;
+
+public class CreateRequestContainer extends Command {
 	private String suggestString;
 	private Integer weight;
 	private String key;
@@ -45,6 +48,12 @@ public class CreateRequestContainer {
 
 	public void setIndexName(String indexName) {
 		this.indexName = indexName;
+	}
+
+	// TODO replace this example suggestTree with concrete ones.
+	@Override
+	public void run() {
+		Search.suggestTree.put(this.suggestString, this.weight, this.key);
 	}
 
 }

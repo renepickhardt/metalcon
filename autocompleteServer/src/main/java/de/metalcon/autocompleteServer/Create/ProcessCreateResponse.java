@@ -48,4 +48,17 @@ public class ProcessCreateResponse {
 
 	}
 
+	public void addIndexToContainer(String indexName) {
+		this.container.setIndexName(indexName);
+	}
+
+	public void addSuggestionKeyToContainer(String suggestionKey) {
+		this.container.setKey(suggestionKey);
+	}
+
+	public void addWeightToContainer(Integer weight) {
+		this.container.setWeight(weight);
+
+	}
+
 }

@@ -20,23 +20,47 @@ public class ProcessCreateRequest {
 	public static ProcessCreateResponse checkRequestParameter(
 			HttpServletRequest request) {
 		ProcessCreateResponse response = new ProcessCreateResponse();
+		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
+
 		if (!checkIsMultiPart(request, response)) {
 			return response;
 		}
+
+		// When Protocol requirements are not met, response is returned to show
+		// error message and also inhibit creating corrupt entries.
 		final FormItemList items = extractFormItems(request);
 		String suggestionString = checkSuggestionString(items, response);
 		if (suggestionString == null) {
+			suggestTreeCreateRequestContainer = null;
 			return response;
 		}
 		response.addSuggestStringToContainer(suggestionString);
+		suggestTreeCreateRequestContainer.setSuggestString(suggestionString);
 
 		String indexName = checkIndexName(items, response);
+		response.addIndexToContainer(indexName);
+		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
+		// TODO find elegant way to abort(->return) if key is too long
 		String suggestionKey = checkSuggestionKey(items, response);
+		// if (suggestionKey == null) {
+		// return response;
+		// }
+		response.addSuggestionKeyToContainer(suggestionKey);
+		suggestTreeCreateRequestContainer.setSuggestString(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
+		if (weight == null) {
+			suggestTreeCreateRequestContainer = null;
+			return response;
+		}
+		response.addWeightToContainer(weight);
+		suggestTreeCreateRequestContainer.setWeight(weight);
 
 		String image = checkImage(items, response);
+		if (image != null) {
+			suggestTreeCreateRequestContainer.setImageSerializedString(image);
+		}
 		return response;
 	}
 
@@ -105,6 +129,11 @@ public class ProcessCreateRequest {
 			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
+		// check if the key length matches ASTP requirements
+		// TODO: add error message String!
+		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
+			response.addError(null);
+		}
 		return null;
 	}
 
@@ -119,7 +148,7 @@ public class ProcessCreateRequest {
 			response.addError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
-		// check if the length matches ASTP requirements
+		// check if the suggestion String length matches ASTP requirements
 		// TODO: add Strings!
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
 			response.addError(null);
