@@ -42,14 +42,21 @@ public class ProcessCreateRequest {
 
 	private static String checkImage(FormItemList items,
 			ProcessCreateResponse response) {
-		// BufferedImage image = null;
-		// try {
-		// image = items.get ??
-		// } catch (IOException e) {
-		// addwarning
-		// return null;
-		// }
+		String image = null;
+		try {
+			// TODO: double check, if it works that way on images
+			image = items.getField(ProtocolConstants.IMAGE);
+			image = deepCheckImage(image);
+		} catch (IllegalArgumentException e) {
+			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			return null;
+		}
 
+		return null;
+	}
+
+	private static String deepCheckImage(String image) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

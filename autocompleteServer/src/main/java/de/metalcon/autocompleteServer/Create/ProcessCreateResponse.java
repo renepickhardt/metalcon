@@ -43,4 +43,9 @@ public class ProcessCreateResponse {
 
 	}
 
+	public void addNoImageWarning(String noImage) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

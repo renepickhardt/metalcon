@@ -16,5 +16,6 @@ public class CreateStatusCodes {
 	public static final String WEIGHT_NOT_GIVEN = null;
 	public static final String WEIGHT_NOT_A_NUMBER = null;
 	public static final String SUGGESTION_KEY_NOT_GIVEN = null;
+	public static final String NO_IMAGE = null;
 
 }
