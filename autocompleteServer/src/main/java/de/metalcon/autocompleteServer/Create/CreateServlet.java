@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 public class CreateServlet extends HttpServlet {
 
 	public CreateServlet() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

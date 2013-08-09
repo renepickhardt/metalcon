@@ -16,7 +16,6 @@ public class Worker implements Runnable {
 
 	public Worker(BlockingQueue<Command> commands) {
 		this.commands = commands;
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -27,7 +26,7 @@ public class Worker implements Runnable {
 				command = this.commands.take();
 				command.run();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				// TODO replace STrace with useful error message
 				e.printStackTrace();
 			}
 		}

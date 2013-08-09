@@ -9,17 +9,17 @@ public class ProcessCreateResponse {
 	}
 
 	public static void addQueryNameWarning(String querynameNotGiven) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate warning
 
 	}
 
 	public static void addIndexNameWarning(String indexnameNotGiven) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate warning
 
 	}
 
 	public void addError(String querynameNotGiven) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate error message
 
 	}
 
@@ -34,17 +34,17 @@ public class ProcessCreateResponse {
 	}
 
 	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate warning
 
 	}
 
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate warning
 
 	}
 
 	public void addNoImageWarning(String noImage) {
-		// TODO Auto-generated method stub
+		// TODO implement appropriate warning
 
 	}
 

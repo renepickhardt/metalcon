@@ -56,7 +56,7 @@ public class ProcessCreateRequest {
 	}
 
 	private static String deepCheckImage(String image) {
-		// TODO Auto-generated method stub
+		// TODO impelent check for image type (jpg) and geometry (in Pixel)
 		return null;
 	}
 
@@ -90,7 +90,6 @@ public class ProcessCreateRequest {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			index = ProtocolConstants.DEFAULT_INDEX_NAME;
 		}
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -106,7 +105,6 @@ public class ProcessCreateRequest {
 			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -22,7 +22,6 @@ public class RetrieveServlet extends HttpServlet {
 	 */
 	public RetrieveServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
