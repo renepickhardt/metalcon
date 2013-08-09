@@ -12,6 +12,14 @@ public class ProtocolConstants {
 	public static final String NUM_ITEMS = "numItems";
 
 	/**
+	 * parameters for the response JSON of the retrieval request
+	 */
+	public static final String RESP_JSON_FIELD_SUGGESTION_LIST = "suggestionList";
+	public static final String RESP_JSON_FIELD_SUGGESTION = "suggestion";
+	public static final String RESP_JSON_FIELD_SUGGESTION_KEY = "key";
+	public static final String RESP_JSON_FIELD_SUGGESTION_IMAGE = "image";
+	
+	/**
 	 * form parameter names for the create request of the ASTP
 	 */
 	public static final String SUGGESTION_WEIGHT = null;

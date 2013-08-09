@@ -1,5 +1,6 @@
 package de.metalcon.autocompleteServer.Retrieve;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -7,6 +8,7 @@ import javax.servlet.ServletContext;
 import org.json.simple.JSONObject;
 
 import de.metalcon.autocompleteServer.Helper.ContextListener;
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 
 /**
  * The ProcessRetrieveResponse class handles the data that are send to the client
@@ -20,8 +22,8 @@ import de.metalcon.autocompleteServer.Helper.ContextListener;
  */
 public class ProcessRetrieveResponse {
 	private ServletContext context;
-
-	//private static HashMap<String, String> warning
+	private JSONObject jsonResponse;
+	private ArrayList<HashMap<String, String>> suggestionsResponseList;
 	
 	/**
 	 * @param context
@@ -30,15 +32,18 @@ public class ProcessRetrieveResponse {
 	public ProcessRetrieveResponse(ServletContext context) {
 		//TODO:what happens if the provided context is null? 
 		this.context = context;
+		jsonResponse = new JSONObject();
+		suggestionsResponseList = new ArrayList<HashMap<String, String>>();
 	}
 
 	/**
-	 * not implemented yet
 	 * @param numitemsNotGiven
 	 */
 	public void addNumItemsWarning(String message) {
-		// TODO NEED to implement method. Put stuff to a HashMap
-		
+		if (jsonResponse==null){
+			jsonResponse = new JSONObject();
+		}
+		jsonResponse.put("warning:numItems", message);		
 	}
 
 	/**
@@ -46,15 +51,21 @@ public class ProcessRetrieveResponse {
 	 * @param noIndexGiven
 	 */
 	public void addIndexWarning(String noIndexGiven) {
-		// TODO NEED to implement method. Put stuff to a HashMap		
+		if (jsonResponse==null){
+			jsonResponse = new JSONObject();
+		}
+		jsonResponse.put("warning:noIndexGiven", noIndexGiven);		
 	}
 
 	/**
 	 * @param noIndexAvailable
 	 */
-	public void addError(String noIndexAvailable) {
-		// TODO NEED to implement. Errors should really stop the request and send the answer away
-		
+	public void addError(String message) {
+		// TODO Errors should really stop the request and send the answer away
+		if (jsonResponse==null){
+			jsonResponse = new JSONObject();
+		}
+		jsonResponse.put("error", message);
 	}
 
 	/**
@@ -63,17 +74,17 @@ public class ProcessRetrieveResponse {
 	 */
 	public void addSuggestion(String suggestString, String key) {
 		// also retrieve image from the image index
+		HashMap<String, String> suggestionJsonEntry = new HashMap<String, String>();
+		suggestionJsonEntry.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION, suggestString);
 		if (key != null){
+			suggestionJsonEntry.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_KEY, key);
 			HashMap<String, String> imageIndex = ContextListener.getImageIndex(context);
 			String serializedImage = imageIndex.get(key);
 			if (serializedImage==null){
-				
-			}
-			else {
-				
+				suggestionJsonEntry.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_IMAGE, serializedImage);
 			}
 		}
-		JSONObject jsonResponse = new JSONObject();
+		suggestionsResponseList.add(suggestionJsonEntry);
 	}
 	
 	/**
@@ -81,7 +92,8 @@ public class ProcessRetrieveResponse {
 	 * @return
 	 */
 	public String buildJsonResonse(){
-		return null;
+		jsonResponse.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST, suggestionsResponseList);
+		return jsonResponse.toJSONString();
 	}
 
 }

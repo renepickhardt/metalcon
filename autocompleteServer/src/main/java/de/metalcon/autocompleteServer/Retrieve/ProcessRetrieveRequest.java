@@ -127,7 +127,7 @@ public class ProcessRetrieveRequest {
 			String suggestString = suggestions.getSuggestion(i);
 			String key = suggestions.getKey(i);
 			response.addSuggestion(suggestString, key);
-		}		
+		}
 	}
 
 }
