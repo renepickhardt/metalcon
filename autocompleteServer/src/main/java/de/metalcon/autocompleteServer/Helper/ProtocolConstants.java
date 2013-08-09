@@ -17,6 +17,9 @@ public class ProtocolConstants {
 	public static final String SUGGESTION_WEIGHT = null;
 	public static final String SUGGESTION_KEY = null;
 	public static final String SUGGESTION_STRING = "term";
+	public static final int SUGGESTION_LENGTH = 80;
+	public static final String IMAGE = "image";
+
 	/**
 	 * the default Number of Items which can be retrieved from the Suggest
 	 * Server

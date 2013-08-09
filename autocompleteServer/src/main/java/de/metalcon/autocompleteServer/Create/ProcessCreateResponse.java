@@ -33,4 +33,14 @@ public class ProcessCreateResponse {
 		this.container.setSuggestString(suggestionString);
 	}
 
+	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void addDefaultIndexWarning(String indexnameNotGiven) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -35,25 +35,70 @@ public class ProcessCreateRequest {
 		String suggestionKey = checkSuggestionKey(items, response);
 
 		Integer weight = checkWeight(items, response);
+
+		String image = checkImage(items, response);
 		return response;
+	}
+
+	private static String checkImage(FormItemList items,
+			ProcessCreateResponse response) {
+		// BufferedImage image = null;
+		// try {
+		// image = items.get ??
+		// } catch (IOException e) {
+		// addwarning
+		// return null;
+		// }
+
+		return null;
 	}
 
 	private static Integer checkWeight(FormItemList items,
 			ProcessCreateResponse response) {
-		String weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
-		// TODO Auto-generated method stub
-		return null;
+		String weight = null;
+		try {
+			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
+		} catch (IllegalArgumentException e) {
+			// TODO: RefactorName
+			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
+			return null;
+		}
+
+		try {
+			return Integer.parseInt(weight);
+		}
+		// TODO: verify this is the right exception
+		catch (NumberFormatException e) {
+			response.addError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			return null;
+		}
 	}
 
 	private static String checkIndexName(FormItemList items,
 			ProcessCreateResponse response) {
+		String index = null;
+		try {
+			index = items.getField(ProtocolConstants.INDEX_PARAMETER);
+		} catch (IllegalArgumentException e) {
+			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
+			index = ProtocolConstants.DEFAULT_INDEX_NAME;
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	private static String checkSuggestionKey(FormItemList items,
 			ProcessCreateResponse response) {
-		String key = items.getField(ProtocolConstants.SUGGESTION_KEY);
+		String key = null;
+		try {
+			key = items.getField(ProtocolConstants.SUGGESTION_KEY);
+		}
+
+		// this exception is no reason to abort processing!
+		catch (IllegalArgumentException e) {
+			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			return null;
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
