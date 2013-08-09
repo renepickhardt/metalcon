@@ -20,7 +20,7 @@ public class ProcessRetrieveRequest {
 	 * @param request
 	 */
 	public static ProcessRetrieveResponse checkRequestParameter(HttpServletRequest request, ServletContext context){
-		ProcessRetrieveResponse response = new ProcessRetrieveResponse();
+		ProcessRetrieveResponse response = new ProcessRetrieveResponse(context);
 		Integer numItems = checkNumItems(request, response);
 		SuggestTree index = checkIndexName(request, response, context);
 		if (index == null){
@@ -127,7 +127,6 @@ public class ProcessRetrieveRequest {
 			String suggestString = suggestions.getSuggestion(i);
 			String key = suggestions.getKey(i);
 			response.addSuggestion(suggestString, key);
-
 		}		
 	}
 
