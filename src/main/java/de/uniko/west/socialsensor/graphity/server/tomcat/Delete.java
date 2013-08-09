@@ -11,7 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.uniko.west.socialsensor.graphity.server.Server;
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.InvalidDeleteFollowedIdentifier;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.delete.DeleteType;
+import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.RemoveStatusUpdate;
@@ -47,17 +52,35 @@ public class Delete extends HttpServlet {
 		try {
 
 			// TODO: OAuth, stop manual determining of user id
-			final long userId = Helper.getLong(request, FormFields.USER_ID);
+			long userId;
+			try {
+				userId = Helper.getLong(request, FormFields.USER_ID);
+				if (!NeoUtils.isValidUserIdentifier(userId)) {
+					throw new NumberFormatException();
+				}
+			} catch (final NumberFormatException e) {
+				throw new InvalidUserIdentifierException(
+						"user identifier has to be greater than zero.");
+			}
 
 			// read essential form fields
 			final long timestamp = System.currentTimeMillis();
 			final DeleteType removalType = DeleteType.GetDeleteType(Helper
 					.getString(request, FormFields.Delete.TYPE));
 
-			if (removalType == DeleteType.FOLLOWSHIP) {
+			if (removalType == DeleteType.FOLLOW) {
 				// read followship specific fields
-				final long followedId = Helper.getLong(request,
-						FormFields.Delete.FOLLOWED);
+				long followedId;
+				try {
+					followedId = Helper.getLong(request,
+							FormFields.Delete.FOLLOWED);
+					if (!NeoUtils.isValidUserIdentifier(followedId)) {
+						throw new NumberFormatException();
+					}
+				} catch (final NumberFormatException e) {
+					throw new InvalidDeleteFollowedIdentifier(
+							"user identifier has to be greater than zero.");
+				}
 
 				// remove followship
 				final RemoveFriendship removeFriendshipCommand = new RemoveFriendship(
@@ -65,8 +88,17 @@ public class Delete extends HttpServlet {
 				this.commandQueue.add(removeFriendshipCommand);
 			} else {
 				// read status update specific fields
-				final long statusUpdateId = Helper.getLong(request,
-						FormFields.Delete.STATUS_UPDATE_ID);
+				long statusUpdateId;
+				try {
+					statusUpdateId = Helper.getLong(request,
+							FormFields.Delete.STATUS_UPDATE_ID);
+					if (!NeoUtils.isValidStatusUpdateIdentifier(statusUpdateId)) {
+						throw new NumberFormatException();
+					}
+				} catch (final NumberFormatException e) {
+					throw new InvalidStatusUpdateIdentifierException(
+							"status update identifier has to be greater than zero");
+				}
 
 				// remove status update
 				final RemoveStatusUpdate removeStatusUpdate = new RemoveStatusUpdate(
@@ -75,7 +107,15 @@ public class Delete extends HttpServlet {
 			}
 
 		} catch (final IllegalArgumentException e) {
+			// a required form field is missing
 			responder.error(500, e.getMessage());
+			e.printStackTrace();
+		} catch (final RequestFailedException e) {
+			// the request contains errors
+			responder.addLine(e.getMessage());
+			responder.addLine(e.getSalvationDescription());
+			responder.finish();
+			e.printStackTrace();
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat.delete;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.InvalidDeleteTypeException;
+
 /**
  * type of a delete request
  * 
@@ -16,7 +18,7 @@ public enum DeleteType {
 	/**
 	 * delete a follow edge from one user to another
 	 */
-	FOLLOWSHIP("follow"),
+	FOLLOW("follow"),
 
 	/**
 	 * delete a status update the user created
@@ -53,20 +55,22 @@ public enum DeleteType {
 	 * @param identifier
 	 *            delete type identifier
 	 * @return delete type
-	 * @throws IllegalArgumentException
+	 * @throws InvalidDeleteTypeException
 	 *             if the identifier is invalid
 	 */
 	public static DeleteType GetDeleteType(final String identifier) {
 		if (USER.getIdentifier().equals(identifier)) {
 			return USER;
-		} else if (FOLLOWSHIP.getIdentifier().equals(identifier)) {
-			return FOLLOWSHIP;
+		} else if (FOLLOW.getIdentifier().equals(identifier)) {
+			return FOLLOW;
 		} else if (STATUS_UPDATE.getIdentifier().equals(identifier)) {
 			return STATUS_UPDATE;
 		}
 
-		throw new IllegalArgumentException("\"" + identifier
-				+ "\" is not a valid delete type identifier!");
+		throw new InvalidDeleteTypeException("\"" + identifier
+				+ "\" is not a valid delete type. valid values: "
+				+ USER.getIdentifier() + ", " + FOLLOW.getIdentifier() + ", "
+				+ STATUS_UPDATE.getIdentifier());
 	}
 
 }

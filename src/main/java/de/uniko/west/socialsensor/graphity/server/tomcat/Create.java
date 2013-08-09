@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.server.Server;
 import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.InvalidStatusUpdateTypeException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
@@ -166,12 +167,20 @@ public class Create extends HttpServlet {
 				}
 			} catch (final FormItemDoubleUsageException e) {
 				responder.error(400, e.getMessage());
+				e.printStackTrace();
 			} catch (final FileUploadException e) {
 				responder.error(500,
 						"an error encountered while processing the request!");
 				e.printStackTrace();
 			} catch (final IllegalArgumentException e) {
+				// a required form field is missing
 				responder.error(500, e.getMessage());
+				e.printStackTrace();
+			} catch (final RequestFailedException e) {
+				// the request contains errors
+				responder.addLine(e.getMessage());
+				responder.addLine(e.getSalvationDescription());
+				responder.finish();
 				e.printStackTrace();
 			}
 		} else {

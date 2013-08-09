@@ -68,7 +68,9 @@ public enum CreateType {
 		}
 
 		throw new InvalidCreateTypeException("\"" + identifier
-				+ "\" is not a valid create type!");
+				+ "\" is not a valid create type. valid values: "
+				+ USER.getIdentifier() + ", " + FOLLOW.getIdentifier() + ", "
+				+ STATUS_UPDATE.getIdentifier());
 	}
 
 }

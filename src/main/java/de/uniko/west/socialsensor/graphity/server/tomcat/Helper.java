@@ -40,9 +40,10 @@ public class Helper {
 	 * @param name
 	 *            boolean parameter name
 	 * @return boolean parameter value
+	 * @throws NumberFormatException
+	 *             if the parameter is no integer that could be parsed
 	 * @throws IllegalArgumentException
-	 *             if the parameter is missing or no integer that could be
-	 *             parsed
+	 *             if the parameter is missing
 	 */
 	public static boolean getBool(final HttpServletRequest request,
 			final String name) {
@@ -58,16 +59,13 @@ public class Helper {
 	 * @param name
 	 *            integer parameter name
 	 * @return integer parameter value
+	 * @throws NumberFormatException
+	 *             if the parameter is no integer
 	 * @throws IllegalArgumentException
-	 *             if the parameter is missing or no integer
+	 *             if the parameter is missing
 	 */
 	public static int getInt(final HttpServletRequest request, final String name) {
-		try {
-			return Integer.valueOf(getFormParameter(request, name));
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("parameter \"" + name
-					+ "\" is not a valid integer!");
-		}
+		return Integer.valueOf(getFormParameter(request, name));
 	}
 
 	/**
@@ -78,17 +76,14 @@ public class Helper {
 	 * @param name
 	 *            long parameter name
 	 * @return long parameter value
+	 * @throws NumberFormatException
+	 *             if the parameter is no long
 	 * @throws IllegalArgumentException
-	 *             if the parameter is missing or no long
+	 *             if the parameter is missing
 	 */
 	public static long getLong(final HttpServletRequest request,
 			final String name) {
-		try {
-			return Long.valueOf(getFormParameter(request, name));
-		} catch (final NumberFormatException e) {
-			throw new IllegalArgumentException("parameter \"" + name
-					+ "\" is not a valid long!");
-		}
+		return Long.valueOf(getFormParameter(request, name));
 	}
 
 	/**
