@@ -63,10 +63,8 @@ public abstract class SocialGraph {
 	 *            identifier of the user following
 	 * @param followedId
 	 *            identifier of the user being followed
-	 * @return true - friendship has been added successfully<br>
-	 *         false - otherwise
 	 */
-	public abstract boolean createFriendship(long timestamp, long followingId,
+	public abstract void createFriendship(long timestamp, long followingId,
 			long followedId);
 
 	/**

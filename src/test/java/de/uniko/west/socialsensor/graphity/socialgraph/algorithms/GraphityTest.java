@@ -1,7 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.algorithms;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +19,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
@@ -101,15 +102,18 @@ public class GraphityTest {
 		this.transaction.finish();
 	}
 
-	@Test
-	public void testCreateFriendship_NotFoundException() {
-		// assert the creation to fail if providing invalid user identifier(s)
-		assertFalse(this.graphity.createFriendship(System.currentTimeMillis(),
-				-1, AlgorithmTests.USER_ID_B));
-		assertFalse(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_A, -1));
-		assertFalse(this.graphity.createFriendship(System.currentTimeMillis(),
-				-1, -1));
+	@Test(expected = InvalidUserIdentifierException.class)
+	public void testCreateFriendship_InvalidFollowingIdentifier() {
+		// assert the creation to fail if providing invalid following identifier
+		this.graphity.createFriendship(System.currentTimeMillis(), -1,
+				AlgorithmTests.USER_ID_B);
+	}
+
+	@Test(expected = InvalidCreateFollowedIdentifier.class)
+	public void testCreateFriendship_InvalidFollowedIdentifier() {
+		// assert the creation to fail if providing invalid followed identifier
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, -1);
 	}
 
 	/**
@@ -136,30 +140,30 @@ public class GraphityTest {
 	 */
 	public void testCreateFriendship_Regular() {
 		// A follows: B, C, D, E
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_B));
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_C));
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_D));
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_E));
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_B);
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_C);
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_D);
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_A, AlgorithmTests.USER_ID_E);
 
 		// B follows: A, D
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_A));
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_D));
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_A);
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_B, AlgorithmTests.USER_ID_D);
 
 		// C follows: A, E
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_C, AlgorithmTests.USER_ID_A));
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_C, AlgorithmTests.USER_ID_E));
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_C, AlgorithmTests.USER_ID_A);
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_C, AlgorithmTests.USER_ID_E);
 
 		// D follows: C
-		assertTrue(this.graphity.createFriendship(System.currentTimeMillis(),
-				AlgorithmTests.USER_ID_D, AlgorithmTests.USER_ID_C));
+		this.graphity.createFriendship(System.currentTimeMillis(),
+				AlgorithmTests.USER_ID_D, AlgorithmTests.USER_ID_C);
 
 		// E follows none
 

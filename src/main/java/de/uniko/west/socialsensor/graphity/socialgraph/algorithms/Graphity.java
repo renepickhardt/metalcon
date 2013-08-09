@@ -10,6 +10,9 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.FollowEdgeExistingException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
@@ -36,15 +39,43 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean createFriendship(final long timestamp,
-			final long followingId, final long followedId) {
+	public void createFriendship(final long timestamp, final long followingId,
+			final long followedId) {
 		// find users first
 		Node following, followed;
 		try {
 			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
+
+		} catch (final NotFoundException e) {
+			throw new InvalidUserIdentifierException("user with id \""
+					+ followingId + "\" is not existing.");
+		}
+
+		try {
 			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
 		} catch (final NotFoundException e) {
-			return false;
+			throw new InvalidCreateFollowedIdentifier("user with id \""
+					+ followedId + "\" is not existing.");
+		}
+
+		// try to find the replica node of the user followed
+		Node followedReplica = null;
+		for (Relationship followship : following.getRelationships(
+				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)) {
+			followedReplica = followship.getEndNode();
+			if (NeoUtils.getNextSingleNode(followedReplica,
+					SocialGraphRelationshipType.REPLICA).equals(followed)) {
+				break;
+			}
+			followedReplica = null;
+		}
+
+		// user is following already
+		if (followedReplica != null) {
+			final String followedName = (String) followed
+					.getProperty(Properties.User.DISPLAY_NAME);
+			throw new FollowEdgeExistingException("you are following \""
+					+ followedName + "\" already.");
 		}
 
 		// create replica
@@ -96,8 +127,6 @@ public class Graphity extends SocialGraph {
 						SocialGraphRelationshipType.GRAPHITY);
 			}
 		}
-
-		return true;
 	}
 
 	@Override

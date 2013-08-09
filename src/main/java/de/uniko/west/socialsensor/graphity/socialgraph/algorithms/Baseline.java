@@ -10,6 +10,9 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.FollowEdgeExistingException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
@@ -30,22 +33,39 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public boolean createFriendship(final long timestamp,
-			final long followingId, final long followedId) {
+	public void createFriendship(final long timestamp, final long followingId,
+			final long followedId) {
 		// find users first
 		Node following, followed;
 		try {
 			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
+
+		} catch (final NotFoundException e) {
+			throw new InvalidUserIdentifierException("user with id \""
+					+ followingId + "\" is not existing.");
+		}
+
+		try {
 			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
 		} catch (final NotFoundException e) {
-			return false;
+			throw new InvalidCreateFollowedIdentifier("user with id \""
+					+ followedId + "\" is not existing.");
+		}
+
+		// try to find the node of the user followed
+		for (Relationship followship : following.getRelationships(
+				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)) {
+			if (followship.getEndNode().equals(followed)) {
+				final String followedName = (String) followed
+						.getProperty(Properties.User.DISPLAY_NAME);
+				throw new FollowEdgeExistingException("you are following \""
+						+ followedName + "\" already.");
+			}
 		}
 
 		// create star topology
 		following.createRelationshipTo(followed,
 				SocialGraphRelationshipType.FOLLOW);
-
-		return true;
 	}
 
 	@Override
