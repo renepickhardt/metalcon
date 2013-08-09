@@ -6,13 +6,17 @@ import java.util.TreeSet;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.FollowEdgeExistingException;
 import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.FollowEdgeNotExistingException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.follow.InvalidDeleteFollowedIdentifier;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.delete.statusupdate.StatusUpdateNotOwnedException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.read.InvalidPosterIdentifierException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.Properties;
@@ -46,14 +50,14 @@ public class Graphity extends SocialGraph {
 		try {
 			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
 
-		} catch (final NotFoundException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new InvalidUserIdentifierException("user with id \""
 					+ followingId + "\" is not existing.");
 		}
 
 		try {
 			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
-		} catch (final NotFoundException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new InvalidCreateFollowedIdentifier("user with id \""
 					+ followedId + "\" is not existing.");
 		}
@@ -136,8 +140,9 @@ public class Graphity extends SocialGraph {
 		Node user;
 		try {
 			user = NeoUtils.getNodeByIdentifier(this.graph, userID);
-		} catch (final NotFoundException e) {
-			return 0;
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidUserIdentifierException("user with id \"" + userID
+					+ "\" is not existing.");
 		}
 
 		// get last recent status update
@@ -231,19 +236,26 @@ public class Graphity extends SocialGraph {
 
 	@Override
 	public List<String> readStatusUpdates(final long posterId,
-			final long readerId, final int numItems, boolean ownUpdates) {
+			final long userId, final int numItems, boolean ownUpdates) {
 		// find users first
-		Node poster, reader;
+		Node user, poster;
 		try {
-			poster = NeoUtils.getNodeByIdentifier(this.graph, posterId);
-			if (posterId == readerId) {
-				reader = poster;
-			} else {
-				ownUpdates = true;
-				reader = NeoUtils.getNodeByIdentifier(this.graph, readerId);
+			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidUserIdentifierException("user with id \"" + userId
+					+ "\" is not existing.");
+		}
+
+		if (userId == posterId) {
+			poster = user;
+		} else {
+			ownUpdates = true;
+			try {
+				poster = NeoUtils.getNodeByIdentifier(this.graph, posterId);
+			} catch (final IllegalArgumentException e) {
+				throw new InvalidPosterIdentifierException("user with id \""
+						+ posterId + "\" is not existing.");
 			}
-		} catch (final NotFoundException e) {
-			return null;
 		}
 
 		final List<String> statusUpdates = new LinkedList<String>();
@@ -349,15 +361,23 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean removeFriendship(final long timestamp,
-			final long followingId, final long followedId) {
+	public void removeFriendship(final long timestamp, final long followingId,
+			final long followedId) {
 		// find users first
 		Node following, followed;
 		try {
 			following = NeoUtils.getNodeByIdentifier(this.graph, followingId);
+
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidUserIdentifierException("user with id \""
+					+ followingId + "\" is not existing.");
+		}
+
+		try {
 			followed = NeoUtils.getNodeByIdentifier(this.graph, followedId);
-		} catch (final NotFoundException e) {
-			return false;
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidDeleteFollowedIdentifier("user with id \""
+					+ followedId + "\" is not existing.");
 		}
 
 		// find the replica node of the user followed
@@ -372,13 +392,15 @@ public class Graphity extends SocialGraph {
 			followedReplica = null;
 		}
 
-		if (followedReplica != null) {
-			this.removeFromReplicaLayer(followedReplica);
-			return true;
+		// there is no such followship existing
+		if (followedReplica == null) {
+			final String followedName = (String) followed
+					.getProperty(Properties.User.DISPLAY_NAME);
+			throw new FollowEdgeNotExistingException("you are not following \""
+					+ followedName + "\".");
 		}
 
-		// there is no such followship existing
-		return false;
+		this.removeFromReplicaLayer(followedReplica);
 	}
 
 	/**
@@ -478,52 +500,59 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public boolean removeStatusUpdate(long userId, long statusUpdateId) {
+	public void removeStatusUpdate(long userId, long statusUpdateId) {
 		// find user and status update first
 		Node user, statusUpdate;
 		try {
 			user = NeoUtils.getNodeByIdentifier(this.graph, userId);
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidUserIdentifierException("user with id \"" + userId
+					+ "\" is not existing.");
+		}
+
+		try {
 			statusUpdate = NeoUtils.getNodeByIdentifier(this.graph,
 					statusUpdateId);
-		} catch (final NotFoundException e) {
-			return false;
+		} catch (final IllegalArgumentException e) {
+			throw new InvalidStatusUpdateIdentifierException(
+					"status update with id \"" + statusUpdateId
+							+ "\" is not existing.");
 		}
 
 		// get the status update owner
 		final Node statusUpdateAuthor = NeoUtils.getPrevSingleNode(
 				statusUpdate, SocialGraphRelationshipType.UPDATE);
 
-		// remove the status update if the ownership has been proved
-		if (user.equals(statusUpdateAuthor)) {
-			// update ego network
-			this.updateReplicaLayerStatusUpdateDeletion(user, statusUpdate);
-
-			// remove reference from previous status update
-			final Node previousUpdate = NeoUtils.getPrevSingleNode(
-					statusUpdate, SocialGraphRelationshipType.UPDATE);
-			previousUpdate.getSingleRelationship(
-					SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
-					.delete();
-
-			// update references to the next status update (if existing)
-			final Node nextUpdate = NeoUtils.getNextSingleNode(statusUpdate,
-					SocialGraphRelationshipType.UPDATE);
-			if (nextUpdate != null) {
-				statusUpdate.getSingleRelationship(
-						SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
-						.delete();
-				previousUpdate.createRelationshipTo(nextUpdate,
-						SocialGraphRelationshipType.UPDATE);
-			}
-
-			// delete the status update node
-			statusUpdate.delete();
-
-			return true;
+		// the status update is not owned by the user passed
+		if (!user.equals(statusUpdateAuthor)) {
+			throw new StatusUpdateNotOwnedException(
+					"you do not own the status update with the id \""
+							+ statusUpdateId + "\".");
 		}
 
-		// the status update is not owned by the user passed
-		return false;
+		// update ego network
+		this.updateReplicaLayerStatusUpdateDeletion(user, statusUpdate);
+
+		// remove reference from previous status update
+		final Node previousUpdate = NeoUtils.getPrevSingleNode(statusUpdate,
+				SocialGraphRelationshipType.UPDATE);
+		previousUpdate.getSingleRelationship(
+				SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+				.delete();
+
+		// update references to the next status update (if existing)
+		final Node nextUpdate = NeoUtils.getNextSingleNode(statusUpdate,
+				SocialGraphRelationshipType.UPDATE);
+		if (nextUpdate != null) {
+			statusUpdate.getSingleRelationship(
+					SocialGraphRelationshipType.UPDATE, Direction.OUTGOING)
+					.delete();
+			previousUpdate.createRelationshipTo(nextUpdate,
+					SocialGraphRelationshipType.UPDATE);
+		}
+
+		// delete the status update node
+		statusUpdate.delete();
 	}
 
 	/**

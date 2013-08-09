@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
@@ -23,20 +24,20 @@ public class RemoveFriendship extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		boolean success = graph.removeFriendship(this.timestamp, this.userId,
-				this.followedId);
+		boolean success = false;
 
-		if (success) {
-			// TODO: send something? HTTP 200:OK sent anyway
-			this.responder.finish();
+		try {
+			graph.removeFriendship(this.timestamp, this.userId, this.followedId);
+			this.responder.addLine("ok");
 
-			return true;
-		} else {
-			// TODO: send error code as the friendship did not exist
-			this.responder.error(404, "friendship not existing!");
-
-			return false;
+			success = true;
+		} catch (final RequestFailedException e) {
+			this.responder.addLine(e.getMessage());
+			this.responder.addLine(e.getSalvationDescription());
 		}
+
+		this.responder.finish();
+		return success;
 	}
 
 }

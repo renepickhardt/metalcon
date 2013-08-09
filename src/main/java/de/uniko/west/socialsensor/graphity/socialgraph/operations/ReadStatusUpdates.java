@@ -2,6 +2,7 @@ package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
 import java.util.List;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
@@ -54,39 +55,30 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		List<String> activities = graph.readStatusUpdates(this.posterId,
-				this.userId, this.numItems, this.ownUpdates);
-
-		if (activities != null) {
-			System.out.println("[CMD-READ]: " + activities.size()
-					+ " status updates found.");
+		try {
+			final List<String> activities = graph.readStatusUpdates(
+					this.posterId, this.userId, this.numItems, this.ownUpdates);
 
 			// send stream to client
 			int i = 0;
 			int lastActivity = activities.size() - 1;
 			this.responder.addLine("{\"items\":[");
 			for (String activity : activities) {
-
 				if (i != lastActivity) {
 					this.responder.addLine(activity + ",");
 				} else {
 					this.responder.addLine(activity);
 				}
+				i += 1;
 			}
 			this.responder.addLine("]}");
-			this.responder.finish();
-
-			System.out.println("[CMD-READ]: stream has been written.");
-
-			return true;
-		} else {
-			// TODO: create own exceptions to catch
-			// send error code
-			this.responder.error(500,
-					"thrown exceptions are not specified yet!");
-
-			return false;
+		} catch (final RequestFailedException e) {
+			this.responder.addLine(e.getMessage());
+			this.responder.addLine(e.getSalvationDescription());
 		}
+
+		this.responder.finish();
+		return false;
 	}
 
 	/**

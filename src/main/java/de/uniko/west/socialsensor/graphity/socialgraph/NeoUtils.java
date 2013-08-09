@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.kernel.AbstractGraphDatabase;
@@ -168,11 +169,43 @@ public class NeoUtils {
 	 * @param nodeId
 	 *            node identifier
 	 * @return node with the identifier passed
+	 * @throws IllegalArgumentException
+	 *             if there is node with the identifier passed
 	 */
 	public static Node getNodeByIdentifier(final AbstractGraphDatabase graphDB,
 			final long nodeId) {
 		// TODO: use lucene index
-		return graphDB.getNodeById(nodeId);
+		try {
+			return graphDB.getNodeById(nodeId);
+		} catch (final NotFoundException e) {
+			throw new IllegalArgumentException("node with identifier \""
+					+ nodeId + "\" not existing!");
+		}
+	}
+
+	/**
+	 * check if a user identifier is valid
+	 * 
+	 * @param userId
+	 *            user identifier
+	 * @return true - if the user identifier is valid<br>
+	 *         false - otherwise
+	 */
+	public static boolean isValidUserIdentifier(final long userId) {
+		return (userId > 0);
+	}
+
+	/**
+	 * check if a status update identifier is valid
+	 * 
+	 * @param statusUpdateId
+	 *            status update identifier
+	 * @return true - if the status update identifier is valid<br>
+	 *         false - otherwise
+	 */
+	public static boolean isValidStatusUpdateIdentifier(
+			final long statusUpdateId) {
+		return (statusUpdateId > 0);
 	}
 
 	/**

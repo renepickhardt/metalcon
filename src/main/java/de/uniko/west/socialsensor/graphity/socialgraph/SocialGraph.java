@@ -57,8 +57,6 @@ public abstract class SocialGraph {
 	/**
 	 * create a new friendship from a user to another
 	 * 
-	 * @param timestamp
-	 *            time stamp of the friendship
 	 * @param followingId
 	 *            identifier of the user following
 	 * @param followedId
@@ -72,7 +70,7 @@ public abstract class SocialGraph {
 	 * 
 	 * @param posterId
 	 *            identifier of the targeted stream's owner
-	 * @param readerId
+	 * @param userId
 	 *            identifier of the reading user
 	 * @param numItems
 	 *            number of items to be read
@@ -82,7 +80,7 @@ public abstract class SocialGraph {
 	 *         (Activitystrea.ms)
 	 */
 	public abstract List<String> readStatusUpdates(long posterId,
-			long readerId, int numItems, boolean ownUpdates);
+			long userId, int numItems, boolean ownUpdates);
 
 	/**
 	 * remove a friendship from one user to another
@@ -93,10 +91,8 @@ public abstract class SocialGraph {
 	 *            identifier of the user following, requesting the deletion
 	 * @param followedId
 	 *            identifier of the user followed
-	 * @return true - if the friendship has been removed successfully<br>
-	 *         false - otherwise
 	 */
-	public abstract boolean removeFriendship(long timestamp, long followingId,
+	public abstract void removeFriendship(long timestamp, long followingId,
 			long followedId);
 
 	/**
@@ -106,9 +102,7 @@ public abstract class SocialGraph {
 	 *            identifier of the user owning the status update
 	 * @param statusUpdateId
 	 *            identifier of the status update
-	 * @return true - if the status update has been removed successfully<br>
-	 *         false - otherwise
 	 */
-	public abstract boolean removeStatusUpdate(long userId, long statusUpdateId);
+	public abstract void removeStatusUpdate(long userId, long statusUpdateId);
 
 }

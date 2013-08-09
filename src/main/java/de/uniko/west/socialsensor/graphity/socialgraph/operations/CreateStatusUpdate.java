@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
@@ -37,23 +38,24 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		final long nodeIdentifier = graph.createStatusUpdate(this.timestamp,
-				this.userId, this.content);
+		boolean success = false;
 
-		if (nodeIdentifier != 0) {
+		try {
+			final long nodeIdentifier = graph.createStatusUpdate(
+					this.timestamp, this.userId, this.content);
+
 			// send status update node identifier
 			this.responder.addLine(String.valueOf(nodeIdentifier));
 			this.responder.finish();
 
-			return true;
-		} else {
-			// TODO: create own exceptions to catch
-			// send error code
-			this.responder.error(500,
-					"thrown exceptions are not specified yet!");
-
-			return false;
+			success = true;
+		} catch (final RequestFailedException e) {
+			this.responder.addLine(e.getMessage());
+			this.responder.addLine(e.getSalvationDescription());
 		}
+
+		this.responder.finish();
+		return success;
 	}
 
 }

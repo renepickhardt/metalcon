@@ -1,5 +1,7 @@
 package de.uniko.west.socialsensor.graphity.server.tomcat.create;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.InvalidCreateTypeException;
+
 /**
  * type of a create request
  * 
@@ -53,7 +55,7 @@ public enum CreateType {
 	 * @param identifier
 	 *            create type identifier
 	 * @return create type
-	 * @throws IllegalArgumentException
+	 * @throws InvalidCreateTypeException
 	 *             if the identifier is invalid
 	 */
 	public static CreateType GetCreateType(final String identifier) {
@@ -65,8 +67,8 @@ public enum CreateType {
 			return STATUS_UPDATE;
 		}
 
-		throw new IllegalArgumentException("\"" + identifier
-				+ "\" is not a valid create type identifier!");
+		throw new InvalidCreateTypeException("\"" + identifier
+				+ "\" is not a valid create type!");
 	}
 
 }

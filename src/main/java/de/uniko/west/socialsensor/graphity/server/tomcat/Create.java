@@ -18,6 +18,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import de.uniko.west.socialsensor.graphity.server.Configs;
 import de.uniko.west.socialsensor.graphity.server.Server;
+import de.uniko.west.socialsensor.graphity.server.exceptions.InvalidUserIdentifierException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.InvalidCreateFollowedIdentifier;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.InvalidStatusUpdateTypeException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdate;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateManager;
 import de.uniko.west.socialsensor.graphity.server.statusupdates.StatusUpdateTemplate;
@@ -26,6 +30,7 @@ import de.uniko.west.socialsensor.graphity.server.tomcat.create.CreateType;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormFile;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemDoubleUsageException;
 import de.uniko.west.socialsensor.graphity.server.tomcat.create.FormItemList;
+import de.uniko.west.socialsensor.graphity.socialgraph.NeoUtils;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.ClientResponder;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateFriendship;
 import de.uniko.west.socialsensor.graphity.socialgraph.operations.CreateStatusUpdate;
@@ -74,16 +79,22 @@ public class Create extends HttpServlet {
 		// store response item for the server response creation
 		final ClientResponder responder = new TomcatClientResponder(response);
 
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		// TODO: check if always (automatically) when posting multi-data forms
-		if (isMultipart) {
+		if (ServletFileUpload.isMultipartContent(request)) {
 			try {
 				// read multi-part form items
 				final FormItemList items = this.extractFormItems(request);
 
-				// TODO: OAuth, stop manual determining of user id
-				final long userId = Long.parseLong(items
-						.getField(FormFields.USER_ID));
+				long userId;
+				try {
+					// TODO: OAuth, stop manual determining of user id
+					userId = Long.parseLong(items.getField(FormFields.USER_ID));
+					if (!NeoUtils.isValidUserIdentifier(userId)) {
+						throw new NumberFormatException();
+					}
+				} catch (final NumberFormatException e) {
+					throw new InvalidUserIdentifierException(
+							"user identifier has to be greater than zero.");
+				}
 
 				// read essential form fields
 				final long timestamp = System.currentTimeMillis();
@@ -92,8 +103,17 @@ public class Create extends HttpServlet {
 
 				if (createType == CreateType.FOLLOW) {
 					// read followship specific fields
-					final long followedId = Long.parseLong(items
-							.getField(FormFields.Create.FOLLOW_TARGET));
+					long followedId;
+					try {
+						followedId = Long.parseLong(items
+								.getField(FormFields.Create.FOLLOW_TARGET));
+						if (!NeoUtils.isValidUserIdentifier(followedId)) {
+							throw new NumberFormatException();
+						}
+					} catch (final NumberFormatException e) {
+						throw new InvalidCreateFollowedIdentifier(
+								"user identifier has to be greater than zero.");
+					}
 
 					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(
@@ -103,8 +123,16 @@ public class Create extends HttpServlet {
 					// read status update specific fields and files
 					final String statusUpdateType = items
 							.getField(FormFields.Create.STATUS_UPDATE_TYPE);
-					final StatusUpdateTemplate template = StatusUpdateManager
-							.getStatusUpdateTemplate(statusUpdateType);
+
+					StatusUpdateTemplate template;
+					try {
+						template = StatusUpdateManager
+								.getStatusUpdateTemplate(statusUpdateType);
+					} catch (final IllegalArgumentException e) {
+						throw new InvalidStatusUpdateTypeException(
+								"there is no status update template named \""
+										+ statusUpdateType + "\".");
+					}
 
 					try {
 						this.writeFiles(template, items);
@@ -117,7 +145,7 @@ public class Create extends HttpServlet {
 						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
 								responder, timestamp, userId, statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
-					} catch (final IllegalArgumentException e) {
+					} catch (final StatusUpdateInstantiationFailedException e) {
 						// remove the files
 						FormFile fileItem;
 						File file;
@@ -130,25 +158,26 @@ public class Create extends HttpServlet {
 							}
 						}
 
-						// delegate the error to show error message to the user
 						throw e;
 					} catch (final Exception e) {
 						throw new IllegalArgumentException(
 								"file writing failed!");
 					}
 				}
-			} catch (final FileUploadException e) {
-				// TODO: error log target management
-				e.printStackTrace();
 			} catch (final FormItemDoubleUsageException e) {
-				// TODO: error log target management
-				System.out.println(e.getMessage());
+				responder.error(400, e.getMessage());
+			} catch (final FileUploadException e) {
+				responder.error(500,
+						"an error encountered while processing the request!");
+				e.printStackTrace();
 			} catch (final IllegalArgumentException e) {
 				responder.error(500, e.getMessage());
 				e.printStackTrace();
 			}
 		} else {
-			// TODO: error - no multi-part form
+			// error - no multipart form
+			responder
+					.error(500, "create requests need to use multipart forms!");
 		}
 	}
 
@@ -186,7 +215,7 @@ public class Create extends HttpServlet {
 	 *            status update template targeted
 	 * @param items
 	 *            form item list
-	 * @throws IllegalArgumentException
+	 * @throws StatusUpdateInstantiationFailedException
 	 *             if a file is not matching the content type set
 	 * @throws Exception
 	 *             if a file could not be written
@@ -204,8 +233,8 @@ public class Create extends HttpServlet {
 				final File file = this.writeFile(fileItem);
 				fileItem.setFile(file);
 			} else {
-				throw new IllegalArgumentException("file \"" + fileIdentifier
-						+ "\" must have content type "
+				throw new StatusUpdateInstantiationFailedException("file \""
+						+ fileIdentifier + "\" must have content type "
 						+ fileInfo.getContentType());
 			}
 		}

@@ -1,6 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
-import de.uniko.west.socialsensor.graphity.server.exceptions.create.follow.CreateFollowFailedException;
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
@@ -39,8 +39,9 @@ public class CreateFriendship extends SocialGraphOperation {
 		try {
 			graph.createFriendship(this.timestamp, this.userId, this.followedId);
 			this.responder.addLine("ok");
+
 			success = true;
-		} catch (final CreateFollowFailedException e) {
+		} catch (final RequestFailedException e) {
 			this.responder.addLine(e.getMessage());
 			this.responder.addLine(e.getSalvationDescription());
 		}

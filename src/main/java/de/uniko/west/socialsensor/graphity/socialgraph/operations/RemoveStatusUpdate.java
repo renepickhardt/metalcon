@@ -1,5 +1,6 @@
 package de.uniko.west.socialsensor.graphity.socialgraph.operations;
 
+import de.uniko.west.socialsensor.graphity.server.exceptions.RequestFailedException;
 import de.uniko.west.socialsensor.graphity.socialgraph.SocialGraph;
 
 /**
@@ -35,21 +36,20 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		final boolean success = graph.removeStatusUpdate(this.userId,
-				this.statusUpdateId);
+		boolean success = false;
 
-		if (success) {
-			// TODO: send something? HTTP 200:OK sent anyway
-			this.responder.finish();
+		try {
+			graph.removeStatusUpdate(this.userId, this.statusUpdateId);
+			this.responder.addLine("ok");
 
-			return true;
-		} else {
-			// TODO: send error code as the status update did not exist or is
-			// not owned
-			this.responder.error(404, "status update missing or not owned!");
-
-			return false;
+			success = true;
+		} catch (final RequestFailedException e) {
+			this.responder.addLine(e.getMessage());
+			this.responder.addLine(e.getSalvationDescription());
 		}
+
+		this.responder.finish();
+		return success;
 	}
 
 }

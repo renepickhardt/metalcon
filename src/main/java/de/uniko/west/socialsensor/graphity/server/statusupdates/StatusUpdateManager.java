@@ -173,6 +173,8 @@ public class StatusUpdateManager {
 	 * @param templateName
 	 *            name of status update template being searched
 	 * @return status update template
+	 * @throws IllegalArgumentException
+	 *             if there is no status update having the name passed
 	 */
 	public static StatusUpdateTemplate getStatusUpdateTemplate(
 			final String templateName) {
