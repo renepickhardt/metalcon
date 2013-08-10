@@ -15,7 +15,7 @@
 	<servlet>
 		<servlet-name>insert</servlet-name>
 		<description>Create new Suggestions for the Autocomplete Service</description>
-		<serlvet-class>de.metalcon.autocompleteServer.Create.CreateServlet</servlet-class>
+		<servlet-class>de.metalcon.autocompleteServer.Create.CreateServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>insert</servlet-name>

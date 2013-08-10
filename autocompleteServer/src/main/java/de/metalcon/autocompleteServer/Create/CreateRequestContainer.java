@@ -53,7 +53,7 @@ public class CreateRequestContainer extends Command {
 	// TODO replace this example suggestTree with concrete ones.
 	@Override
 	public void run() {
-		Search.suggestTree.put(this.suggestString, this.weight, this.key);
+		//Search.suggestTree.put(this.suggestString, this.weight, this.key);
 	}
 
 }

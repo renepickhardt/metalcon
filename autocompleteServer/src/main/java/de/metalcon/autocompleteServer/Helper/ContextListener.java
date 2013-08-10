@@ -23,6 +23,7 @@ public class ContextListener implements ServletContextListener {
 	}
 
 	public void contextInitialized(ServletContextEvent arg0){
-		Search.initilizeSuggestTree();
+		ServletContext context = arg0.getServletContext();
+		Search.initilizeSuggestTree(context);
 	}
 }
