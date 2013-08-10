@@ -1,7 +1,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee">
 	<display-name>autocompleteServer</display-name>
  	<listener>
-   		<listener-class>de.metalcon.autocompleteServer.Server</listener-class>
+   		<listener-class>de.metalcon.autocompleteServer.Helper.ContextListener</listener-class>
    	</listener>
 	<servlet> 
 		<servlet-name>suggest</servlet-name>
@@ -12,7 +12,7 @@
    		<servlet-name>suggest</servlet-name>
    		<url-pattern>/suggest</url-pattern>
 	</servlet-mapping>
-	<servlet>
+<!--	<servlet>
 		<servlet-name>insert</servlet-name>
 		<description>Create new Suggestions for the Autocomplete Service</description>
 		<servlet-class>de.metalcon.autocompleteServer.Create.CreateServlet</servlet-class>
@@ -20,5 +20,5 @@
 	<servlet-mapping>
 		<servlet-name>insert</servlet-name>
 		<url-pattern>/insert</url-pattern>
-	</servlet-mapping>
+	</servlet-mapping>-->
 </web-app>

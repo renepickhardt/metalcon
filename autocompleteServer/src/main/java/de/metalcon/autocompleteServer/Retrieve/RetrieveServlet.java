@@ -25,18 +25,21 @@ public class RetrieveServlet extends HttpServlet {
 	}
 
 	/**
+	 * de.metalcon.autocompleteServer.Retrieve.RetrieveServlet
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		long start = System.nanoTime();
 		ProcessRetrieveResponse responseObject = ProcessRetrieveRequest.checkRequestParameter(request,
 				this.getServletContext());
 		String resultJson = responseObject.buildJsonResonse();
 		response.setContentType("text/json"); 
 		PrintWriter out = response.getWriter();
-		out.println(resultJson);
+		long end = System.nanoTime();
+		out.println(resultJson+ " " + (end - start)/1000 + " micro seconds");
 		out.flush();
 	}
 

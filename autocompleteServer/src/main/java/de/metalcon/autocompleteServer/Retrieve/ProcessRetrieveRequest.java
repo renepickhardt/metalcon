@@ -47,16 +47,16 @@ public class ProcessRetrieveRequest {
 		String tmp = request.getParameter(ProtocolConstants.NUM_ITEMS);
 		Integer numItems = null;
 		if (tmp != null){
-			numItems = Integer.parseInt(tmp);
-			if (numItems != null){
+			try {
+				numItems = Integer.parseInt(tmp);
 				if (numItems < 1 || numItems > ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS){
 					numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
 					response.addNumItemsWarning(RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE);
 				}
-			}else {
+
+			}catch (NumberFormatException e) {
 				numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
 				response.addNumItemsWarning(RetrieveStatusCodes.NUMITEMS_NOT_AN_INTEGER);
-
 			}
 		}else{
 			numItems = ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS;
@@ -105,6 +105,10 @@ public class ProcessRetrieveRequest {
 			return null;
 		}
 		else {
+			if (term.equals("")){
+				response.addError(RetrieveStatusCodes.NO_TERM_GIVEN);
+				return null;
+			}
 			return term;
 		}
 	}
