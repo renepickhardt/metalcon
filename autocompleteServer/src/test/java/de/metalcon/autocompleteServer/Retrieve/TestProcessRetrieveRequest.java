@@ -90,16 +90,30 @@ public class TestProcessRetrieveRequest {
 		when(request.getParameter("term")).thenReturn("Me");
 		when(request.getParameter("numItems")).thenReturn("7");
 		when(request.getParameter("indexName")).thenReturn("generalindex");
-		SuggestTree index = ContextListener.getIndex(
-				ProtocolConstants.DEFAULT_INDEX_NAME, servletContext);
-		assertNotNull(index);
 		ProcessRetrieveResponse response = ProcessRetrieveRequest
 				.checkRequestParameter(request, servletContext);
 		response.buildJsonResonse();
 		JSONObject jsonResponse = getJson(response);
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
 		assertTrue(suggestionList.size()==7);
+		
+		
+		when(request.getParameter("term")).thenReturn(null);
+		response = ProcessRetrieveRequest
+				.checkRequestParameter(request, servletContext);
+		response.buildJsonResonse();
+		jsonResponse = getJson(response);
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==0);
 
+		when(request.getParameter("term")).thenReturn("Me");
+		when(request.getParameter("numItems")).thenReturn("8");
+		response = ProcessRetrieveRequest
+				.checkRequestParameter(request, servletContext);
+		response.buildJsonResonse();
+		jsonResponse = getJson(response);
+		jsonResponse.get("warning:numItems").equals(RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE);
+		System.out.println(jsonResponse.get("warning:numItems"));
 	}
 
 	/**
