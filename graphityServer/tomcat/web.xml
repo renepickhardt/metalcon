@@ -2,17 +2,17 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee">
 	<display-name>Graphity-Server</display-name>
 	<listener>
-		<listener-class>de.uniko.west.socialsensor.graphity.server.Server</listener-class>
+		<listener-class>de.metalcon.server.Server</listener-class>
 	</listener>
   <servlet>    
     <servlet-name>Read</servlet-name>
     <description>Read status update of users.</description>
-    <servlet-class>de.uniko.west.socialsensor.graphity.server.tomcat.Read</servlet-class>
+    <servlet-class>de.metalcon.server.tomcat.Read</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>Create</servlet-name>
     <description>Create friendships and status update messages.</description>
-    <servlet-class>de.uniko.west.socialsensor.graphity.server.tomcat.Create</servlet-class>
+    <servlet-class>de.metalcon.server.tomcat.Create</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Read</servlet-name>
