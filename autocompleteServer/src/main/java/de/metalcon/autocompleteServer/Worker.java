@@ -18,12 +18,14 @@ public class Worker implements Runnable {
 		this.commands = commands;
 	}
 
+	@Override
 	public void run() {
 		Command command;
+
 		while (true) {
 			try {
 				command = this.commands.take();
-				command.run();
+				command.run(command.getContext());
 			} catch (InterruptedException e) {
 				// TODO replace STrace with useful error message
 				e.printStackTrace();
