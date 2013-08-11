@@ -30,23 +30,16 @@ import static org.mockito.Mockito.*;
 /**
  * @author Rene Pickhardt
  * 
+ * This TestClass makes sure that the ASTP Retrieve part of the protocol is properly workig
+ * 
+ * We check several things like passing wrong parameters, passing wrong parameter types but also passig the correct values
+ * 
  */
 public class TestProcessRetrieveRequest {
+	final private ServletConfig servletConfig = mock(ServletConfig.class);
+	final private ServletContext servletContext = mock(ServletContext.class);
 
-	/**
-	 * Test method for
-	 * {@link de.metalcon.autocompleteServer.Retrieve.ProcessRetrieveRequest#checkRequestParameter(javax.servlet.http.HttpServletRequest, javax.servlet.ServletContext)}
-	 * . foolowing:
-	 * http://stackoverflow.com/questions/5434419/how-to-test-my-servlet
-	 * -using-junit
-	 * @throws ServletException 
-	 */
-	@Test
-	public void testCheckRequestParameter() throws ServletException {
-
-		final ServletConfig servletConfig = mock(ServletConfig.class);
-		final ServletContext servletContext = mock(ServletContext.class);
-
+	private HttpServletRequest initializeTest(){
 		// setup the test.
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
@@ -79,41 +72,132 @@ public class TestProcessRetrieveRequest {
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		when(servletContext.getAttribute(ProtocolConstants.IMAGE_SERVER_CONTEXT_KEY)).thenReturn(imageIndex);
 		
-		servlet.init(servletConfig);		
-
-		
-		//		ContextListener.setIndex("venues", venueIndex, context);
-
-		/***********************************************************************************************
-		 * DO THE TESTING FROM HERE
-		 ***********************************************************************************************/
-		when(request.getParameter("term")).thenReturn("Me");
-		when(request.getParameter("numItems")).thenReturn("7");
-		when(request.getParameter("indexName")).thenReturn("generalindex");
-		ProcessRetrieveResponse response = ProcessRetrieveRequest
-				.checkRequestParameter(request, servletContext);
-		response.buildJsonResonse();
-		JSONObject jsonResponse = getJson(response);
+		try {
+			servlet.init(servletConfig);
+		} catch (ServletException e) {
+			fail("could not initialize servlet");
+			e.printStackTrace();
+		}				
+		return request;
+	}
+	
+	/**
+	 * Test method for
+	 * {@link de.metalcon.autocompleteServer.Retrieve.ProcessRetrieveRequest#checkRequestParameter(javax.servlet.http.HttpServletRequest, javax.servlet.ServletContext)}
+	 * . foolowing:
+	 * http://stackoverflow.com/questions/5434419/how-to-test-my-servlet
+	 * -using-junit
+	 * @throws ServletException 
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCheckRequestParameter() throws ServletException {
+		HttpServletRequest request = initializeTest();		
+		JSONObject jsonResponse = testRequest(request, "Me", "7", "generalIndex");
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
 		assertTrue(suggestionList.size()==7);
+	}
+
+	/**
+	 * Tests all possible ways the suggest string ca be set
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testTermField(){
+		HttpServletRequest request = initializeTest();		
+		JSONObject jsonResponse = testRequest(request, "Ne", "7", "generalIndex");
+		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==0);
 		
+		jsonResponse = testRequest(request, null, "7", "generalIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==0);
+	}
+
+	/**
+	 * tests all possible ways the numItems parameter can be set
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testNumItemField(){
+		HttpServletRequest request = initializeTest();		
+		JSONObject jsonResponse = testRequest(request, "Me", "8", "generalIndex");
+		assertTrue(jsonResponse.get("warning:numItems").equals(RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE));
+		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==7);
+
 		
-		when(request.getParameter("term")).thenReturn(null);
-		response = ProcessRetrieveRequest
-				.checkRequestParameter(request, servletContext);
-		response.buildJsonResonse();
-		jsonResponse = getJson(response);
+		jsonResponse = testRequest(request, "Me", "someRandomString", "generalIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(jsonResponse.get("warning:numItems").equals(RetrieveStatusCodes.NUMITEMS_NOT_AN_INTEGER));
+		assertTrue(suggestionList.size()==7);
+		
+		jsonResponse = testRequest(request, "Me", null, "generalIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(jsonResponse.get("warning:numItems").equals(RetrieveStatusCodes.NUMITEMS_NOT_GIVEN));
+		assertTrue(suggestionList.size()==7);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testIndexNames(){
+		HttpServletRequest request = initializeTest();		
+		JSONObject jsonResponse = testRequest(request, "D", "7", "venueIndex");
+		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==7);
+
+		jsonResponse = testRequest(request, "M", "7", "venueIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
 		assertTrue(suggestionList.size()==0);
 
-		when(request.getParameter("term")).thenReturn("Me");
-		when(request.getParameter("numItems")).thenReturn("8");
-		response = ProcessRetrieveRequest
+		jsonResponse = testRequest(request, "D", "7", "generalIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==0);
+
+		jsonResponse = testRequest(request, "M", "7", "generalIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(suggestionList.size()==7);
+		
+		jsonResponse = testRequest(request, "Me", "7", "someRandomIndex");
+		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		assertTrue(jsonResponse.get("warning:noIndexGiven").equals(RetrieveStatusCodes.INDEX_UNKNOWN));
+		assertTrue(suggestionList.size()==7);
+	}
+	
+	/**
+	 * tests if the keys are correctly trasfered
+	 * TODO: need to be more specific what happens if no keys are in the answer and if mixed keys are availabel
+	 */
+	@Test
+	public void testKeys(){
+		HttpServletRequest request = initializeTest();		
+		JSONObject jsonResponse = testRequest(request, "D", "7", "venueIndex");
+		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
+		suggestionList.get(0).get("key").equals("http://www.daskult.de");
+	}
+	
+	@Test
+	public void testImages(){
+		//TODO: need to implement Images Test
+	}
+	
+	/**
+	 * @param request
+	 * @param term
+	 * @param numItems
+	 * @param indexName
+	 * @return
+	 */
+	private JSONObject testRequest(HttpServletRequest request, String term,
+			String numItems, String indexName) {
+		when(request.getParameter("term")).thenReturn(term);
+		when(request.getParameter("numItems")).thenReturn(numItems);
+		when(request.getParameter("indexName")).thenReturn(indexName);
+		ProcessRetrieveResponse response = ProcessRetrieveRequest
 				.checkRequestParameter(request, servletContext);
 		response.buildJsonResonse();
-		jsonResponse = getJson(response);
-		jsonResponse.get("warning:numItems").equals(RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE);
-		System.out.println(jsonResponse.get("warning:numItems"));
+		JSONObject jsonResponse = getJson(response);		
+		return jsonResponse;
 	}
 
 	/**

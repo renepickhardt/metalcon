@@ -1,9 +1,11 @@
 package de.metalcon.autocompleteServer;
 
 import java.io.*;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 import de.metalcon.autocompleteServer.Helper.SuggestTree.*;
@@ -25,6 +27,7 @@ public class Search {
 
 	public static void initilizeSuggestTree(ServletContext context) {	//can't be private now, because ContextListener needs access
 		SuggestTree suggestTree = new SuggestTree(ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
+		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		int priority = 100000;
 		String filename = "/var/lib/datasets/metalcon/Band.csv";
 		// there must be a way to use relative paths!
@@ -47,7 +50,12 @@ public class Search {
 					newZeileMyspace = "<a href=" + parts[2] + ">"
 							+ parts[0] + "</a>" + "<br>";
 //					suggestTree.put(parts[0], priority, parts[1]);
-					suggestTree.put(parts[0], priority, null);
+					suggestTree.put(parts[0], priority, parts[0]);
+					String p = parts[0];
+					//TODO: quick test for images since no image data is available right now
+					p = p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p + p;
+					p = p + p;
+					imageIndex.put(parts[0], p.substring(0, Math.min(2048, p.length())));
 					--priority;
 				}
 			}
@@ -55,5 +63,6 @@ public class Search {
 			e.printStackTrace();
 		}
 		context.setAttribute("indexName:"+ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
+		ContextListener.setImageIndex(imageIndex, context);
 	}		
 }

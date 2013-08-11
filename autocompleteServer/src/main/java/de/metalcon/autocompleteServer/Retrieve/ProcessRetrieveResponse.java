@@ -80,7 +80,7 @@ public class ProcessRetrieveResponse {
 			suggestionJsonEntry.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_KEY, key);
 			HashMap<String, String> imageIndex = ContextListener.getImageIndex(context);
 			String serializedImage = imageIndex.get(key);
-			if (serializedImage==null){
+			if (serializedImage!=null){
 				suggestionJsonEntry.put(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_IMAGE, serializedImage);
 			}
 		}
