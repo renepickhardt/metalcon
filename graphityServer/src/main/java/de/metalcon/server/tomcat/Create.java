@@ -17,6 +17,7 @@ import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.Configs;
 import de.metalcon.server.Server;
+import de.metalcon.server.exceptions.InvalidUserIdentifierException;
 import de.metalcon.server.exceptions.RequestFailedException;
 import de.metalcon.server.exceptions.create.statusupdate.InvalidStatusUpdateTypeException;
 import de.metalcon.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
@@ -97,6 +98,17 @@ public class Create extends GraphityHttpServlet {
 					// read user specific fields
 					final String userId = items
 							.getField(NSSProtocol.Create.USER_ID);
+					boolean existing = true;
+					try {
+						NeoUtils.getUserNodeByIdentifier(this.graphDB, userId);
+					} catch (final InvalidUserIdentifierException e) {
+						existing = false;
+					}
+					if (existing) {
+						throw new InvalidUserIdentifierException(
+								"the user identifier \"" + userId
+										+ "\" is already in use.");
+					}
 					final String displayName = items
 							.getField(NSSProtocol.Create.USER_DISPLAY_NAME);
 					final String profilePicturePath = items
