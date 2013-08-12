@@ -32,6 +32,7 @@ import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.CreateFriendship;
 import de.metalcon.socialgraph.operations.CreateStatusUpdate;
+import de.metalcon.socialgraph.operations.CreateUser;
 
 /**
  * Tomcat create operation handler
@@ -40,6 +41,11 @@ import de.metalcon.socialgraph.operations.CreateStatusUpdate;
  * 
  */
 public class Create extends GraphityHttpServlet {
+
+	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = 752658118858186708L;
 
 	/**
 	 * server configuration containing file paths
@@ -75,17 +81,32 @@ public class Create extends GraphityHttpServlet {
 				// read multi-part form items
 				final FormItemList items = this.extractFormItems(request);
 
-				// TODO: OAuth, stop manual determining of user id
-				final String userId = items.getField(FormFields.USER_ID);
-				final Node user = NeoUtils.getUserNodeByIdentifier(
-						this.graphDB, userId);
-
 				// read essential form fields
 				final long timestamp = System.currentTimeMillis();
 				final CreateType createType = CreateType.GetCreateType(items
 						.getField(FormFields.Create.TYPE));
 
-				if (createType == CreateType.FOLLOW) {
+				Node user = null;
+				if (createType != CreateType.USER) {
+					// TODO: OAuth, stop manual determining of user id
+					final String userId = items.getField(FormFields.USER_ID);
+					user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
+							userId);
+				}
+
+				if (createType == CreateType.USER) {
+					// read user specific fields
+					final String userId = items
+							.getField(FormFields.Create.USER_ID);
+					final String displayName = items
+							.getField(FormFields.Create.USER_DISPLAY_NAME);
+
+					// create user
+					final CreateUser createUserCommand = new CreateUser(
+							responder, timestamp, userId, displayName);
+					this.commandQueue.add(createUserCommand);
+
+				} else if (createType == CreateType.FOLLOW) {
 					// read followship specific fields
 					final String followedId = items
 							.getField(FormFields.Create.FOLLOW_TARGET);

@@ -42,13 +42,10 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 		boolean success = false;
 
 		try {
-			final String nodeIdentifier = graph.createStatusUpdate(
+			graph.createStatusUpdate(
 					this.timestamp, this.user, this.content);
-
-			// send status update node identifier
-			this.responder.addLine(nodeIdentifier);
-			this.responder.finish();
-
+			responder.addLine("ok");
+			
 			success = true;
 		} catch (final RequestFailedException e) {
 			this.responder.addLine(e.getMessage());

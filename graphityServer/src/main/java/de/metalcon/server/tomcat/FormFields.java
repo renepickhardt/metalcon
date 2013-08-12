@@ -27,6 +27,16 @@ public class FormFields {
 		public static final String TYPE = "type";
 
 		/**
+		 * identifier of the new user
+		 */
+		public static final String USER_ID = "user_id";
+
+		/**
+		 * display name of the new user
+		 */
+		public static final String USER_DISPLAY_NAME = "user_display_name";
+
+		/**
 		 * identifier of the user the follow edge shall be created to
 		 */
 		public static final String FOLLOW_TARGET = "followed_id";

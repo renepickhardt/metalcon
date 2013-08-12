@@ -49,9 +49,8 @@ public abstract class SocialGraph {
 	 *            user
 	 * @param content
 	 *            status update content object
-	 * @return status update identifier
 	 */
-	public abstract String createStatusUpdate(long timestamp, Node user,
+	public abstract void createStatusUpdate(long timestamp, Node user,
 			StatusUpdate content);
 
 	/**

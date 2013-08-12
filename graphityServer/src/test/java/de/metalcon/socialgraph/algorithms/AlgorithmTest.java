@@ -23,11 +23,7 @@ public class AlgorithmTest {
 	/**
 	 * single users
 	 */
-	protected final Node USER_A = AlgorithmTests.USERS[this.USER_INDEX_A],
-			USER_B = AlgorithmTests.USERS[this.USER_INDEX_B],
-			USER_C = AlgorithmTests.USERS[this.USER_INDEX_C],
-			USER_D = AlgorithmTests.USERS[this.USER_INDEX_D],
-			USER_E = AlgorithmTests.USERS[this.USER_INDEX_E];
+	protected Node USER_A, USER_B, USER_C, USER_D, USER_E;
 
 	/**
 	 * social graph algorithm being tested
@@ -38,6 +34,17 @@ public class AlgorithmTest {
 	 * test transaction
 	 */
 	protected Transaction transaction;
+
+	/**
+	 * load neo4j user nodes
+	 */
+	protected void loadUserNodes() {
+		this.USER_A = AlgorithmTests.USERS[this.USER_INDEX_A];
+		this.USER_B = AlgorithmTests.USERS[this.USER_INDEX_B];
+		this.USER_C = AlgorithmTests.USERS[this.USER_INDEX_C];
+		this.USER_D = AlgorithmTests.USERS[this.USER_INDEX_D];
+		this.USER_E = AlgorithmTests.USERS[this.USER_INDEX_E];
+	}
 
 	/**
 	 * wait the number of milliseconds specified

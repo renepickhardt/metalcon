@@ -22,6 +22,11 @@ import de.metalcon.socialgraph.operations.ReadStatusUpdates;
  */
 public class Read extends GraphityHttpServlet {
 
+	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = 3210720308557065909L;
+
 	@Override
 	protected void doGet(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {

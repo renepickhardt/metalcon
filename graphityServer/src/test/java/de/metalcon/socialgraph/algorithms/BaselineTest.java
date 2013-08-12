@@ -44,6 +44,7 @@ public class BaselineTest extends AlgorithmTest {
 
 		// assert the test to get started by the algorithm tests suite
 		assertNotNull(AlgorithmTests.DATABASE);
+		this.loadUserNodes();
 
 		// initialize the test transaction
 		this.transaction = AlgorithmTests.DATABASE.beginTx();
@@ -142,7 +143,6 @@ public class BaselineTest extends AlgorithmTest {
 		long timestamp;
 		int statusUpdateIdInt = 0;
 		StatusUpdate statusUpdate;
-		String statusUpdateId;
 		Node statusUpdateNode;
 		for (StatusUpdateCreationItem creationItem : creates) {
 			// set status update identifier
@@ -152,17 +152,17 @@ public class BaselineTest extends AlgorithmTest {
 
 			// create status update
 			timestamp = System.currentTimeMillis();
-			statusUpdateId = this.algorithm.createStatusUpdate(timestamp,
+			this.algorithm.createStatusUpdate(timestamp,
 					creationItem.getUser(), statusUpdate);
 
 			// check if status update node exists and contains correct data
 			statusUpdateNode = NeoUtils.getStatusUpdateNodeByIdentifier(
-					AlgorithmTests.DATABASE, statusUpdateId);
+					AlgorithmTests.DATABASE, statusUpdate.getId());
 
 			assertEquals(
 					statusUpdateNode
 							.getProperty(Properties.StatusUpdate.IDENTIFIER),
-					statusUpdateId);
+					statusUpdate.getId());
 			assertEquals(
 					statusUpdateNode
 							.getProperty(Properties.StatusUpdate.TIMESTAMP),

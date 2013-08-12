@@ -51,7 +51,7 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public String createStatusUpdate(final long timestamp, final Node user,
+	public void createStatusUpdate(final long timestamp, final Node user,
 			StatusUpdate content) {
 		// get last recent status update
 		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
@@ -83,8 +83,6 @@ public class Baseline extends SocialGraph {
 		// add reference from user to current update node
 		user.createRelationshipTo(crrUpdate, SocialGraphRelationshipType.UPDATE);
 		user.setProperty(Properties.User.LAST_UPDATE, timestamp);
-
-		return content.getId();
 	}
 
 	@Override

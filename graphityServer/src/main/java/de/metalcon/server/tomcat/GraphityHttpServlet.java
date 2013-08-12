@@ -21,6 +21,11 @@ import de.metalcon.socialgraph.operations.SocialGraphOperation;
 public abstract class GraphityHttpServlet extends HttpServlet {
 
 	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = 591330391893402568L;
+
+	/**
 	 * graph database to <b>read</b>
 	 */
 	protected AbstractGraphDatabase graphDB;

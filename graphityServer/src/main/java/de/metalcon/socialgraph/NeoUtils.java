@@ -15,7 +15,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
 import de.metalcon.server.exceptions.InvalidUserIdentifierException;
-import de.metalcon.server.exceptions.delete.statusupdate.InvalidStatusUpdateIdentifierException;
+import de.metalcon.server.exceptions.delete.statusupdate.InvalidDeleteStatusUpdateIdentifierException;
 
 /**
  * collection of useful functions for neo4j
@@ -281,7 +281,7 @@ public class NeoUtils {
 	 * @param statusUpdateId
 	 *            status update node identifier
 	 * @return status update node with the identifier passed
-	 * @throws InvalidStatusUpdateIdentifierException
+	 * @throws InvalidDeleteStatusUpdateIdentifierException
 	 *             if there is no status update node with the identifier passed
 	 */
 	public static Node getStatusUpdateNodeByIdentifier(
@@ -293,7 +293,7 @@ public class NeoUtils {
 			return statusUpdate;
 		}
 
-		throw new InvalidStatusUpdateIdentifierException(
+		throw new InvalidDeleteStatusUpdateIdentifierException(
 				"status update with identifier \"" + statusUpdateId
 						+ "\" not existing!");
 	}

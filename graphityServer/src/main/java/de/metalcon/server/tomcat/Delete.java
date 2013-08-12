@@ -22,6 +22,11 @@ import de.metalcon.socialgraph.operations.RemoveStatusUpdate;
  */
 public class Delete extends GraphityHttpServlet {
 
+	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = 3225499980113476273L;
+
 	@Override
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {

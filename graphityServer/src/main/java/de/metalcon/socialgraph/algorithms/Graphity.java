@@ -110,7 +110,7 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public String createStatusUpdate(final long timestamp, final Node user,
+	public void createStatusUpdate(final long timestamp, final Node user,
 			final StatusUpdate content) {
 		// get last recent status update
 		final Node lastUpdate = NeoUtils.getNextSingleNode(user,
@@ -145,8 +145,6 @@ public class Graphity extends SocialGraph {
 
 		// update ego network for this user
 		this.updateEgoNetwork(user);
-
-		return content.getId();
 	}
 
 	/**

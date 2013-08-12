@@ -40,12 +40,12 @@ public class Server implements ServletContextListener {
 	/**
 	 * server configuration
 	 */
-	private Configs config;
+	private final Configs config;
 
 	/**
 	 * social graph database
 	 */
-	private AbstractGraphDatabase graphDatabase;
+	private final AbstractGraphDatabase graphDatabase;
 
 	/**
 	 * social graph algorithm
@@ -55,12 +55,12 @@ public class Server implements ServletContextListener {
 	/**
 	 * queued commands being executed by the command worker
 	 */
-	private BlockingQueue<SocialGraphOperation> commands;
+	private final BlockingQueue<SocialGraphOperation> commands;
 
 	/**
 	 * server's social graph command worker
 	 */
-	private Worker commandWorker;
+	private final Worker commandWorker;
 
 	public Server() {
 		// load server configuration
@@ -149,10 +149,7 @@ public class Server implements ServletContextListener {
 		boolean isEmpty = true;
 		final GlobalGraphOperations globalGraphOps = GlobalGraphOperations
 				.at(this.graphDatabase);
-		for (Node node : globalGraphOps.getAllNodes()) {
-			isEmpty = false;
-			break;
-		}
+		isEmpty = !globalGraphOps.getAllNodes().iterator().hasNext();
 
 		// DEBUG
 		// load test case scenario
@@ -164,7 +161,8 @@ public class Server implements ServletContextListener {
 			final Node[] users = new Node[userIds.length];
 			for (int i = 0; i < userIds.length; i++) {
 				userIds[i] = String.valueOf(i);
-				users[i] = NeoUtils.createUserNode(graphDatabase, userIds[i]);
+				users[i] = NeoUtils.createUserNode(this.graphDatabase,
+						userIds[i]);
 			}
 
 			transaction.success();
