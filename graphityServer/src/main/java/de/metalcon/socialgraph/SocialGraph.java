@@ -2,7 +2,9 @@ package de.metalcon.socialgraph;
 
 import java.util.List;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
@@ -41,6 +43,24 @@ public abstract class SocialGraph {
 	}
 
 	/**
+	 * create a new user
+	 * 
+	 * @param userId
+	 *            user identifier
+	 * @param displayName
+	 *            user display name
+	 * @param profilePicturePath
+	 *            path to the profile picture of the user
+	 */
+	public void createUser(final String userId, final String displayName,
+			final String profilePicturePath) {
+		final Node user = NeoUtils.createUserNode(this.graph, userId);
+		user.setProperty(Properties.User.DISPLAY_NAME, displayName);
+		user.setProperty(Properties.User.PROFILE_PICTURE_PATH,
+				profilePicturePath);
+	}
+
+	/**
 	 * create a new status update for a user
 	 * 
 	 * @param timestamp
@@ -61,8 +81,7 @@ public abstract class SocialGraph {
 	 * @param followed
 	 *            user being followed
 	 */
-	public abstract void createFriendship(long timestamp, Node following,
-			Node followed);
+	public abstract void createFriendship(Node following, Node followed);
 
 	/**
 	 * read some status updates for/from a user
@@ -82,17 +101,31 @@ public abstract class SocialGraph {
 			int numItems, boolean ownUpdates);
 
 	/**
+	 * delete a user removing it from all replica layers of following users
+	 * 
+	 * @param user
+	 *            user that shall be deleted
+	 */
+	public void deleteUser(final Node user) {
+		Node userReplica, following;
+		for (Relationship replica : user.getRelationships(
+				SocialGraphRelationshipType.REPLICA, Direction.INCOMING)) {
+			userReplica = replica.getEndNode();
+			following = NeoUtils.getPrevSingleNode(userReplica,
+					SocialGraphRelationshipType.FOLLOW);
+			this.removeFriendship(following, user);
+		}
+	}
+
+	/**
 	 * remove a friendship from one user to another
 	 * 
-	 * @param timestamp
-	 *            time stamp of the friendship removal
 	 * @param following
 	 *            user following, requesting the deletion
 	 * @param followed
 	 *            user followed
 	 */
-	public abstract void removeFriendship(long timestamp, Node following,
-			Node followed);
+	public abstract void removeFriendship(Node following, Node followed);
 
 	/**
 	 * remove a status update from a user

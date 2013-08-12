@@ -35,8 +35,6 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	 * 
 	 * @param responder
 	 *            client responder
-	 * @param timestamp
-	 *            time stamp of the access
 	 * @param reader
 	 *            reading user
 	 * @param poster
@@ -47,9 +45,9 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	 *            single stream flag
 	 */
 	public ReadStatusUpdates(final ClientResponder responder,
-			final long timestamp, final Node reader, final Node poster,
-			final int numItems, final boolean ownUpdates) {
-		super(responder, timestamp, reader);
+			final Node reader, final Node poster, final int numItems,
+			final boolean ownUpdates) {
+		super(responder, reader);
 		this.poster = poster;
 		this.numItems = numItems;
 		this.ownUpdates = ownUpdates;

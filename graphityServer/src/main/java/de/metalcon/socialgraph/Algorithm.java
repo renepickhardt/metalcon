@@ -11,11 +11,11 @@ public class Algorithm {
 	/**
 	 * social graph algorithm 'Graphity' by René Pickhardt
 	 */
-	public static final String Graphity = "graphity";
+	public static final String ReadOptimizedGraphity = "graphity";
 
 	/**
 	 * social graph algorithm 'Graphity' by René Pickhardt (write optimized)
 	 */
-	public static final String Baseline = "baseline";
+	public static final String WriteOptimizedGraphity = "baseline";
 
 }

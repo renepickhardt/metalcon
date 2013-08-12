@@ -26,7 +26,7 @@ import de.metalcon.socialgraph.SocialGraphRelationshipType;
  * @author Sebastian Schlicht
  * 
  */
-public class BaselineTest extends AlgorithmTest {
+public class WriteOptimizedGraphityTest extends AlgorithmTest {
 
 	private static boolean TESTING = false;
 
@@ -50,7 +50,7 @@ public class BaselineTest extends AlgorithmTest {
 		this.transaction = AlgorithmTests.DATABASE.beginTx();
 
 		// load the Gravity read optimized algorithm
-		this.algorithm = new Baseline(AlgorithmTests.DATABASE);
+		this.algorithm = new WriteOptimizedGraphity(AlgorithmTests.DATABASE);
 	}
 
 	@After
@@ -65,30 +65,21 @@ public class BaselineTest extends AlgorithmTest {
 	 */
 	public void testCreateFriendship_Regular() {
 		// A follows: B, C, D, E
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_A, this.USER_B);
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_A, this.USER_C);
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_A, this.USER_D);
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_A, this.USER_E);
+		this.algorithm.createFriendship(this.USER_A, this.USER_B);
+		this.algorithm.createFriendship(this.USER_A, this.USER_C);
+		this.algorithm.createFriendship(this.USER_A, this.USER_D);
+		this.algorithm.createFriendship(this.USER_A, this.USER_E);
 
 		// B follows: A, D
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_B, this.USER_A);
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_B, this.USER_D);
+		this.algorithm.createFriendship(this.USER_B, this.USER_A);
+		this.algorithm.createFriendship(this.USER_B, this.USER_D);
 
 		// C follows: A, E
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_C, this.USER_A);
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_C, this.USER_E);
+		this.algorithm.createFriendship(this.USER_C, this.USER_A);
+		this.algorithm.createFriendship(this.USER_C, this.USER_E);
 
 		// D follows: C
-		this.algorithm.createFriendship(System.currentTimeMillis(),
-				this.USER_D, this.USER_C);
+		this.algorithm.createFriendship(this.USER_D, this.USER_C);
 
 		// E follows none
 

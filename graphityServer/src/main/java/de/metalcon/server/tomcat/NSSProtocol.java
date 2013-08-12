@@ -6,7 +6,7 @@ package de.metalcon.server.tomcat;
  * @author sebschlicht
  * 
  */
-public class FormFields {
+public class NSSProtocol {
 
 	/**
 	 * user identifier (TODO: delete)
@@ -35,6 +35,11 @@ public class FormFields {
 		 * display name of the new user
 		 */
 		public static final String USER_DISPLAY_NAME = "user_display_name";
+
+		/**
+		 * path to the profile picture of the new user
+		 */
+		public static final String USER_PROFILE_PICTURE_PATH = "user_profile_picture_path";
 
 		/**
 		 * identifier of the user the follow edge shall be created to
@@ -90,6 +95,11 @@ public class FormFields {
 		 * deletion type
 		 */
 		public static final String TYPE = "type";
+
+		/**
+		 * identifier of the user that shall be deleted
+		 */
+		public static final String USER_ID = "user_id";
 
 		/**
 		 * identifier of the user the follow edge shall be deleted from

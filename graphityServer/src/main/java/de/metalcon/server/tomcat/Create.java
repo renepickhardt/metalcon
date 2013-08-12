@@ -82,14 +82,13 @@ public class Create extends GraphityHttpServlet {
 				final FormItemList items = this.extractFormItems(request);
 
 				// read essential form fields
-				final long timestamp = System.currentTimeMillis();
 				final CreateType createType = CreateType.GetCreateType(items
-						.getField(FormFields.Create.TYPE));
+						.getField(NSSProtocol.Create.TYPE));
 
 				Node user = null;
 				if (createType != CreateType.USER) {
 					// TODO: OAuth, stop manual determining of user id
-					final String userId = items.getField(FormFields.USER_ID);
+					final String userId = items.getField(NSSProtocol.USER_ID);
 					user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
 							userId);
 				}
@@ -97,32 +96,33 @@ public class Create extends GraphityHttpServlet {
 				if (createType == CreateType.USER) {
 					// read user specific fields
 					final String userId = items
-							.getField(FormFields.Create.USER_ID);
+							.getField(NSSProtocol.Create.USER_ID);
 					final String displayName = items
-							.getField(FormFields.Create.USER_DISPLAY_NAME);
+							.getField(NSSProtocol.Create.USER_DISPLAY_NAME);
+					final String profilePicturePath = items
+							.getField(NSSProtocol.Create.USER_PROFILE_PICTURE_PATH);
 
 					// create user
 					final CreateUser createUserCommand = new CreateUser(
-							responder, timestamp, userId, displayName);
+							responder, userId, displayName, profilePicturePath);
 					this.commandQueue.add(createUserCommand);
-
 				} else if (createType == CreateType.FOLLOW) {
 					// read followship specific fields
 					final String followedId = items
-							.getField(FormFields.Create.FOLLOW_TARGET);
+							.getField(NSSProtocol.Create.FOLLOW_TARGET);
 					final Node followed = NeoUtils.getUserNodeByIdentifier(
 							this.graphDB, followedId);
 
 					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(
-							responder, timestamp, user, followed);
+							responder, user, followed);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {
 					// read status update specific fields and files
 					final String statusUpdateId = items
-							.getField(FormFields.Create.STATUS_UPDATE_ID);
+							.getField(NSSProtocol.Create.STATUS_UPDATE_ID);
 					final String statusUpdateType = items
-							.getField(FormFields.Create.STATUS_UPDATE_TYPE);
+							.getField(NSSProtocol.Create.STATUS_UPDATE_TYPE);
 
 					StatusUpdateTemplate template;
 					try {
@@ -144,7 +144,8 @@ public class Create extends GraphityHttpServlet {
 						statusUpdate.setId(statusUpdateId);
 
 						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-								responder, timestamp, user, statusUpdate);
+								responder, System.currentTimeMillis(), user,
+								statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
 					} catch (final StatusUpdateInstantiationFailedException e) {
 						// remove the files

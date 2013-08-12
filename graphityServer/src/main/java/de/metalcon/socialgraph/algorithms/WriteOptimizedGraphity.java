@@ -25,15 +25,14 @@ import de.metalcon.socialgraph.User;
  * @author Rene Pickhardt, Jonas Kunze, Sebastian Schlicht
  * 
  */
-public class Baseline extends SocialGraph {
+public class WriteOptimizedGraphity extends SocialGraph {
 
-	public Baseline(final AbstractGraphDatabase graph) {
+	public WriteOptimizedGraphity(final AbstractGraphDatabase graph) {
 		super(graph);
 	}
 
 	@Override
-	public void createFriendship(final long timestamp, final Node following,
-			final Node followed) {
+	public void createFriendship(final Node following, final Node followed) {
 		// try to find the node of the user followed
 		for (Relationship followship : following.getRelationships(
 				SocialGraphRelationshipType.FOLLOW, Direction.OUTGOING)) {
@@ -138,8 +137,7 @@ public class Baseline extends SocialGraph {
 	}
 
 	@Override
-	public void removeFriendship(final long timestamp, final Node following,
-			final Node followed) {
+	public void removeFriendship(final Node following, final Node followed) {
 		// delete the followship if existing
 		final Relationship followship = NeoUtils.getRelationshipBetween(
 				following, followed, SocialGraphRelationshipType.FOLLOW,

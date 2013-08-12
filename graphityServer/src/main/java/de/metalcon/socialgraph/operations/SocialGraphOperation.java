@@ -19,11 +19,6 @@ public abstract class SocialGraphOperation {
 	protected final ClientResponder responder;
 
 	/**
-	 * time stamp of the operation
-	 */
-	protected final long timestamp;
-
-	/**
 	 * executing user
 	 */
 	protected final Node user;
@@ -33,15 +28,11 @@ public abstract class SocialGraphOperation {
 	 * 
 	 * @param responder
 	 *            client responder
-	 * @param timestamp
-	 *            time stamp of the operation
 	 * @param user
 	 *            executing user
 	 */
-	public SocialGraphOperation(final ClientResponder responder,
-			final long timestamp, final Node user) {
+	public SocialGraphOperation(final ClientResponder responder, final Node user) {
 		this.responder = responder;
-		this.timestamp = timestamp;
 		this.user = user;
 	}
 

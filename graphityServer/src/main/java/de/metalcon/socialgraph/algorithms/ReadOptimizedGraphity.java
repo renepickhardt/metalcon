@@ -25,7 +25,7 @@ import de.metalcon.socialgraph.User;
  * @author Rene Pickhardt, Jonas Kunze, Sebastian Schlicht
  * 
  */
-public class Graphity extends SocialGraph {
+public class ReadOptimizedGraphity extends SocialGraph {
 
 	/**
 	 * create a new graphity social graph
@@ -33,13 +33,12 @@ public class Graphity extends SocialGraph {
 	 * @param graph
 	 *            graph database to operate on
 	 */
-	public Graphity(final AbstractGraphDatabase graph) {
+	public ReadOptimizedGraphity(final AbstractGraphDatabase graph) {
 		super(graph);
 	}
 
 	@Override
-	public void createFriendship(final long timestamp, final Node following,
-			final Node followed) {
+	public void createFriendship(final Node following, final Node followed) {
 		// try to find the replica node of the user followed
 		Node followedReplica = null;
 		for (Relationship followship : following.getRelationships(
@@ -309,8 +308,7 @@ public class Graphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeFriendship(final long timestamp, final Node following,
-			final Node followed) {
+	public void removeFriendship(final Node following, final Node followed) {
 		// find the replica node of the user followed
 		Node followedReplica = null;
 		for (Relationship followship : following.getRelationships(

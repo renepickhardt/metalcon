@@ -23,16 +23,14 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 	 * 
 	 * @param responder
 	 *            client responder
-	 * @param timestamp
-	 *            time stamp of the status update removal
 	 * @param poster
 	 *            posting user
 	 * @param statusUpdate
 	 *            status update
 	 */
 	public RemoveStatusUpdate(final ClientResponder responder,
-			final long timestamp, final Node poster, final Node statusUpdate) {
-		super(responder, timestamp, poster);
+			final Node poster, final Node statusUpdate) {
+		super(responder, poster);
 		this.statusUpdate = statusUpdate;
 	}
 

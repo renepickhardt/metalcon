@@ -23,16 +23,14 @@ public class CreateFriendship extends SocialGraphOperation {
 	 * 
 	 * @param responder
 	 *            client responder
-	 * @param timestamp
-	 *            time stamp of the friendship
 	 * @param following
 	 *            following user
 	 * @param followed
 	 *            followed user
 	 */
 	public CreateFriendship(final ClientResponder responder,
-			final long timestamp, final Node following, final Node followed) {
-		super(responder, timestamp, following);
+			final Node following, final Node followed) {
+		super(responder, following);
 		this.followed = followed;
 	}
 
@@ -41,7 +39,7 @@ public class CreateFriendship extends SocialGraphOperation {
 		boolean success = false;
 
 		try {
-			graph.createFriendship(this.timestamp, this.user, this.followed);
+			graph.createFriendship(this.user, this.followed);
 			this.responder.addLine("ok");
 
 			success = true;

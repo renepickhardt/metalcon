@@ -23,7 +23,7 @@ import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.socialgraph.NeoUtils;
 
 @RunWith(Suite.class)
-@SuiteClasses({ BaselineTest.class, GraphityTest.class })
+@SuiteClasses({ WriteOptimizedGraphityTest.class, ReadOptimizedGraphityTest.class })
 /**
  * test all social graph CRUD algorithms
  * 

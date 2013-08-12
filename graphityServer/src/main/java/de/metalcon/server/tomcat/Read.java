@@ -35,18 +35,18 @@ public class Read extends GraphityHttpServlet {
 
 		try {
 			// TODO: OAuth, stop manual determining of user id
-			final String userId = Helper.getString(request, FormFields.USER_ID);
+			final String userId = Helper.getString(request, NSSProtocol.USER_ID);
 			final Node user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
 					userId);
 
 			final String posterId = Helper.getString(request,
-					FormFields.Read.POSTER_ID);
+					NSSProtocol.Read.POSTER_ID);
 			final Node poster = NeoUtils.getUserNodeByIdentifier(this.graphDB,
 					posterId);
 
 			int numItems;
 			try {
-				numItems = Helper.getInt(request, FormFields.Read.NUM_ITEMS);
+				numItems = Helper.getInt(request, NSSProtocol.Read.NUM_ITEMS);
 				if (numItems <= 0) {
 					throw new InvalidItemNumberException(
 							"the number of items to retrieve must be greater than zero.");
@@ -58,15 +58,14 @@ public class Read extends GraphityHttpServlet {
 			boolean ownUpdates;
 			try {
 				ownUpdates = Helper.getBool(request,
-						FormFields.Read.OWN_UPDATES);
+						NSSProtocol.Read.OWN_UPDATES);
 			} catch (final NumberFormatException e) {
 				throw new InvalidRetrievalFlag("a number is excpected.");
 			}
 
 			// read status updates
 			final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
-					responder, System.currentTimeMillis(), user, poster,
-					numItems, ownUpdates);
+					responder, user, poster, numItems, ownUpdates);
 			this.commandQueue.add(readStatusUpdatesCommand);
 		} catch (final IllegalArgumentException e) {
 			// a required form field is missing

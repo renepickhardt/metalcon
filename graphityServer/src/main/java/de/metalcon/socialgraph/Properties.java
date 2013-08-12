@@ -67,6 +67,11 @@ public final class Properties {
 		public static final String DISPLAY_NAME = "displayName";
 
 		/**
+		 * user profile picture path
+		 */
+		public static final String PROFILE_PICTURE_PATH = "profilePicturePath";
+
+		/**
 		 * time stamp in milliseconds for the last recent status update
 		 */
 		public static final String LAST_UPDATE = "last_update";

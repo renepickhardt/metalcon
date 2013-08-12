@@ -15,6 +15,11 @@ import de.metalcon.socialgraph.SocialGraph;
 public class CreateStatusUpdate extends SocialGraphOperation {
 
 	/**
+	 * time stamp of the operation
+	 */
+	private final long timestamp;
+
+	/**
 	 * status update content object
 	 */
 	private final StatusUpdate content;
@@ -33,7 +38,8 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	 */
 	public CreateStatusUpdate(final ClientResponder responder,
 			final long timestamp, final Node poster, final StatusUpdate content) {
-		super(responder, timestamp, poster);
+		super(responder, poster);
+		this.timestamp = timestamp;
 		this.content = content;
 	}
 
@@ -42,10 +48,9 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 		boolean success = false;
 
 		try {
-			graph.createStatusUpdate(
-					this.timestamp, this.user, this.content);
-			responder.addLine("ok");
-			
+			graph.createStatusUpdate(this.timestamp, this.user, this.content);
+			this.responder.addLine("ok");
+
 			success = true;
 		} catch (final RequestFailedException e) {
 			this.responder.addLine(e.getMessage());

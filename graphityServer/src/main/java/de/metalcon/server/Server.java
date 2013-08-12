@@ -25,8 +25,8 @@ import de.metalcon.server.tomcat.create.FormItemList;
 import de.metalcon.socialgraph.Algorithm;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraph;
-import de.metalcon.socialgraph.algorithms.Baseline;
-import de.metalcon.socialgraph.algorithms.Graphity;
+import de.metalcon.socialgraph.algorithms.ReadOptimizedGraphity;
+import de.metalcon.socialgraph.algorithms.WriteOptimizedGraphity;
 import de.metalcon.socialgraph.operations.SocialGraphOperation;
 
 /**
@@ -73,12 +73,12 @@ public class Server implements ServletContextListener {
 		// load social graph algorithm
 		switch (this.config.algorithm()) {
 
-		case Algorithm.Graphity:
-			this.graph = new Graphity(this.graphDatabase);
+		case Algorithm.ReadOptimizedGraphity:
+			this.graph = new ReadOptimizedGraphity(this.graphDatabase);
 			break;
 
-		case Algorithm.Baseline:
-			this.graph = new Baseline(this.graphDatabase);
+		case Algorithm.WriteOptimizedGraphity:
+			this.graph = new WriteOptimizedGraphity(this.graphDatabase);
 			break;
 
 		default:
@@ -180,8 +180,7 @@ public class Server implements ServletContextListener {
 
 			for (int i = 0; i < userIds.length; i++) {
 				for (Node followed : friendships.get(userIds[i])) {
-					this.graph.createFriendship(System.currentTimeMillis(),
-							users[i], followed);
+					this.graph.createFriendship(users[i], followed);
 				}
 			}
 
