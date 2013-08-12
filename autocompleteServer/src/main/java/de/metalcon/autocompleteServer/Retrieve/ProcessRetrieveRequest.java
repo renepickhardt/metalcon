@@ -22,13 +22,13 @@ public class ProcessRetrieveRequest {
 	public static ProcessRetrieveResponse checkRequestParameter(HttpServletRequest request, ServletContext context){
 		ProcessRetrieveResponse response = new ProcessRetrieveResponse(context);
 		Integer numItems = checkNumItems(request, response);
+		String term = checkTerm(request, response);
+		if (term == null){
+			return response;
+		}
 		SuggestTree index = checkIndexName(request, response, context);
 		if (index == null){
 			response.addError(RetrieveStatusCodes.NO_INDEX_AVAILABLE);
-			return response;
-		}
-		String term = checkTerm(request, response);
-		if (term == null){
 			return response;
 		}
 		retrieveSuggestions(request, response, index, term, numItems);
