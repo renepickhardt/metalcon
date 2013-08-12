@@ -65,7 +65,7 @@ public class Worker implements Runnable {
 				command.run(this.graph);
 			}
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			// stopped by worker
 		}
 
 		// reset worker flags
@@ -86,6 +86,7 @@ public class Worker implements Runnable {
 	 */
 	public void stop() {
 		this.stopping = true;
+		this.workerThread.interrupt();
 	}
 
 	/**
