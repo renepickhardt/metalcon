@@ -16,6 +16,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -272,16 +273,13 @@ public class ServletBenchmark {
 			IOException {
 		timeDeleteFollow = System.nanoTime();
 
-		final MultipartEntity entity = new MultipartEntity();
-		try {
-			entity.addPart(NSSProtocol.USER_ID, new StringBody(followingId));
-			entity.addPart(NSSProtocol.Delete.TYPE, new StringBody(
-					DeleteType.FOLLOW.getIdentifier()));
-			entity.addPart(NSSProtocol.Delete.FOLLOWED, new StringBody(
-					followedId));
-		} catch (final UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		final List<NameValuePair> values = new ArrayList<NameValuePair>(3);
+		values.add(new BasicNameValuePair(NSSProtocol.USER_ID, followingId));
+		values.add(new BasicNameValuePair(NSSProtocol.Delete.TYPE,
+				DeleteType.FOLLOW.getIdentifier()));
+		values.add(new BasicNameValuePair(NSSProtocol.Delete.FOLLOWED,
+				followedId));
+		final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(values);
 
 		postRequest(
 				"http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/delete",
