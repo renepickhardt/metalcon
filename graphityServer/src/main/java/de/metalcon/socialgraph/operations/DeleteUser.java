@@ -2,6 +2,7 @@ package de.metalcon.socialgraph.operations;
 
 import org.neo4j.graphdb.Node;
 
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -20,13 +21,16 @@ public class DeleteUser extends SocialGraphOperation {
 	/**
 	 * create a new delete user command
 	 * 
+	 * @param servlet
+	 *            response servlet
 	 * @param responder
 	 *            client responder
 	 * @param user
 	 *            user that shall be deleted
 	 */
-	public DeleteUser(final ClientResponder responder, final Node user) {
-		super(responder, null);
+	public DeleteUser(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node user) {
+		super(servlet, responder, null);
 		this.user = user;
 	}
 

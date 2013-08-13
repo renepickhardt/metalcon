@@ -3,6 +3,7 @@ package de.metalcon.socialgraph.operations;
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.exceptions.RequestFailedException;
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -21,6 +22,8 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 	/**
 	 * create a new remove status update command
 	 * 
+	 * @param servlet
+	 *            request servlet
 	 * @param responder
 	 *            client responder
 	 * @param poster
@@ -28,9 +31,10 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 	 * @param statusUpdate
 	 *            status update
 	 */
-	public RemoveStatusUpdate(final ClientResponder responder,
-			final Node poster, final Node statusUpdate) {
-		super(responder, poster);
+	public RemoveStatusUpdate(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node poster,
+			final Node statusUpdate) {
+		super(servlet, responder, poster);
 		this.statusUpdate = statusUpdate;
 	}
 
@@ -47,8 +51,8 @@ public class RemoveStatusUpdate extends SocialGraphOperation {
 			this.responder.addLine(e.getMessage());
 			this.responder.addLine(e.getSalvationDescription());
 		}
+		// TODO: check status update ownage in servlet
 
-		this.responder.finish();
 		return success;
 	}
 

@@ -115,7 +115,7 @@ public class Create extends GraphityHttpServlet {
 							.getField(NSSProtocol.Create.USER_PROFILE_PICTURE_PATH);
 
 					// create user
-					final CreateUser createUserCommand = new CreateUser(
+					final CreateUser createUserCommand = new CreateUser(this,
 							responder, userId, displayName, profilePicturePath);
 					this.commandQueue.add(createUserCommand);
 				} else if (createType == CreateType.FOLLOW) {
@@ -127,7 +127,7 @@ public class Create extends GraphityHttpServlet {
 
 					// create followship
 					final CreateFriendship createFriendshipCommand = new CreateFriendship(
-							responder, user, followed);
+							this, responder, user, followed);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {
 					// read status update specific fields and files
@@ -156,8 +156,8 @@ public class Create extends GraphityHttpServlet {
 						statusUpdate.setId(statusUpdateId);
 
 						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-								responder, System.currentTimeMillis(), user,
-								statusUpdate);
+								this, responder, System.currentTimeMillis(),
+								user, statusUpdate);
 						this.commandQueue.add(createStatusUpdateCommand);
 					} catch (final StatusUpdateInstantiationFailedException e) {
 						// remove the files
@@ -178,6 +178,14 @@ public class Create extends GraphityHttpServlet {
 								"file writing failed!");
 					}
 				}
+
+				try {
+					this.workingQueue.take();
+					responder.finish();
+				} catch (final InterruptedException e) {
+					System.err.println("request status queue failed");
+					e.printStackTrace();
+				}
 			} catch (final FormItemDoubleUsageException e) {
 				responder.error(400, e.getMessage());
 				e.printStackTrace();
@@ -194,7 +202,6 @@ public class Create extends GraphityHttpServlet {
 				responder.addLine(e.getMessage());
 				responder.addLine(e.getSalvationDescription());
 				responder.finish();
-				e.printStackTrace();
 			}
 		} else {
 			// error - no multipart form

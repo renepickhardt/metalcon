@@ -3,6 +3,7 @@ package de.metalcon.socialgraph.operations;
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.exceptions.RequestFailedException;
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -21,6 +22,8 @@ public class CreateFriendship extends SocialGraphOperation {
 	/**
 	 * create a new create friendship command
 	 * 
+	 * @param servlet
+	 *            request servlet
 	 * @param responder
 	 *            client responder
 	 * @param following
@@ -28,9 +31,10 @@ public class CreateFriendship extends SocialGraphOperation {
 	 * @param followed
 	 *            followed user
 	 */
-	public CreateFriendship(final ClientResponder responder,
-			final Node following, final Node followed) {
-		super(responder, following);
+	public CreateFriendship(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node following,
+			final Node followed) {
+		super(servlet, responder, following);
 		this.followed = followed;
 	}
 
@@ -48,7 +52,6 @@ public class CreateFriendship extends SocialGraphOperation {
 			this.responder.addLine(e.getSalvationDescription());
 		}
 
-		this.responder.finish();
 		return success;
 	}
 

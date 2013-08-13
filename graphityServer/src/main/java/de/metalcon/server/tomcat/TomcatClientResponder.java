@@ -55,7 +55,8 @@ public class TomcatClientResponder implements ClientResponder {
 
 	@Override
 	public void finish() {
-		// this.writer.close();
+		this.writer.flush();
+		this.writer.close();
 	}
 
 }

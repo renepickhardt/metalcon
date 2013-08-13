@@ -2,7 +2,7 @@ package de.metalcon.socialgraph.operations;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.exceptions.RequestFailedException;
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -21,6 +21,8 @@ public class RemoveFriendship extends SocialGraphOperation {
 	/**
 	 * create a new delete follow edge command
 	 * 
+	 * @param servlet
+	 *            response servlet
 	 * @param responder
 	 *            client responder
 	 * @param following
@@ -28,28 +30,19 @@ public class RemoveFriendship extends SocialGraphOperation {
 	 * @param followed
 	 *            followed user
 	 */
-	public RemoveFriendship(final ClientResponder responder,
-			final Node following, final Node followed) {
-		super(responder, following);
+	public RemoveFriendship(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node following,
+			final Node followed) {
+		super(servlet, responder, following);
 		this.followed = followed;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		boolean success = false;
+		graph.removeFriendship(this.user, this.followed);
+		this.responder.addLine("ok");
 
-		try {
-			graph.removeFriendship(this.user, this.followed);
-			this.responder.addLine("ok");
-
-			success = true;
-		} catch (final RequestFailedException e) {
-			this.responder.addLine(e.getMessage());
-			this.responder.addLine(e.getSalvationDescription());
-		}
-
-		this.responder.finish();
-		return success;
+		return true;
 	}
 
 }

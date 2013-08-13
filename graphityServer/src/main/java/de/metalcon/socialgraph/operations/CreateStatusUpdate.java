@@ -4,6 +4,7 @@ import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.exceptions.RequestFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -27,6 +28,8 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	/**
 	 * create a new create status update command
 	 * 
+	 * @param servlet
+	 *            request servlet
 	 * @param responder
 	 *            client responder
 	 * @param timestamp
@@ -36,9 +39,10 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 	 * @param content
 	 *            status update content object
 	 */
-	public CreateStatusUpdate(final ClientResponder responder,
-			final long timestamp, final Node poster, final StatusUpdate content) {
-		super(responder, poster);
+	public CreateStatusUpdate(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final long timestamp,
+			final Node poster, final StatusUpdate content) {
+		super(servlet, responder, poster);
 		this.timestamp = timestamp;
 		this.content = content;
 	}
@@ -57,7 +61,6 @@ public class CreateStatusUpdate extends SocialGraphOperation {
 			this.responder.addLine(e.getSalvationDescription());
 		}
 
-		this.responder.finish();
 		return success;
 	}
 

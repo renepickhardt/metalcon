@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.exceptions.RequestFailedException;
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -33,6 +33,8 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	/**
 	 * create a new read status updates command
 	 * 
+	 * @param servlet
+	 *            response servlet
 	 * @param responder
 	 *            client responder
 	 * @param reader
@@ -44,10 +46,10 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	 * @param ownUpdates
 	 *            single stream flag
 	 */
-	public ReadStatusUpdates(final ClientResponder responder,
-			final Node reader, final Node poster, final int numItems,
-			final boolean ownUpdates) {
-		super(responder, reader);
+	public ReadStatusUpdates(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node reader,
+			final Node poster, final int numItems, final boolean ownUpdates) {
+		super(servlet, responder, reader);
 		this.poster = poster;
 		this.numItems = numItems;
 		this.ownUpdates = ownUpdates;
@@ -55,29 +57,23 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		try {
-			final List<String> activities = graph.readStatusUpdates(
-					this.poster, this.user, this.numItems, this.ownUpdates);
+		final List<String> activities = graph.readStatusUpdates(this.poster,
+				this.user, this.numItems, this.ownUpdates);
 
-			// send stream to client
-			int i = 0;
-			int lastActivity = activities.size() - 1;
-			this.responder.addLine("{\"items\":[");
-			for (String activity : activities) {
-				if (i != lastActivity) {
-					this.responder.addLine(activity + ",");
-				} else {
-					this.responder.addLine(activity);
-				}
-				i += 1;
+		// send stream to client
+		int i = 0;
+		int lastActivity = activities.size() - 1;
+		this.responder.addLine("{\"items\":[");
+		for (String activity : activities) {
+			if (i != lastActivity) {
+				this.responder.addLine(activity + ",");
+			} else {
+				this.responder.addLine(activity);
 			}
-			this.responder.addLine("]}");
-		} catch (final RequestFailedException e) {
-			this.responder.addLine(e.getMessage());
-			this.responder.addLine(e.getSalvationDescription());
+			i += 1;
 		}
+		this.responder.addLine("]}");
 
-		this.responder.finish();
 		return false;
 	}
 

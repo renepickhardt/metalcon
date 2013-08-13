@@ -3,6 +3,7 @@ package de.metalcon.socialgraph.operations;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
+import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -12,6 +13,11 @@ import de.metalcon.socialgraph.SocialGraph;
  * 
  */
 public abstract class SocialGraphOperation {
+
+	/**
+	 * request servlet
+	 */
+	protected final GraphityHttpServlet servlet;
 
 	/**
 	 * client responder
@@ -26,12 +32,16 @@ public abstract class SocialGraphOperation {
 	/**
 	 * create a new basic social graph operation
 	 * 
+	 * @param servlet
+	 *            request servlet
 	 * @param responder
 	 *            client responder
 	 * @param user
 	 *            executing user
 	 */
-	public SocialGraphOperation(final ClientResponder responder, final Node user) {
+	public SocialGraphOperation(final GraphityHttpServlet servlet,
+			final ClientResponder responder, final Node user) {
+		this.servlet = servlet;
 		this.responder = responder;
 		this.user = user;
 	}
@@ -49,6 +59,7 @@ public abstract class SocialGraphOperation {
 			transaction.success();
 		}
 		transaction.finish();
+		this.servlet.finish();
 	}
 
 	/**

@@ -54,8 +54,8 @@ public class Delete extends GraphityHttpServlet {
 				user = NeoUtils.getUserNodeByIdentifier(this.graphDB, userId);
 
 				// delete user
-				final DeleteUser deleteUserCommand = new DeleteUser(responder,
-						user);
+				final DeleteUser deleteUserCommand = new DeleteUser(this,
+						responder, user);
 				this.commandQueue.add(deleteUserCommand);
 			} else if (removalType == DeleteType.FOLLOW) {
 				// read followship specific fields
@@ -66,7 +66,7 @@ public class Delete extends GraphityHttpServlet {
 
 				// remove followship
 				final RemoveFriendship removeFriendshipCommand = new RemoveFriendship(
-						responder, user, followed);
+						this, responder, user, followed);
 				this.commandQueue.add(removeFriendshipCommand);
 			} else {
 				// read status update specific fields
@@ -78,8 +78,16 @@ public class Delete extends GraphityHttpServlet {
 
 				// remove status update
 				final RemoveStatusUpdate removeStatusUpdate = new RemoveStatusUpdate(
-						responder, user, statusUpdate);
+						this, responder, user, statusUpdate);
 				this.commandQueue.add(removeStatusUpdate);
+			}
+
+			try {
+				this.workingQueue.take();
+				responder.finish();
+			} catch (final InterruptedException e) {
+				System.err.println("request status queue failed");
+				e.printStackTrace();
 			}
 
 		} catch (final IllegalArgumentException e) {

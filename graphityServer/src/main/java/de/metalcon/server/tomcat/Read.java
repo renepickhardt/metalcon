@@ -35,7 +35,8 @@ public class Read extends GraphityHttpServlet {
 
 		try {
 			// TODO: OAuth, stop manual determining of user id
-			final String userId = Helper.getString(request, NSSProtocol.USER_ID);
+			final String userId = Helper
+					.getString(request, NSSProtocol.USER_ID);
 			final Node user = NeoUtils.getUserNodeByIdentifier(this.graphDB,
 					userId);
 
@@ -63,10 +64,21 @@ public class Read extends GraphityHttpServlet {
 				throw new InvalidRetrievalFlag("a number is excpected.");
 			}
 
+			// DEBUG
+			responder.addLine("stacked commands: " + this.commandQueue.size());
+
 			// read status updates
 			final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
-					responder, user, poster, numItems, ownUpdates);
+					this, responder, user, poster, numItems, ownUpdates);
 			this.commandQueue.add(readStatusUpdatesCommand);
+
+			try {
+				this.workingQueue.take();
+				responder.finish();
+			} catch (final InterruptedException e) {
+				System.err.println("request status queue failed");
+				e.printStackTrace();
+			}
 		} catch (final IllegalArgumentException e) {
 			// a required form field is missing
 			responder.error(500, e.getMessage());
@@ -76,7 +88,6 @@ public class Read extends GraphityHttpServlet {
 			responder.addLine(e.getMessage());
 			responder.addLine(e.getSalvationDescription());
 			responder.finish();
-			e.printStackTrace();
 		}
 	}
 }

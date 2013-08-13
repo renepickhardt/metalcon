@@ -1,6 +1,8 @@
 package de.metalcon.server.tomcat;
 
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -35,6 +37,11 @@ public abstract class GraphityHttpServlet extends HttpServlet {
 	 */
 	protected Queue<SocialGraphOperation> commandQueue;
 
+	/**
+	 * working queue
+	 */
+	protected BlockingQueue<Object> workingQueue;
+
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
@@ -42,6 +49,14 @@ public abstract class GraphityHttpServlet extends HttpServlet {
 		final Server server = (Server) context.getAttribute("server");
 		this.graphDB = server.getGraphDatabase();
 		this.commandQueue = server.getCommandQueue();
+		this.workingQueue = new LinkedBlockingQueue<Object>(1);
+	}
+
+	/**
+	 * trigger the request finished signal
+	 */
+	public void finish() {
+		this.workingQueue.add(new Object());
 	}
 
 }
