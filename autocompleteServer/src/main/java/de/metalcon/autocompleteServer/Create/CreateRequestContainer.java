@@ -14,7 +14,7 @@ public class CreateRequestContainer extends Command {
 	private String suggestString;
 	private Integer weight;
 	private String key;
-	private String imageSerializedString;
+	private byte[] imageBase64;
 	private String indexName;
 
 	public String getSuggestString() {
@@ -41,12 +41,12 @@ public class CreateRequestContainer extends Command {
 		this.key = key;
 	}
 
-	public String getImageSerializedString() {
-		return this.imageSerializedString;
+	public byte[] getImageBase64() {
+		return this.imageBase64;
 	}
 
-	public void setImageSerializedString(String imageSerializedString) {
-		this.imageSerializedString = imageSerializedString;
+	public void setImageBase64(byte[] imageBase64) {
+		this.imageBase64 = imageBase64;
 	}
 
 	public String getIndexName() {

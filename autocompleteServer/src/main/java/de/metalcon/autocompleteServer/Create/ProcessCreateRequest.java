@@ -1,7 +1,13 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -57,31 +63,56 @@ public class ProcessCreateRequest {
 		response.addWeightToContainer(weight);
 		suggestTreeCreateRequestContainer.setWeight(weight);
 
-		String image = checkImage(items, response);
+		byte[] image = checkImage(items, response);
 		if (image != null) {
-			suggestTreeCreateRequestContainer.setImageSerializedString(image);
+			suggestTreeCreateRequestContainer.setImageBase64(image);
 		}
 		return response;
 	}
 
-	private static String checkImage(FormItemList items,
+	private static byte[] checkImage(FormItemList items,
 			ProcessCreateResponse response) {
 		String image = null;
+		byte[] imageB64 = null;
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getField(ProtocolConstants.IMAGE);
-			image = deepCheckImage(image);
+
+			imageB64 = deepCheckImage(image);
 		} catch (IllegalArgumentException e) {
 			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
-		return null;
+		return imageB64;
 	}
 
-	private static String deepCheckImage(String image) {
+	/**
+	 * 
+	 * This method checks whether an image is conform to the conditions. If it
+	 * does not have the right geometry or format, null is returned. If it is
+	 * ok, the image is returned as a Base64 Byte array.
+	 * 
+	 * @param image
+	 * @return Base64 image as Byte[] or null, if check not passed
+	 */
+	private static byte[] deepCheckImage(String image) {
 		// TODO impelent check for image type (jpg) and geometry (in Pixel)
-		return null;
+		BufferedImage bImage = null;
+		byte[] base64EncodedImage = Base64.encodeBase64(image.getBytes());
+
+		try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(
+					base64EncodedImage);
+
+			bImage = ImageIO.read(bais);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+
+		return base64EncodedImage;
 	}
 
 	private static Integer checkWeight(FormItemList items,
