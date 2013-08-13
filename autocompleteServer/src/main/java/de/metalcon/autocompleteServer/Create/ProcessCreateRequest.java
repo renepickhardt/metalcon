@@ -106,7 +106,10 @@ public class ProcessCreateRequest {
 					base64EncodedImage);
 
 			bImage = ImageIO.read(bais);
-
+			if (!((ProtocolConstants.IMAGE_WIDTH == bImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT == bImage
+					.getHeight()))) {
+				return null;
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			return null;
