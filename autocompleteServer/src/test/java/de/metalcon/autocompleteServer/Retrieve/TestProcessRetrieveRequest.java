@@ -92,7 +92,7 @@ public class TestProcessRetrieveRequest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckRequestParameter() throws ServletException {
-		HttpServletRequest request = initializeTest();		
+		HttpServletRequest request = initializeTest();
 		JSONObject jsonResponse = testRequest(request, "Me", "7", "generalIndex");
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse.get("suggestionList");
 		assertTrue(suggestionList.size()==7);
