@@ -2,6 +2,9 @@ package de.metalcon.autocompleteServer.Create;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -63,24 +66,29 @@ public class ProcessCreateRequest {
 		response.addWeightToContainer(weight);
 		suggestTreeCreateRequestContainer.setWeight(weight);
 
-		byte[] image = checkImage(items, response);
-		if (image != null) {
-			suggestTreeCreateRequestContainer.setImageBase64(image);
+		String image = checkImage(items, response);
+		if (image == null) {
+			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			// suggestTreeCreateRequestContainer.putHash(suggestionString,
+			// imageName);
 		}
+
+		suggestTreeCreateRequestContainer.setImageBase64(image);
+
 		return response;
 	}
 
-	private static byte[] checkImage(FormItemList items,
+	private static String checkImage(FormItemList items,
 			ProcessCreateResponse response) {
-		String image = null;
-		byte[] imageB64 = null;
+		FormFile image = null;
+		String imageB64 = null;
 		try {
 			// TODO: double check, if it works that way on images
-			image = items.getField(ProtocolConstants.IMAGE);
-
-			imageB64 = deepCheckImage(image);
+			image = items.getFile(ProtocolConstants.IMAGE);
+			File imageFile = image.getFile();
+			imageB64 = deepCheckImage(imageFile);
 		} catch (IllegalArgumentException e) {
-			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
@@ -93,29 +101,51 @@ public class ProcessCreateRequest {
 	 * does not have the right geometry or format, null is returned. If it is
 	 * ok, the image is returned as a Base64 Byte array.
 	 * 
-	 * @param image
-	 * @return Base64 image as Byte[] or null, if check not passed
+	 * @param imageFile
+	 * @return Base64 image as String or null, if check not passed
 	 */
-	private static byte[] deepCheckImage(String image) {
-		// TODO impelent check for image type (jpg) and geometry (in Pixel)
+	private static String deepCheckImage(File imageFile) {
+		// TODO implement check for image type (jpg) and geometry (in Pixel)
 		BufferedImage bImage = null;
-		byte[] base64EncodedImage = Base64.encodeBase64(image.getBytes());
+		FileReader fileReader = null;
+		try {
+			fileReader = new FileReader(imageFile);
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			return null;
+		}
+		// TODO: check length
+		long fileLength = imageFile.length();
+		char[] cbuf = null;
+		try {
+			fileReader.read(cbuf, 0, (int) fileLength);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+		byte[] rawImageData = new byte[(int) fileLength];
+		for (int i = 0; i < fileLength; i++) {
+			rawImageData[i] = (byte) cbuf[i];
+		}
+		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
+		String result = new String(base64EncodedImage);
 
 		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(
-					base64EncodedImage);
-
+			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
 			bImage = ImageIO.read(bais);
+			// TODO: maybe less strong
 			if (!((ProtocolConstants.IMAGE_WIDTH == bImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT == bImage
 					.getHeight()))) {
 				return null;
 			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			return null;
 		}
-
-		return base64EncodedImage;
+		return result;
 	}
 
 	private static Integer checkWeight(FormItemList items,

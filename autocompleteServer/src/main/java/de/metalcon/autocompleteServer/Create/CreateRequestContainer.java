@@ -4,17 +4,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Command;
+import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class CreateRequestContainer extends Command {
 	private String suggestString;
 	private Integer weight;
 	private String key;
-	private byte[] imageBase64;
+	private String imageBase64;
 	private String indexName;
 
 	public String getSuggestString() {
@@ -41,12 +43,12 @@ public class CreateRequestContainer extends Command {
 		this.key = key;
 	}
 
-	public byte[] getImageBase64() {
+	public String getImageBase64() {
 		return this.imageBase64;
 	}
 
-	public void setImageBase64(byte[] imageBase64) {
-		this.imageBase64 = imageBase64;
+	public void setImageBase64(String image) {
+		this.imageBase64 = image;
 	}
 
 	public String getIndexName() {
@@ -65,7 +67,11 @@ public class CreateRequestContainer extends Command {
 				.getAttribute("indexName:" + this.indexName);
 
 		suggestTree.put(this.suggestString, this.weight, this.key);
-
+		if (this.imageBase64 != null) {
+			HashMap<String, String> map = ContextListener
+					.getImageIndex(context);
+			map.put(this.key, this.imageBase64);
+		}
 		// This creates the database file if it doesn't exist
 		File createFile = new File("Database.save");
 
