@@ -30,6 +30,7 @@ public class ProtocolConstants {
 	public static final String IMAGE = "image";
 	public static final int IMAGE_WIDTH = 64;
 	public static final int IMAGE_HEIGHT = 64;
+	public static final long MAX_IMAGE_FILE_LENGTH = 3000000;
 
 	/**
 	 * the default Number of Items which can be retrieved from the Suggest

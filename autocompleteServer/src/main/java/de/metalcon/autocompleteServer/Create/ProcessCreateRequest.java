@@ -3,7 +3,6 @@ package de.metalcon.autocompleteServer.Create;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -82,35 +81,21 @@ public class ProcessCreateRequest {
 			ProcessCreateResponse response) {
 		FormFile image = null;
 		String imageB64 = null;
+		File imageFile = null;
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
-			File imageFile = image.getFile();
-			imageB64 = deepCheckImage(imageFile);
+			imageFile = image.getFile();
 		} catch (IllegalArgumentException e) {
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
-		return imageB64;
-	}
-
-	/**
-	 * 
-	 * This method checks whether an image is conform to the conditions. If it
-	 * does not have the right geometry or format, null is returned. If it is
-	 * ok, the image is returned as a Base64 Byte array.
-	 * 
-	 * @param imageFile
-	 * @return Base64 image as String or null, if check not passed
-	 */
-	private static String deepCheckImage(File imageFile) {
-		// TODO implement check for image type (jpg) and geometry (in Pixel)
-		BufferedImage bImage = null;
+		BufferedImage bufferedImage = null;
 		FileReader fileReader = null;
 		try {
 			fileReader = new FileReader(imageFile);
-		} catch (FileNotFoundException e2) {
+		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 			return null;
@@ -120,8 +105,8 @@ public class ProcessCreateRequest {
 		char[] cbuf = null;
 		try {
 			fileReader.read(cbuf, 0, (int) fileLength);
+			fileReader.close();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
 		}
@@ -134,18 +119,18 @@ public class ProcessCreateRequest {
 
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
-			bImage = ImageIO.read(bais);
+			bufferedImage = ImageIO.read(bais);
 			// TODO: maybe less strong
-			if (!((ProtocolConstants.IMAGE_WIDTH == bImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT == bImage
+			if (!((ProtocolConstants.IMAGE_WIDTH == bufferedImage.getWidth()) && (ProtocolConstants.IMAGE_HEIGHT == bufferedImage
 					.getHeight()))) {
 				return null;
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return null;
 		}
-		return result;
+		return imageB64;
 	}
 
 	private static Integer checkWeight(FormItemList items,
@@ -178,7 +163,7 @@ public class ProcessCreateRequest {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			index = ProtocolConstants.DEFAULT_INDEX_NAME;
 		}
-		return null;
+		return index;
 	}
 
 	private static String checkSuggestionKey(FormItemList items,
@@ -193,12 +178,12 @@ public class ProcessCreateRequest {
 			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
-		// check if the key length matches ASTP requirements
-		// TODO: add error message String!
+		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addError(null);
+			response.addError(CreateStatusCodes.KEY_TOO_LONG);
+			return null;
 		}
-		return null;
+		return key;
 	}
 
 	private static String checkSuggestionString(FormItemList items,
@@ -215,9 +200,10 @@ public class ProcessCreateRequest {
 		// check if the suggestion String length matches ASTP requirements
 		// TODO: add Strings!
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
-			response.addError(null);
+			response.addError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			return null;
 		}
-		return null;
+		return suggestString;
 	}
 
 	// checkContentType(); Accept must be text/x-json.
