@@ -47,11 +47,11 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.setSuggestString(suggestionString);
 
 		String indexName = checkIndexName(items, response);
-		response.addIndexToContainer(indexName);
+		// response.addIndexToContainer(indexName);
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
 		String suggestionKey = checkSuggestionKey(items, response);
-		response.addSuggestionKeyToContainer(suggestionKey);
+		// response.addSuggestionKeyToContainer(suggestionKey);
 		suggestTreeCreateRequestContainer.setSuggestString(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
@@ -59,7 +59,7 @@ public class ProcessCreateRequest {
 			suggestTreeCreateRequestContainer = null;
 			return response;
 		}
-		response.addWeightToContainer(weight);
+		// response.addWeightToContainer(weight);
 		suggestTreeCreateRequestContainer.setWeight(weight);
 
 		// Protocol forbids images for suggestions without keys

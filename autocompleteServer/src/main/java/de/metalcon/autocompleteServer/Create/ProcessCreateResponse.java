@@ -2,25 +2,23 @@ package de.metalcon.autocompleteServer.Create;
 
 public class ProcessCreateResponse {
 
-	private final CreateRequestContainer container;
+	private final CreateResponseContainer container;
 
 	public ProcessCreateResponse() {
-		this.container = new CreateRequestContainer();
+		this.container = new CreateResponseContainer();
 	}
 
-	public static void addQueryNameWarning(String querynameNotGiven) {
-		// TODO implement appropriate warning
+	public void addQueryNameWarning(String querynameNotGiven) {
+		this.container.addStatusMessage(querynameNotGiven);
 
 	}
 
-	public static void addIndexNameWarning(String indexnameNotGiven) {
-		// TODO implement appropriate warning
-
+	public void addIndexNameWarning(String indexnameNotGiven) {
+		this.container.addStatusMessage(indexnameNotGiven);
 	}
 
 	public void addError(String querynameNotGiven) {
-		// TODO implement appropriate error message
-
+		this.container.addStatusMessage(querynameNotGiven);
 	}
 
 	/**
@@ -34,31 +32,30 @@ public class ProcessCreateResponse {
 	}
 
 	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
-		// TODO implement appropriate warning
-
+		this.container.addStatusMessage(suggestionKeyNotGiven);
 	}
 
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
-		// TODO implement appropriate warning
-
+		this.container.addStatusMessage(indexnameNotGiven);
 	}
 
 	public void addNoImageWarning(String noImage) {
-		// TODO implement appropriate warning
-
+		this.container.addStatusMessage(noImage);
 	}
 
-	public void addIndexToContainer(String indexName) {
-		this.container.setIndexName(indexName);
+	public String getResponse() {
+		return this.container.getStatusMessages();
 	}
-
-	public void addSuggestionKeyToContainer(String suggestionKey) {
-		this.container.setKey(suggestionKey);
-	}
-
-	public void addWeightToContainer(Integer weight) {
-		this.container.setWeight(weight);
-
-	}
-
+	/*
+	 * public void addIndexToContainer(String indexName) {
+	 * this.container.setIndexName(indexName); }
+	 * 
+	 * public void addSuggestionKeyToContainer(String suggestionKey) {
+	 * this.container.setKey(suggestionKey); }
+	 * 
+	 * public void addWeightToContainer(Integer weight) {
+	 * this.container.setWeight(weight);
+	 * 
+	 * }
+	 */
 }
