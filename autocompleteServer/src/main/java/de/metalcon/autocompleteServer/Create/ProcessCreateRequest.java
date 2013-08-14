@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,11 +50,7 @@ public class ProcessCreateRequest {
 		response.addIndexToContainer(indexName);
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
-		// TODO find elegant way to abort(->return) if key is too long
 		String suggestionKey = checkSuggestionKey(items, response);
-		// if (suggestionKey == null) {
-		// return response;
-		// }
 		response.addSuggestionKeyToContainer(suggestionKey);
 		suggestTreeCreateRequestContainer.setSuggestString(suggestionKey);
 
@@ -65,14 +62,16 @@ public class ProcessCreateRequest {
 		response.addWeightToContainer(weight);
 		suggestTreeCreateRequestContainer.setWeight(weight);
 
-		String image = checkImage(items, response);
-		if (image == null) {
-			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
-			// suggestTreeCreateRequestContainer.putHash(suggestionString,
-			// imageName);
-		}
+		// Protocol forbids images for suggestions without keys
+		// TODO: add this piece of information to nokey-Warning
+		if (suggestionKey != null) {
+			String image = checkImage(items, response);
+			if (image == null) {
+				response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			}
 
-		suggestTreeCreateRequestContainer.setImageBase64(image);
+			suggestTreeCreateRequestContainer.setImageBase64(image);
+		}
 
 		return response;
 	}
@@ -100,7 +99,17 @@ public class ProcessCreateRequest {
 			e2.printStackTrace();
 			return null;
 		}
-		// TODO: check length
+		// maybe there is a better way for verifying image encoding than MIME?
+		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
+		if (!(mimeType.equals("image/JPEG"))) {
+			try {
+				fileReader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
 		long fileLength = imageFile.length();
 		char[] cbuf = null;
 		try {
@@ -197,8 +206,7 @@ public class ProcessCreateRequest {
 			response.addError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
-		// check if the suggestion String length matches ASTP requirements
-		// TODO: add Strings!
+		// checks if the suggestion String length matches ASTP requirements
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
 			response.addError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
 			return null;
