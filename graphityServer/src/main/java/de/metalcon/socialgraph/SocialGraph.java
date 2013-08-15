@@ -118,14 +118,16 @@ public abstract class SocialGraph {
 	}
 
 	/**
-	 * remove a friendship from one user to another
+	 * remove a follow edge from one user to another
 	 * 
 	 * @param following
 	 *            user following, requesting the deletion
 	 * @param followed
 	 *            user followed
+	 * @return true - if the follow edge has been removed<br>
+	 *         false - if there is no follow edge between the users
 	 */
-	public abstract void removeFriendship(Node following, Node followed);
+	public abstract boolean removeFriendship(Node following, Node followed);
 
 	/**
 	 * remove a status update from a user

@@ -58,6 +58,18 @@ public class DeleteFollowRequest extends DeleteRequest {
 		return this.followed;
 	}
 
+	/**
+	 * check a delete follow edge request for validity concerning NSSP
+	 * 
+	 * @param request
+	 *            Tomcat servlet request
+	 * @param deleteRequest
+	 *            basic delete request object
+	 * @param deleteFollowResponse
+	 *            delete follow response object
+	 * @return delete follow request object<br>
+	 *         <b>null</b> if the delete follow request is invalid
+	 */
 	public static DeleteFollowRequest checkRequest(
 			final HttpServletRequest request,
 			final DeleteRequest deleteRequest,
@@ -66,6 +78,10 @@ public class DeleteFollowRequest extends DeleteRequest {
 		if (user != null) {
 			final Node followed = checkFollowedIdentifier(request,
 					deleteFollowResponse);
+			if (followed != null) {
+				return new DeleteFollowRequest(deleteRequest.getType(), user,
+						followed);
+			}
 		}
 
 		return null;
@@ -114,9 +130,9 @@ public class DeleteFollowRequest extends DeleteRequest {
 		final String followedId = request
 				.getParameter(NSSProtocol.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER);
 		if (followedId != null) {
-			final Node user = NeoUtils.getUserByIdentifier(followedId);
-			if (user != null) {
-				return user;
+			final Node followed = NeoUtils.getUserByIdentifier(followedId);
+			if (followed != null) {
+				return followed;
 			}
 			response.followedIdentifierInvalid(followedId);
 		} else {

@@ -25,8 +25,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 import de.metalcon.server.tomcat.create.CreateType;
-import de.metalcon.server.tomcat.delete.DeleteType;
 
 /**
  * simple benchmark for all CRUD requests in NSSP the server can handle
@@ -278,10 +278,13 @@ public class ServletBenchmark {
 		timeDeleteFollow = System.nanoTime();
 
 		final List<NameValuePair> values = new ArrayList<NameValuePair>(3);
-		values.add(new BasicNameValuePair(NSSProtocol.USER_ID, followingId));
-		values.add(new BasicNameValuePair(NSSProtocol.Delete.TYPE,
-				DeleteType.FOLLOW.getIdentifier()));
-		values.add(new BasicNameValuePair(NSSProtocol.Delete.FOLLOWED,
+		values.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Delete.Follow.USER_IDENTIFIER,
+				followingId));
+		values.add(new BasicNameValuePair(NSSProtocol.Parameters.Delete.TYPE,
+				DeleteRequestType.FOLLOW.getIdentifier()));
+		values.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER,
 				followedId));
 		final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(values);
 

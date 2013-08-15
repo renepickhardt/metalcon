@@ -10,7 +10,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.metalcon.server.exceptions.create.follow.FollowEdgeExistingException;
-import de.metalcon.server.exceptions.delete.follow.FollowEdgeNotExistingException;
 import de.metalcon.server.exceptions.delete.statusupdate.StatusUpdateNotOwnedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.socialgraph.NeoUtils;
@@ -308,7 +307,7 @@ public class ReadOptimizedGraphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeFriendship(final Node following, final Node followed) {
+	public boolean removeFriendship(final Node following, final Node followed) {
 		// find the replica node of the user followed
 		Node followedReplica = null;
 		for (Relationship followship : following.getRelationships(
@@ -323,13 +322,11 @@ public class ReadOptimizedGraphity extends SocialGraph {
 
 		// there is no such followship existing
 		if (followedReplica == null) {
-			final String followedName = (String) followed
-					.getProperty(Properties.User.DISPLAY_NAME);
-			throw new FollowEdgeNotExistingException("you are not following \""
-					+ followedName + "\".");
+			return false;
 		}
 
 		this.removeFromReplicaLayer(followedReplica);
+		return true;
 	}
 
 	/**
