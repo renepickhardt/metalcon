@@ -26,6 +26,11 @@ import de.metalcon.server.exceptions.delete.statusupdate.InvalidDeleteStatusUpda
 public class NeoUtils {
 
 	/**
+	 * active graph database
+	 */
+	private static AbstractGraphDatabase DATABASE;
+
+	/**
 	 * lucene index identifier
 	 */
 	private static final String IDENTIFIER = "id";
@@ -101,6 +106,7 @@ public class NeoUtils {
 		}
 
 		// load lucene indices
+		DATABASE = database;
 		loadLuceneIndices(database);
 
 		return database;
@@ -271,6 +277,18 @@ public class NeoUtils {
 
 		throw new InvalidUserIdentifierException("user with identifier \""
 				+ userId + "\" not existing!");
+	}
+
+	/**
+	 * get a user node from the active database
+	 * 
+	 * @param userId
+	 *            user node identifier
+	 * @return user node with the identifier passed<br>
+	 *         <b>null</b> if there is no user with such identifier
+	 */
+	public static Node getUserByIdentifier(final String userId) {
+		return INDEX_USERS.get(IDENTIFIER, userId).getSingle();
 	}
 
 	/**

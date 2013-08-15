@@ -1,12 +1,102 @@
 package de.metalcon.server.tomcat;
 
 /**
- * form field identifier for server requests
+ * NewsStreamServerProtocol constants
  * 
  * @author sebschlicht
  * 
  */
 public class NSSProtocol {
+
+	/**
+	 * JSON field name for the status message
+	 */
+	public static final String STATUS_MESSAGE = "statusMessage";
+
+	/**
+	 * JSON field name for the detailed description and the solution
+	 */
+	public static final String SOLUTION = "solution";
+
+	/**
+	 * status codes for NSSP requests
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public class StatusCodes {
+
+		/**
+		 * status codes for read requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Read {
+
+			/**
+			 * there is no user with the identifier of the user requesting
+			 */
+			public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+			/**
+			 * there is no user with the identifier of the user posted
+			 */
+			public static final String POSTER_NOT_EXISTING = "poster identifier invalid";
+
+			/**
+			 * the number of items is invalid (no number | number <= 0)
+			 */
+			public static final String NUM_ITEMS_INVALID = "number of items invalid";
+
+			/**
+			 * the retrieval flag is invalid (no number)
+			 */
+			public static final String OWN_UPDATES_INVALID = "retrieval flag invalid";
+
+		}
+
+	}
+
+	/**
+	 * parameters for NSSP requests
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public class Parameters {
+
+		/**
+		 * parameters for read requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Read {
+
+			/**
+			 * identifier of the user requesting
+			 */
+			public static final String USER_IDENTIFIER = "user_id";
+
+			/**
+			 * identifier of the user posted
+			 */
+			public static final String POSTER_IDENTIFIER = "poster_id";
+
+			/**
+			 * number of items to retrieve
+			 */
+			public static final String NUM_ITEMS = "num_items";
+
+			/**
+			 * retrieval flag
+			 */
+			public static final String OWN_UPDATES = "own_updates";
+
+		}
+
+	}
 
 	/**
 	 * user identifier (TODO: delete)
@@ -55,31 +145,6 @@ public class NSSProtocol {
 		 * status update type identifier
 		 */
 		public static final String STATUS_UPDATE_TYPE = "status_update_type";
-
-	}
-
-	/**
-	 * form field identifiers for read requests
-	 * 
-	 * @author sebschlicht
-	 * 
-	 */
-	public class Read {
-
-		/**
-		 * identifier of the user whose status updates are requested
-		 */
-		public static final String POSTER_ID = "poster_id";
-
-		/**
-		 * number of status updates to be retrieved
-		 */
-		public static final String NUM_ITEMS = "num_items";
-
-		/**
-		 * own status updates/social network switch
-		 */
-		public static final String OWN_UPDATES = "own_updates";
 
 	}
 

@@ -143,10 +143,14 @@ public class ServletBenchmark {
 		timeRead = System.nanoTime();
 
 		final List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair(NSSProtocol.USER_ID, userId));
-		params.add(new BasicNameValuePair(NSSProtocol.Read.POSTER_ID, userId));
-		params.add(new BasicNameValuePair(NSSProtocol.Read.NUM_ITEMS, "15"));
-		params.add(new BasicNameValuePair(NSSProtocol.Read.OWN_UPDATES, "0"));
+		params.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Read.USER_IDENTIFIER, userId));
+		params.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Read.POSTER_IDENTIFIER, userId));
+		params.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Read.NUM_ITEMS, "15"));
+		params.add(new BasicNameValuePair(
+				NSSProtocol.Parameters.Read.OWN_UPDATES, "0"));
 
 		final String url = "http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/read?"
 				+ URLEncodedUtils.format(params, "utf-8");
