@@ -1,24 +1,30 @@
 package de.metalcon.autocompleteServer.Create;
 
+import javax.servlet.ServletContext;
+
+import org.json.simple.JSONObject;
+
 public class ProcessCreateResponse {
 
-	private final CreateResponseContainer container;
+	private final ServletContext context;
+	private final JSONObject jsonResponse;
 
-	public ProcessCreateResponse() {
-		this.container = new CreateResponseContainer();
+	public ProcessCreateResponse(ServletContext context) {
+		this.context = context;
+		this.jsonResponse = new JSONObject();
 	}
 
 	public void addQueryNameWarning(String querynameNotGiven) {
-		this.container.addStatusMessage(querynameNotGiven);
+		this.jsonResponse.put("Warning:queryName", querynameNotGiven);
 
 	}
 
 	public void addIndexNameWarning(String indexnameNotGiven) {
-		this.container.addStatusMessage(indexnameNotGiven);
+		this.jsonResponse.put("Warning:indexName", indexnameNotGiven);
 	}
 
 	public void addError(String querynameNotGiven) {
-		this.container.addStatusMessage(querynameNotGiven);
+		this.jsonResponse.put("Error:queryName", querynameNotGiven);
 	}
 
 	/**
@@ -28,24 +34,24 @@ public class ProcessCreateResponse {
 	 * @param suggestionString
 	 */
 	public void addSuggestStringToContainer(String suggestionString) {
-		this.container.setSuggestString(suggestionString);
+		this.jsonResponse.put("SuggestString", suggestionString);
 	}
 
 	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
-		this.container.addStatusMessage(suggestionKeyNotGiven);
+		this.jsonResponse.put("Warning:suggestionKey", suggestionKeyNotGiven);
 	}
 
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
-		this.container.addStatusMessage(indexnameNotGiven);
+		this.jsonResponse.put("Warning:defaultIndex", indexnameNotGiven);
 	}
 
 	public void addNoImageWarning(String noImage) {
-		this.container.addStatusMessage(noImage);
+		this.jsonResponse.put("Warning", noImage);
 	}
 
-	public String getResponse() {
-		return this.container.getStatusMessages();
-	}
+	// public JSONObject getResponse() {
+	// return this.jsonResponse;
+	// }
 	/*
 	 * public void addIndexToContainer(String indexName) {
 	 * this.container.setIndexName(indexName); }

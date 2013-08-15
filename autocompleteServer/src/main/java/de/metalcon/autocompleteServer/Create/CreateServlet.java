@@ -14,7 +14,8 @@ public class CreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException {
 
-		ProcessCreateRequest.checkRequestParameter(request);
+		ProcessCreateRequest.checkRequestParameter(request,
+				this.getServletContext());
 
 	}
 }

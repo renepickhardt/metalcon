@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
@@ -27,8 +28,8 @@ public class ProcessCreateRequest {
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
 	public static ProcessCreateResponse checkRequestParameter(
-			HttpServletRequest request) {
-		ProcessCreateResponse response = new ProcessCreateResponse();
+			HttpServletRequest request, ServletContext context) {
+		ProcessCreateResponse response = new ProcessCreateResponse(context);
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
 		if (!checkIsMultiPart(request, response)) {
