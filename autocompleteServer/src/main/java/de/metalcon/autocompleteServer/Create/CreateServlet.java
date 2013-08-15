@@ -1,5 +1,7 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +16,16 @@ public class CreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException {
 
-		ProcessCreateRequest.checkRequestParameter(request,
-				this.getServletContext());
+		ProcessCreateResponse resp = ProcessCreateRequest
+				.checkRequestParameter(request, this.getServletContext());
+		try {
+			// response.setContentType("text/json");
+			response.getWriter().write(resp.getResponse().toJSONString());
+			response.getWriter().flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 }

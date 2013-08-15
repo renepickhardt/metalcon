@@ -14,6 +14,8 @@ public class ProcessCreateResponse {
 		this.jsonResponse = new JSONObject();
 	}
 
+	// FIXME: bad JSON keys!
+
 	public void addQueryNameWarning(String querynameNotGiven) {
 		this.jsonResponse.put("Warning:queryName", querynameNotGiven);
 
@@ -34,7 +36,7 @@ public class ProcessCreateResponse {
 	 * @param suggestionString
 	 */
 	public void addSuggestStringToContainer(String suggestionString) {
-		this.jsonResponse.put("SuggestString", suggestionString);
+		this.jsonResponse.put("term", suggestionString);
 	}
 
 	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
@@ -46,12 +48,12 @@ public class ProcessCreateResponse {
 	}
 
 	public void addNoImageWarning(String noImage) {
-		this.jsonResponse.put("Warning", noImage);
+		this.jsonResponse.put("Warning:noImage", noImage);
 	}
 
-	// public JSONObject getResponse() {
-	// return this.jsonResponse;
-	// }
+	public JSONObject getResponse() {
+		return this.jsonResponse;
+	}
 	/*
 	 * public void addIndexToContainer(String indexName) {
 	 * this.container.setIndexName(indexName); }

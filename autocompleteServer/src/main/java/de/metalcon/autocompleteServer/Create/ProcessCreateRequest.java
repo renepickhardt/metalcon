@@ -30,6 +30,7 @@ public class ProcessCreateRequest {
 	public static ProcessCreateResponse checkRequestParameter(
 			HttpServletRequest request, ServletContext context) {
 		ProcessCreateResponse response = new ProcessCreateResponse(context);
+		System.out.println("HELP");
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
 		if (!checkIsMultiPart(request, response)) {
@@ -150,7 +151,8 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
+			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
+			e.printStackTrace();
 			return null;
 		}
 
@@ -242,6 +244,10 @@ public class ProcessCreateRequest {
 			for (FileItem item : upload.parseRequest(request)) {
 				if (item.isFormField()) {
 					formItems.addField(item.getFieldName(), item.getString());
+
+					// TODO: remove after debugging!
+					System.out.println(item);
+
 				} else {
 					formItems.addFile(item.getFieldName(), item);
 				}

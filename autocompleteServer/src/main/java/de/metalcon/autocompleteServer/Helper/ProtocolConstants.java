@@ -4,7 +4,7 @@ package de.metalcon.autocompleteServer.Helper;
  * Constants that are used in the Auto Suggest Transfer Protocol (ASTP)
  * 
  * @author Rene Pickhardt
- * 
+ * @author Christian Schowalter
  */
 public class ProtocolConstants {
 	public static final String QUERY_PARAMETER = "term";
@@ -22,8 +22,8 @@ public class ProtocolConstants {
 	/**
 	 * form parameter names for the create request of the ASTP
 	 */
-	public static final String SUGGESTION_WEIGHT = null;
-	public static final String SUGGESTION_KEY = null;
+	public static final String SUGGESTION_WEIGHT = "weight";
+	public static final String SUGGESTION_KEY = "key";
 	public static final String SUGGESTION_STRING = "term";
 	public static final int SUGGESTION_LENGTH = 80;
 	public static final int MAX_KEY_LENGTH = 64;

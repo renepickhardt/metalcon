@@ -57,6 +57,8 @@ public class Search {
 					suggestTree.put(suggestTreeEntry.getSuggestString(),
 							suggestTreeEntry.getWeight(),
 							suggestTreeEntry.getKey());
+					imageIndex.put(suggestTreeEntry.getKey(),
+							suggestTreeEntry.getImageBase64());
 				} catch (EOFException e) {
 					break;
 				}
