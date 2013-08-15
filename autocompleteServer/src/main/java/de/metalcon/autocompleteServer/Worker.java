@@ -26,7 +26,6 @@ public class Worker implements Runnable {
 				command = this.commands.take();
 				command.run(command.getContext());
 			} catch (InterruptedException e) {
-				// TODO replace STrace with useful error message
 				e.printStackTrace();
 			}
 		}

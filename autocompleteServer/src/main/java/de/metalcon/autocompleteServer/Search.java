@@ -1,6 +1,7 @@
 package de.metalcon.autocompleteServer;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import de.metalcon.autocompleteServer.Create.CreateRequestContainer;
 import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ImportScript;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
@@ -31,29 +33,34 @@ public class Search {
 	// }
 
 	public static void initilizeSuggestTree(ServletContext context) { // can't
-																		// be
-																		// private
-																		// now,
-																		// because
-																		// ContextListener
-																		// needs
-																		// access
 		SuggestTree suggestTree = new SuggestTree(
 				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		int priority = 100000;
 
-//		try {
-//			FileInputStream saveFile = new FileInputStream("saveFile.sav");
-//			ObjectInputStream restore = new ObjectInputStream(saveFile);
-//			Object obj = restore.readObject();
-//			suggestTree = (SuggestTree) restore.readObject();
-//			restore.close();
-//		} catch (Exception e1) {
-//
-//		}
-			String filename = "/var/lib/datasets/metalcon/Band.csv";
-			// there must be a way to use relative paths!
+		try {
+			FileInputStream saveFile = new FileInputStream("saveFile.sav");
+			ObjectInputStream restore = new ObjectInputStream(saveFile);
+
+			Object obj = restore.readObject();
+
+			while (true) {
+				try {
+					CreateRequestContainer suggestTreeEntry = (CreateRequestContainer) restore
+							.readObject();
+					suggestTree.put(suggestTreeEntry.getSuggestString(),
+							suggestTreeEntry.getWeight(),
+							suggestTreeEntry.getKey());
+					imageIndex.put(suggestTreeEntry.getKey(),
+							suggestTreeEntry.getImageBase64());
+				} catch (EOFException e) {
+					break;
+				}
+
+			}
+
+		} catch (IOException | ClassNotFoundException e1) {
+
 
 				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
 				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);

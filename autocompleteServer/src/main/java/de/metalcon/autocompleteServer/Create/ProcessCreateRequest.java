@@ -1,7 +1,17 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -18,8 +28,9 @@ public class ProcessCreateRequest {
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
 	public static ProcessCreateResponse checkRequestParameter(
-			HttpServletRequest request) {
-		ProcessCreateResponse response = new ProcessCreateResponse();
+			HttpServletRequest request, ServletContext context) {
+		ProcessCreateResponse response = new ProcessCreateResponse(context);
+		System.out.println("HELP");
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
 		if (!checkIsMultiPart(request, response)) {
@@ -38,15 +49,11 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.setSuggestString(suggestionString);
 
 		String indexName = checkIndexName(items, response);
-		response.addIndexToContainer(indexName);
+		// response.addIndexToContainer(indexName);
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
-		// TODO find elegant way to abort(->return) if key is too long
 		String suggestionKey = checkSuggestionKey(items, response);
-		// if (suggestionKey == null) {
-		// return response;
-		// }
-		response.addSuggestionKeyToContainer(suggestionKey);
+		// response.addSuggestionKeyToContainer(suggestionKey);
 		suggestTreeCreateRequestContainer.setSuggestString(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
@@ -54,34 +61,91 @@ public class ProcessCreateRequest {
 			suggestTreeCreateRequestContainer = null;
 			return response;
 		}
-		response.addWeightToContainer(weight);
+		// response.addWeightToContainer(weight);
 		suggestTreeCreateRequestContainer.setWeight(weight);
 
-		String image = checkImage(items, response);
-		if (image != null) {
-			suggestTreeCreateRequestContainer.setImageSerializedString(image);
+		// Protocol forbids images for suggestions without keys
+		// TODO: add this piece of information to nokey-Warning
+		if (suggestionKey != null) {
+			String image = checkImage(items, response);
+			if (image == null) {
+				response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			}
+
+			suggestTreeCreateRequestContainer.setImageBase64(image);
 		}
+		response.addContainer(suggestTreeCreateRequestContainer);
+
+		// TODO remove this line, when the queue is ready.
+		suggestTreeCreateRequestContainer.run(context);
+
 		return response;
 	}
 
 	private static String checkImage(FormItemList items,
 			ProcessCreateResponse response) {
-		String image = null;
+		FormFile image = null;
+		String imageB64 = null;
+		File imageFile = null;
 		try {
 			// TODO: double check, if it works that way on images
-			image = items.getField(ProtocolConstants.IMAGE);
-			image = deepCheckImage(image);
+			image = items.getFile(ProtocolConstants.IMAGE);
+			imageFile = image.getFile();
 		} catch (IllegalArgumentException e) {
-			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
-		return null;
-	}
+		BufferedImage bufferedImage = null;
+		FileReader fileReader = null;
+		try {
+			fileReader = new FileReader(imageFile);
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			return null;
+		}
+		// maybe there is a better way for verifying image encoding than MIME?
+		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
+		if (!(mimeType.equals("image/JPEG"))) {
+			try {
+				fileReader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 
-	private static String deepCheckImage(String image) {
-		// TODO impelent check for image type (jpg) and geometry (in Pixel)
-		return null;
+		long fileLength = imageFile.length();
+		char[] cbuf = null;
+		try {
+			fileReader.read(cbuf, 0, (int) fileLength);
+			fileReader.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		byte[] rawImageData = new byte[(int) fileLength];
+		for (int i = 0; i < fileLength; i++) {
+			rawImageData[i] = (byte) cbuf[i];
+		}
+		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
+		String result = new String(base64EncodedImage);
+
+		try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
+			bufferedImage = ImageIO.read(bais);
+			// TODO: maybe less strong
+			if (!((ProtocolConstants.IMAGE_WIDTH == bufferedImage.getWidth()) && (ProtocolConstants.IMAGE_HEIGHT == bufferedImage
+					.getHeight()))) {
+				return null;
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return imageB64;
 	}
 
 	private static Integer checkWeight(FormItemList items,
@@ -91,7 +155,8 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
+			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
+			e.printStackTrace();
 			return null;
 		}
 
@@ -114,7 +179,7 @@ public class ProcessCreateRequest {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			index = ProtocolConstants.DEFAULT_INDEX_NAME;
 		}
-		return null;
+		return index;
 	}
 
 	private static String checkSuggestionKey(FormItemList items,
@@ -129,12 +194,12 @@ public class ProcessCreateRequest {
 			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
-		// check if the key length matches ASTP requirements
-		// TODO: add error message String!
+		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addError(null);
+			response.addError(CreateStatusCodes.KEY_TOO_LONG);
+			return null;
 		}
-		return null;
+		return key;
 	}
 
 	private static String checkSuggestionString(FormItemList items,
@@ -148,12 +213,12 @@ public class ProcessCreateRequest {
 			response.addError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
-		// check if the suggestion String length matches ASTP requirements
-		// TODO: add Strings!
+		// checks if the suggestion String length matches ASTP requirements
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
-			response.addError(null);
+			response.addError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			return null;
 		}
-		return null;
+		return suggestString;
 	}
 
 	// checkContentType(); Accept must be text/x-json.
@@ -183,6 +248,10 @@ public class ProcessCreateRequest {
 			for (FileItem item : upload.parseRequest(request)) {
 				if (item.isFormField()) {
 					formItems.addField(item.getFieldName(), item.getString());
+
+					// TODO: remove after debugging!
+					System.out.println(item);
+
 				} else {
 					formItems.addFile(item.getFieldName(), item);
 				}
