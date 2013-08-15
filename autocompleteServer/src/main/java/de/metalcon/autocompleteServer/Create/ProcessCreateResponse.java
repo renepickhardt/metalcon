@@ -8,10 +8,13 @@ public class ProcessCreateResponse {
 
 	private final ServletContext context;
 	private final JSONObject jsonResponse;
+	private CreateRequestContainer container;
 
 	public ProcessCreateResponse(ServletContext context) {
 		this.context = context;
 		this.jsonResponse = new JSONObject();
+		this.container = new CreateRequestContainer();
+
 	}
 
 	// FIXME: bad JSON keys!
@@ -54,6 +57,7 @@ public class ProcessCreateResponse {
 	public JSONObject getResponse() {
 		return this.jsonResponse;
 	}
+
 	/*
 	 * public void addIndexToContainer(String indexName) {
 	 * this.container.setIndexName(indexName); }
@@ -66,4 +70,14 @@ public class ProcessCreateResponse {
 	 * 
 	 * }
 	 */
+
+	public CreateRequestContainer getContainer() {
+		return this.container;
+	}
+
+	public void addContainer(
+			CreateRequestContainer suggestTreeCreateRequestContainer) {
+		this.container = suggestTreeCreateRequestContainer;
+
+	}
 }

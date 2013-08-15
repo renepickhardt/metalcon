@@ -74,6 +74,10 @@ public class ProcessCreateRequest {
 
 			suggestTreeCreateRequestContainer.setImageBase64(image);
 		}
+		response.addContainer(suggestTreeCreateRequestContainer);
+
+		// TODO remove this line, when the queue is ready.
+		suggestTreeCreateRequestContainer.run(context);
 
 		return response;
 	}
