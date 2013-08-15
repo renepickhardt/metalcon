@@ -1,4 +1,4 @@
-package de.metalcon.server.tomcat.NSSP;
+package de.metalcon.server.tomcat.NSSP.read;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.RequestTest;
 import de.metalcon.server.tomcat.NSSP.read.ReadRequest;
 import de.metalcon.server.tomcat.NSSP.read.ReadResponse;
 
@@ -53,31 +54,28 @@ public class ReadRequestTest extends RequestTest {
 
 	@Test
 	public void testParameterMissing() {
-		final String before = "request incomplete: parameter \"";
-		final String after = "\" is missing";
-
 		// missing: user identifier
 		this.fillRequest(null, VALID_USER_IDENTIFIER, VALID_NUM_ITEMS,
 				VALID_OWN_UPDATES);
-		assertEquals(before + NSSProtocol.Parameters.Read.USER_IDENTIFIER
-				+ after, this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Read.USER_IDENTIFIER
+				+ MISSING_PARAM_AFTER, this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
 
 		// missing: poster identifier
 		this.fillRequest(VALID_USER_IDENTIFIER, null, VALID_NUM_ITEMS,
 				VALID_OWN_UPDATES);
-		assertEquals(before + NSSProtocol.Parameters.Read.POSTER_IDENTIFIER
-				+ after, this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Read.POSTER_IDENTIFIER
+				+ MISSING_PARAM_AFTER, this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
 
 		// missing: number of items
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER, null,
 				VALID_OWN_UPDATES);
-		assertEquals(before + NSSProtocol.Parameters.Read.NUM_ITEMS + after,
+		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Read.NUM_ITEMS + MISSING_PARAM_AFTER,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
 
 		// missing: retrieval flag
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, null);
-		assertEquals(before + NSSProtocol.Parameters.Read.OWN_UPDATES + after,
+		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Read.OWN_UPDATES + MISSING_PARAM_AFTER,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
 	}
 

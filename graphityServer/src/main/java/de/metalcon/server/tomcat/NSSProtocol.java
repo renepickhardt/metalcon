@@ -56,6 +56,56 @@ public class NSSProtocol {
 
 		}
 
+		/**
+		 * status codes for delete requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Delete {
+
+			/**
+			 * the delete request type is invalid
+			 */
+			public static final String TYPE_INVALID = "type invalid";
+
+			/**
+			 * status codes for delete user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * there is no user with the identifier of the user requesting
+				 */
+				public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+			}
+
+			/**
+			 * status codes for delete follow edge requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class Follow {
+
+				/**
+				 * there is no user with the identifier of the user requesting
+				 */
+				public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+				/**
+				 * there is no user with the identifier of the user followed
+				 */
+				public static final String FOLLOWED_NOT_EXISTING = "followed identifier invalid";
+
+			}
+
+		}
+
 	}
 
 	/**
@@ -93,6 +143,71 @@ public class NSSProtocol {
 			 * retrieval flag
 			 */
 			public static final String OWN_UPDATES = "own_updates";
+
+		}
+
+		/**
+		 * parameters for delete requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Delete {
+
+			/**
+			 * delete request type
+			 */
+			public static final String TYPE = "type";
+
+			/**
+			 * parameters for delete user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * identifier of the user to be deleted
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+			}
+
+			/**
+			 * parameters for delete follow edge requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class Follow {
+
+				/**
+				 * identifier of the user requesting
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+				/**
+				 * identifier if the user followed
+				 */
+				public static final String FOLLOWED_IDENTIFIER = "followed_id";
+
+			}
+
+			/**
+			 * parameters for delete status update requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class StatusUpdate {
+
+				/**
+				 * identifier of the user requesting
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+			}
 
 		}
 

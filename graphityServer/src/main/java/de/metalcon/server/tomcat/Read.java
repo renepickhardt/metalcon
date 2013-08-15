@@ -18,6 +18,11 @@ import de.metalcon.socialgraph.operations.ReadStatusUpdates;
  */
 public class Read extends GraphityHttpServlet {
 
+	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = 3210720308557065909L;
+
 	@Override
 	protected void doGet(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
@@ -32,6 +37,8 @@ public class Read extends GraphityHttpServlet {
 		responder.addLine("stacked commands: " + this.commandQueue.size());
 
 		if (readRequestObject != null) {
+			// TODO: use read request/response to instantiate command
+
 			// read status updates
 			final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
 					this, responder, readRequestObject.getUser(),
@@ -42,11 +49,14 @@ public class Read extends GraphityHttpServlet {
 
 			try {
 				this.workingQueue.take();
-				responder.finish();
 			} catch (final InterruptedException e) {
-				System.err.println("request status queue failed");
+				System.err
+						.println("request status queue failed due to read request");
 				e.printStackTrace();
 			}
 		}
+
+		responder.addLine(readResponse.toString());
+		responder.finish();
 	}
 }

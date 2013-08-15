@@ -99,9 +99,9 @@ public class ReadRequest {
 	 */
 	public static ReadRequest checkRequest(final HttpServletRequest request,
 			final ReadResponse readResponse) {
-		final Node user = checkUserId(request, readResponse);
+		final Node user = checkUserIdentifier(request, readResponse);
 		if (user != null) {
-			final Node poster = checkPosterId(request, readResponse);
+			final Node poster = checkPosterIdentifier(request, readResponse);
 			if (poster != null) {
 				final int numItems = checkNumItems(request, readResponse);
 				if (numItems != 0) {
@@ -128,7 +128,7 @@ public class ReadRequest {
 	 * @return user node with the identifier passed<br>
 	 *         <b>null</b> if the identifier is invalid
 	 */
-	private static Node checkUserId(final HttpServletRequest request,
+	private static Node checkUserIdentifier(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String userId = request
 				.getParameter(NSSProtocol.Parameters.Read.USER_IDENTIFIER);
@@ -155,7 +155,7 @@ public class ReadRequest {
 	 * @return user node with the identifier passed<br>
 	 *         <b>null</b> if the identifier is invalid
 	 */
-	private static Node checkPosterId(final HttpServletRequest request,
+	private static Node checkPosterIdentifier(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String posterId = request
 				.getParameter(NSSProtocol.Parameters.Read.POSTER_IDENTIFIER);

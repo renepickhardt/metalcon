@@ -84,7 +84,7 @@ public class ReadResponse extends Response {
 	 * add status message: retrieval flag
 	 * 
 	 * @param ownUpdates
-	 *            detailed description and solution
+	 *            retrieval flag passed
 	 */
 	public void ownUpdatesInvalid(final String ownUpdates) {
 		this.addStatusMessage(

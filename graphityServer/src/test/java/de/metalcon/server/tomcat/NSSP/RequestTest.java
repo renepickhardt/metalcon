@@ -23,7 +23,15 @@ import de.metalcon.socialgraph.algorithms.AlgorithmTests;
  */
 public abstract class RequestTest {
 
-	private static boolean TESTING = false;
+	/**
+	 * NSSP prefix for missing parameters
+	 */
+	protected static final String MISSING_PARAM_BEFORE = "request incomplete: parameter \"";
+
+	/**
+	 * NSSP postfix for missing parameters
+	 */
+	protected static final String MISSING_PARAM_AFTER = "\" is missing";
 
 	/**
 	 * valid user identifier

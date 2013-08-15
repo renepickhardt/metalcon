@@ -5,15 +5,15 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.neo4j.graphdb.Node;
-
-import de.metalcon.server.exceptions.RequestFailedException;
-import de.metalcon.server.tomcat.delete.DeleteType;
-import de.metalcon.socialgraph.NeoUtils;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteFollowRequest;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteFollowResponse;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteResponse;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteUserRequest;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteUserResponse;
 import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.DeleteUser;
 import de.metalcon.socialgraph.operations.RemoveFriendship;
-import de.metalcon.socialgraph.operations.RemoveStatusUpdate;
 
 /**
  * Tomcat delete operation handler
@@ -34,72 +34,72 @@ public class Delete extends GraphityHttpServlet {
 		// store response item for the server response creation
 		final ClientResponder responder = new TomcatClientResponder(response);
 
-		try {
-			// read essential form fields
-			final DeleteType removalType = DeleteType.GetDeleteType(Helper
-					.getString(request, NSSProtocol.Delete.TYPE));
+		DeleteResponse deleteResponse = new DeleteResponse();
+		final DeleteRequest deleteRequest = DeleteRequest.checkRequest(request,
+				deleteResponse);
 
-			Node user = null;
-			if (removalType != DeleteType.USER) {
-				// TODO: OAuth, stop manual determining of user id
-				final String userId = Helper.getString(request,
-						NSSProtocol.USER_ID);
-				user = NeoUtils.getUserNodeByIdentifier(this.graphDB, userId);
+		boolean commandStacked = false;
+		if (deleteRequest != null) {
+			switch (deleteRequest.getType()) {
+
+			// TODO: user delete requests/responses to instantiate commands
+
+			// delete a user
+			case USER:
+				final DeleteUserResponse deleteUserResponse = new DeleteUserResponse();
+				final DeleteUserRequest deleteUserRequest = DeleteUserRequest
+						.checkRequest(request, deleteRequest,
+								deleteUserResponse);
+				deleteResponse = deleteUserResponse;
+
+				if (deleteUserRequest != null) {
+					// delete user
+					final DeleteUser deleteUserCommand = new DeleteUser(this,
+							responder, deleteUserRequest.getUser());
+					this.commandQueue.add(deleteUserCommand);
+
+					commandStacked = true;
+				}
+				break;
+
+			// delete a follow edge
+			case FOLLOW:
+				final DeleteFollowResponse deleteFollowResponse = new DeleteFollowResponse();
+				final DeleteFollowRequest deleteFollowRequest = DeleteFollowRequest
+						.checkRequest(request, deleteRequest,
+								deleteFollowResponse);
+				deleteResponse = deleteFollowResponse;
+
+				if (deleteFollowRequest != null) {
+					// delete follow edge
+					final RemoveFriendship deleteFollowCommand = new RemoveFriendship(
+							this, responder, deleteFollowRequest.getUser(),
+							deleteFollowRequest.getFollowed());
+					this.commandQueue.add(deleteFollowCommand);
+
+					commandStacked = true;
+				}
+				break;
+
+			// delete status update
+			default:
+				// TODO
+				break;
+
 			}
 
-			if (removalType == DeleteType.USER) {
-				// read user specific fields
-				final String userId = Helper.getString(request,
-						NSSProtocol.Delete.USER_ID);
-				user = NeoUtils.getUserNodeByIdentifier(this.graphDB, userId);
-
-				// delete user
-				final DeleteUser deleteUserCommand = new DeleteUser(this,
-						responder, user);
-				this.commandQueue.add(deleteUserCommand);
-			} else if (removalType == DeleteType.FOLLOW) {
-				// read followship specific fields
-				final String followedId = Helper.getString(request,
-						NSSProtocol.Delete.FOLLOWED);
-				final Node followed = NeoUtils.getUserNodeByIdentifier(
-						this.graphDB, followedId);
-
-				// remove followship
-				final RemoveFriendship removeFriendshipCommand = new RemoveFriendship(
-						this, responder, user, followed);
-				this.commandQueue.add(removeFriendshipCommand);
-			} else {
-				// read status update specific fields
-				final String statusUpdateId = Helper.getString(request,
-						NSSProtocol.Delete.STATUS_UPDATE_ID);
-				final Node statusUpdate = NeoUtils
-						.getStatusUpdateNodeByIdentifier(this.graphDB,
-								statusUpdateId);
-
-				// remove status update
-				final RemoveStatusUpdate removeStatusUpdate = new RemoveStatusUpdate(
-						this, responder, user, statusUpdate);
-				this.commandQueue.add(removeStatusUpdate);
+			if (commandStacked) {
+				try {
+					this.workingQueue.take();
+				} catch (final InterruptedException e) {
+					System.err
+							.println("request status queue failed due to delete request");
+					e.printStackTrace();
+				}
 			}
-
-			try {
-				this.workingQueue.take();
-				responder.finish();
-			} catch (final InterruptedException e) {
-				System.err.println("request status queue failed");
-				e.printStackTrace();
-			}
-
-		} catch (final IllegalArgumentException e) {
-			// a required form field is missing
-			responder.error(500, e.getMessage());
-			e.printStackTrace();
-		} catch (final RequestFailedException e) {
-			// the request contains errors
-			responder.addLine(e.getMessage());
-			responder.addLine(e.getSalvationDescription());
-			responder.finish();
-			e.printStackTrace();
 		}
+
+		responder.addLine(deleteResponse.toString());
+		responder.finish();
 	}
 }
