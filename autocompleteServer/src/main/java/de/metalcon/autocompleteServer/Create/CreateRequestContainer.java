@@ -67,11 +67,17 @@ public class CreateRequestContainer extends Command {
 				.getAttribute("indexName:" + this.indexName);
 
 		suggestTree.put(this.suggestString, this.weight, this.key);
+		
+		System.out.println(suggestString + weight + key);
 		if (this.imageBase64 != null) {
 			HashMap<String, String> map = ContextListener
 					.getImageIndex(context);
+			System.out.println("fetched image index");
 			map.put(this.key, this.imageBase64);
+			System.out.println(key + imageBase64);
+			ContextListener.setImageIndex(map, context);
 		}
+		
 		// This creates the database file if it doesn't exist
 		File createFile = new File("Database.save");
 

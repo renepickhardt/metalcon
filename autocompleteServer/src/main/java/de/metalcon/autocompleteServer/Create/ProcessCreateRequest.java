@@ -3,8 +3,12 @@ package de.metalcon.autocompleteServer.Create;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
@@ -33,9 +37,9 @@ public class ProcessCreateRequest {
 		System.out.println("HELP");
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
-		if (!checkIsMultiPart(request, response)) {
-			return response;
-		}
+//		if (!checkIsMultiPart(request, response)) {
+//			return response;
+//		}
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.
@@ -53,8 +57,8 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
 		String suggestionKey = checkSuggestionKey(items, response);
-		// response.addSuggestionKeyToContainer(suggestionKey);
-		suggestTreeCreateRequestContainer.setSuggestString(suggestionKey);
+		//response.addSuggestionKeyToContainer(suggestionKey);
+		suggestTreeCreateRequestContainer.setKey(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
 		if (weight == null) {
@@ -86,66 +90,95 @@ public class ProcessCreateRequest {
 			ProcessCreateResponse response) {
 		FormFile image = null;
 		String imageB64 = null;
-		File imageFile = null;
+		FileItem imageFile;
+		//FormItem imageFile = null;
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
-			imageFile = image.getFile();
+			imageFile = image.getFormItem();
+//			imageFile = image.get;
 		} catch (IllegalArgumentException e) {
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
-		BufferedImage bufferedImage = null;
-		FileReader fileReader = null;
+		byte[] buffer = new byte[50000];
+		byte[] tmp = null;
 		try {
-			fileReader = new FileReader(imageFile);
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-			return null;
-		}
-		// maybe there is a better way for verifying image encoding than MIME?
-		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
-		if (!(mimeType.equals("image/JPEG"))) {
-			try {
-				fileReader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			int size = imageFile.getInputStream().read(buffer);
+			if (size > 0){
+				//System.out.println(buffer);
+				tmp = new byte[size];
+				for (int i = 0;i< size; i++){
+					tmp[i] = buffer[i];
+				}
 			}
-			return null;
-		}
-
-		long fileLength = imageFile.length();
-		char[] cbuf = null;
-		try {
-			fileReader.read(cbuf, 0, (int) fileLength);
-			fileReader.close();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-		byte[] rawImageData = new byte[(int) fileLength];
-		for (int i = 0; i < fileLength; i++) {
-			rawImageData[i] = (byte) cbuf[i];
-		}
-		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
-		String result = new String(base64EncodedImage);
-
-		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
-			bufferedImage = ImageIO.read(bais);
-			// TODO: maybe less strong
-			if (!((ProtocolConstants.IMAGE_WIDTH == bufferedImage.getWidth()) && (ProtocolConstants.IMAGE_HEIGHT == bufferedImage
-					.getHeight()))) {
-				return null;
-			}
-
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		if (tmp!=null){
+			byte[] base64EncodedImage = Base64.encodeBase64(tmp);
+			imageB64 = new String(base64EncodedImage);
+		}
+		else {
 			return null;
 		}
-		return imageB64;
+		
+		
+		
+//		BufferedImage bufferedImage = null;
+//		FileReader fileReader = null;
+//		try {
+//			fileReader = new FileReader(imageFile);
+//		} catch (IOException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//			return null;
+//		}
+		// maybe there is a better way for verifying image encoding than MIME?
+//		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
+//		if (!(mimeType.equals("image/JPEG"))) {
+//			try {
+//				fileReader.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			return null;
+//		}
+//
+//		long fileLength = imageFile.length();
+//		char[] cbuf = null;
+//		try {
+//			fileReader.read(cbuf, 0, (int) fileLength);
+//			fileReader.close();
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			return null;
+//		}
+//		byte[] rawImageData = new byte[(int) fileLength];
+//		for (int i = 0; i < fileLength; i++) {
+//			rawImageData[i] = (byte) cbuf[i];
+//		}
+//		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
+//		String result = new String(base64EncodedImage);
+//
+//		try {
+//			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
+//			bufferedImage = ImageIO.read(bais);
+//			// TODO: maybe less strong
+//			if ((ProtocolConstants.IMAGE_WIDTH < bufferedImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT < bufferedImage
+//					.getHeight())) {
+//				return null;
+//			}
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+		System.out.println(imageB64);
+		return "data:image/jpg;base64," +imageB64;
 	}
 
 	private static Integer checkWeight(FormItemList items,
@@ -254,6 +287,8 @@ public class ProcessCreateRequest {
 
 				} else {
 					formItems.addFile(item.getFieldName(), item);
+					System.out.println(item);
+
 				}
 			}
 		} catch (final FileUploadException e) {
