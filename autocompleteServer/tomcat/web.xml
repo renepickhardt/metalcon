@@ -2,7 +2,7 @@
 	<display-name>autocompleteServer</display-name>
  	<listener>
    		<listener-class>de.metalcon.autocompleteServer.Helper.ContextListener</listener-class>
-   	</listener>
+   	</listener>   	
 	<servlet> 
 		<servlet-name>suggest</servlet-name>
    		<description>Retrieve Suggestions for an Autocomplete service</description>
@@ -11,6 +11,10 @@
 	<servlet-mapping>
    		<servlet-name>suggest</servlet-name>
    		<url-pattern>/suggest</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+   		<servlet-name>default</servlet-name>
+		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
 <!--	<servlet>
 		<servlet-name>insert</servlet-name>

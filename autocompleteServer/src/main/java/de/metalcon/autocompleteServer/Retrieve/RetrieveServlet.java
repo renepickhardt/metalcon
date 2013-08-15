@@ -36,10 +36,11 @@ public class RetrieveServlet extends HttpServlet {
 		ProcessRetrieveResponse responseObject = ProcessRetrieveRequest.checkRequestParameter(request,
 				this.getServletContext());
 		String resultJson = responseObject.buildJsonResonse();
-		response.setContentType("text/json"); 
+		response.setContentType("application/json"); 
 		PrintWriter out = response.getWriter();
 		long end = System.nanoTime();
-		out.println(resultJson+ " " + (end - start)/1000 + " micro seconds");
+		//+ " " + (end - start)/1000 + " micro seconds"
+		out.println(resultJson);
 		out.flush();
 	}
 

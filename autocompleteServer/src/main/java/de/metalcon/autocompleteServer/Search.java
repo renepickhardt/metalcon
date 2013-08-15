@@ -10,6 +10,7 @@ import java.util.HashMap;
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Helper.ContextListener;
+import de.metalcon.autocompleteServer.Helper.ImportScript;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
@@ -42,24 +43,33 @@ public class Search {
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		int priority = 100000;
 
-		try {
-			FileInputStream saveFile = new FileInputStream("saveFile.sav");
-			ObjectInputStream restore = new ObjectInputStream(saveFile);
-			Object obj = restore.readObject();
-			suggestTree = (SuggestTree) restore.readObject();
-			restore.close();
-		} catch (IOException | ClassNotFoundException e1) {
-
+//		try {
+//			FileInputStream saveFile = new FileInputStream("saveFile.sav");
+//			ObjectInputStream restore = new ObjectInputStream(saveFile);
+//			Object obj = restore.readObject();
+//			suggestTree = (SuggestTree) restore.readObject();
+//			restore.close();
+//		} catch (Exception e1) {
+//
+//		}
 			String filename = "/var/lib/datasets/metalcon/Band.csv";
 			// there must be a way to use relative paths!
 
-			try {
-				BufferedReader in = new BufferedReader(new FileReader(filename));
-				String zeile = null;
-				String newZeile = null;
-				String newZeileMyspace = null;
-				// String Bandname = null;
+				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
+				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
 
+				
+				context.setAttribute("indexName:"
+						+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
+				ContextListener.setImageIndex(imageIndex, context);
+				
+				
+				//				BufferedReader in = new BufferedReader(new FileReader(filename));
+//				String zeile = null;
+//				String newZeile = null;
+//				String newZeileMyspace = null;
+				// String Bandname = null;
+/*
 				while ((zeile = in.readLine()) != null) {
 					String[] parts = zeile.split(";");
 					if ((parts.length == 3) && !(parts[1].equals("NULL"))
@@ -79,17 +89,12 @@ public class Search {
 								+ p + p + p + p + p + p + p + p + p + p + p + p
 								+ p + p + p;
 						p = p + p;
-						imageIndex.put(parts[0],
-								p.substring(0, Math.min(2048, p.length())));
+						imageIndex.put(parts[0],"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==");
+								//p.substring(0, Math.min(2048, p.length())));
 						--priority;
 					}
-				}
-			} catch (IOException e2) {
-				e2.printStackTrace();
-			}
-		}
-		context.setAttribute("indexName:"
-				+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
-		ContextListener.setImageIndex(imageIndex, context);
+				}*/
+//		}
+
 	}
 }
