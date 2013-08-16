@@ -132,7 +132,7 @@ public class DeleteStatusUpdateRequest extends DeleteRequest {
 				.getParameter(NSSProtocol.Parameters.Delete.StatusUpdate.STATUS_UPDATE_IDENTIFIER);
 		if (statusUpdateId != null) {
 			final Node statusUpdate = NeoUtils
-					.getUserByIdentifier(statusUpdateId);
+					.getStatusUpdateByIdentifier(statusUpdateId);
 			if (statusUpdate != null) {
 				return statusUpdate;
 			}
