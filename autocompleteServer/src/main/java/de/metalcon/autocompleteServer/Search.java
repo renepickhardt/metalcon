@@ -39,7 +39,7 @@ public class Search {
 		int priority = 100000;
 
 		try {
-			FileInputStream saveFile = new FileInputStream("saveFile.sav");
+			FileInputStream saveFile = new FileInputStream("Database.save");
 			ObjectInputStream restore = new ObjectInputStream(saveFile);
 
 			Object obj = restore.readObject();
