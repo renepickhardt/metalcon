@@ -40,13 +40,13 @@ public class ServletBenchmark {
 			totalDeleteFollow, totalCreateStatusUpdate;
 	private static long timeRead, timeCreateUser, timeCreateFollow,
 			timeDeleteFollow, timeCreateStatusUpdate;
-	private static long countRead, countCreateUser, countCreateFollow,
-			countDeleteFollow, countCreateStatusUpdate;
+	private static long countRead = 1, countCreateUser = 1, countCreateFollow = 1 ,
+			countDeleteFollow = 1, countCreateStatusUpdate = 1;
 	private static long time;
 
 	public static void main(final String[] args) throws IOException {
 		final FileReader fileReader = new FileReader(
-				"/home/sebschlicht/de-events.log");
+				"/var/lib/datasets/rawdata/wikievents/simple-events.logSortedByTime");
 		final BufferedReader reader = new BufferedReader(fileReader);
 		final HashSet<String> userExists = new HashSet<String>();
 
@@ -56,15 +56,13 @@ public class ServletBenchmark {
 		while ((line = reader.readLine()) != null) {
 			final String[] values = line.split("\t");
 
-			while ((userExists.size() > 0) && (Math.random() < 0.9)) {
-				readStatusUpdateRequest(userExists);
-				event += 1;
-			}
 
 			if (values.length == 3) {
 				if (!userExists.contains(values[2])) {
 					createUserRequest(values[2]);
 					userExists.add(values[2]);
+						readStatusUpdateRequest(userExists,values[2]);
+						event += 1;
 				}
 
 				// create status update
@@ -128,17 +126,17 @@ public class ServletBenchmark {
 		reader.close();
 	}
 
-	private static void readStatusUpdateRequest(final Set<String> userIds)
+	private static void readStatusUpdateRequest(final Set<String> userIds, String userId)
 			throws ClientProtocolException, IOException {
-		String userId = null;
+//		String userId = null;
 		final int userIndex = new Random().nextInt(userIds.size());
 		int crrUserIndex = 0;
-		for (Object crrUserId : userIds) {
-			if (crrUserIndex == userIndex) {
-				userId = (String) crrUserId;
-			}
-			crrUserIndex += 1;
-		}
+//		for (Object crrUserId : userIds) {
+//			if (crrUserIndex == userIndex) {
+//				userId = (String) crrUserId;
+//			}
+//			crrUserIndex += 1;
+//		}
 
 		timeRead = System.nanoTime();
 
@@ -150,7 +148,7 @@ public class ServletBenchmark {
 		params.add(new BasicNameValuePair(
 				NSSProtocol.Parameters.Read.NUM_ITEMS, "15"));
 		params.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Read.OWN_UPDATES, "0"));
+				NSSProtocol.Parameters.Read.OWN_UPDATES, "1"));
 
 		final String url = "http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/read?"
 				+ URLEncodedUtils.format(params, "utf-8");
