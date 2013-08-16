@@ -1,6 +1,5 @@
 package de.metalcon.socialgraph.operations;
 
-import de.metalcon.server.exceptions.RequestFailedException;
 import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.socialgraph.SocialGraph;
 
@@ -44,7 +43,7 @@ public class CreateUser extends SocialGraphOperation {
 	public CreateUser(final GraphityHttpServlet servlet,
 			final ClientResponder responder, final String userId,
 			final String displayName, final String profilePicturePath) {
-		super(servlet, responder, null);
+		super(servlet, null);
 		this.userId = userId;
 		this.displayName = displayName;
 		this.profilePicturePath = profilePicturePath;
@@ -52,18 +51,9 @@ public class CreateUser extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		// TODO: ensure no exceptions here
-		try {
-			graph.createUser(this.userId, this.displayName,
-					this.profilePicturePath);
-			this.responder.addLine("ok");
-
-			return true;
-		} catch (final RequestFailedException e) {
-			this.responder.addLine(e.getMessage());
-			this.responder.addLine(e.getSalvationDescription());
-		}
-		return false;
+		graph.createUser(this.userId, this.displayName, this.profilePicturePath);
+		// TODO: createUserSucceeded();
+		return true;
 	}
 
 }

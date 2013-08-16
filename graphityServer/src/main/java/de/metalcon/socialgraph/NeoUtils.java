@@ -15,7 +15,6 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
 import de.metalcon.server.exceptions.InvalidUserIdentifierException;
-import de.metalcon.server.exceptions.delete.statusupdate.InvalidDeleteStatusUpdateIdentifierException;
 
 /**
  * collection of useful functions for neo4j
@@ -289,31 +288,6 @@ public class NeoUtils {
 	 */
 	public static Node getUserByIdentifier(final String userId) {
 		return INDEX_USERS.get(IDENTIFIER, userId).getSingle();
-	}
-
-	/**
-	 * get a status update node from a database via its identifier
-	 * 
-	 * @param graphDB
-	 *            social graph database to search in
-	 * @param statusUpdateId
-	 *            status update node identifier
-	 * @return status update node with the identifier passed
-	 * @throws InvalidDeleteStatusUpdateIdentifierException
-	 *             if there is no status update node with the identifier passed
-	 */
-	public static Node getStatusUpdateNodeByIdentifier(
-			final AbstractGraphDatabase graphDB, final String statusUpdateId) {
-		final Node statusUpdate = INDEX_STATUS_UPDATES.get(IDENTIFIER,
-				statusUpdateId).getSingle();
-
-		if (statusUpdate != null) {
-			return statusUpdate;
-		}
-
-		throw new InvalidDeleteStatusUpdateIdentifierException(
-				"status update with identifier \"" + statusUpdateId
-						+ "\" not existing!");
 	}
 
 	/**

@@ -3,6 +3,7 @@ package de.metalcon.server.tomcat.NSSP.delete;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import org.junit.BeforeClass;
@@ -12,6 +13,8 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.metalcon.server.tomcat.NSSProtocol;
 import de.metalcon.server.tomcat.NSSP.RequestTest;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateRequest;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateResponse;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.algorithms.AlgorithmTests;
 
@@ -134,7 +137,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 				VALID_STATUS_UPDATE_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 	@Test
@@ -152,7 +155,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 		assertEquals(
 				NSSProtocol.StatusCodes.Delete.StatusUpdate.USER_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 	@Test
@@ -170,7 +173,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 		assertEquals(
 				NSSProtocol.StatusCodes.Delete.StatusUpdate.STATUS_UPDATE_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 }

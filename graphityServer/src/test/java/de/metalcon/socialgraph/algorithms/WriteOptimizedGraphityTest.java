@@ -147,8 +147,8 @@ public class WriteOptimizedGraphityTest extends AlgorithmTest {
 					creationItem.getUser(), statusUpdate);
 
 			// check if status update node exists and contains correct data
-			statusUpdateNode = NeoUtils.getStatusUpdateNodeByIdentifier(
-					AlgorithmTests.DATABASE, statusUpdate.getId());
+			statusUpdateNode = NeoUtils
+					.getStatusUpdateByIdentifier(statusUpdate.getId());
 
 			assertEquals(
 					statusUpdateNode

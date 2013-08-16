@@ -20,11 +20,6 @@ public abstract class SocialGraphOperation {
 	protected final GraphityHttpServlet servlet;
 
 	/**
-	 * client responder
-	 */
-	protected final ClientResponder responder;
-
-	/**
 	 * executing user
 	 */
 	protected final Node user;
@@ -34,15 +29,12 @@ public abstract class SocialGraphOperation {
 	 * 
 	 * @param servlet
 	 *            request servlet
-	 * @param responder
-	 *            client responder
 	 * @param user
-	 *            executing user
+	 *            user executing
 	 */
 	public SocialGraphOperation(final GraphityHttpServlet servlet,
-			final ClientResponder responder, final Node user) {
+			final Node user) {
 		this.servlet = servlet;
-		this.responder = responder;
 		this.user = user;
 	}
 

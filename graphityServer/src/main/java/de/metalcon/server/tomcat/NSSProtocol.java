@@ -78,6 +78,11 @@ public class NSSProtocol {
 			public class User {
 
 				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
+
+				/**
 				 * there is no user with the identifier of the user requesting
 				 */
 				public static final String USER_NOT_EXISTING = "user identifier invalid";
@@ -91,6 +96,11 @@ public class NSSProtocol {
 			 * 
 			 */
 			public class Follow {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
 
 				/**
 				 * there is no user with the identifier of the user requesting
@@ -111,6 +121,11 @@ public class NSSProtocol {
 			 * 
 			 */
 			public class StatusUpdate {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
 
 				/**
 				 * there is no user with the identifier of the user requesting
@@ -285,31 +300,6 @@ public class NSSProtocol {
 		 * status update type identifier
 		 */
 		public static final String STATUS_UPDATE_TYPE = "status_update_type";
-
-	}
-
-	/**
-	 * form field identifiers for delete requests
-	 * 
-	 * @author sebschlicht
-	 * 
-	 */
-	public class Delete {
-
-		/**
-		 * deletion type
-		 */
-		public static final String TYPE = "type";
-
-		/**
-		 * identifier of the user that shall be deleted
-		 */
-		public static final String USER_ID = "user_id";
-
-		/**
-		 * identifier of the status update that is to be deleted
-		 */
-		public static final String STATUS_UPDATE_ID = "status_update_id";
 
 	}
 

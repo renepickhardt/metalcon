@@ -31,7 +31,7 @@ import de.metalcon.server.tomcat.create.FormItemDoubleUsageException;
 import de.metalcon.server.tomcat.create.FormItemList;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.operations.ClientResponder;
-import de.metalcon.socialgraph.operations.CreateFriendship;
+import de.metalcon.socialgraph.operations.CreateFollow;
 import de.metalcon.socialgraph.operations.CreateStatusUpdate;
 import de.metalcon.socialgraph.operations.CreateUser;
 
@@ -126,7 +126,7 @@ public class Create extends GraphityHttpServlet {
 							this.graphDB, followedId);
 
 					// create followship
-					final CreateFriendship createFriendshipCommand = new CreateFriendship(
+					final CreateFollow createFriendshipCommand = new CreateFollow(
 							this, responder, user, followed);
 					this.commandQueue.add(createFriendshipCommand);
 				} else {

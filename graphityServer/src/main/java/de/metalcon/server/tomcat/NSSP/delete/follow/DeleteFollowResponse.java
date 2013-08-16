@@ -1,6 +1,7 @@
-package de.metalcon.server.tomcat.NSSP.delete;
+package de.metalcon.server.tomcat.NSSP.delete.follow;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteResponse;
 
 /**
  * response to delete follow edge requests according to NSSP
@@ -52,6 +53,14 @@ public class DeleteFollowResponse extends DeleteResponse {
 				NSSProtocol.StatusCodes.Delete.Follow.FOLLOWED_NOT_EXISTING,
 				"there is no user with the identifier \"" + followedId
 						+ "\". Please provide a valid user identifier.");
+	}
+
+	/**
+	 * add status message: delete follow edge succeeded
+	 */
+	public void deleteFollowSucceeded() {
+		this.addStatusMessage(NSSProtocol.StatusCodes.Delete.Follow.SUCCEEDED,
+				"");
 	}
 
 }

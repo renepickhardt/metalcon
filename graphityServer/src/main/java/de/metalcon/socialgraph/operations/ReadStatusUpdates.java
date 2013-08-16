@@ -5,6 +5,8 @@ import java.util.List;
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.tomcat.GraphityHttpServlet;
+import de.metalcon.server.tomcat.NSSP.read.ReadRequest;
+import de.metalcon.server.tomcat.NSSP.read.ReadResponse;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -14,6 +16,11 @@ import de.metalcon.socialgraph.SocialGraph;
  * 
  */
 public class ReadStatusUpdates extends SocialGraphOperation {
+
+	/**
+	 * read response object
+	 */
+	private final ReadResponse response;
 
 	/**
 	 * owner of the stream targeted
@@ -35,24 +42,18 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 	 * 
 	 * @param servlet
 	 *            response servlet
-	 * @param responder
-	 *            client responder
-	 * @param reader
-	 *            reading user
-	 * @param poster
-	 *            owner of the stream targeted
-	 * @param numItems
-	 *            number of items to be read
-	 * @param ownUpdates
-	 *            single stream flag
+	 * @param readResponse
+	 *            read response object
+	 * @param readRequest
+	 *            read request object
 	 */
 	public ReadStatusUpdates(final GraphityHttpServlet servlet,
-			final ClientResponder responder, final Node reader,
-			final Node poster, final int numItems, final boolean ownUpdates) {
-		super(servlet, responder, reader);
-		this.poster = poster;
-		this.numItems = numItems;
-		this.ownUpdates = ownUpdates;
+			final ReadResponse readResponse, final ReadRequest readRequest) {
+		super(servlet, readRequest.getUser());
+		this.response = readResponse;
+		this.poster = readRequest.getPoster();
+		this.numItems = readRequest.getNumItems();
+		this.ownUpdates = readRequest.getOwnUpdates();
 	}
 
 	@Override
@@ -60,45 +61,10 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 		final List<String> activities = graph.readStatusUpdates(this.poster,
 				this.user, this.numItems, this.ownUpdates);
 
-		// send stream to client
-		int i = 0;
-		int lastActivity = activities.size() - 1;
-		this.responder.addLine("{\"items\":[");
-		for (String activity : activities) {
-			if (i != lastActivity) {
-				this.responder.addLine(activity + ",");
-			} else {
-				this.responder.addLine(activity);
-			}
-			i += 1;
-		}
-		this.responder.addLine("]}");
+		// add news stream to the client response
+		this.response.addActivityStream(activities);
 
 		return false;
-	}
-
-	/**
-	 * create the Activity stream containing the Activities specified
-	 * 
-	 * @param activities
-	 *            Activities to be contained in the Activity stream
-	 * @return Activity stream JSON<br>
-	 *         (Activitystrea.ms)
-	 */
-	public static String getActivityStream(final List<String> activities) {
-		final StringBuilder activityStream = new StringBuilder("{\"items\":[");
-
-		final int numItems = activities.size();
-		int i = 0;
-		for (String activity : activities) {
-			activityStream.append(activity);
-			if (++i != numItems) {
-				activityStream.append(",");
-			}
-		}
-
-		activityStream.append("]}");
-		return activityStream.toString();
 	}
 
 }

@@ -2,11 +2,14 @@ package de.metalcon.server.tomcat.NSSP.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserRequest;
+import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserResponse;
 
 public class DeleteUserRequestTest extends DeleteRequestTest {
 
@@ -70,7 +73,7 @@ public class DeleteUserRequestTest extends DeleteRequestTest {
 		this.fillRequest(INVALID_TYPE, VALID_USER_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteUserRequest);
+		assertNull(this.deleteUserRequest);
 	}
 
 	@Test
@@ -85,7 +88,7 @@ public class DeleteUserRequestTest extends DeleteRequestTest {
 		this.fillRequest(VALID_TYPE, INVALID_USER_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.User.USER_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteUserRequest);
+		assertNull(this.deleteUserRequest);
 	}
 
 }
