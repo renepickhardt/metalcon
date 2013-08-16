@@ -48,6 +48,29 @@ public class DeleteFollowRequestTest extends DeleteRequestTest {
 	}
 
 	@Test
+	public void testParameterMissing() {
+		// missing: delete request type
+		this.fillRequest(null, VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER);
+		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Delete.TYPE
+				+ MISSING_PARAM_AFTER,
+				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+
+		// missing: user identifier
+		this.fillRequest(VALID_TYPE, null, VALID_USER_IDENTIFIER);
+		assertEquals(MISSING_PARAM_BEFORE
+				+ NSSProtocol.Parameters.Delete.Follow.USER_IDENTIFIER
+				+ MISSING_PARAM_AFTER,
+				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+
+		// missing: followed identifier
+		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, null);
+		assertEquals(MISSING_PARAM_BEFORE
+				+ NSSProtocol.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER
+				+ MISSING_PARAM_AFTER,
+				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+	}
+
+	@Test
 	public void testDeleteTypeValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_USER_IDENTIFIER);

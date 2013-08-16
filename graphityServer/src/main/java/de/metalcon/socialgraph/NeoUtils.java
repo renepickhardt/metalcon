@@ -317,6 +317,18 @@ public class NeoUtils {
 	}
 
 	/**
+	 * get a status update node from the active database
+	 * 
+	 * @param statusUpdateId
+	 *            status update node identifier
+	 * @return status update node with the identifier passed<br>
+	 *         <b>null</b> if there is no status update with such identifier
+	 */
+	public static Node getStatusUpdateByIdentifier(final String statusUpdateId) {
+		return INDEX_STATUS_UPDATES.get(IDENTIFIER, statusUpdateId).getSingle();
+	}
+
+	/**
 	 * store a status update template node in the index replacing previous
 	 * occurrences
 	 * 

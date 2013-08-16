@@ -104,6 +104,26 @@ public class NSSProtocol {
 
 			}
 
+			/**
+			 * status codes for delete status update requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class StatusUpdate {
+
+				/**
+				 * there is no user with the identifier of the user requesting
+				 */
+				public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+				/**
+				 * there is no status update with the identifier passed
+				 */
+				public static final String STATUS_UPDATE_NOT_EXISTING = "status update identifier invalid";
+
+			}
+
 		}
 
 	}
@@ -207,6 +227,11 @@ public class NSSProtocol {
 				 */
 				public static final String USER_IDENTIFIER = "user_id";
 
+				/**
+				 * identifier of the status update to be deleted
+				 */
+				public static final String STATUS_UPDATE_IDENTIFIER = "status_update_id";
+
 			}
 
 		}
@@ -280,11 +305,6 @@ public class NSSProtocol {
 		 * identifier of the user that shall be deleted
 		 */
 		public static final String USER_ID = "user_id";
-
-		/**
-		 * identifier of the user the follow edge shall be deleted from
-		 */
-		public static final String FOLLOWED = "followed_id";
 
 		/**
 		 * identifier of the status update that is to be deleted

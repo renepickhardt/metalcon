@@ -10,7 +10,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.metalcon.server.exceptions.create.follow.FollowEdgeExistingException;
-import de.metalcon.server.exceptions.delete.follow.FollowEdgeNotExistingException;
 import de.metalcon.server.exceptions.delete.statusupdate.StatusUpdateNotOwnedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.socialgraph.NeoUtils;
@@ -137,7 +136,7 @@ public class WriteOptimizedGraphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeFriendship(final Node following, final Node followed) {
+	public boolean removeFriendship(final Node following, final Node followed) {
 		// delete the followship if existing
 		final Relationship followship = NeoUtils.getRelationshipBetween(
 				following, followed, SocialGraphRelationshipType.FOLLOW,
@@ -145,13 +144,11 @@ public class WriteOptimizedGraphity extends SocialGraph {
 
 		// there is no such followship existing
 		if (followship == null) {
-			final String followedName = (String) followed
-					.getProperty(Properties.User.DISPLAY_NAME);
-			throw new FollowEdgeNotExistingException("you are not following \""
-					+ followedName + "\".");
+			return false;
 		}
 
 		followship.delete();
+		return true;
 	}
 
 	@Override
