@@ -37,9 +37,9 @@ public class ProcessCreateRequest {
 		System.out.println("HELP");
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
-//		if (!checkIsMultiPart(request, response)) {
-//			return response;
-//		}
+		if (!checkIsMultiPart(request, response)) {
+			return response;
+		}
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.
@@ -188,7 +188,7 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
+			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
 			e.printStackTrace();
 			return null;
 		}
@@ -198,7 +198,7 @@ public class ProcessCreateRequest {
 		}
 		// TODO: verify this is the right exception
 		catch (NumberFormatException e) {
-			response.addError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
 			return null;
 		}
 	}
@@ -229,7 +229,7 @@ public class ProcessCreateRequest {
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addError(CreateStatusCodes.KEY_TOO_LONG);
+			response.addQueryNameError(CreateStatusCodes.KEY_TOO_LONG);
 			return null;
 		}
 		return key;
@@ -243,12 +243,12 @@ public class ProcessCreateRequest {
 			suggestString = items.getField(ProtocolConstants.SUGGESTION_STRING);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
+			response.addQueryNameError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
 		// checks if the suggestion String length matches ASTP requirements
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
-			response.addError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			response.addQueryNameError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
 			return null;
 		}
 		return suggestString;
@@ -268,7 +268,7 @@ public class ProcessCreateRequest {
 		if (isMultipart) {
 			return true;
 		}
-		response.addError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
+		response.addQueryNameError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
 		return false;
 	}
 

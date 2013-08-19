@@ -19,16 +19,13 @@ public class ProcessCreateResponse {
 
 	// FIXME: bad JSON keys!
 
-	public void addQueryNameWarning(String querynameNotGiven) {
-		this.jsonResponse.put("Warning:queryName", querynameNotGiven);
-
-	}
-
-	public void addIndexNameWarning(String indexnameNotGiven) {
-		this.jsonResponse.put("Warning:indexName", indexnameNotGiven);
-	}
-
-	public void addError(String querynameNotGiven) {
+	/**
+	 * Adds a queryName-Error to the container object.Expects the String to be
+	 * not NULL and correctly formatted.
+	 * 
+	 * @param querynameNotGiven
+	 */
+	public void addQueryNameError(String querynameNotGiven) {
 		this.jsonResponse.put("Error:queryName", querynameNotGiven);
 	}
 
@@ -42,34 +39,34 @@ public class ProcessCreateResponse {
 		this.jsonResponse.put("term", suggestionString);
 	}
 
-	public void addSuggestionKeyWarning(String suggestionKeyNotGiven) {
-		this.jsonResponse.put("Warning:suggestionKey", suggestionKeyNotGiven);
-	}
-
+	/**
+	 * Adds a DefaultIndex-Warning to the container object.Expects the String to
+	 * be not NULL and correctly formatted.
+	 * 
+	 * @param indexnameNotGiven
+	 */
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
 		this.jsonResponse.put("Warning:defaultIndex", indexnameNotGiven);
 	}
 
+	/**
+	 * Adds a NoImage-Warning to the container object.Expects the String to be
+	 * not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
 	public void addNoImageWarning(String noImage) {
 		this.jsonResponse.put("Warning:noImage", noImage);
 	}
 
+	/**
+	 * Getter for the response as JSONObject.
+	 * 
+	 * @return JSONObject
+	 */
 	public JSONObject getResponse() {
 		return this.jsonResponse;
 	}
-
-	/*
-	 * public void addIndexToContainer(String indexName) {
-	 * this.container.setIndexName(indexName); }
-	 * 
-	 * public void addSuggestionKeyToContainer(String suggestionKey) {
-	 * this.container.setKey(suggestionKey); }
-	 * 
-	 * public void addWeightToContainer(Integer weight) {
-	 * this.container.setWeight(weight);
-	 * 
-	 * }
-	 */
 
 	public CreateRequestContainer getContainer() {
 		return this.container;
