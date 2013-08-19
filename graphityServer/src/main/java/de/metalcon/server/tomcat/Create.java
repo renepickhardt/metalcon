@@ -23,14 +23,15 @@ import de.metalcon.server.statusupdates.StatusUpdateTemplate;
 import de.metalcon.server.statusupdates.TemplateFileInfo;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateResponse;
+import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowRequest;
+import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowResponse;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserRequest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserResponse;
-import de.metalcon.server.tomcat.create.FormFile;
-import de.metalcon.server.tomcat.create.FormItemDoubleUsageException;
 import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.CreateFollow;
 import de.metalcon.socialgraph.operations.CreateStatusUpdate;
 import de.metalcon.socialgraph.operations.CreateUser;
+import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
 
 /**

@@ -2,8 +2,10 @@ package de.metalcon.server.tomcat.NSSP.create.follow;
 
 import org.neo4j.graphdb.Node;
 
+import de.metalcon.server.tomcat.NSSProtocol;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
+import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.utils.FormItemList;
 
 /**
@@ -72,6 +74,74 @@ public class CreateFollowRequest extends CreateRequest {
 	public static CreateFollowRequest checkRequest(
 			final FormItemList formItemList, final CreateRequest createRequest,
 			final CreateFollowResponse createFollowResponse) {
+		final Node user = checkUserIdentifier(formItemList,
+				createFollowResponse);
+		if (user != null) {
+			final Node followed = checkFollowedIdentifier(formItemList,
+					createFollowResponse);
+			if (followed != null) {
+				return new CreateFollowRequest(createRequest.getType(), user,
+						followed);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * check if the request contains a valid user identifier
+	 * 
+	 * @param request
+	 *            Tomcat servlet request
+	 * @param response
+	 *            response object
+	 * @return user node with the identifier passed<br>
+	 *         <b>null</b> if the identifier is invalid
+	 */
+	private static Node checkUserIdentifier(final FormItemList formItemList,
+			final CreateFollowResponse createFollowResponse) {
+		final String userId = formItemList
+				.getField(NSSProtocol.Parameters.Create.Follow.USER_IDENTIFIER);
+		if (userId != null) {
+			final Node user = NeoUtils.getUserByIdentifier(userId);
+			if (user != null) {
+				return user;
+			}
+
+			createFollowResponse.userIdentifierInvalid(userId);
+		} else {
+			createFollowResponse.userIdentifierMissing();
+		}
+
+		return null;
+	}
+
+	/**
+	 * check if the request contains a valid followed identifier
+	 * 
+	 * @param request
+	 *            Tomcat servlet request
+	 * @param response
+	 *            response object
+	 * @return user node with the identifier passed<br>
+	 *         <b>null</b> if the identifier is invalid
+	 */
+	private static Node checkFollowedIdentifier(
+			final FormItemList formItemList,
+			final CreateFollowResponse createFollowResponse) {
+		final String followedId = formItemList
+				.getField(NSSProtocol.Parameters.Create.Follow.FOLLOWED_IDENTIFIER);
+		if (followedId != null) {
+			final Node followed = NeoUtils.getUserByIdentifier(followedId);
+			if (followed != null) {
+				return followed;
+			}
+
+			createFollowResponse.followedIdentifierInvalid(followedId);
+		} else {
+			createFollowResponse.followedIdentifierMissing();
+		}
+
 		return null;
 	}
 

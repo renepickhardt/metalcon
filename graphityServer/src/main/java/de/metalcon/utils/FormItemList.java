@@ -11,7 +11,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import de.metalcon.server.tomcat.create.FormFile;
 
 /**
  * list for multi-part server form posts wrapping fields and files

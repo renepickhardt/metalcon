@@ -51,4 +51,11 @@ public class CreateUserResponse extends CreateResponse {
 						+ "\" existing. Please provide a valid user identifier.");
 	}
 
+	/**
+	 * add status message: create user succeeded
+	 */
+	public void createUserSucceeded() {
+		this.addStatusMessage(NSSProtocol.StatusCodes.Create.User.SUCCEEDED, "");
+	}
+
 }

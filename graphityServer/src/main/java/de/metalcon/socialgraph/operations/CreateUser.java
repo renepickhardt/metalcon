@@ -46,7 +46,7 @@ public class CreateUser extends SocialGraphOperation {
 		graph.createUser(this.request.getUserId(),
 				this.request.getDisplayName(),
 				this.request.getProfilePicturePath());
-		// TODO: response.createUserSucceeded();
+		this.response.createUserSucceeded();
 		return true;
 	}
 

@@ -1,8 +1,8 @@
 package de.metalcon.socialgraph.operations;
 
-import org.neo4j.graphdb.Node;
-
 import de.metalcon.server.tomcat.GraphityHttpServlet;
+import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowRequest;
+import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowResponse;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -14,33 +14,37 @@ import de.metalcon.socialgraph.SocialGraph;
 public class CreateFollow extends SocialGraphOperation {
 
 	/**
-	 * followed user
+	 * create follow edge response object
 	 */
-	private final Node followed;
+	private final CreateFollowResponse response;
+
+	/**
+	 * create follow edge request object
+	 */
+	private final CreateFollowRequest request;
 
 	/**
 	 * create a new create follow edge command
 	 * 
 	 * @param servlet
 	 *            request servlet
-	 * @param responder
-	 *            client responder
-	 * @param following
-	 *            following user
-	 * @param followed
-	 *            followed user
+	 * @param createFollowResponse
+	 *            create follow edge response object
+	 * @param createFollowRequest
+	 *            create follow edge request object
 	 */
 	public CreateFollow(final GraphityHttpServlet servlet,
-			final ClientResponder responder, final Node following,
-			final Node followed) {
-		super(servlet, following);
-		this.followed = followed;
+			final CreateFollowResponse createFollowResponse,
+			final CreateFollowRequest createFollowRequest) {
+		super(servlet, createFollowRequest.getUser());
+		this.response = createFollowResponse;
+		this.request = createFollowRequest;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		graph.createFriendship(this.user, this.followed);
-		// TODO: createFollowSucceeded();
+		graph.createFriendship(this.user, this.request.getFollowed());
+		this.response.createFollowSucceeded();
 		return true;
 	}
 
