@@ -5,15 +5,18 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.metalcon.server.tomcat.NSSP.delete.DeleteFollowRequest;
-import de.metalcon.server.tomcat.NSSP.delete.DeleteFollowResponse;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteResponse;
-import de.metalcon.server.tomcat.NSSP.delete.DeleteUserRequest;
-import de.metalcon.server.tomcat.NSSP.delete.DeleteUserResponse;
+import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowRequest;
+import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowResponse;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateRequest;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateResponse;
+import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserRequest;
+import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserResponse;
 import de.metalcon.socialgraph.operations.ClientResponder;
+import de.metalcon.socialgraph.operations.DeleteFollow;
+import de.metalcon.socialgraph.operations.DeleteStatusUpdate;
 import de.metalcon.socialgraph.operations.DeleteUser;
-import de.metalcon.socialgraph.operations.RemoveFriendship;
 
 /**
  * Tomcat delete operation handler
@@ -55,7 +58,7 @@ public class Delete extends GraphityHttpServlet {
 				if (deleteUserRequest != null) {
 					// delete user
 					final DeleteUser deleteUserCommand = new DeleteUser(this,
-							responder, deleteUserRequest.getUser());
+							deleteUserResponse, deleteUserRequest);
 					this.commandQueue.add(deleteUserCommand);
 
 					commandStacked = true;
@@ -72,9 +75,8 @@ public class Delete extends GraphityHttpServlet {
 
 				if (deleteFollowRequest != null) {
 					// delete follow edge
-					final RemoveFriendship deleteFollowCommand = new RemoveFriendship(
-							this, responder, deleteFollowRequest.getUser(),
-							deleteFollowRequest.getFollowed());
+					final DeleteFollow deleteFollowCommand = new DeleteFollow(
+							this, deleteFollowResponse, deleteFollowRequest);
 					this.commandQueue.add(deleteFollowCommand);
 
 					commandStacked = true;
@@ -83,7 +85,22 @@ public class Delete extends GraphityHttpServlet {
 
 			// delete status update
 			default:
-				// TODO
+				// TODO: check status update ownage in request instantiation
+				final DeleteStatusUpdateResponse deleteStatusUpdateResponse = new DeleteStatusUpdateResponse();
+				final DeleteStatusUpdateRequest deleteStatusUpdateRequest = DeleteStatusUpdateRequest
+						.checkRequest(request, deleteRequest,
+								deleteStatusUpdateResponse);
+				deleteResponse = deleteStatusUpdateResponse;
+
+				if (deleteStatusUpdateRequest != null) {
+					// delete status update
+					final DeleteStatusUpdate deleteStatusUpdateCommand = new DeleteStatusUpdate(
+							this, deleteStatusUpdateResponse,
+							deleteStatusUpdateRequest);
+					this.commandQueue.add(deleteStatusUpdateCommand);
+
+					commandStacked = true;
+				}
 				break;
 
 			}

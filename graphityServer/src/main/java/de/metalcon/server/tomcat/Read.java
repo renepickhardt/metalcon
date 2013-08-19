@@ -33,18 +33,10 @@ public class Read extends GraphityHttpServlet {
 		final ReadRequest readRequestObject = ReadRequest.checkRequest(request,
 				readResponse);
 
-		// DEBUG
-		responder.addLine("stacked commands: " + this.commandQueue.size());
-
 		if (readRequestObject != null) {
-			// TODO: use read request/response to instantiate command
-
 			// read status updates
 			final ReadStatusUpdates readStatusUpdatesCommand = new ReadStatusUpdates(
-					this, responder, readRequestObject.getUser(),
-					readRequestObject.getPoster(),
-					readRequestObject.getNumItems(),
-					readRequestObject.getOwnUpdates());
+					this, readResponse, readRequestObject);
 			this.commandQueue.add(readStatusUpdatesCommand);
 
 			try {

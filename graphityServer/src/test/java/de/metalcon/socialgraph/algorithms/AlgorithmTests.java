@@ -23,7 +23,8 @@ import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.socialgraph.NeoUtils;
 
 @RunWith(Suite.class)
-@SuiteClasses({ WriteOptimizedGraphityTest.class, ReadOptimizedGraphityTest.class })
+@SuiteClasses({ WriteOptimizedGraphityTest.class,
+		ReadOptimizedGraphityTest.class })
 /**
  * test all social graph CRUD algorithms
  * 
@@ -95,8 +96,7 @@ public class AlgorithmTests {
 
 		// assert the test user nodes to be existing
 		for (int i = 0; i < USER_IDS.length; i++) {
-			assertEquals(USERS[i],
-					NeoUtils.getUserNodeByIdentifier(DATABASE, USER_IDS[i]));
+			assertEquals(USERS[i], NeoUtils.getUserByIdentifier(USER_IDS[i]));
 		}
 
 		// load status update templates

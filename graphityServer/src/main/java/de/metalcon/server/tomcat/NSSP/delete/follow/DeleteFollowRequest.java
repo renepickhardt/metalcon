@@ -1,10 +1,12 @@
-package de.metalcon.server.tomcat.NSSP.delete;
+package de.metalcon.server.tomcat.NSSP.delete.follow;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 import de.metalcon.socialgraph.NeoUtils;
 
 /**
@@ -66,9 +68,9 @@ public class DeleteFollowRequest extends DeleteRequest {
 	 * @param deleteRequest
 	 *            basic delete request object
 	 * @param deleteFollowResponse
-	 *            delete follow response object
-	 * @return delete follow request object<br>
-	 *         <b>null</b> if the delete follow request is invalid
+	 *            delete follow edge response object
+	 * @return delete follow edge request object<br>
+	 *         <b>null</b> if the delete follow edge request is invalid
 	 */
 	public static DeleteFollowRequest checkRequest(
 			final HttpServletRequest request,

@@ -25,8 +25,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
-import de.metalcon.server.tomcat.create.CreateType;
 
 /**
  * simple benchmark for all CRUD requests in NSSP the server can handle
@@ -192,12 +192,14 @@ public class ServletBenchmark {
 
 		final MultipartEntity entity = new MultipartEntity();
 		try {
-			entity.addPart(NSSProtocol.Create.TYPE, new StringBody(
-					CreateType.USER.getIdentifier()));
-			entity.addPart(NSSProtocol.Create.USER_ID, new StringBody(userId));
-			entity.addPart(NSSProtocol.Create.USER_DISPLAY_NAME,
+			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+					CreateRequestType.USER.getIdentifier()));
+			entity.addPart(NSSProtocol.Parameters.Create.User.USER_IDENTIFIER,
+					new StringBody(userId));
+			entity.addPart(NSSProtocol.Parameters.Create.User.DISPLAY_NAME,
 					new StringBody("user" + userId));
-			entity.addPart(NSSProtocol.Create.USER_PROFILE_PICTURE_PATH,
+			entity.addPart(
+					NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH,
 					new StringBody("http://google.de/somepic"));
 		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -219,12 +221,16 @@ public class ServletBenchmark {
 
 		final MultipartEntity entity = new MultipartEntity();
 		try {
-			entity.addPart(NSSProtocol.USER_ID, new StringBody(userId));
-			entity.addPart(NSSProtocol.Create.TYPE, new StringBody(
-					CreateType.STATUS_UPDATE.getIdentifier()));
-			entity.addPart(NSSProtocol.Create.STATUS_UPDATE_ID, new StringBody(
-					statusUpdateId));
-			entity.addPart(NSSProtocol.Create.STATUS_UPDATE_TYPE,
+			entity.addPart(
+					NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
+					new StringBody(userId));
+			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+					CreateRequestType.STATUS_UPDATE.getIdentifier()));
+			entity.addPart(
+					NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
+					new StringBody(statusUpdateId));
+			entity.addPart(
+					NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
 					new StringBody("Plain"));
 			entity.addPart(
 					"message",
@@ -251,11 +257,14 @@ public class ServletBenchmark {
 
 		final MultipartEntity entity = new MultipartEntity();
 		try {
-			entity.addPart(NSSProtocol.USER_ID, new StringBody(followingId));
-			entity.addPart(NSSProtocol.Create.TYPE, new StringBody(
-					CreateType.FOLLOW.getIdentifier()));
-			entity.addPart(NSSProtocol.Create.FOLLOW_TARGET, new StringBody(
-					followedId));
+			entity.addPart(
+					NSSProtocol.Parameters.Create.Follow.USER_IDENTIFIER,
+					new StringBody(followingId));
+			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+					CreateRequestType.FOLLOW.getIdentifier()));
+			entity.addPart(
+					NSSProtocol.Parameters.Create.Follow.FOLLOWED_IDENTIFIER,
+					new StringBody(followedId));
 		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

@@ -1,10 +1,8 @@
 package de.metalcon.socialgraph.operations;
 
-import org.neo4j.graphdb.Node;
-
-import de.metalcon.server.exceptions.RequestFailedException;
-import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.tomcat.GraphityHttpServlet;
+import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateRequest;
+import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateResponse;
 import de.metalcon.socialgraph.SocialGraph;
 
 /**
@@ -16,52 +14,39 @@ import de.metalcon.socialgraph.SocialGraph;
 public class CreateStatusUpdate extends SocialGraphOperation {
 
 	/**
-	 * time stamp of the operation
+	 * create status update response object
 	 */
-	private final long timestamp;
+	private final CreateStatusUpdateResponse response;
 
 	/**
-	 * status update content object
+	 * create status update request object
 	 */
-	private final StatusUpdate content;
+	private final CreateStatusUpdateRequest request;
 
 	/**
 	 * create a new create status update command
 	 * 
 	 * @param servlet
 	 *            request servlet
-	 * @param responder
-	 *            client responder
-	 * @param timestamp
-	 *            time stamp of the status update
-	 * @param poster
-	 *            posting user
-	 * @param content
-	 *            status update content object
+	 * @param createStatusUpdateResponse
+	 *            create status update response object
+	 * @param createStatusUpdateRequest
+	 *            create status update request object
 	 */
 	public CreateStatusUpdate(final GraphityHttpServlet servlet,
-			final ClientResponder responder, final long timestamp,
-			final Node poster, final StatusUpdate content) {
-		super(servlet, responder, poster);
-		this.timestamp = timestamp;
-		this.content = content;
+			final CreateStatusUpdateResponse createStatusUpdateResponse,
+			final CreateStatusUpdateRequest createStatusUpdateRequest) {
+		super(servlet, createStatusUpdateRequest.getUser());
+		this.response = createStatusUpdateResponse;
+		this.request = createStatusUpdateRequest;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		boolean success = false;
-
-		try {
-			graph.createStatusUpdate(this.timestamp, this.user, this.content);
-			this.responder.addLine("ok");
-
-			success = true;
-		} catch (final RequestFailedException e) {
-			this.responder.addLine(e.getMessage());
-			this.responder.addLine(e.getSalvationDescription());
-		}
-
-		return success;
+		graph.createStatusUpdate(this.request.getTimestamp(), this.user,
+				this.request.getStatusUpdate());
+		this.response.createStatusUpdateSucceeded();
+		return true;
 	}
 
 }

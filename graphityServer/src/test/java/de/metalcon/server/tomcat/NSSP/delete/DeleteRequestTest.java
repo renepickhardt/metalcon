@@ -2,7 +2,7 @@ package de.metalcon.server.tomcat.NSSP.delete;
 
 import de.metalcon.server.tomcat.NSSP.RequestTest;
 
-public class DeleteRequestTest extends RequestTest {
+public abstract class DeleteRequestTest extends RequestTest {
 
 	/**
 	 * invalid delete request type

@@ -2,11 +2,14 @@ package de.metalcon.server.tomcat.NSSP.delete;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowRequest;
+import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowResponse;
 
 public class DeleteFollowRequestTest extends DeleteRequestTest {
 
@@ -84,7 +87,7 @@ public class DeleteFollowRequestTest extends DeleteRequestTest {
 				VALID_USER_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteFollowRequest);
+		assertNull(this.deleteFollowRequest);
 	}
 
 	@Test
@@ -101,7 +104,7 @@ public class DeleteFollowRequestTest extends DeleteRequestTest {
 				VALID_USER_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.Follow.USER_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteFollowRequest);
+		assertNull(this.deleteFollowRequest);
 	}
 
 	@Test
@@ -119,7 +122,7 @@ public class DeleteFollowRequestTest extends DeleteRequestTest {
 		assertEquals(
 				NSSProtocol.StatusCodes.Delete.Follow.FOLLOWED_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteFollowRequest);
+		assertNull(this.deleteFollowRequest);
 	}
 
 }

@@ -1,6 +1,7 @@
-package de.metalcon.server.tomcat.NSSP.delete;
+package de.metalcon.server.tomcat.NSSP.delete.user;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteResponse;
 
 /**
  * response to delete user requests according to NSSP
@@ -30,6 +31,13 @@ public class DeleteUserResponse extends DeleteResponse {
 				NSSProtocol.StatusCodes.Delete.User.USER_NOT_EXISTING,
 				"there is no user with the identifier \"" + userId
 						+ "\". Please provide a valid user identifier.");
+	}
+
+	/**
+	 * add status message: delete user succeeded
+	 */
+	public void deleteUserSucceeded() {
+		this.addStatusMessage(NSSProtocol.StatusCodes.Delete.User.SUCCEEDED, "");
 	}
 
 }

@@ -1,5 +1,9 @@
 package de.metalcon.server.tomcat.NSSP.read;
 
+import java.util.List;
+
+import org.json.simple.JSONArray;
+
 import de.metalcon.server.tomcat.NSSProtocol;
 import de.metalcon.server.tomcat.NSSP.Response;
 
@@ -92,6 +96,21 @@ public class ReadResponse extends Response {
 				"\""
 						+ ownUpdates
 						+ "\" is not a number. Please provide a number such as \"0\" to retrieve the items for the user or \"1\" to retrieve those from the user.");
+	}
+
+	/**
+	 * add the news stream according to the Activitystrea.ms format
+	 * 
+	 * @param activities
+	 *            news stream items
+	 */
+	@SuppressWarnings("unchecked")
+	public void addActivityStream(final List<String> activities) {
+		final JSONArray items = new JSONArray();
+		for (String activity : activities) {
+			items.add(activity);
+		}
+		this.json.put("items", items);
 	}
 
 }

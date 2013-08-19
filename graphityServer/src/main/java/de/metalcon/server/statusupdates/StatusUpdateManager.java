@@ -20,9 +20,9 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
 import de.metalcon.server.Configs;
-import de.metalcon.server.tomcat.create.FormItemList;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraphRelationshipType;
+import de.metalcon.utils.FormItemList;
 
 /**
  * status update manager to load
@@ -168,8 +168,7 @@ public class StatusUpdateManager {
 		for (File xmlFile : xmlFiles) {
 			template = new StatusUpdateTemplate(xmlFile);
 			final Node previousTemplateNode = NeoUtils
-					.getStatusUpdateTemplateByIdentifier(graphDatabase,
-							template.getName());
+					.getStatusUpdateTemplateByIdentifier(template.getName());
 
 			if (previousTemplateNode != null) {
 				previousTemplate = new StatusUpdateTemplate(
@@ -212,20 +211,12 @@ public class StatusUpdateManager {
 	 * 
 	 * @param templateName
 	 *            name of status update template being searched
-	 * @return status update template
-	 * @throws IllegalArgumentException
-	 *             if there is no status update having the name passed
+	 * @return status update template<br>
+	 *         <b>null</b> if there is no template with such name
 	 */
 	public static StatusUpdateTemplate getStatusUpdateTemplate(
 			final String templateName) {
-		final StatusUpdateTemplate template = STATUS_UPDATE_TYPES
-				.get(templateName);
-		if (template != null) {
-			return template;
-		}
-
-		throw new IllegalArgumentException("status update type \""
-				+ templateName + "\" not existing or allowed!");
+		return STATUS_UPDATE_TYPES.get(templateName);
 	}
 
 	/**

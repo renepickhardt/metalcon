@@ -130,13 +130,15 @@ public abstract class SocialGraph {
 	public abstract boolean removeFriendship(Node following, Node followed);
 
 	/**
-	 * remove a status update from a user
+	 * delete a status update from a user
 	 * 
 	 * @param user
 	 *            user requesting
 	 * @param statusUpdate
 	 *            status update
+	 * @return true - if the status update has been removed<br>
+	 *         false - if the status update is not owned by the user requesting
 	 */
-	public abstract void removeStatusUpdate(Node user, Node statusUpdate);
+	public abstract boolean deleteStatusUpdate(Node user, Node statusUpdate);
 
 }

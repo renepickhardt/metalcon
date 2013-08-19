@@ -1,10 +1,12 @@
-package de.metalcon.server.tomcat.NSSP.delete;
+package de.metalcon.server.tomcat.NSSP.delete.statusupdate;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
+import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 import de.metalcon.socialgraph.NeoUtils;
 
 /**

@@ -3,15 +3,17 @@ package de.metalcon.server.tomcat.NSSP.delete;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.metalcon.server.tomcat.NSSProtocol;
 import de.metalcon.server.tomcat.NSSP.RequestTest;
+import de.metalcon.server.tomcat.NSSP.create.CreateStatusUpdateRequestTest;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateRequest;
+import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateResponse;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.algorithms.AlgorithmTests;
 
@@ -26,7 +28,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 	/**
 	 * valid status update identifier
 	 */
-	private static final String VALID_STATUS_UPDATE_IDENTIFIER = "stup1";
+	public static final String VALID_STATUS_UPDATE_IDENTIFIER = "stup1";
 
 	/**
 	 * invalid status update identifier
@@ -39,31 +41,14 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 	private DeleteStatusUpdateRequest deleteStatusUpdateRequest;
 
 	// TODO: move to CreateStatusUpdateRequestTest
-	/**
-	 * create the test status update in the database
-	 * 
-	 * @param graphDatabase
-	 *            social graph database to operate on
-	 */
-	public static void createStatusUpdate(
-			final AbstractGraphDatabase graphDatabase) {
-		final Transaction transaction = graphDatabase.beginTx();
-
-		try {
-			NeoUtils.createStatusUpdateNode(graphDatabase,
-					VALID_STATUS_UPDATE_IDENTIFIER);
-			transaction.success();
-		} finally {
-			transaction.finish();
-		}
-	}
 
 	@BeforeClass
 	public static void beforeClass() {
 		RequestTest.beforeClass();
 
 		// create a status update that can be deleted
-		createStatusUpdate(AlgorithmTests.DATABASE);
+		CreateStatusUpdateRequestTest.createStatusUpdate(
+				AlgorithmTests.DATABASE, VALID_STATUS_UPDATE_IDENTIFIER);
 		assertNotNull(NeoUtils
 				.getStatusUpdateByIdentifier(VALID_STATUS_UPDATE_IDENTIFIER));
 	}
@@ -134,7 +119,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 				VALID_STATUS_UPDATE_IDENTIFIER);
 		assertEquals(NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 	@Test
@@ -152,7 +137,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 		assertEquals(
 				NSSProtocol.StatusCodes.Delete.StatusUpdate.USER_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 	@Test
@@ -170,7 +155,7 @@ public class DeleteStatusUpdateRequestTest extends DeleteRequestTest {
 		assertEquals(
 				NSSProtocol.StatusCodes.Delete.StatusUpdate.STATUS_UPDATE_NOT_EXISTING,
 				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
-		assertEquals(null, this.deleteStatusUpdateRequest);
+		assertNull(this.deleteStatusUpdateRequest);
 	}
 
 }

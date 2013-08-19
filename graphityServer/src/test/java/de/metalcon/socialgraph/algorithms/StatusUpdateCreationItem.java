@@ -4,8 +4,7 @@ import org.neo4j.graphdb.Node;
 
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
-import de.metalcon.server.tomcat.create.FormItemDoubleUsageException;
-import de.metalcon.server.tomcat.create.FormItemList;
+import de.metalcon.utils.FormItemList;
 
 /**
  * status update creation item
@@ -37,11 +36,7 @@ public class StatusUpdateCreationItem {
 		this.user = user;
 
 		final FormItemList values = new FormItemList();
-		try {
-			values.addField("message", String.valueOf(timestamp));
-		} catch (final FormItemDoubleUsageException e) {
-			e.printStackTrace();
-		}
+		values.addField("message", String.valueOf(timestamp));
 
 		this.statusUpdate = StatusUpdateManager.instantiateStatusUpdate(
 				"Plain", values);

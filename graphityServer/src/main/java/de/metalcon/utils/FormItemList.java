@@ -1,10 +1,16 @@
-package de.metalcon.server.tomcat.create;
+package de.metalcon.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 
 /**
  * list for multi-part server form posts wrapping fields and files
@@ -39,15 +45,8 @@ public class FormItemList {
 	 *            field identifier
 	 * @param value
 	 *            field value
-	 * @throws FormItemDoubleUsageException
-	 *             if there is a field having the same key
 	 */
-	public void addField(final String key, final String value)
-			throws FormItemDoubleUsageException {
-		if (this.fields.containsKey(key)) {
-			throw new FormItemDoubleUsageException("field \"" + key
-					+ "\" already existing!");
-		}
+	public void addField(final String key, final String value) {
 		this.fields.put(key, value);
 	}
 
@@ -58,15 +57,8 @@ public class FormItemList {
 	 *            file identifier
 	 * @param file
 	 *            file item
-	 * @throws FormItemDoubleUsageException
-	 *             if there is a file having the same key
 	 */
-	public void addFile(final String key, final FileItem file)
-			throws FormItemDoubleUsageException {
-		if (this.files.containsKey(key)) {
-			throw new FormItemDoubleUsageException("file \"" + key
-					+ "\" already existing!");
-		}
+	public void addFile(final String key, final FileItem file) {
 		this.files.put(key, new FormFile(file));
 	}
 
@@ -79,7 +71,7 @@ public class FormItemList {
 	 * @throws IllegalArgumentException
 	 *             if there is no field with such identifier
 	 */
-	public String getField(final String key) {
+	public String getField(final String key) throws IllegalArgumentException {
 		if (this.fields.containsKey(key)) {
 			return this.fields.get(key);
 		}
@@ -109,6 +101,39 @@ public class FormItemList {
 	 */
 	public Set<String> getFileIdentifiers() {
 		return this.files.keySet();
+	}
+
+	/**
+	 * extract the form item list from a multi-part form
+	 * 
+	 * @param request
+	 *            Tomcat servlet request
+	 * @param factory
+	 *            disk file item factory
+	 * @return form item list extracted<br>
+	 *         <b>null</b> if the request does not contain a multi-part form
+	 * @throws FileUploadException
+	 */
+	public static FormItemList extractFormItems(
+			final HttpServletRequest request, final DiskFileItemFactory factory)
+			throws FileUploadException {
+		if (ServletFileUpload.isMultipartContent(request)) {
+			final ServletFileUpload upload = new ServletFileUpload(factory);
+			final FormItemList formItems = new FormItemList();
+
+			for (FileItem item : upload.parseRequest(request)) {
+				if (item.isFormField()) {
+					formItems.addField(item.getFieldName(), item.getString());
+				} else {
+					formItems.addFile(item.getFieldName(), item);
+				}
+			}
+
+			return formItems;
+		}
+
+		// no multi-part form
+		return null;
 	}
 
 }

@@ -17,7 +17,12 @@ public class User {
 	/**
 	 * user identifier
 	 */
-	private final long id;
+	private final String id;
+
+	/**
+	 * display name
+	 */
+	private final String displayName;
 
 	/**
 	 * create a new user instance from Neo4j user node
@@ -26,7 +31,9 @@ public class User {
 	 *            Neo4j node representing the creator
 	 */
 	public User(final Node userNode) {
-		this.id = userNode.getId();
+		this.id = (String) userNode.getProperty(Properties.User.IDENTIFIER);
+		this.displayName = (String) userNode
+				.getProperty(Properties.User.DISPLAY_NAME);
 	}
 
 	/**
@@ -39,6 +46,7 @@ public class User {
 		final HashMap<String, Object> actor = new LinkedHashMap<String, Object>();
 		actor.put("objectType", "person");
 		actor.put("id", this.id);
+		actor.put("displayName", this.displayName);
 		return actor;
 	}
 

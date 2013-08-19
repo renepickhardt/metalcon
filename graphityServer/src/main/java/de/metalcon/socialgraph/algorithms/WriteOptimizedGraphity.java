@@ -10,7 +10,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
 import de.metalcon.server.exceptions.create.follow.FollowEdgeExistingException;
-import de.metalcon.server.exceptions.delete.statusupdate.StatusUpdateNotOwnedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.Properties;
@@ -152,18 +151,14 @@ public class WriteOptimizedGraphity extends SocialGraph {
 	}
 
 	@Override
-	public void removeStatusUpdate(final Node user, final Node statusUpdate) {
+	public boolean deleteStatusUpdate(final Node user, final Node statusUpdate) {
 		// get the status update owner
 		final Node statusUpdateAuthor = NeoUtils.getPrevSingleNode(
 				statusUpdate, SocialGraphRelationshipType.UPDATE);
 
 		// the status update is not owned by the user passed
 		if (!user.equals(statusUpdateAuthor)) {
-			throw new StatusUpdateNotOwnedException(
-					"you do not own the status update with the id \""
-							+ statusUpdate
-									.getProperty(Properties.StatusUpdate.IDENTIFIER)
-							+ "\".");
+			return false;
 		}
 
 		// remove reference from previous status update
@@ -186,5 +181,6 @@ public class WriteOptimizedGraphity extends SocialGraph {
 
 		// delete the status update node
 		statusUpdate.delete();
+		return true;
 	}
 }

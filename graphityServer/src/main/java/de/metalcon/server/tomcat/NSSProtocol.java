@@ -27,6 +27,107 @@ public class NSSProtocol {
 	public class StatusCodes {
 
 		/**
+		 * status codes for create requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Create {
+
+			/**
+			 * the create request is not using a multipart form
+			 */
+			public static final String NO_MULTIPART_REQUEST = "create requests have to be multipart requests";
+
+			/**
+			 * the create request type is invalid
+			 */
+			public static final String TYPE_INVALID = "type invalid";
+
+			/**
+			 * status codes for create user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
+
+				/**
+				 * there is already a user with the identifier existing
+				 */
+				public static final String USER_EXISTING = "user identifier invalid";
+
+			}
+
+			/**
+			 * status codes for create follow edge requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class Follow {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
+
+				/**
+				 * there is no user with the identifier of the user requesting
+				 */
+				public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+				/**
+				 * there is no user with the identifier of the user followed
+				 */
+				public static final String FOLLOWED_NOT_EXISTING = "followed identifier invalid";
+
+			}
+
+			/**
+			 * status codes for create status update requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class StatusUpdate {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
+
+				/**
+				 * there is no user with the identifier of the user requesting
+				 */
+				public static final String USER_NOT_EXISTING = "user identifier invalid";
+
+				/**
+				 * there is already a status update with the identifier existing
+				 */
+				public static final String STATUS_UPDATE_EXISTING = "status update identifier invalid";
+
+				/**
+				 * the status update template is unknown
+				 */
+				public static final String STATUS_UPDATE_TYPE_NOT_EXISTING = "status update type invalid";
+
+				/**
+				 * the parameters passed did not match the status update
+				 * template specified
+				 */
+				public static final String STATUS_UPDATE_INSTANTIATION_FAILED = "status update instantiation failed";
+
+			}
+
+		}
+
+		/**
 		 * status codes for read requests
 		 * 
 		 * @author sebschlicht
@@ -78,6 +179,11 @@ public class NSSProtocol {
 			public class User {
 
 				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
+
+				/**
 				 * there is no user with the identifier of the user requesting
 				 */
 				public static final String USER_NOT_EXISTING = "user identifier invalid";
@@ -91,6 +197,11 @@ public class NSSProtocol {
 			 * 
 			 */
 			public class Follow {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
 
 				/**
 				 * there is no user with the identifier of the user requesting
@@ -111,6 +222,11 @@ public class NSSProtocol {
 			 * 
 			 */
 			public class StatusUpdate {
+
+				/**
+				 * everything went fine
+				 */
+				public static final String SUCCEEDED = "ok";
 
 				/**
 				 * there is no user with the identifier of the user requesting
@@ -135,6 +251,91 @@ public class NSSProtocol {
 	 * 
 	 */
 	public class Parameters {
+
+		/**
+		 * parameters for create requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Create {
+
+			/**
+			 * create request type
+			 */
+			public static final String TYPE = "type";
+
+			/**
+			 * parameters for create user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * identifier of the user to be created
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+				/**
+				 * display name of the new user
+				 */
+				public static final String DISPLAY_NAME = "user_display_name";
+
+				/**
+				 * path to the profile picture of the new user
+				 */
+				public static final String PROFILE_PICTURE_PATH = "user_profile_picture_path";
+
+			}
+
+			/**
+			 * parameters for create follow edge requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class Follow {
+
+				/**
+				 * identifier of the user requesting
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+				/**
+				 * identifier of the user followed
+				 */
+				public static final String FOLLOWED_IDENTIFIER = "followed_id";
+
+			}
+
+			/**
+			 * parameters for create status update requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class StatusUpdate {
+
+				/**
+				 * identifier of the user requesting
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+				/**
+				 * identifier of the status update to be created
+				 */
+				public static final String STATUS_UPDATE_IDENTIFIER = "status_update_id";
+
+				/**
+				 * status update template used
+				 */
+				public static final String STATUS_UPDATE_TYPE = "status_update_type";
+
+			}
+
+		}
 
 		/**
 		 * parameters for read requests
@@ -208,7 +409,7 @@ public class NSSProtocol {
 				public static final String USER_IDENTIFIER = "user_id";
 
 				/**
-				 * identifier if the user followed
+				 * identifier of the user followed
 				 */
 				public static final String FOLLOWED_IDENTIFIER = "followed_id";
 
@@ -235,81 +436,6 @@ public class NSSProtocol {
 			}
 
 		}
-
-	}
-
-	/**
-	 * user identifier (TODO: delete)
-	 */
-	public static final String USER_ID = "user_id";
-
-	/**
-	 * form field identifies for create requests
-	 * 
-	 * @author sebschlicht
-	 * 
-	 */
-	public class Create {
-
-		/**
-		 * creation type
-		 */
-		public static final String TYPE = "type";
-
-		/**
-		 * identifier of the new user
-		 */
-		public static final String USER_ID = "user_id";
-
-		/**
-		 * display name of the new user
-		 */
-		public static final String USER_DISPLAY_NAME = "user_display_name";
-
-		/**
-		 * path to the profile picture of the new user
-		 */
-		public static final String USER_PROFILE_PICTURE_PATH = "user_profile_picture_path";
-
-		/**
-		 * identifier of the user the follow edge shall be created to
-		 */
-		public static final String FOLLOW_TARGET = "followed_id";
-
-		/**
-		 * identifier of the status update that is to be created
-		 */
-		public static final String STATUS_UPDATE_ID = "status_update_id";
-
-		/**
-		 * status update type identifier
-		 */
-		public static final String STATUS_UPDATE_TYPE = "status_update_type";
-
-	}
-
-	/**
-	 * form field identifiers for delete requests
-	 * 
-	 * @author sebschlicht
-	 * 
-	 */
-	public class Delete {
-
-		/**
-		 * deletion type
-		 */
-		public static final String TYPE = "type";
-
-		/**
-		 * identifier of the user that shall be deleted
-		 */
-		public static final String USER_ID = "user_id";
-
-		/**
-		 * identifier of the status update that is to be deleted
-		 */
-		public static final String STATUS_UPDATE_ID = "status_update_id";
 
 	}
 

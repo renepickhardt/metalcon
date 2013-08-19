@@ -15,12 +15,13 @@ public class DeleteRequest {
 	/**
 	 * delete request type
 	 */
-	protected final DeleteRequestType type;
+	private final DeleteRequestType type;
 
 	/**
 	 * create a new basic delete request according to NSSP
 	 * 
 	 * @param type
+	 *            delete request type
 	 */
 	public DeleteRequest(final DeleteRequestType type) {
 		this.type = type;
@@ -59,13 +60,14 @@ public class DeleteRequest {
 	 * 
 	 * @param request
 	 *            Tomcat servlet request
-	 * @param response
-	 *            response object
+	 * @param deleteResponse
+	 *            delete response object
 	 * @return delete request type<br>
 	 *         <b>null</b> if the delete request type is invalid
 	 */
 	private static DeleteRequestType checkType(
-			final HttpServletRequest request, final DeleteResponse response) {
+			final HttpServletRequest request,
+			final DeleteResponse deleteResponse) {
 		{
 			final String sType = request
 					.getParameter(NSSProtocol.Parameters.Delete.TYPE);
@@ -79,10 +81,10 @@ public class DeleteRequest {
 						.equals(sType)) {
 					return DeleteRequestType.STATUS_UPDATE;
 				} else {
-					response.typeInvalid(sType);
+					deleteResponse.typeInvalid(sType);
 				}
 			} else {
-				response.typeMissing();
+				deleteResponse.typeMissing();
 			}
 
 			return null;
