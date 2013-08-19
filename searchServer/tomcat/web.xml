@@ -1,0 +1,12 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee">
+  <display-name>searchServer</display-name>
+  <servlet>
+    <servlet-name>search</servlet-name>
+    <description>Search something</description>
+    <servlet-class>de.metalcon.searchServer.Search.SearchServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>search</servlet-name>
+    <url-pattern>/search</url-pattern>
+	</servlet-mapping>
+</web-app>
