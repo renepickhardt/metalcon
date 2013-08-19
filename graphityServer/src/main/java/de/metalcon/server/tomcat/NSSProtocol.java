@@ -27,6 +27,41 @@ public class NSSProtocol {
 	public class StatusCodes {
 
 		/**
+		 * status codes for create requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Create {
+
+			/**
+			 * the create request is not using a multipart form
+			 */
+			public static final String NO_MULTIPART_REQUEST = "create requests have to be multipart requests";
+
+			/**
+			 * the create request type is invalid
+			 */
+			public static final String TYPE_INVALID = "type invalid";
+
+			/**
+			 * status codes for create user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * there is already a user with the identifier existing
+				 */
+				public static final String USER_EXISTING = "user identifier invalid";
+
+			}
+
+		}
+
+		/**
 		 * status codes for read requests
 		 * 
 		 * @author sebschlicht
@@ -150,6 +185,46 @@ public class NSSProtocol {
 	 * 
 	 */
 	public class Parameters {
+
+		/**
+		 * parameters for create requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Create {
+
+			/**
+			 * create request type
+			 */
+			public static final String TYPE = "type";
+
+			/**
+			 * parameters for create user requests
+			 * 
+			 * @author sebschlicht
+			 * 
+			 */
+			public class User {
+
+				/**
+				 * identifier of the user to be created
+				 */
+				public static final String USER_IDENTIFIER = "user_id";
+
+				/**
+				 * display name of the new user
+				 */
+				public static final String DISPLAY_NAME = "user_display_name";
+
+				/**
+				 * path to the profile picture of the new user
+				 */
+				public static final String PROFILE_PICTURE_PATH = "user_profile_picture_path";
+
+			}
+
+		}
 
 		/**
 		 * parameters for read requests

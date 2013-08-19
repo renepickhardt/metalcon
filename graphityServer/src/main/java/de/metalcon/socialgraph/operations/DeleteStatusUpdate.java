@@ -1,7 +1,5 @@
 package de.metalcon.socialgraph.operations;
 
-import org.neo4j.graphdb.Node;
-
 import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateRequest;
 import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateResponse;
@@ -21,9 +19,9 @@ public class DeleteStatusUpdate extends SocialGraphOperation {
 	private final DeleteStatusUpdateResponse response;
 
 	/**
-	 * status update
+	 * delete status update request object
 	 */
-	private final Node statusUpdate;
+	private final DeleteStatusUpdateRequest request;
 
 	/**
 	 * create a new delete status update command
@@ -42,12 +40,12 @@ public class DeleteStatusUpdate extends SocialGraphOperation {
 			final DeleteStatusUpdateRequest deleteStatusUpdateRequest) {
 		super(servlet, deleteStatusUpdateRequest.getUser());
 		this.response = deleteStatusUpdateResponse;
-		this.statusUpdate = deleteStatusUpdateRequest.getStatusUpdate();
+		this.request = deleteStatusUpdateRequest;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		graph.deleteStatusUpdate(this.user, this.statusUpdate);
+		graph.deleteStatusUpdate(this.user, this.request.getStatusUpdate());
 		this.response.deleteStatusUpdateSucceeded();
 		return true;
 	}

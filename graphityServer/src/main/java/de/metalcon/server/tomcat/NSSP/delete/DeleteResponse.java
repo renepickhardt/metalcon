@@ -17,7 +17,13 @@ public class DeleteResponse extends Response {
 	public void typeMissing() {
 		this.parameterMissing(
 				NSSProtocol.Parameters.Delete.TYPE,
-				"Please provide the type of the delete request. Use \"user\" to delete a user, \"follow\" to delete a follow edge or \"status_update\" to delete a status update.");
+				"Please provide the type of the delete request. Use \""
+						+ DeleteRequestType.USER.getIdentifier()
+						+ "\" to delete a user, \""
+						+ DeleteRequestType.FOLLOW.getIdentifier()
+						+ "\" to delete a follow edge or \""
+						+ DeleteRequestType.STATUS_UPDATE.getIdentifier()
+						+ "\" to delete a status update.");
 	}
 
 	/**
@@ -29,9 +35,13 @@ public class DeleteResponse extends Response {
 	public void typeInvalid(final String type) {
 		this.addStatusMessage(
 				NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
-				"\""
-						+ type
-						+ "\" is not a valid delete request type. Use \"user\" to delete a user, \"follow\" to delete a follow edge or \"status_update\" to delete a status update.");
+				"\"" + type + "\" is not a valid delete request type. Use \""
+						+ DeleteRequestType.USER.getIdentifier()
+						+ "\" to delete a user, \""
+						+ DeleteRequestType.FOLLOW.getIdentifier()
+						+ "\" to delete a follow edge or \""
+						+ DeleteRequestType.STATUS_UPDATE.getIdentifier()
+						+ "\" to delete a status update.");
 	}
 
 }

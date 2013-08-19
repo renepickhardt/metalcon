@@ -44,7 +44,7 @@ public abstract class RequestTest {
 	protected static String INVALID_USER_IDENTIFIER;
 
 	/**
-	 * Tomcat read request servlet
+	 * Tomcat request servlet
 	 */
 	protected HttpServletRequest request;
 

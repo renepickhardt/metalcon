@@ -20,9 +20,9 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
 import de.metalcon.server.Configs;
-import de.metalcon.server.tomcat.create.FormItemList;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraphRelationshipType;
+import de.metalcon.utils.FormItemList;
 
 /**
  * status update manager to load

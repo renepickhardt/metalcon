@@ -1,7 +1,5 @@
 package de.metalcon.socialgraph.operations;
 
-import org.neo4j.graphdb.Node;
-
 import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowRequest;
 import de.metalcon.server.tomcat.NSSP.delete.follow.DeleteFollowResponse;
@@ -21,9 +19,9 @@ public class DeleteFollow extends SocialGraphOperation {
 	private final DeleteFollowResponse response;
 
 	/**
-	 * followed user
+	 * delete follow edge request object
 	 */
-	private final Node followed;
+	private final DeleteFollowRequest request;
 
 	/**
 	 * create a new delete follow edge command
@@ -40,12 +38,12 @@ public class DeleteFollow extends SocialGraphOperation {
 			final DeleteFollowRequest deleteFollowRequest) {
 		super(servlet, deleteFollowRequest.getUser());
 		this.response = deleteFollowResponse;
-		this.followed = deleteFollowRequest.getFollowed();
+		this.request = deleteFollowRequest;
 	}
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		graph.removeFriendship(this.user, this.followed);
+		graph.removeFriendship(this.user, this.request.getFollowed());
 		this.response.deleteFollowSucceeded();
 		return true;
 	}
