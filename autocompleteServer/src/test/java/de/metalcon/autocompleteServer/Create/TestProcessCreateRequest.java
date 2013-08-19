@@ -20,6 +20,8 @@ public class TestProcessCreateRequest {
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 	final private ServletContext servletContext = mock(ServletContext.class);
 
+	SuggestTree generalIndex = new SuggestTree(7);
+	
 	private HttpServletRequest initializeTest() {
 
 		HttpServletRequest request = mock(HttpServletRequest.class);
@@ -29,7 +31,7 @@ public class TestProcessCreateRequest {
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
 
-		SuggestTree generalIndex = new SuggestTree(7);
+	//	SuggestTree generalIndex = new SuggestTree(7);
 
 		try {
 			servlet.init(this.servletConfig);
@@ -40,6 +42,32 @@ public class TestProcessCreateRequest {
 		return request;
 	}
 
+	@Test
+	public void testContainerRun() {
+		
+		//TODO: include an image to this test or make another one with an image
+		HttpServletRequest request = this.initializeTest();
+		ProcessCreateResponse response = ProcessCreateRequest
+				.checkRequestParameter(request,
+						this.servletConfig.getServletContext());
+		
+		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
+		
+		suggestTreeCreateRequestContainer.setSuggestString("testband");
+		suggestTreeCreateRequestContainer.setIndexName("testIndex");
+		suggestTreeCreateRequestContainer.setKey("testkey");
+		suggestTreeCreateRequestContainer.setWeight(1);
+		
+		suggestTreeCreateRequestContainer.run(this.servletConfig.getServletContext());
+		
+		String retrieveResponse = generalIndex.getBestSuggestions("test").toString();
+		
+		//FIXME: insert correct response-string.
+		//assertTrue(output.equals("testband, testIndex, testkey"));
+		
+	}
+	
+	
 	@Test
 	public void testFullFormWithoutImage() {
 		HttpServletRequest request = this.initializeTest();
