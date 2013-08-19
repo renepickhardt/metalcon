@@ -3,6 +3,7 @@ package de.metalcon.server.tomcat.NSSP.read;
 import java.util.List;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import de.metalcon.server.tomcat.NSSProtocol;
 import de.metalcon.server.tomcat.NSSP.Response;
@@ -105,9 +106,9 @@ public class ReadResponse extends Response {
 	 *            news stream items
 	 */
 	@SuppressWarnings("unchecked")
-	public void addActivityStream(final List<String> activities) {
+	public void addActivityStream(final List<JSONObject> activities) {
 		final JSONArray items = new JSONArray();
-		for (String activity : activities) {
+		for (JSONObject activity : activities) {
 			items.add(activity);
 		}
 		this.json.put("items", items);

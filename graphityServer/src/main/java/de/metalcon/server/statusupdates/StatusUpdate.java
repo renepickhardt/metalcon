@@ -117,7 +117,7 @@ public abstract class StatusUpdate {
 	 *         (Activitystrea.ms)
 	 */
 	@SuppressWarnings("unchecked")
-	public String toJSONString() {
+	public JSONObject toJSONObject() {
 		final JSONObject activity = new JSONObject();
 
 		// parse time stamp
@@ -135,7 +135,7 @@ public abstract class StatusUpdate {
 		final Map<String, Object> object = this.toObjectJSON();
 		activity.put("object", object);
 
-		return activity.toJSONString();
+		return activity;
 	}
 
 	/**

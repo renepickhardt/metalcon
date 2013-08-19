@@ -14,7 +14,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
 import de.metalcon.server.Configs;
 import de.metalcon.server.Server;
-import de.metalcon.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
+import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.server.statusupdates.StatusUpdateTemplate;
@@ -200,6 +200,9 @@ public class Create extends GraphityHttpServlet {
 		} else {
 			createResponse.noMultipartRequest();
 		}
+
+		responder.addLine(createResponse.toString());
+		responder.finish();
 	}
 
 	/**

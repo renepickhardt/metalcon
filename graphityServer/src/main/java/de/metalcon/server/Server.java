@@ -1,5 +1,6 @@
 package de.metalcon.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -10,10 +11,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
 import de.metalcon.server.statusupdates.StatusUpdateManager;
+import de.metalcon.server.tomcat.Create;
 import de.metalcon.socialgraph.Algorithm;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraph;
@@ -162,5 +165,11 @@ public class Server implements ServletContextListener {
 
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("server", this);
+
+		final File tmpDir = (File) context
+				.getAttribute("javax.servlet.context.tempdir");
+		final DiskFileItemFactory factory = new DiskFileItemFactory();
+		factory.setRepository(tmpDir);
+		Create.setDiskFileItemFactory(factory);
 	}
 }

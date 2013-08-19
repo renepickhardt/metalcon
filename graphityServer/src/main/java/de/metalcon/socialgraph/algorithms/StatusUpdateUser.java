@@ -1,5 +1,6 @@
 package de.metalcon.socialgraph.algorithms;
 
+import org.json.simple.JSONObject;
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.socialgraph.NeoUtils;
@@ -68,8 +69,8 @@ public class StatusUpdateUser {
 	 * 
 	 * @return status update loaded before
 	 */
-	public String getStatusUpdate() {
-		final String statusUpdate = (String) this.nextStatusUpdateNode
+	public JSONObject getStatusUpdate() {
+		final JSONObject statusUpdate = (JSONObject) this.nextStatusUpdateNode
 				.getProperty(Properties.StatusUpdate.CONTENT);
 		this.nextStatusUpdate();
 		return statusUpdate;

@@ -4,12 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.json.simple.JSONObject;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
-import de.metalcon.server.exceptions.create.follow.FollowEdgeExistingException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.Properties;
@@ -51,10 +51,7 @@ public class ReadOptimizedGraphity extends SocialGraph {
 
 		// user is following already
 		if (followedReplica != null) {
-			final String followedName = (String) followed
-					.getProperty(Properties.User.DISPLAY_NAME);
-			throw new FollowEdgeExistingException("you are following \""
-					+ followedName + "\" already.");
+			return;
 		}
 
 		// create replica
@@ -126,7 +123,7 @@ public class ReadOptimizedGraphity extends SocialGraph {
 		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT_TYPE,
 				content.getType());
 		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT,
-				content.toJSONString());
+				content.toJSONObject());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {
@@ -197,13 +194,13 @@ public class ReadOptimizedGraphity extends SocialGraph {
 	}
 
 	@Override
-	public List<String> readStatusUpdates(final Node poster, final Node user,
-			final int numItems, boolean ownUpdates) {
+	public List<JSONObject> readStatusUpdates(final Node poster,
+			final Node user, final int numItems, boolean ownUpdates) {
 		if (!poster.equals(user)) {
 			ownUpdates = true;
 		}
 
-		final List<String> statusUpdates = new LinkedList<String>();
+		final List<JSONObject> statusUpdates = new LinkedList<JSONObject>();
 
 		// check if ego network stream is being accessed
 		if (!ownUpdates) {

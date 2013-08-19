@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -171,7 +172,7 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 			assertEquals(
 					statusUpdateNode
 							.getProperty(Properties.StatusUpdate.CONTENT),
-					statusUpdate.toJSONString());
+					statusUpdate.toJSONObject());
 
 			// prevent the time stamps from being equal
 			AlgorithmTest.waitMs(2);
@@ -215,7 +216,7 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 
 	@Test
 	public void testReadStatusUpdates_Regular() {
-		List<String> activities;
+		List<JSONObject> activities;
 
 		// assert success if reading from users without status updates
 		activities = this.algorithm.readStatusUpdates(this.USER_A, this.USER_A,
