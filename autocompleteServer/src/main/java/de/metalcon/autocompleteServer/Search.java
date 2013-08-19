@@ -64,7 +64,13 @@ public class Search {
 
 				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
 				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
+				
+				SuggestTree wikiTree = new SuggestTree(ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
+				ImportScript.loadWikipedia(wikiTree,imageIndex);
 
+				
+				context.setAttribute("indexName:"
+						+ "wikitree", wikiTree);
 				
 				context.setAttribute("indexName:"
 						+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);

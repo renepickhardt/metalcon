@@ -19,6 +19,112 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class ImportScript {
 
+	public static void loadWikipedia(SuggestTree suggestTree, HashMap<String, String> imageIndex){		
+		BufferedReader br = null;
+		/**
+		 * load images
+		 */
+				String imagePath = "/var/lib/datasets/rawdata/wikicommons/";
+				try {
+					br = new BufferedReader(new FileReader(imagePath + "imageIndex.tsv"));
+				} catch (FileNotFoundException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+
+				String line =null;
+				try {
+					while ((line = br.readLine())!=null){
+						String[] values = line.split("\t");
+						if (values.length!=3)continue;
+						
+						String id = values[0];
+						String title = values[1];
+						String image = values[2];
+						
+						File f = new File ( imagePath + image);
+						if (!f.exists()){
+							System.out.println("cant finde image " + image + " entitiy " + title);
+							continue;
+						}
+
+						if (f == null )continue;
+						FileInputStream fileReader = null;
+						try {
+							fileReader = new FileInputStream(f);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
+						byte[] cbuf = new byte[(int)f.length()];
+						try {
+							fileReader.read(cbuf, 0, (int) f.length());
+							fileReader.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							continue;
+						}
+						byte[] base64EncodedImage = Base64.encodeBase64(cbuf);
+						String result = new String(base64EncodedImage);
+						result = "data:image/jpg;base64," + result;
+						imageIndex.put(title.replace(" ", "_"), result);
+						
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				
+		String path = "/var/lib/datasets/rawdata/wikipedia/de/personlized search/wiki-pr.tsv";
+		HashMap<Integer, Integer> prValues = new HashMap<Integer, Integer>();
+//				HashMap<String, Integer> prTitles = new HashMap<String, Integer>();
+
+		
+		try {
+			br = new BufferedReader(new FileReader(path));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		line = null;
+		try {
+			while ((line = br.readLine())!=null){
+				String[] values = line.split("\t");
+				Integer id = Integer.parseInt(values[0]);
+				Double pr = Double.parseDouble(values[1]);
+				double d = pr * 1000. * 1000. * 10000.;
+				prValues.put(id, (int)d );
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		path = "/var/lib/datasets/rawdata/wikipedia/de/personlized search/wiki-titles.tsv";
+		br = null;
+		try {
+			br = new BufferedReader(new FileReader(path));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		line = null;	
+		try {
+			while ((line = br.readLine())!=null){
+				String[] values = line.split("\t");
+				if (values.length!=2)continue;
+				Integer id = Integer.parseInt(values[0]);
+				String title = values[1].replace("_", " ").toLowerCase();
+				
+				Integer pr = prValues.get(id);
+				if (pr != null && imageIndex.containsKey(values[1])){
+					suggestTree.put(title, pr, values[1]);
+				}
+				
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+				
+	}
+	
 	
 	public static void loadFilesToIndex(boolean parseBands, SuggestTree suggestTree, HashMap<String, String> imageIndex){
 		//boolean parseBand = true;
