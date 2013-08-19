@@ -91,9 +91,9 @@ public class CreateFollowRequest extends CreateRequest {
 	/**
 	 * check if the request contains a valid user identifier
 	 * 
-	 * @param request
-	 *            Tomcat servlet request
-	 * @param response
+	 * @param formItemList
+	 *            form item list extracted
+	 * @param createFollowResponse
 	 *            response object
 	 * @return user node with the identifier passed<br>
 	 *         <b>null</b> if the identifier is invalid
@@ -119,9 +119,9 @@ public class CreateFollowRequest extends CreateRequest {
 	/**
 	 * check if the request contains a valid followed identifier
 	 * 
-	 * @param request
-	 *            Tomcat servlet request
-	 * @param response
+	 * @param formItemList
+	 *            form item list extracted
+	 * @param createFollowResponse
 	 *            response object
 	 * @return user node with the identifier passed<br>
 	 *         <b>null</b> if the identifier is invalid

@@ -112,7 +112,7 @@ public class CreateUserRequest extends CreateRequest {
 	 * @param formItemList
 	 *            form item list extracted
 	 * @param createUserResponse
-	 *            create user response object
+	 *            response object
 	 * @return user identifier<br>
 	 *         <b>null</b> if the identifier is invalid
 	 */
@@ -140,7 +140,7 @@ public class CreateUserRequest extends CreateRequest {
 	 * @param formItemList
 	 *            form item list extracted
 	 * @param createUserResponse
-	 *            create user response object
+	 *            response object
 	 * @return display name<br>
 	 *         <b>null</b> if there was no display name passed
 	 */

@@ -116,6 +116,7 @@ public abstract class StatusUpdate {
 	 * @return Activity JSON String representing this status update<br>
 	 *         (Activitystrea.ms)
 	 */
+	@SuppressWarnings("unchecked")
 	public String toJSONString() {
 		final JSONObject activity = new JSONObject();
 

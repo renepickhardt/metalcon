@@ -14,8 +14,6 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
-import de.metalcon.server.exceptions.InvalidUserIdentifierException;
-
 /**
  * collection of useful functions for neo4j
  * 
@@ -256,29 +254,6 @@ public class NeoUtils {
 	}
 
 	/**
-	 * get a user node from a database via its identifier
-	 * 
-	 * @param graphDB
-	 *            social graph database to search in
-	 * @param userId
-	 *            user node identifier
-	 * @return user node with the identifier passed
-	 * @throws InvalidUserIdentifierException
-	 *             if there is no user node with the identifier passed
-	 */
-	public static Node getUserNodeByIdentifier(
-			final AbstractGraphDatabase graphDB, final String userId) {
-		final Node user = INDEX_USERS.get(IDENTIFIER, userId).getSingle();
-
-		if (user != null) {
-			return user;
-		}
-
-		throw new InvalidUserIdentifierException("user with identifier \""
-				+ userId + "\" not existing!");
-	}
-
-	/**
 	 * get a user node from the active database
 	 * 
 	 * @param userId
@@ -329,17 +304,16 @@ public class NeoUtils {
 	}
 
 	/**
-	 * get a status update template node from a database via its identifier
+	 * get a status update template node from the active database via its
+	 * identifier
 	 * 
-	 * @param graphDB
-	 *            social graph database to search in
 	 * @param templateId
 	 *            status update template node identifier
 	 * @return status update template node with the identifier passed<br>
 	 *         <b>null</b>if there is no template with such identifier
 	 */
 	public static Node getStatusUpdateTemplateByIdentifier(
-			final AbstractGraphDatabase graphDB, final String templateId) {
+			final String templateId) {
 		return INDEX_STATUS_UPDATE_TEMPLATES.get(IDENTIFIER, templateId)
 				.getSingle();
 	}

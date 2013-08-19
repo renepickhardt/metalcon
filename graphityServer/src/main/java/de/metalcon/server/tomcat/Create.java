@@ -9,10 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import de.metalcon.server.Configs;
 import de.metalcon.server.Server;
@@ -25,6 +23,8 @@ import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateResponse;
 import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowRequest;
 import de.metalcon.server.tomcat.NSSP.create.follow.CreateFollowResponse;
+import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateRequest;
+import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateResponse;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserRequest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserResponse;
 import de.metalcon.socialgraph.operations.ClientResponder;
@@ -137,71 +137,69 @@ public class Create extends GraphityHttpServlet {
 
 				default:
 					// TODO
-					try {
-						this.writeFiles(template, items);
+					final CreateStatusUpdateResponse createStatusUpdateResponse = new CreateStatusUpdateResponse();
+					final CreateStatusUpdateRequest createStatusUpdateRequest = CreateStatusUpdateRequest
+							.checkRequest(formItemList, createRequest,
+									createStatusUpdateResponse);
+					createResponse = createStatusUpdateResponse;
 
-						// create a new status update of the type specified
-						final StatusUpdate statusUpdate = StatusUpdateManager
-								.instantiateStatusUpdate(statusUpdateType,
-										items);
-						statusUpdate.setId(statusUpdateId);
+					if (createStatusUpdateRequest != null) {
+						try {
+							this.writeFiles(createStatusUpdateRequest
+									.getStatusUpdateTemplate(), formItemList);
 
-						final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
-								this, responder, System.currentTimeMillis(),
-								user, statusUpdate);
-						this.commandQueue.add(createStatusUpdateCommand);
-					} catch (final StatusUpdateInstantiationFailedException e) {
-						// remove the files
-						FormFile fileItem;
-						File file;
-						for (String fileIdentifier : items.getFileIdentifiers()) {
-							fileItem = items.getFile(fileIdentifier);
-							file = fileItem.getFile();
+							// create a new status update of the type specified
+							final StatusUpdate statusUpdate = StatusUpdateManager
+									.instantiateStatusUpdate(
+											createStatusUpdateRequest
+													.getStatusUpdateTemplate()
+													.getName(), formItemList);
+							statusUpdate.setId(createStatusUpdateRequest
+									.getStatusUpdateId());
+							createStatusUpdateRequest
+									.setStatusUpdate(statusUpdate);
 
-							if (file != null) {
-								file.delete();
+							final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
+									this, createStatusUpdateResponse,
+									createStatusUpdateRequest);
+							this.commandQueue.add(createStatusUpdateCommand);
+
+							commandStacked = true;
+						} catch (final StatusUpdateInstantiationFailedException e) {
+							// remove the files
+							FormFile fileItem;
+							File file;
+							for (String fileIdentifier : formItemList
+									.getFileIdentifiers()) {
+								fileItem = formItemList.getFile(fileIdentifier);
+								file = fileItem.getFile();
+
+								if (file != null) {
+									file.delete();
+								}
 							}
+						} catch (final Exception e) {
+							responder.error(500,
+									"errors encountered while writing files");
 						}
-
-						throw e;
-					} catch (final Exception e) {
-						throw new IllegalArgumentException(
-								"file writing failed!");
 					}
 					break;
 
+				}
+
+				if (commandStacked) {
+					try {
+						this.workingQueue.take();
+					} catch (final InterruptedException e) {
+						System.err
+								.println("request status queue failed due to create request");
+						e.printStackTrace();
+					}
 				}
 			}
 		} else {
 			createResponse.noMultipartRequest();
 		}
-	}
-
-	/**
-	 * extract fields and files from the multi-part form in the request
-	 * 
-	 * @param request
-	 *            HTTP servlet request
-	 * @return form fields and files wrapped in a form item list
-	 * @throws FormItemDoubleUsageException
-	 *             if form items use the same identifier
-	 * @throws FileUploadException
-	 *             if the form item parsing fails
-	 */
-	private FormItemList extractFormItems(final HttpServletRequest request)
-			throws FileUploadException, FormItemDoubleUsageException {
-		final ServletFileUpload upload = new ServletFileUpload(this.FACTORY);
-		final FormItemList formItems = new FormItemList();
-
-		for (FileItem item : upload.parseRequest(request)) {
-			if (item.isFormField()) {
-				formItems.addField(item.getFieldName(), item.getString());
-			} else {
-				formItems.addFile(item.getFieldName(), item);
-			}
-		}
-
-		return formItems;
 	}
 
 	/**
