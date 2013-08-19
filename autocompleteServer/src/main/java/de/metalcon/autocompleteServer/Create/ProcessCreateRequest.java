@@ -1,17 +1,7 @@
 package de.metalcon.autocompleteServer.Create;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,7 +47,7 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
 		String suggestionKey = checkSuggestionKey(items, response);
-		//response.addSuggestionKeyToContainer(suggestionKey);
+		// response.addSuggestionKeyToContainer(suggestionKey);
 		suggestTreeCreateRequestContainer.setKey(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
@@ -91,12 +81,12 @@ public class ProcessCreateRequest {
 		FormFile image = null;
 		String imageB64 = null;
 		FileItem imageFile;
-		//FormItem imageFile = null;
+		// FormItem imageFile = null;
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
 			imageFile = image.getFormItem();
-//			imageFile = image.get;
+			// imageFile = image.get;
 		} catch (IllegalArgumentException e) {
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
@@ -106,10 +96,10 @@ public class ProcessCreateRequest {
 		byte[] tmp = null;
 		try {
 			int size = imageFile.getInputStream().read(buffer);
-			if (size > 0){
-				//System.out.println(buffer);
+			if (size > 0) {
+				// System.out.println(buffer);
 				tmp = new byte[size];
-				for (int i = 0;i< size; i++){
+				for (int i = 0; i < size; i++) {
 					tmp[i] = buffer[i];
 				}
 			}
@@ -117,68 +107,67 @@ public class ProcessCreateRequest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if (tmp!=null){
+
+		if (tmp != null) {
 			byte[] base64EncodedImage = Base64.encodeBase64(tmp);
 			imageB64 = new String(base64EncodedImage);
-		}
-		else {
+		} else {
 			return null;
 		}
-		
-		
-		
-//		BufferedImage bufferedImage = null;
-//		FileReader fileReader = null;
-//		try {
-//			fileReader = new FileReader(imageFile);
-//		} catch (IOException e2) {
-//			// TODO Auto-generated catch block
-//			e2.printStackTrace();
-//			return null;
-//		}
+
+		// BufferedImage bufferedImage = null;
+		// FileReader fileReader = null;
+		// try {
+		// fileReader = new FileReader(imageFile);
+		// } catch (IOException e2) {
+		// // TODO Auto-generated catch block
+		// e2.printStackTrace();
+		// return null;
+		// }
 		// maybe there is a better way for verifying image encoding than MIME?
-//		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
-//		if (!(mimeType.equals("image/JPEG"))) {
-//			try {
-//				fileReader.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			return null;
-//		}
-//
-//		long fileLength = imageFile.length();
-//		char[] cbuf = null;
-//		try {
-//			fileReader.read(cbuf, 0, (int) fileLength);
-//			fileReader.close();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//			return null;
-//		}
-//		byte[] rawImageData = new byte[(int) fileLength];
-//		for (int i = 0; i < fileLength; i++) {
-//			rawImageData[i] = (byte) cbuf[i];
-//		}
-//		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
-//		String result = new String(base64EncodedImage);
-//
-//		try {
-//			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
-//			bufferedImage = ImageIO.read(bais);
-//			// TODO: maybe less strong
-//			if ((ProtocolConstants.IMAGE_WIDTH < bufferedImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT < bufferedImage
-//					.getHeight())) {
-//				return null;
-//			}
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
+		// String mimeType = new
+		// MimetypesFileTypeMap().getContentType(imageFile);
+		// if (!(mimeType.equals("image/JPEG"))) {
+		// try {
+		// fileReader.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// return null;
+		// }
+		//
+		// long fileLength = imageFile.length();
+		// char[] cbuf = null;
+		// try {
+		// fileReader.read(cbuf, 0, (int) fileLength);
+		// fileReader.close();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// return null;
+		// }
+		// byte[] rawImageData = new byte[(int) fileLength];
+		// for (int i = 0; i < fileLength; i++) {
+		// rawImageData[i] = (byte) cbuf[i];
+		// }
+		// byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
+		// String result = new String(base64EncodedImage);
+		//
+		// try {
+		// ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
+		// bufferedImage = ImageIO.read(bais);
+		// // TODO: maybe less strong
+		// if ((ProtocolConstants.IMAGE_WIDTH < bufferedImage.getWidth()) ||
+		// (ProtocolConstants.IMAGE_HEIGHT < bufferedImage
+		// .getHeight())) {
+		// return null;
+		// }
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// return null;
+		// }
 		System.out.println(imageB64);
-		return "data:image/jpg;base64," +imageB64;
+		return "data:image/jpg;base64," + imageB64;
 	}
 
 	private static Integer checkWeight(FormItemList items,
@@ -188,7 +177,8 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
+			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_GIVEN
+					+ e.toString());
 			e.printStackTrace();
 			return null;
 		}
@@ -224,7 +214,7 @@ public class ProcessCreateRequest {
 
 		// this exception is no reason to abort processing!
 		catch (IllegalArgumentException e) {
-			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			response.addQueryNameError(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
 		//

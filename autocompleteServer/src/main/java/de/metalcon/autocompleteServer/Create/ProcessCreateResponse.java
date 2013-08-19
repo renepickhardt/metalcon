@@ -17,7 +17,7 @@ public class ProcessCreateResponse {
 
 	}
 
-	// FIXME: bad JSON keys!
+	// TODO: double-check JSON keys!
 
 	/**
 	 * Adds a queryName-Error to the container object.Expects the String to be
