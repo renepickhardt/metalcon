@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONValue;
 
+import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.searchServer.Error.SearchError;
 
 public class SearchServlet extends HttpServlet {
@@ -31,6 +32,8 @@ public class SearchServlet extends HttpServlet {
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+        // This line results in infinite load time:
+        //out.print(JsonPrettyPrinter.prettyPrintJson(JSONValue.toJSONString(result)));
         out.print(JSONValue.toJSONString(result));
         out.flush();
     }
