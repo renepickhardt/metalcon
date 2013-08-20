@@ -27,7 +27,6 @@ import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateRequ
 import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateResponse;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserRequest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserResponse;
-import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.CreateFollow;
 import de.metalcon.socialgraph.operations.CreateStatusUpdate;
 import de.metalcon.socialgraph.operations.CreateUser;
@@ -80,7 +79,8 @@ public class Create extends GraphityHttpServlet {
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
-		final ClientResponder responder = new TomcatClientResponder(response);
+		final TomcatClientResponder responder = new TomcatClientResponder(
+				response);
 
 		CreateResponse createResponse = new CreateResponse();
 		FormItemList formItemList = null;

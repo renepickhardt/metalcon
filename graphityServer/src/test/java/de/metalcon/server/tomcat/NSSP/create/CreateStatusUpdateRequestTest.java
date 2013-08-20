@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.RequestTest;
 import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateRequest;
 import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateResponse;
@@ -88,7 +88,7 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 			final String statusUpdateId, final String statusUpdateType) {
 		// create form item list
 		final FormItemList formItemList = new FormItemList();
-		formItemList.addField(NSSProtocol.Parameters.Create.TYPE, type);
+		formItemList.addField(ProtocolConstants.Parameters.Create.TYPE, type);
 
 		final CreateResponse createResponse = new CreateResponse();
 		CreateRequest createRequest;
@@ -99,15 +99,15 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 			this.jsonResponse = extractJson(createResponse);
 		} else {
 			formItemList.addField(
-					NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
+					ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
 					userId);
 			formItemList
 					.addField(
-							NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
+							ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
 							statusUpdateId);
 			formItemList
 					.addField(
-							NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
+							ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
 							statusUpdateType);
 
 			final CreateStatusUpdateResponse createStatusUpdateResponse = new CreateStatusUpdateResponse();
@@ -123,50 +123,50 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		// missing: create request type
 		this.fillRequest(null, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Create.TYPE
+		assertEquals(MISSING_PARAM_BEFORE + ProtocolConstants.Parameters.Create.TYPE
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: user identifier
 		this.fillRequest(VALID_TYPE, null, VALID_STATUS_UPDATE_IDENTIFIER,
 				VALID_STATUS_UPDATE_TYPE);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER
+				+ ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: status update identifier
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, null,
 				VALID_STATUS_UPDATE_TYPE);
 		assertEquals(
 				MISSING_PARAM_BEFORE
-						+ NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER
+						+ ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER
 						+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: status update type
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, null);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE
+				+ ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testTypeValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertFalse(NSSProtocol.StatusCodes.Create.TYPE_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.TYPE_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testTypeInvalid() {
 		this.fillRequest(INVALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertEquals(NSSProtocol.StatusCodes.Create.TYPE_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Create.TYPE_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createStatusUpdateRequest);
 	}
 
@@ -174,8 +174,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 	public void testUserIdentifierValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertFalse(NSSProtocol.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
@@ -183,8 +183,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		this.fillRequest(VALID_TYPE, INVALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
 		assertEquals(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createStatusUpdateRequest);
 	}
 
@@ -192,8 +192,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 	public void testStatusUpdateIdentifierValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertFalse(NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
@@ -201,8 +201,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				INVALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
 		assertEquals(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createStatusUpdateRequest);
 	}
 
@@ -210,8 +210,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 	public void testStatusUpdateTypeValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertFalse(NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
@@ -219,8 +219,8 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, INVALID_STATUS_UPDATE_TYPE);
 		assertEquals(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createStatusUpdateRequest);
 	}
 

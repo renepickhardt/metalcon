@@ -2,7 +2,7 @@ package de.metalcon.server.tomcat.NSSP.create.follow;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
 import de.metalcon.socialgraph.NeoUtils;
@@ -101,7 +101,7 @@ public class CreateFollowRequest extends CreateRequest {
 	private static Node checkUserIdentifier(final FormItemList formItemList,
 			final CreateFollowResponse createFollowResponse) {
 		final String userId = formItemList
-				.getField(NSSProtocol.Parameters.Create.Follow.USER_IDENTIFIER);
+				.getField(ProtocolConstants.Parameters.Create.Follow.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user != null) {
@@ -130,7 +130,7 @@ public class CreateFollowRequest extends CreateRequest {
 			final FormItemList formItemList,
 			final CreateFollowResponse createFollowResponse) {
 		final String followedId = formItemList
-				.getField(NSSProtocol.Parameters.Create.Follow.FOLLOWED_IDENTIFIER);
+				.getField(ProtocolConstants.Parameters.Create.Follow.FOLLOWED_IDENTIFIER);
 		if (followedId != null) {
 			final Node followed = NeoUtils.getUserByIdentifier(followedId);
 			if (followed != null) {

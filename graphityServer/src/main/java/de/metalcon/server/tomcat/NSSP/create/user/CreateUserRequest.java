@@ -2,7 +2,7 @@ package de.metalcon.server.tomcat.NSSP.create.user;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
 import de.metalcon.socialgraph.NeoUtils;
@@ -119,7 +119,7 @@ public class CreateUserRequest extends CreateRequest {
 	private static String checkUserIdentifier(final FormItemList formItemList,
 			final CreateUserResponse createUserResponse) {
 		final String userId = formItemList
-				.getField(NSSProtocol.Parameters.Create.User.USER_IDENTIFIER);
+				.getField(ProtocolConstants.Parameters.Create.User.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user == null) {
@@ -147,7 +147,7 @@ public class CreateUserRequest extends CreateRequest {
 	private static String checkDisplayName(final FormItemList formItemList,
 			final CreateUserResponse createUserResponse) {
 		final String displayName = formItemList
-				.getField(NSSProtocol.Parameters.Create.User.DISPLAY_NAME);
+				.getField(ProtocolConstants.Parameters.Create.User.DISPLAY_NAME);
 		if (displayName != null) {
 			return displayName;
 		} else {
@@ -171,7 +171,7 @@ public class CreateUserRequest extends CreateRequest {
 			final FormItemList formItemList,
 			final CreateUserResponse createUserResponse) {
 		final String profilePicturePath = formItemList
-				.getField(NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH);
+				.getField(ProtocolConstants.Parameters.Create.User.PROFILE_PICTURE_PATH);
 		if (profilePicturePath != null) {
 			return profilePicturePath;
 		} else {

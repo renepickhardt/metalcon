@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 /**
@@ -97,7 +97,7 @@ public class CreateRequest {
 	private static CreateRequestType checkType(final FormItemList formItemList,
 			final CreateResponse createResponse) {
 		final String sType = formItemList
-				.getField(NSSProtocol.Parameters.Create.TYPE);
+				.getField(ProtocolConstants.Parameters.Create.TYPE);
 		if (sType != null) {
 			if (CreateRequestType.USER.getIdentifier().equals(sType)) {
 				return CreateRequestType.USER;

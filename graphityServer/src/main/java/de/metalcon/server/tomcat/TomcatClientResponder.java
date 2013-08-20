@@ -5,15 +5,13 @@ import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletResponse;
 
-import de.metalcon.socialgraph.operations.ClientResponder;
-
 /**
  * client responder using Tomcat's response instance
  * 
  * @author Sebastian Schlicht
  * 
  */
-public class TomcatClientResponder implements ClientResponder {
+public class TomcatClientResponder {
 
 	/**
 	 * Tomcat response instance to reach the client
@@ -35,25 +33,39 @@ public class TomcatClientResponder implements ClientResponder {
 	public TomcatClientResponder(final HttpServletResponse response)
 			throws IOException {
 		this.response = response;
+		response.setContentType("application/json");
 		this.writer = response.getWriter();
 	}
 
-	@Override
+	/**
+	 * add a line to the response
+	 * 
+	 * @param line
+	 *            line to be added
+	 */
 	public void addLine(final String line) {
 		this.writer.println(line);
 	}
 
-	@Override
+	/**
+	 * abort the response with an error
+	 * 
+	 * @param errorCode
+	 *            HTTP error code
+	 * @param message
+	 *            error message
+	 */
 	public void error(final int errorCode, final String message) {
 		try {
 			this.response.sendError(errorCode, message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Override
+	/**
+	 * finish the response by closing the stream
+	 */
 	public void finish() {
 		this.writer.flush();
 		this.writer.close();

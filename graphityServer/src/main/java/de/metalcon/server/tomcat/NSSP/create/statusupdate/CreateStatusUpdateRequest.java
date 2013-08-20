@@ -5,7 +5,7 @@ import org.neo4j.graphdb.Node;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.server.statusupdates.StatusUpdateTemplate;
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequest;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
 import de.metalcon.socialgraph.NeoUtils;
@@ -165,7 +165,7 @@ public class CreateStatusUpdateRequest extends CreateRequest {
 	private static Node checkUserIdentifier(final FormItemList formItemList,
 			final CreateStatusUpdateResponse createStatusUpdateResponse) {
 		final String userId = formItemList
-				.getField(NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER);
+				.getField(ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user != null) {
@@ -194,7 +194,7 @@ public class CreateStatusUpdateRequest extends CreateRequest {
 			final FormItemList formItemList,
 			final CreateStatusUpdateResponse createStatusUpdateResponse) {
 		final String statusUpdateId = formItemList
-				.getField(NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER);
+				.getField(ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER);
 		if (statusUpdateId != null) {
 			final Node statusUpdate = NeoUtils
 					.getStatusUpdateByIdentifier(statusUpdateId);
@@ -225,7 +225,7 @@ public class CreateStatusUpdateRequest extends CreateRequest {
 			final FormItemList formItemList,
 			final CreateStatusUpdateResponse createStatusUpdateResponse) {
 		final String statusUpdateType = formItemList
-				.getField(NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE);
+				.getField(ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE);
 		if (statusUpdateType != null) {
 			final StatusUpdateTemplate statusUpdateTemplate = StatusUpdateManager
 					.getStatusUpdateTemplate(statusUpdateType);

@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.create.statusupdate;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateResponse;
 
 /**
@@ -16,7 +16,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void userIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
+				ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
 				"Please provide a user identifier matching to an existing user.");
 	}
 
@@ -25,7 +25,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void statusUpdateIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
+				ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
 				"Please provide a status update identifier that is not used by an existing status update.");
 	}
 
@@ -34,7 +34,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void statusUpdateTypeMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
+				ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
 				"Please provide a valid status update template that you are using to create the status update.");
 	}
 
@@ -46,7 +46,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void userIdentifierInvalid(final String userId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.USER_NOT_EXISTING,
 				"there is no user with the identifier \"" + userId
 						+ "\". Please provide a valid user identifier.");
 	}
@@ -59,7 +59,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void statusUpdateIdentifierInvalid(final String statusUpdateId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING,
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_EXISTING,
 				"there is already a status update with the identifier \""
 						+ statusUpdateId
 						+ "\" existing. Please provide a valid status update identifier.");
@@ -73,7 +73,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void statusUpdateTypeInvalid(final String statusUpdateType) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_TYPE_NOT_EXISTING,
 				"there is no status update template called \""
 						+ statusUpdateType
 						+ "\" existing. Please provide a valid status update type.");
@@ -84,7 +84,7 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	 */
 	public void createStatusUpdateSucceeded() {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.StatusUpdate.SUCCEEDED, "");
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.SUCCEEDED, "");
 	}
 
 }

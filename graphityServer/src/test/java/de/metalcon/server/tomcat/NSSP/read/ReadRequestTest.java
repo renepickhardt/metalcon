@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.RequestTest;
 
 public class ReadRequestTest extends RequestTest {
@@ -36,15 +36,15 @@ public class ReadRequestTest extends RequestTest {
 			final String numItems, final String ownUpdates) {
 		when(
 				this.request
-						.getParameter(NSSProtocol.Parameters.Read.USER_IDENTIFIER))
+						.getParameter(ProtocolConstants.Parameters.Read.USER_IDENTIFIER))
 				.thenReturn(userId);
 		when(
 				this.request
-						.getParameter(NSSProtocol.Parameters.Read.POSTER_IDENTIFIER))
+						.getParameter(ProtocolConstants.Parameters.Read.POSTER_IDENTIFIER))
 				.thenReturn(posterId);
-		when(this.request.getParameter(NSSProtocol.Parameters.Read.NUM_ITEMS))
+		when(this.request.getParameter(ProtocolConstants.Parameters.Read.NUM_ITEMS))
 				.thenReturn(numItems);
-		when(this.request.getParameter(NSSProtocol.Parameters.Read.OWN_UPDATES))
+		when(this.request.getParameter(ProtocolConstants.Parameters.Read.OWN_UPDATES))
 				.thenReturn(ownUpdates);
 		final ReadResponse response = new ReadResponse();
 		this.readRequest = ReadRequest.checkRequest(this.request, response);
@@ -57,48 +57,48 @@ public class ReadRequestTest extends RequestTest {
 		this.fillRequest(null, VALID_USER_IDENTIFIER, VALID_NUM_ITEMS,
 				VALID_OWN_UPDATES);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Read.USER_IDENTIFIER
+				+ ProtocolConstants.Parameters.Read.USER_IDENTIFIER
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: poster identifier
 		this.fillRequest(VALID_USER_IDENTIFIER, null, VALID_NUM_ITEMS,
 				VALID_OWN_UPDATES);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Read.POSTER_IDENTIFIER
+				+ ProtocolConstants.Parameters.Read.POSTER_IDENTIFIER
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: number of items
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER, null,
 				VALID_OWN_UPDATES);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Read.NUM_ITEMS + MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				+ ProtocolConstants.Parameters.Read.NUM_ITEMS + MISSING_PARAM_AFTER,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: retrieval flag
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, null);
 		assertEquals(
-				MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Read.OWN_UPDATES
+				MISSING_PARAM_BEFORE + ProtocolConstants.Parameters.Read.OWN_UPDATES
 						+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testUserIdentifierValid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, VALID_OWN_UPDATES);
-		assertFalse(NSSProtocol.StatusCodes.Read.USER_NOT_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Read.USER_NOT_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testUserIdentifierInvalid() {
 		this.fillRequest(INVALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, VALID_OWN_UPDATES);
-		assertEquals(NSSProtocol.StatusCodes.Read.USER_NOT_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Read.USER_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.readRequest);
 	}
 
@@ -106,16 +106,16 @@ public class ReadRequestTest extends RequestTest {
 	public void testPosterIdentifierValid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, VALID_OWN_UPDATES);
-		assertFalse(NSSProtocol.StatusCodes.Read.POSTER_NOT_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Read.POSTER_NOT_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testPosterIdentifierInvalid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, INVALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, VALID_OWN_UPDATES);
-		assertEquals(NSSProtocol.StatusCodes.Read.POSTER_NOT_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Read.POSTER_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.readRequest);
 	}
 
@@ -123,8 +123,8 @@ public class ReadRequestTest extends RequestTest {
 	public void testNumItemsValid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, VALID_OWN_UPDATES);
-		assertFalse(NSSProtocol.StatusCodes.Read.NUM_ITEMS_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Read.NUM_ITEMS_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
@@ -132,15 +132,15 @@ public class ReadRequestTest extends RequestTest {
 		// number of items is no number
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER, "abc",
 				VALID_OWN_UPDATES);
-		assertEquals(NSSProtocol.StatusCodes.Read.NUM_ITEMS_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Read.NUM_ITEMS_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.readRequest);
 
 		// number of items is an invalid number
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER, "0",
 				VALID_OWN_UPDATES);
-		assertEquals(NSSProtocol.StatusCodes.Read.NUM_ITEMS_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Read.NUM_ITEMS_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.readRequest);
 	}
 
@@ -148,21 +148,21 @@ public class ReadRequestTest extends RequestTest {
 	public void testOwnUpdatesValid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, "0");
-		assertFalse(NSSProtocol.StatusCodes.Read.OWN_UPDATES_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Read.OWN_UPDATES_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, "1");
-		assertFalse(NSSProtocol.StatusCodes.Read.OWN_UPDATES_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Read.OWN_UPDATES_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testOwnUpdatesInvalid() {
 		this.fillRequest(VALID_USER_IDENTIFIER, VALID_USER_IDENTIFIER,
 				VALID_NUM_ITEMS, INVALID_OWN_UPDATES);
-		assertEquals(NSSProtocol.StatusCodes.Read.OWN_UPDATES_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Read.OWN_UPDATES_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.readRequest);
 	}
 }

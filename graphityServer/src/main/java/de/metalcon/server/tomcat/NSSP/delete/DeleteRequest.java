@@ -2,7 +2,7 @@ package de.metalcon.server.tomcat.NSSP.delete;
 
 import javax.servlet.http.HttpServletRequest;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 
 /**
  * basic delete requests according to NSSP
@@ -70,7 +70,7 @@ public class DeleteRequest {
 			final DeleteResponse deleteResponse) {
 		{
 			final String sType = request
-					.getParameter(NSSProtocol.Parameters.Delete.TYPE);
+					.getParameter(ProtocolConstants.Parameters.Delete.TYPE);
 			if (sType != null) {
 				if (DeleteRequestType.USER.getIdentifier().equals(sType)) {
 					return DeleteRequestType.USER;

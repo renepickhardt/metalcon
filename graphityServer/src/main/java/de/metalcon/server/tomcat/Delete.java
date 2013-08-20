@@ -13,7 +13,6 @@ import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateRequ
 import de.metalcon.server.tomcat.NSSP.delete.statusupdate.DeleteStatusUpdateResponse;
 import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserRequest;
 import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserResponse;
-import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.DeleteFollow;
 import de.metalcon.socialgraph.operations.DeleteStatusUpdate;
 import de.metalcon.socialgraph.operations.DeleteUser;
@@ -35,7 +34,8 @@ public class Delete extends GraphityHttpServlet {
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
-		final ClientResponder responder = new TomcatClientResponder(response);
+		final TomcatClientResponder responder = new TomcatClientResponder(
+				response);
 
 		DeleteResponse deleteResponse = new DeleteResponse();
 		final DeleteRequest deleteRequest = DeleteRequest.checkRequest(request,

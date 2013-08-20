@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.RequestTest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserRequest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserResponse;
@@ -49,7 +49,7 @@ public class CreateUserRequestTest extends CreateRequestTest {
 			final String displayName, final String profilePicturePath) {
 		// create form item list
 		final FormItemList formItemList = new FormItemList();
-		formItemList.addField(NSSProtocol.Parameters.Create.TYPE, type);
+		formItemList.addField(ProtocolConstants.Parameters.Create.TYPE, type);
 
 		final CreateResponse createResponse = new CreateResponse();
 		CreateRequest createRequest;
@@ -60,12 +60,12 @@ public class CreateUserRequestTest extends CreateRequestTest {
 			this.jsonResponse = extractJson(createResponse);
 		} else {
 			formItemList.addField(
-					NSSProtocol.Parameters.Create.User.USER_IDENTIFIER, userId);
+					ProtocolConstants.Parameters.Create.User.USER_IDENTIFIER, userId);
 			formItemList.addField(
-					NSSProtocol.Parameters.Create.User.DISPLAY_NAME,
+					ProtocolConstants.Parameters.Create.User.DISPLAY_NAME,
 					displayName);
 			formItemList.addField(
-					NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH,
+					ProtocolConstants.Parameters.Create.User.PROFILE_PICTURE_PATH,
 					profilePicturePath);
 
 			final CreateUserResponse createUserResponse = new CreateUserResponse();
@@ -80,49 +80,49 @@ public class CreateUserRequestTest extends CreateRequestTest {
 		// missing: create request type
 		this.fillRequest(null, VALID_USER_IDENTIFIER, VALID_DISPLAY_NAME,
 				VALID_PROFILE_PICTURE_PATH);
-		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Create.TYPE
+		assertEquals(MISSING_PARAM_BEFORE + ProtocolConstants.Parameters.Create.TYPE
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: user identifier
 		this.fillRequest(VALID_TYPE, null, VALID_DISPLAY_NAME,
 				VALID_PROFILE_PICTURE_PATH);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Create.User.USER_IDENTIFIER
+				+ ProtocolConstants.Parameters.Create.User.USER_IDENTIFIER
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: display name
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, null,
 				VALID_PROFILE_PICTURE_PATH);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Create.User.DISPLAY_NAME
+				+ ProtocolConstants.Parameters.Create.User.DISPLAY_NAME
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: profile picture path
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, VALID_DISPLAY_NAME,
 				null);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH
+				+ ProtocolConstants.Parameters.Create.User.PROFILE_PICTURE_PATH
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testTypeValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, VALID_DISPLAY_NAME,
 				VALID_PROFILE_PICTURE_PATH);
-		assertFalse(NSSProtocol.StatusCodes.Create.TYPE_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.TYPE_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testTypeInvalid() {
 		this.fillRequest(INVALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_DISPLAY_NAME, VALID_PROFILE_PICTURE_PATH);
-		assertEquals(NSSProtocol.StatusCodes.Create.TYPE_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Create.TYPE_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createUserRequest);
 	}
 
@@ -130,16 +130,16 @@ public class CreateUserRequestTest extends CreateRequestTest {
 	public void testUserIdentifierValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER, VALID_DISPLAY_NAME,
 				VALID_PROFILE_PICTURE_PATH);
-		assertFalse(NSSProtocol.StatusCodes.Create.User.USER_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Create.User.USER_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testUserIdentifierInvalid() {
 		this.fillRequest(VALID_TYPE, INVALID_USER_IDENTIFIER,
 				VALID_DISPLAY_NAME, VALID_PROFILE_PICTURE_PATH);
-		assertEquals(NSSProtocol.StatusCodes.Create.User.USER_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Create.User.USER_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.createUserRequest);
 	}
 

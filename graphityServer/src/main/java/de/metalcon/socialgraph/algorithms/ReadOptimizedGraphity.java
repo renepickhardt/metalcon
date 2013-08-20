@@ -122,8 +122,8 @@ public class ReadOptimizedGraphity extends SocialGraph {
 		crrUpdate.setProperty(Properties.StatusUpdate.TIMESTAMP, timestamp);
 		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT_TYPE,
 				content.getType());
-		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT,
-				content.toJSONObject());
+		crrUpdate.setProperty(Properties.StatusUpdate.CONTENT, content
+				.toJSONObject().toJSONString());
 
 		// update references to previous status update (if existing)
 		if (lastUpdate != null) {

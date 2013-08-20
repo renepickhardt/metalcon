@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.create.user;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateResponse;
 
 /**
@@ -16,7 +16,7 @@ public class CreateUserResponse extends CreateResponse {
 	 */
 	public void userIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.User.USER_IDENTIFIER,
+				ProtocolConstants.Parameters.Create.User.USER_IDENTIFIER,
 				"Please provide a user identifier that is not used by an existing user.");
 	}
 
@@ -24,7 +24,7 @@ public class CreateUserResponse extends CreateResponse {
 	 * add status message: display name missing
 	 */
 	public void displayNameMissing() {
-		this.parameterMissing(NSSProtocol.Parameters.Create.User.DISPLAY_NAME,
+		this.parameterMissing(ProtocolConstants.Parameters.Create.User.DISPLAY_NAME,
 				"Please provide any display name for the new user.");
 	}
 
@@ -33,7 +33,7 @@ public class CreateUserResponse extends CreateResponse {
 	 */
 	public void profilePicturePathMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH,
+				ProtocolConstants.Parameters.Create.User.PROFILE_PICTURE_PATH,
 				"Please provide a path to the profile picture of the new user.");
 	}
 
@@ -45,7 +45,7 @@ public class CreateUserResponse extends CreateResponse {
 	 */
 	public void userIdentifierInvalid(final String userId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.User.USER_EXISTING,
+				ProtocolConstants.StatusCodes.Create.User.USER_EXISTING,
 				"there is already a user with the identifier \""
 						+ userId
 						+ "\" existing. Please provide a valid user identifier.");
@@ -55,7 +55,7 @@ public class CreateUserResponse extends CreateResponse {
 	 * add status message: create user succeeded
 	 */
 	public void createUserSucceeded() {
-		this.addStatusMessage(NSSProtocol.StatusCodes.Create.User.SUCCEEDED, "");
+		this.addStatusMessage(ProtocolConstants.StatusCodes.Create.User.SUCCEEDED, "");
 	}
 
 }

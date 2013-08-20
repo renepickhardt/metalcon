@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.socialgraph.NeoUtils;
 
 /**
@@ -131,7 +131,7 @@ public class ReadRequest {
 	private static Node checkUserIdentifier(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String userId = request
-				.getParameter(NSSProtocol.Parameters.Read.USER_IDENTIFIER);
+				.getParameter(ProtocolConstants.Parameters.Read.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user != null) {
@@ -158,7 +158,7 @@ public class ReadRequest {
 	private static Node checkPosterIdentifier(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String posterId = request
-				.getParameter(NSSProtocol.Parameters.Read.POSTER_IDENTIFIER);
+				.getParameter(ProtocolConstants.Parameters.Read.POSTER_IDENTIFIER);
 		if (posterId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(posterId);
 			if (user != null) {
@@ -185,7 +185,7 @@ public class ReadRequest {
 	private static int checkNumItems(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String sNumItems = request
-				.getParameter(NSSProtocol.Parameters.Read.NUM_ITEMS);
+				.getParameter(ProtocolConstants.Parameters.Read.NUM_ITEMS);
 		if (sNumItems != null) {
 			int numItems;
 			try {
@@ -220,7 +220,7 @@ public class ReadRequest {
 	private static Boolean checkOwnUpdates(final HttpServletRequest request,
 			final ReadResponse response) {
 		final String sOwnUpdates = request
-				.getParameter(NSSProtocol.Parameters.Read.OWN_UPDATES);
+				.getParameter(ProtocolConstants.Parameters.Read.OWN_UPDATES);
 		if (sOwnUpdates != null) {
 			try {
 				final int iOwnUpdates = Integer.valueOf(sOwnUpdates);

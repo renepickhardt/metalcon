@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.create.follow;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateResponse;
 
 /**
@@ -16,7 +16,7 @@ public class CreateFollowResponse extends CreateResponse {
 	 */
 	public void userIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.Follow.USER_IDENTIFIER,
+				ProtocolConstants.Parameters.Create.Follow.USER_IDENTIFIER,
 				"Please provide a user identifier matching to an existing user.");
 	}
 
@@ -25,7 +25,7 @@ public class CreateFollowResponse extends CreateResponse {
 	 */
 	public void followedIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.Follow.FOLLOWED_IDENTIFIER,
+				ProtocolConstants.Parameters.Create.Follow.FOLLOWED_IDENTIFIER,
 				"Please provide a user identifier matching to an existing user.");
 	}
 
@@ -37,7 +37,7 @@ public class CreateFollowResponse extends CreateResponse {
 	 */
 	public void userIdentifierInvalid(final String userId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.Follow.USER_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Create.Follow.USER_NOT_EXISTING,
 				"there is no user with the identifier \"" + userId
 						+ "\". Please provide a valid user identifier.");
 	}
@@ -50,7 +50,7 @@ public class CreateFollowResponse extends CreateResponse {
 	 */
 	public void followedIdentifierInvalid(final String followedId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.Follow.FOLLOWED_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Create.Follow.FOLLOWED_NOT_EXISTING,
 				"there is no user with the identifier \"" + followedId
 						+ "\". Please provide a valid user identifier.");
 	}
@@ -59,7 +59,7 @@ public class CreateFollowResponse extends CreateResponse {
 	 * add status message: create follow edge succeeded
 	 */
 	public void createFollowSucceeded() {
-		this.addStatusMessage(NSSProtocol.StatusCodes.Create.Follow.SUCCEEDED,
+		this.addStatusMessage(ProtocolConstants.StatusCodes.Create.Follow.SUCCEEDED,
 				"");
 	}
 

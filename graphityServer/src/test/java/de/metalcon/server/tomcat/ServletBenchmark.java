@@ -25,6 +25,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.create.CreateRequestType;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 
@@ -144,13 +145,13 @@ public class ServletBenchmark {
 
 		final List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Read.USER_IDENTIFIER, userId));
+				ProtocolConstants.Parameters.Read.USER_IDENTIFIER, userId));
 		params.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Read.POSTER_IDENTIFIER, userId));
+				ProtocolConstants.Parameters.Read.POSTER_IDENTIFIER, userId));
 		params.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Read.NUM_ITEMS, "15"));
+				ProtocolConstants.Parameters.Read.NUM_ITEMS, "15"));
 		params.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Read.OWN_UPDATES, "0"));
+				ProtocolConstants.Parameters.Read.OWN_UPDATES, "0"));
 
 		final String url = "http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/read?"
 				+ URLEncodedUtils.format(params, "utf-8");
@@ -194,14 +195,14 @@ public class ServletBenchmark {
 
 		final MultipartEntity entity = new MultipartEntity();
 		try {
-			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+			entity.addPart(ProtocolConstants.Parameters.Create.TYPE, new StringBody(
 					CreateRequestType.USER.getIdentifier()));
-			entity.addPart(NSSProtocol.Parameters.Create.User.USER_IDENTIFIER,
+			entity.addPart(ProtocolConstants.Parameters.Create.User.USER_IDENTIFIER,
 					new StringBody(userId));
-			entity.addPart(NSSProtocol.Parameters.Create.User.DISPLAY_NAME,
+			entity.addPart(ProtocolConstants.Parameters.Create.User.DISPLAY_NAME,
 					new StringBody("user" + userId));
 			entity.addPart(
-					NSSProtocol.Parameters.Create.User.PROFILE_PICTURE_PATH,
+					ProtocolConstants.Parameters.Create.User.PROFILE_PICTURE_PATH,
 					new StringBody("http://google.de/somepic"));
 		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -224,15 +225,15 @@ public class ServletBenchmark {
 		final MultipartEntity entity = new MultipartEntity();
 		try {
 			entity.addPart(
-					NSSProtocol.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
+					ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
 					new StringBody(userId));
-			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+			entity.addPart(ProtocolConstants.Parameters.Create.TYPE, new StringBody(
 					CreateRequestType.STATUS_UPDATE.getIdentifier()));
 			entity.addPart(
-					NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
+					ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
 					new StringBody(statusUpdateId));
 			entity.addPart(
-					NSSProtocol.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
+					ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE,
 					new StringBody("Plain"));
 			entity.addPart(
 					"message",
@@ -260,12 +261,12 @@ public class ServletBenchmark {
 		final MultipartEntity entity = new MultipartEntity();
 		try {
 			entity.addPart(
-					NSSProtocol.Parameters.Create.Follow.USER_IDENTIFIER,
+					ProtocolConstants.Parameters.Create.Follow.USER_IDENTIFIER,
 					new StringBody(followingId));
-			entity.addPart(NSSProtocol.Parameters.Create.TYPE, new StringBody(
+			entity.addPart(ProtocolConstants.Parameters.Create.TYPE, new StringBody(
 					CreateRequestType.FOLLOW.getIdentifier()));
 			entity.addPart(
-					NSSProtocol.Parameters.Create.Follow.FOLLOWED_IDENTIFIER,
+					ProtocolConstants.Parameters.Create.Follow.FOLLOWED_IDENTIFIER,
 					new StringBody(followedId));
 		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -288,12 +289,12 @@ public class ServletBenchmark {
 
 		final List<NameValuePair> values = new ArrayList<NameValuePair>(3);
 		values.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Delete.Follow.USER_IDENTIFIER,
+				ProtocolConstants.Parameters.Delete.Follow.USER_IDENTIFIER,
 				followingId));
-		values.add(new BasicNameValuePair(NSSProtocol.Parameters.Delete.TYPE,
+		values.add(new BasicNameValuePair(ProtocolConstants.Parameters.Delete.TYPE,
 				DeleteRequestType.FOLLOW.getIdentifier()));
 		values.add(new BasicNameValuePair(
-				NSSProtocol.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER,
+				ProtocolConstants.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER,
 				followedId));
 		final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(values);
 

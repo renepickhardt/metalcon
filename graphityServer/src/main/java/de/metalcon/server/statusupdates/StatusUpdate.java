@@ -124,9 +124,10 @@ public abstract class StatusUpdate {
 		activity.put("published",
 				dateFormatter.format(new Date(this.timestamp)));
 
+		// TODO: check performance
 		// parse user
-		final Map<String, Object> user = this.creator.toActorJSON();
-		activity.put("actor", user);
+		// final Map<String, Object> user = this.creator.toActorJSON();
+		// activity.put("actor", user);
 
 		// parse verb:read
 		activity.put("verb", "read");
