@@ -178,7 +178,7 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 			assertEquals(
 					statusUpdateNode
 							.getProperty(Properties.StatusUpdate.CONTENT),
-					statusUpdate.toJSONObject());
+					statusUpdate.toJSONObject().toJSONString());
 
 			// prevent the time stamps from being equal
 			AlgorithmTest.waitMs(2);

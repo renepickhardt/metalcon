@@ -95,7 +95,7 @@ public class AlgorithmTest {
 			jsonString = activity.toJSONString();
 			index = jsonString.indexOf("message");
 			message = jsonString.substring(index + 10,
-					jsonString.indexOf("}", index) - 1);
+					jsonString.indexOf(",", index) - 1);
 			statusUpdateMessages.add(Long.valueOf(message));
 		}
 

@@ -21,6 +21,7 @@ import org.xml.sax.SAXException;
 import de.metalcon.server.Configs;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.socialgraph.NeoUtils;
+import de.metalcon.socialgraph.Properties;
 
 @RunWith(Suite.class)
 @SuiteClasses({ WriteOptimizedGraphityTest.class,
@@ -73,6 +74,9 @@ public class AlgorithmTests {
 			for (int i = 0; i < USER_IDS.length; i++) {
 				USER_IDS[i] = String.valueOf(i);
 				USERS[i] = NeoUtils.createUserNode(USER_IDS[i]);
+				USERS[i].setProperty(Properties.User.DISPLAY_NAME, "Testy");
+				USERS[i].setProperty(Properties.User.PROFILE_PICTURE_PATH,
+						"google.de/somepic");
 			}
 			transaction.success();
 		} finally {
