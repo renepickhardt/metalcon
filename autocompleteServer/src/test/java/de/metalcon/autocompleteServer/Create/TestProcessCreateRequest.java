@@ -67,6 +67,24 @@ public class TestProcessCreateRequest {
 	}
 
 	@Test
+	public void testFormSuggestStringTooLong() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.TOO_LONG_SUGGESTION_STRING,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		if (testResponse.getResponse().containsKey("Error:queryNameTooLong")) {
+			assertEquals(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG,
+					testResponse.getResponse().get("Error:queryNameTooLong"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
 	public void testFormWeightNotGiven() {
 
 		ProcessCreateResponse testResponse = this.processTestRequest(

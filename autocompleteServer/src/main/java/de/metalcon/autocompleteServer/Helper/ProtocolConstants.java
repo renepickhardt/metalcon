@@ -25,7 +25,7 @@ public class ProtocolConstants {
 	public static final String SUGGESTION_WEIGHT = "weight";
 	public static final String SUGGESTION_KEY = "key";
 	public static final String SUGGESTION_STRING = "term";
-	public static final int SUGGESTION_LENGTH = 80;
+	public static final int MAX_SUGGESTION_LENGTH = 80;
 	public static final int MAX_KEY_LENGTH = 64;
 	public static final String IMAGE = "image";
 	public static final int IMAGE_WIDTH = 64;

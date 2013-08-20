@@ -234,12 +234,12 @@ public class ProcessCreateRequest {
 
 		// this exception is no reason to abort processing!
 		catch (IllegalArgumentException e) {
-			response.addQueryNameError(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			response.addQueryNameMissingError(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addQueryNameError(CreateStatusCodes.KEY_TOO_LONG);
+			response.addQueryNameMissingError(CreateStatusCodes.KEY_TOO_LONG);
 			return null;
 		}
 		return key;
@@ -253,12 +253,13 @@ public class ProcessCreateRequest {
 			suggestString = items.getField(ProtocolConstants.SUGGESTION_STRING);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addQueryNameError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
+			response.addQueryNameMissingError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
 		// checks if the suggestion String length matches ASTP requirements
-		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
-			response.addQueryNameError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+		// FIXME: JUnit says the Error-Message is not added
+		if (suggestString.length() > ProtocolConstants.MAX_SUGGESTION_LENGTH) {
+			response.addQueryNameTooLongError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
 			return null;
 		}
 		return suggestString;

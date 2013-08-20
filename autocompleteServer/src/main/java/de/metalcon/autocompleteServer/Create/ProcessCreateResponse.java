@@ -25,8 +25,12 @@ public class ProcessCreateResponse {
 	 * 
 	 * @param querynameNotGiven
 	 */
-	public void addQueryNameError(String querynameNotGiven) {
-		this.jsonResponse.put("Error:queryName", querynameNotGiven);
+	public void addQueryNameMissingError(String querynameNotGiven) {
+		this.jsonResponse.put("Error:queryNameNotGiven", querynameNotGiven);
+	}
+
+	public void addQueryNameTooLongError(String querynameTooLong) {
+		this.jsonResponse.put("Error:queryNameTooLong", querynameTooLong);
 	}
 
 	/**
