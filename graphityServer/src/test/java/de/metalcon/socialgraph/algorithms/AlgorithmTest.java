@@ -1,12 +1,14 @@
 package de.metalcon.socialgraph.algorithms;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
+import org.junit.BeforeClass;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -35,6 +37,18 @@ public class AlgorithmTest {
 	 * test transaction
 	 */
 	protected Transaction transaction;
+
+	@BeforeClass
+	public static void beforeClass() {
+		if (AlgorithmTests.wasUsed()) {
+			// reset database
+			AlgorithmTests.tearDown();
+		}
+		AlgorithmTests.setUp();
+
+		// assert the database to be created successfully
+		assertNotNull(AlgorithmTests.DATABASE);
+	}
 
 	/**
 	 * load neo4j user nodes
