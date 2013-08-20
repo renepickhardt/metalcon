@@ -50,6 +50,58 @@ public class TestProcessCreateRequest {
 	// status.
 
 	@Test
+	public void testFormMissingSuggestString() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY, null,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		if (testResponse.getResponse().containsKey("Error:queryName")) {
+			assertEquals(CreateStatusCodes.QUERYNAME_NOT_GIVEN, testResponse
+					.getResponse().get("Error:queryName"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
+	public void testFormWeightNotGiven() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING, null,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		if (testResponse.getResponse().containsKey("Error:WeightNotGiven")) {
+			assertEquals(CreateStatusCodes.WEIGHT_NOT_GIVEN, testResponse
+					.getResponse().get("Error:WeightNotGiven"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
+	public void testFormWeightNotANumber() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				ProtocolTestConstants.NOT_A_NUMBER_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		if (testResponse.getResponse().containsKey("Error:WeightNotANumber")) {
+			assertEquals(CreateStatusCodes.WEIGHT_NOT_A_NUMBER, testResponse
+					.getResponse().get("Error:WeightNotANumber"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
 	public void testFullFormWithImage() {
 
 		// TODO insert base64 encoded image
@@ -67,9 +119,9 @@ public class TestProcessCreateRequest {
 				testResponse.getContainer().getWeight().toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
 				.getContainer().getIndexName());
-		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
-				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
-				testResponse.getResponse().toString());
+		// assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+		// + "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
+		// testResponse.getResponse().toString());
 		// assert image is B64 encoded and not null
 	}
 
@@ -101,11 +153,21 @@ public class TestProcessCreateRequest {
 		ProcessCreateResponse response = new ProcessCreateResponse(
 				this.servletConfig.getServletContext());
 		FormItemList testItems = new FormItemList();
-		testItems.addField(ProtocolConstants.SUGGESTION_KEY, key);
-		testItems.addField(ProtocolConstants.SUGGESTION_STRING, term);
-		testItems.addField(ProtocolConstants.SUGGESTION_WEIGHT, weight);
-		testItems.addField(ProtocolConstants.INDEX_PARAMETER, index);
-		testItems.addField(ProtocolConstants.IMAGE, imageBase64);
+		if (key != null) {
+			testItems.addField(ProtocolConstants.SUGGESTION_KEY, key);
+		}
+		if (term != null) {
+			testItems.addField(ProtocolConstants.SUGGESTION_STRING, term);
+		}
+		if (weight != null) {
+			testItems.addField(ProtocolConstants.SUGGESTION_WEIGHT, weight);
+		}
+		if (index != null) {
+			testItems.addField(ProtocolConstants.INDEX_PARAMETER, index);
+		}
+		if (imageBase64 != null) {
+			testItems.addField(ProtocolConstants.IMAGE, imageBase64);
+		}
 
 		return ProcessCreateRequest.checkRequestParameter(testItems, response,
 				this.servletConfig.getServletContext());

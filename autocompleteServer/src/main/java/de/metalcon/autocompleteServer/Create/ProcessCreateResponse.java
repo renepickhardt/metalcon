@@ -17,7 +17,7 @@ public class ProcessCreateResponse {
 
 	}
 
-	// TODO: double-check JSON keys!
+	// TODO: Change JSON-Keys (not values!) to constants
 
 	/**
 	 * Adds a queryName-Error to the container object.Expects the String to be
@@ -68,6 +68,15 @@ public class ProcessCreateResponse {
 	public void addHttpRequestError(String requestMustBeMultipart) {
 		this.jsonResponse.put("Error:RequestNotMultipart",
 				requestMustBeMultipart);
+	}
+
+	public void addWeightNotGivenError(String weightNotGiven) {
+		this.jsonResponse.put("Error:WeightNotGiven", weightNotGiven);
+
+	}
+
+	public void addWeightNotANumberError(String weightNotANumber) {
+		this.jsonResponse.put("Error:WeightNotANumber", weightNotANumber);
 	}
 
 	/**

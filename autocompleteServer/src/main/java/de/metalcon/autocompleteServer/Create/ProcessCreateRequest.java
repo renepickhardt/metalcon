@@ -198,8 +198,7 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_GIVEN
-					+ e.toString());
+			response.addWeightNotGivenError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
 			e.printStackTrace();
 			return null;
 		}
@@ -209,7 +208,7 @@ public class ProcessCreateRequest {
 		}
 		// TODO: verify this is the right exception
 		catch (NumberFormatException e) {
-			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			response.addWeightNotANumberError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
 			return null;
 		}
 	}
