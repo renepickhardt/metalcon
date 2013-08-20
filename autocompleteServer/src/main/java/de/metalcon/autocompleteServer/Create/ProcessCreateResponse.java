@@ -60,6 +60,17 @@ public class ProcessCreateResponse {
 	}
 
 	/**
+	 * Adds a requestMustBeMultipart-Error to the container object.Expects the
+	 * String to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
+	public void addHttpRequestError(String requestMustBeMultipart) {
+		this.jsonResponse.put("Error:RequestNotMultipart",
+				requestMustBeMultipart);
+	}
+
+	/**
 	 * Getter for the response as JSONObject.
 	 * 
 	 * @return JSONObject
@@ -77,4 +88,5 @@ public class ProcessCreateResponse {
 		this.container = suggestTreeCreateRequestContainer;
 
 	}
+
 }

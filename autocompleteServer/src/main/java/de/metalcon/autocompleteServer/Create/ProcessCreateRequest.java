@@ -40,7 +40,7 @@ public class ProcessCreateRequest {
 
 		// items is == null, when request is not multipart
 		if (items == null) {
-			response.addError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
+			response.addHttpRequestError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
 			// TODO double-check if return correct
 			return response;
 		}
