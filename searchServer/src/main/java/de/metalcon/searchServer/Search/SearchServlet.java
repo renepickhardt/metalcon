@@ -30,9 +30,14 @@ public class SearchServlet extends HttpServlet {
             result = SearchError.toJson(e);
         }
         
+        Object indent = request.getParameter("indent");
+        
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        out.print(JsonPrettyPrinter.prettyPrintJson(JSONValue.toJSONString(result)));
+        String json = JSONValue.toJSONString(result);
+        if (indent != null)
+            json = JsonPrettyPrinter.prettyPrintJson(json);
+        out.print(json);
         out.flush();
     }
     
