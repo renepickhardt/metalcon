@@ -165,6 +165,20 @@ public class StatusUpdateManager {
 		// crawl XML files
 		StatusUpdateTemplate template, previousTemplate;
 		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
+
+		// create basic status update template
+		if (xmlFiles == null) {
+			final File plainTemplate = new File(config.templatesPath()
+					+ "Plain.xml");
+			final PrintWriter writer = new PrintWriter(plainTemplate);
+			writer.println("<class name=\"Plain\" version=\"1.0\">");
+			writer.println("<param name=\"message\" type=\"String\" />");
+			writer.println("</class>");
+			writer.flush();
+			writer.close();
+			loadXmlFiles(new File(config.templatesPath()));
+		}
+
 		System.out.println("TEMPLATES:" + xmlFiles.length);
 		for (File xmlFile : xmlFiles) {
 			template = new StatusUpdateTemplate(xmlFile);
