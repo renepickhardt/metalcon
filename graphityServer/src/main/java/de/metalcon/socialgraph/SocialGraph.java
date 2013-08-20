@@ -55,7 +55,7 @@ public abstract class SocialGraph {
 	 */
 	public void createUser(final String userId, final String displayName,
 			final String profilePicturePath) {
-		final Node user = NeoUtils.createUserNode(this.graph, userId);
+		final Node user = NeoUtils.createUserNode(userId);
 		user.setProperty(Properties.User.DISPLAY_NAME, displayName);
 		user.setProperty(Properties.User.PROFILE_PICTURE_PATH,
 				profilePicturePath);

@@ -52,8 +52,7 @@ public class WriteOptimizedGraphity extends SocialGraph {
 				SocialGraphRelationshipType.UPDATE);
 
 		// create new status update node
-		final Node crrUpdate = NeoUtils.createStatusUpdateNode(this.graph,
-				content.getId());
+		final Node crrUpdate = NeoUtils.createStatusUpdateNode(content.getId());
 
 		// prepare status update for JSON parsing
 		content.setTimestamp(timestamp);

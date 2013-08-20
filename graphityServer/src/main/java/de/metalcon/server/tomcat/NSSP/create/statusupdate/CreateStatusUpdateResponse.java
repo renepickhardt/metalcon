@@ -80,6 +80,18 @@ public class CreateStatusUpdateResponse extends CreateResponse {
 	}
 
 	/**
+	 * add status message: status update instantiation failed
+	 * 
+	 * @param solution
+	 *            detailed description and solution
+	 */
+	public void statusUpdateInstantiationFailed(final String solution) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusCodes.Create.StatusUpdate.STATUS_UPDATE_INSTANTIATION_FAILED,
+				solution);
+	}
+
+	/**
 	 * add status message: create status update succeeded
 	 */
 	public void createStatusUpdateSucceeded() {

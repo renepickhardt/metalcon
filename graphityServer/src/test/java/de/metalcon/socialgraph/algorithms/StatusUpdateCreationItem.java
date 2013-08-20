@@ -2,6 +2,7 @@ package de.metalcon.socialgraph.algorithms;
 
 import org.neo4j.graphdb.Node;
 
+import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.utils.FormItemList;
@@ -31,8 +32,11 @@ public class StatusUpdateCreationItem {
 	 *            status update creator
 	 * @param timestamp
 	 *            status update time stamp
+	 * @throws StatusUpdateInstantiationFailedException
+	 *             if the status update could not be instantiated
 	 */
-	public StatusUpdateCreationItem(final Node user, final long timestamp) {
+	public StatusUpdateCreationItem(final Node user, final long timestamp)
+			throws StatusUpdateInstantiationFailedException {
 		this.user = user;
 
 		final FormItemList values = new FormItemList();

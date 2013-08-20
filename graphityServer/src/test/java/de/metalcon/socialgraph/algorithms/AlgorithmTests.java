@@ -72,7 +72,7 @@ public class AlgorithmTests {
 		try {
 			for (int i = 0; i < USER_IDS.length; i++) {
 				USER_IDS[i] = String.valueOf(i);
-				USERS[i] = NeoUtils.createUserNode(graphDatabase, USER_IDS[i]);
+				USERS[i] = NeoUtils.createUserNode(USER_IDS[i]);
 			}
 			transaction.success();
 		} finally {

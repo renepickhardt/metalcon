@@ -1,6 +1,5 @@
 package de.metalcon.server.exceptions;
 
-
 /**
  * the status update could not be instantiated with the parameters passed in the
  * create status update request
@@ -20,7 +19,7 @@ public class StatusUpdateInstantiationFailedException extends Exception {
 	 */
 	public StatusUpdateInstantiationFailedException(
 			final String salvationDescription) {
-		super("status update instantiation failed");
+		super(salvationDescription);
 	}
 
 }

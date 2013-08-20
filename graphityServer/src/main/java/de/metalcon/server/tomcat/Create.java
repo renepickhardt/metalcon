@@ -178,6 +178,10 @@ public class Create extends GraphityHttpServlet {
 									file.delete();
 								}
 							}
+
+							createStatusUpdateResponse
+									.statusUpdateInstantiationFailed(e
+											.getMessage());
 						} catch (final Exception e) {
 							// TODO: remove exception transparency
 							responder.error(500,

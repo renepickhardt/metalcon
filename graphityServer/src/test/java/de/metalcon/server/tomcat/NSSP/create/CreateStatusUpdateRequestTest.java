@@ -66,7 +66,7 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		final Transaction transaction = graphDatabase.beginTx();
 
 		try {
-			NeoUtils.createStatusUpdateNode(graphDatabase, statusUpdateId);
+			NeoUtils.createStatusUpdateNode(statusUpdateId);
 			transaction.success();
 		} finally {
 			transaction.finish();
@@ -98,9 +98,10 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		if (createRequest == null) {
 			this.jsonResponse = extractJson(createResponse);
 		} else {
-			formItemList.addField(
-					ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
-					userId);
+			formItemList
+					.addField(
+							ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER,
+							userId);
 			formItemList
 					.addField(
 							ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
@@ -123,16 +124,18 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		// missing: create request type
 		this.fillRequest(null, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, VALID_STATUS_UPDATE_TYPE);
-		assertEquals(MISSING_PARAM_BEFORE + ProtocolConstants.Parameters.Create.TYPE
+		assertEquals(MISSING_PARAM_BEFORE
+				+ ProtocolConstants.Parameters.Create.TYPE
 				+ MISSING_PARAM_AFTER,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: user identifier
 		this.fillRequest(VALID_TYPE, null, VALID_STATUS_UPDATE_IDENTIFIER,
 				VALID_STATUS_UPDATE_TYPE);
-		assertEquals(MISSING_PARAM_BEFORE
-				+ ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER
-				+ MISSING_PARAM_AFTER,
+		assertEquals(
+				MISSING_PARAM_BEFORE
+						+ ProtocolConstants.Parameters.Create.StatusUpdate.USER_IDENTIFIER
+						+ MISSING_PARAM_AFTER,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: status update identifier
@@ -147,9 +150,10 @@ public class CreateStatusUpdateRequestTest extends CreateRequestTest {
 		// missing: status update type
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER,
 				VALID_STATUS_UPDATE_IDENTIFIER, null);
-		assertEquals(MISSING_PARAM_BEFORE
-				+ ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE
-				+ MISSING_PARAM_AFTER,
+		assertEquals(
+				MISSING_PARAM_BEFORE
+						+ ProtocolConstants.Parameters.Create.StatusUpdate.STATUS_UPDATE_TYPE
+						+ MISSING_PARAM_AFTER,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
