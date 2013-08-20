@@ -1,4 +1,6 @@
-package de.metalcon.searchServer.Search;
+package de.metalcon.searchServer.Error;
+
+import de.metalcon.searchServer.Search.SearchRequest;
 
 public class NonCompleteSearchRequestSearchError extends SearchError {
 

@@ -11,6 +11,9 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
+import de.metalcon.searchServer.Error.NonCompleteSearchRequestSearchError;
+import de.metalcon.searchServer.Error.SolrServerExceptionSearchError;
+
 public class SearchRequest {
 
     private String query = null;

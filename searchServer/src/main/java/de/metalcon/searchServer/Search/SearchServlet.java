@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONValue;
 
+import de.metalcon.searchServer.Error.SearchError;
+
 public class SearchServlet extends HttpServlet {
 
     final private static long serialVersionUID = 1L;

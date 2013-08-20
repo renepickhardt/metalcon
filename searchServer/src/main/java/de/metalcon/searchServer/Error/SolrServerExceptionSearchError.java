@@ -1,4 +1,4 @@
-package de.metalcon.searchServer.Search;
+package de.metalcon.searchServer.Error;
 
 import org.apache.solr.client.solrj.SolrServerException;
 
