@@ -151,6 +151,12 @@ public class Server implements ServletContextListener {
 		System.out.println("context initialized");
 		this.start();
 
+		final ServletContext context = arg0.getServletContext();
+		context.setAttribute("server", this);
+		this.config.working_path = context.getRealPath("/")
+				+ "WEB-INF/classes/";
+		System.out.println(this.config.working_path);
+
 		// load status update types
 		try {
 			System.out.println("loading status update templates");
@@ -161,9 +167,6 @@ public class Server implements ServletContextListener {
 			System.err.println("failed to load status update templates!");
 			e.printStackTrace();
 		}
-
-		final ServletContext context = arg0.getServletContext();
-		context.setAttribute("server", this);
 
 		final File tmpDir = (File) context
 				.getAttribute("javax.servlet.context.tempdir");
