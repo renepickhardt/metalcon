@@ -32,9 +32,7 @@ public class SearchServlet extends HttpServlet {
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        // This line results in infinite load time:
-        //out.print(JsonPrettyPrinter.prettyPrintJson(JSONValue.toJSONString(result)));
-        out.print(JSONValue.toJSONString(result));
+        out.print(JsonPrettyPrinter.prettyPrintJson(JSONValue.toJSONString(result)));
         out.flush();
     }
     

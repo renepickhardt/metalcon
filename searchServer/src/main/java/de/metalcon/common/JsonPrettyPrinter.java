@@ -26,25 +26,26 @@ public class JsonPrettyPrinter {
         // http://stackoverflow.com/questions/8894258/fastest-way-to-iterate-over-all-the-chars-in-a-string
         for (int i = 0; i != json.length(); ++i) {
             char c = json.charAt(i);
+            
+            switch (c) {
+                case '}':
+                case ']':
+                    --indent;
+                    result += "\n" + strrepeat(" ", indent * tabWidth);
+                    break;
+            }
+            
             result += c;
             
             switch (c) {
                 case '{':
                 case '[':
-                    ++i;
+                    ++indent;
                     result += "\n" + strrepeat(" ", indent * tabWidth);
-                    break;
-                    
-                case '}':
-                case ']':
-                    --i;
                     break;
                     
                 case ',':
                     result += "\n" + strrepeat(" ", indent * tabWidth);
-                    break;
-
-                default:
                     break;
             }
         }
