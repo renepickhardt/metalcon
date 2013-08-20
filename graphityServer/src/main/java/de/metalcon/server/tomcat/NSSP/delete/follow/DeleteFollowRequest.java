@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 import de.metalcon.socialgraph.NeoUtils;
@@ -102,7 +102,7 @@ public class DeleteFollowRequest extends DeleteRequest {
 	private static Node checkUserIdentifier(final HttpServletRequest request,
 			final DeleteFollowResponse response) {
 		final String userId = request
-				.getParameter(NSSProtocol.Parameters.Delete.Follow.USER_IDENTIFIER);
+				.getParameter(ProtocolConstants.Parameters.Delete.Follow.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user != null) {
@@ -130,7 +130,7 @@ public class DeleteFollowRequest extends DeleteRequest {
 			final HttpServletRequest request,
 			final DeleteFollowResponse response) {
 		final String followedId = request
-				.getParameter(NSSProtocol.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER);
+				.getParameter(ProtocolConstants.Parameters.Delete.Follow.FOLLOWED_IDENTIFIER);
 		if (followedId != null) {
 			final Node followed = NeoUtils.getUserByIdentifier(followedId);
 			if (followed != null) {

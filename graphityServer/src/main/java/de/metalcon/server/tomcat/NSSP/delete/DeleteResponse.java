@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.delete;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.Response;
 
 /**
@@ -16,7 +16,7 @@ public class DeleteResponse extends Response {
 	 */
 	public void typeMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Delete.TYPE,
+				ProtocolConstants.Parameters.Delete.TYPE,
 				"Please provide the type of the delete request. Use \""
 						+ DeleteRequestType.USER.getIdentifier()
 						+ "\" to delete a user, \""
@@ -34,7 +34,7 @@ public class DeleteResponse extends Response {
 	 */
 	public void typeInvalid(final String type) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
+				ProtocolConstants.StatusCodes.Delete.TYPE_INVALID,
 				"\"" + type + "\" is not a valid delete request type. Use \""
 						+ DeleteRequestType.USER.getIdentifier()
 						+ "\" to delete a user, \""

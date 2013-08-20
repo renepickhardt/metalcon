@@ -20,6 +20,7 @@ import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
 import de.metalcon.server.Configs;
+import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraphRelationshipType;
 import de.metalcon.utils.FormItemList;
@@ -227,9 +228,15 @@ public class StatusUpdateManager {
 	 * @param values
 	 *            form item list containing all status update items necessary
 	 * @return status update instance of type specified
+	 * @throws StatusUpdateInstantiationFailedException
+	 *             if the status update could not be instantiated with the
+	 *             parameters passed
+	 * @throws IllegalArgumentException
+	 *             if template internal errors occur
 	 */
 	public static StatusUpdate instantiateStatusUpdate(
-			final String typeIdentifier, final FormItemList values) {
+			final String typeIdentifier, final FormItemList values)
+			throws StatusUpdateInstantiationFailedException {
 		final StatusUpdateTemplate template = getStatusUpdateTemplate(typeIdentifier);
 		final Class<?> templateInstantiationClass = template
 				.getInstantiationClass();
@@ -241,17 +248,32 @@ public class StatusUpdateManager {
 
 			// set status update fields
 			String value;
-			for (String fieldName : template.getFields().keySet()) {
-				value = values.getField(fieldName);
-				templateInstantiationClass.getField(fieldName).set(
-						statusUpdate, value);
-			}
+			try {
+				for (String fieldName : template.getFields().keySet()) {
+					try {
+						value = values.getField(fieldName);
+					} catch (final IllegalArgumentException e) {
+						throw new StatusUpdateInstantiationFailedException(
+								e.getMessage());
+					}
+					templateInstantiationClass.getField(fieldName).set(
+							statusUpdate, value);
+				}
 
-			// set status update file paths
-			for (String fileName : template.getFiles().keySet()) {
-				value = values.getFile(fileName).getAbsoluteFilePath();
-				templateInstantiationClass.getField(fileName).set(statusUpdate,
-						value);
+				// set status update file paths
+				for (String fileName : template.getFiles().keySet()) {
+					try {
+						value = values.getFile(fileName).getAbsoluteFilePath();
+					} catch (final IllegalArgumentException e) {
+						throw new StatusUpdateInstantiationFailedException(
+								e.getMessage());
+					}
+					templateInstantiationClass.getField(fileName).set(
+							statusUpdate, value);
+				}
+			} catch (final IllegalArgumentException e) {
+				throw new StatusUpdateInstantiationFailedException(
+						"The types of the parameters passed do not match the status update template.");
 			}
 
 			return statusUpdate;

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.simple.JSONObject;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -85,15 +86,16 @@ public class AlgorithmTest {
 	 * @return list containing the status update messages
 	 */
 	protected static List<Long> extractStatusUpdateMessages(
-			final List<String> activities) {
+			final List<JSONObject> activities) {
 		final List<Long> statusUpdateMessages = new LinkedList<Long>();
 
 		int index;
-		String message;
-		for (String activity : activities) {
-			index = activity.indexOf("message");
-			message = activity.substring(index + 10,
-					activity.indexOf("}", index) - 1);
+		String jsonString, message;
+		for (JSONObject activity : activities) {
+			jsonString = activity.toJSONString();
+			index = jsonString.indexOf("message");
+			message = jsonString.substring(index + 10,
+					jsonString.indexOf("}", index) - 1);
 			statusUpdateMessages.add(Long.valueOf(message));
 		}
 
@@ -109,7 +111,7 @@ public class AlgorithmTest {
 	 *            list of status updates in Activity JSON format
 	 */
 	protected static void compareValues(final long[] messages,
-			final List<String> activities) {
+			final List<JSONObject> activities) {
 		final List<Long> statusUpdateNodeMessages = extractStatusUpdateMessages(activities);
 		assertEquals(statusUpdateNodeMessages.size(), messages.length);
 

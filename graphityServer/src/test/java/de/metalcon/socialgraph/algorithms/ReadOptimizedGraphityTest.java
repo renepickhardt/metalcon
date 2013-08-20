@@ -3,18 +3,21 @@ package de.metalcon.socialgraph.algorithms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 
+import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.Properties;
@@ -124,18 +127,22 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 	public void testCreateStatusUpdate_Regular() {
 		// prepare for status update creation
 		final List<StatusUpdateCreationItem> creates = new LinkedList<StatusUpdateCreationItem>();
-		creates.add(new StatusUpdateCreationItem(this.USER_B, 4));
-		creates.add(new StatusUpdateCreationItem(this.USER_D, 5));
-		creates.add(new StatusUpdateCreationItem(this.USER_C, 6));
-		creates.add(new StatusUpdateCreationItem(this.USER_C, 7));
-		creates.add(new StatusUpdateCreationItem(this.USER_D, 8));
-		creates.add(new StatusUpdateCreationItem(this.USER_A, 9));
-		creates.add(new StatusUpdateCreationItem(this.USER_B, 10));
-		creates.add(new StatusUpdateCreationItem(this.USER_D, 11));
-		creates.add(new StatusUpdateCreationItem(this.USER_B, 12));
-		creates.add(new StatusUpdateCreationItem(this.USER_C, 13));
-		creates.add(new StatusUpdateCreationItem(this.USER_A, 14));
-		creates.add(new StatusUpdateCreationItem(this.USER_A, 17));
+		try {
+			creates.add(new StatusUpdateCreationItem(this.USER_B, 4));
+			creates.add(new StatusUpdateCreationItem(this.USER_D, 5));
+			creates.add(new StatusUpdateCreationItem(this.USER_C, 6));
+			creates.add(new StatusUpdateCreationItem(this.USER_C, 7));
+			creates.add(new StatusUpdateCreationItem(this.USER_D, 8));
+			creates.add(new StatusUpdateCreationItem(this.USER_A, 9));
+			creates.add(new StatusUpdateCreationItem(this.USER_B, 10));
+			creates.add(new StatusUpdateCreationItem(this.USER_D, 11));
+			creates.add(new StatusUpdateCreationItem(this.USER_B, 12));
+			creates.add(new StatusUpdateCreationItem(this.USER_C, 13));
+			creates.add(new StatusUpdateCreationItem(this.USER_A, 14));
+			creates.add(new StatusUpdateCreationItem(this.USER_A, 17));
+		} catch (final StatusUpdateInstantiationFailedException e) {
+			fail();
+		}
 
 		long timestamp;
 		int statusUpdateIdInt = 0;
@@ -171,7 +178,7 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 			assertEquals(
 					statusUpdateNode
 							.getProperty(Properties.StatusUpdate.CONTENT),
-					statusUpdate.toJSONString());
+					statusUpdate.toJSONObject());
 
 			// prevent the time stamps from being equal
 			AlgorithmTest.waitMs(2);
@@ -215,7 +222,7 @@ public class ReadOptimizedGraphityTest extends AlgorithmTest {
 
 	@Test
 	public void testReadStatusUpdates_Regular() {
-		List<String> activities;
+		List<JSONObject> activities;
 
 		// assert success if reading from users without status updates
 		activities = this.algorithm.readStatusUpdates(this.USER_A, this.USER_A,

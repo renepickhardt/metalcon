@@ -2,6 +2,7 @@ package de.metalcon.socialgraph;
 
 import java.util.List;
 
+import org.json.simple.JSONObject;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -54,7 +55,7 @@ public abstract class SocialGraph {
 	 */
 	public void createUser(final String userId, final String displayName,
 			final String profilePicturePath) {
-		final Node user = NeoUtils.createUserNode(this.graph, userId);
+		final Node user = NeoUtils.createUserNode(userId);
 		user.setProperty(Properties.User.DISPLAY_NAME, displayName);
 		user.setProperty(Properties.User.PROFILE_PICTURE_PATH,
 				profilePicturePath);
@@ -97,7 +98,7 @@ public abstract class SocialGraph {
 	 * @return list containing numItems status update Activities<br>
 	 *         (Activitystrea.ms)
 	 */
-	public abstract List<String> readStatusUpdates(Node poster, Node user,
+	public abstract List<JSONObject> readStatusUpdates(Node poster, Node user,
 			int numItems, boolean ownUpdates);
 
 	/**

@@ -14,7 +14,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
 import de.metalcon.server.Configs;
 import de.metalcon.server.Server;
-import de.metalcon.server.exceptions.create.statusupdate.StatusUpdateInstantiationFailedException;
+import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.server.statusupdates.StatusUpdateTemplate;
@@ -27,7 +27,6 @@ import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateRequ
 import de.metalcon.server.tomcat.NSSP.create.statusupdate.CreateStatusUpdateResponse;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserRequest;
 import de.metalcon.server.tomcat.NSSP.create.user.CreateUserResponse;
-import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.CreateFollow;
 import de.metalcon.socialgraph.operations.CreateStatusUpdate;
 import de.metalcon.socialgraph.operations.CreateUser;
@@ -80,7 +79,8 @@ public class Create extends GraphityHttpServlet {
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
-		final ClientResponder responder = new TomcatClientResponder(response);
+		final TomcatClientResponder responder = new TomcatClientResponder(
+				response);
 
 		CreateResponse createResponse = new CreateResponse();
 		FormItemList formItemList = null;
@@ -178,9 +178,15 @@ public class Create extends GraphityHttpServlet {
 									file.delete();
 								}
 							}
+
+							createStatusUpdateResponse
+									.statusUpdateInstantiationFailed(e
+											.getMessage());
 						} catch (final Exception e) {
+							// TODO: remove exception transparency
 							responder.error(500,
-									"errors encountered while writing files");
+									"errors encountered while writing files: "
+											+ e.getMessage());
 						}
 					}
 					break;
@@ -200,6 +206,9 @@ public class Create extends GraphityHttpServlet {
 		} else {
 			createResponse.noMultipartRequest();
 		}
+
+		responder.addLine(createResponse.toString());
+		responder.finish();
 	}
 
 	/**

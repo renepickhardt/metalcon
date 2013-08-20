@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.create;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.Response;
 
 /**
@@ -16,7 +16,7 @@ public class CreateResponse extends Response {
 	 */
 	public void noMultipartRequest() {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.NO_MULTIPART_REQUEST,
+				ProtocolConstants.StatusCodes.Create.NO_MULTIPART_REQUEST,
 				"Please use a multipart form to execute your request.");
 	}
 
@@ -25,7 +25,7 @@ public class CreateResponse extends Response {
 	 */
 	public void typeMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Create.TYPE,
+				ProtocolConstants.Parameters.Create.TYPE,
 				"Please provide the type of the create request. Use \""
 						+ CreateRequestType.USER.getIdentifier()
 						+ "\" to create a user, \""
@@ -43,7 +43,7 @@ public class CreateResponse extends Response {
 	 */
 	public void typeInvalid(final String type) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Create.TYPE_INVALID,
+				ProtocolConstants.StatusCodes.Create.TYPE_INVALID,
 				"\"" + type + "\" is not a valid create request type. Use \""
 						+ CreateRequestType.USER.getIdentifier()
 						+ "\" to create a user, \""

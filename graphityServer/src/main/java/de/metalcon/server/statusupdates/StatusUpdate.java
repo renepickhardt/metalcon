@@ -117,16 +117,17 @@ public abstract class StatusUpdate {
 	 *         (Activitystrea.ms)
 	 */
 	@SuppressWarnings("unchecked")
-	public String toJSONString() {
+	public JSONObject toJSONObject() {
 		final JSONObject activity = new JSONObject();
 
 		// parse time stamp
 		activity.put("published",
 				dateFormatter.format(new Date(this.timestamp)));
 
+		// TODO: check performance
 		// parse user
-		final Map<String, Object> user = this.creator.toActorJSON();
-		activity.put("actor", user);
+		// final Map<String, Object> user = this.creator.toActorJSON();
+		// activity.put("actor", user);
 
 		// parse verb:read
 		activity.put("verb", "read");
@@ -135,7 +136,7 @@ public abstract class StatusUpdate {
 		final Map<String, Object> object = this.toObjectJSON();
 		activity.put("object", object);
 
-		return activity.toJSONString();
+		return activity;
 	}
 
 	/**

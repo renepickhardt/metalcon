@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.metalcon.server.tomcat.NSSP.read.ReadRequest;
 import de.metalcon.server.tomcat.NSSP.read.ReadResponse;
-import de.metalcon.socialgraph.operations.ClientResponder;
 import de.metalcon.socialgraph.operations.ReadStatusUpdates;
 
 /**
@@ -27,7 +26,8 @@ public class Read extends GraphityHttpServlet {
 	protected void doGet(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
-		final ClientResponder responder = new TomcatClientResponder(response);
+		final TomcatClientResponder responder = new TomcatClientResponder(
+				response);
 
 		final ReadResponse readResponse = new ReadResponse();
 		final ReadRequest readRequestObject = ReadRequest.checkRequest(request,

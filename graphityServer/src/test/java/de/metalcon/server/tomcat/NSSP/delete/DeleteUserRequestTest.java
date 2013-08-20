@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserRequest;
 import de.metalcon.server.tomcat.NSSP.delete.user.DeleteUserResponse;
 
@@ -25,7 +25,7 @@ public class DeleteUserRequestTest extends DeleteRequestTest {
 	private DeleteUserRequest deleteUserRequest;
 
 	private void fillRequest(final String type, final String userId) {
-		when(this.request.getParameter(NSSProtocol.Parameters.Delete.TYPE))
+		when(this.request.getParameter(ProtocolConstants.Parameters.Delete.TYPE))
 				.thenReturn(type);
 		final DeleteResponse deleteResponse = new DeleteResponse();
 		final DeleteRequest deleteRequest = DeleteRequest.checkRequest(
@@ -36,7 +36,7 @@ public class DeleteUserRequestTest extends DeleteRequestTest {
 		} else {
 			when(
 					this.request
-							.getParameter(NSSProtocol.Parameters.Delete.User.USER_IDENTIFIER))
+							.getParameter(ProtocolConstants.Parameters.Delete.User.USER_IDENTIFIER))
 					.thenReturn(userId);
 			final DeleteUserResponse deleteUserResponse = new DeleteUserResponse();
 			this.deleteUserRequest = DeleteUserRequest.checkRequest(
@@ -49,45 +49,45 @@ public class DeleteUserRequestTest extends DeleteRequestTest {
 	public void testParameterMissing() {
 		// missing: delete request type
 		this.fillRequest(null, VALID_USER_IDENTIFIER);
-		assertEquals(MISSING_PARAM_BEFORE + NSSProtocol.Parameters.Delete.TYPE
+		assertEquals(MISSING_PARAM_BEFORE + ProtocolConstants.Parameters.Delete.TYPE
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 		// missing: user identifier
 		this.fillRequest(VALID_TYPE, null);
 		assertEquals(MISSING_PARAM_BEFORE
-				+ NSSProtocol.Parameters.Delete.User.USER_IDENTIFIER
+				+ ProtocolConstants.Parameters.Delete.User.USER_IDENTIFIER
 				+ MISSING_PARAM_AFTER,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testDeleteTypeValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER);
-		assertFalse(NSSProtocol.StatusCodes.Delete.TYPE_INVALID
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Delete.TYPE_INVALID
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testDeleteTypeInvalid() {
 		this.fillRequest(INVALID_TYPE, VALID_USER_IDENTIFIER);
-		assertEquals(NSSProtocol.StatusCodes.Delete.TYPE_INVALID,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Delete.TYPE_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.deleteUserRequest);
 	}
 
 	@Test
 	public void testUserIdentifierValid() {
 		this.fillRequest(VALID_TYPE, VALID_USER_IDENTIFIER);
-		assertFalse(NSSProtocol.StatusCodes.Delete.User.USER_NOT_EXISTING
-				.equals(this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE)));
+		assertFalse(ProtocolConstants.StatusCodes.Delete.User.USER_NOT_EXISTING
+				.equals(this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE)));
 	}
 
 	@Test
 	public void testUserIdentifierInvalid() {
 		this.fillRequest(VALID_TYPE, INVALID_USER_IDENTIFIER);
-		assertEquals(NSSProtocol.StatusCodes.Delete.User.USER_NOT_EXISTING,
-				this.jsonResponse.get(NSSProtocol.STATUS_MESSAGE));
+		assertEquals(ProtocolConstants.StatusCodes.Delete.User.USER_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 		assertNull(this.deleteUserRequest);
 	}
 

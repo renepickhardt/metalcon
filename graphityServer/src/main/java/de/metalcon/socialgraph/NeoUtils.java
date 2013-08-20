@@ -204,20 +204,17 @@ public class NeoUtils {
 	}
 
 	/**
-	 * create a user node in a database
+	 * create a user node in the active database
 	 * 
-	 * @param graphDB
-	 *            social graph database to operate on
 	 * @param userId
 	 *            user identifier
 	 * @return user node having its identifier stored
 	 * @throws IllegalArgumentException
 	 *             if the identifier is already in use
 	 */
-	public static Node createUserNode(final AbstractGraphDatabase graphDB,
-			final String userId) {
+	public static Node createUserNode(final String userId) {
 		if (INDEX_USERS.get(IDENTIFIER, userId).getSingle() == null) {
-			final Node user = graphDB.createNode();
+			final Node user = DATABASE.createNode();
 			user.setProperty(Properties.User.IDENTIFIER, userId);
 			INDEX_USERS.add(user, IDENTIFIER, userId);
 			return user;
@@ -228,20 +225,17 @@ public class NeoUtils {
 	}
 
 	/**
-	 * create a status update node in a database
+	 * create a status update node in the active database
 	 * 
-	 * @param graphDB
-	 *            social graph database to operate on
 	 * @param statusUpdateId
 	 *            status update identifier
 	 * @return status update node having its identifier stored
 	 * @throws IllegalArgumentException
 	 *             if the identifier is already in use
 	 */
-	public static Node createStatusUpdateNode(
-			final AbstractGraphDatabase graphDB, final String statusUpdateId) {
+	public static Node createStatusUpdateNode(final String statusUpdateId) {
 		if (INDEX_STATUS_UPDATES.get(IDENTIFIER, statusUpdateId).getSingle() == null) {
-			final Node statusUpdate = graphDB.createNode();
+			final Node statusUpdate = DATABASE.createNode();
 			statusUpdate.setProperty(Properties.StatusUpdate.IDENTIFIER,
 					statusUpdateId);
 			INDEX_STATUS_UPDATES.add(statusUpdate, IDENTIFIER, statusUpdateId);
@@ -316,21 +310,6 @@ public class NeoUtils {
 			final String templateId) {
 		return INDEX_STATUS_UPDATE_TEMPLATES.get(IDENTIFIER, templateId)
 				.getSingle();
-	}
-
-	/**
-	 * fixed identifiers for special nodes
-	 * 
-	 * @author sebschlicht
-	 * 
-	 */
-	public class NodeIdentifiers {
-
-		/**
-		 * database root node
-		 */
-		public static final long ROOT = 0;
-
 	}
 
 }

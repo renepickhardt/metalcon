@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.graphdb.Node;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequest;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteRequestType;
 import de.metalcon.socialgraph.NeoUtils;
@@ -80,7 +80,7 @@ public class DeleteUserRequest extends DeleteRequest {
 	private static Node checkUserIdentifier(final HttpServletRequest request,
 			final DeleteUserResponse response) {
 		final String userId = request
-				.getParameter(NSSProtocol.Parameters.Delete.User.USER_IDENTIFIER);
+				.getParameter(ProtocolConstants.Parameters.Delete.User.USER_IDENTIFIER);
 		if (userId != null) {
 			final Node user = NeoUtils.getUserByIdentifier(userId);
 			if (user != null) {

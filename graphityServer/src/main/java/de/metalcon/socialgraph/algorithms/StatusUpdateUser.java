@@ -1,10 +1,16 @@
 package de.metalcon.socialgraph.algorithms;
 
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.neo4j.graphdb.Node;
 
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.Properties;
 import de.metalcon.socialgraph.SocialGraphRelationshipType;
+import de.metalcon.socialgraph.User;
 
 /**
  * user used within first social networking approach's reading process
@@ -13,6 +19,21 @@ import de.metalcon.socialgraph.SocialGraphRelationshipType;
  * 
  */
 public class StatusUpdateUser {
+
+	/**
+	 * String to JSON parser
+	 */
+	private static final JSONParser JSON_PARSER = new JSONParser();
+
+	/**
+	 * status update creator JSON Map
+	 */
+	private Map<String, Object> userJSON;
+
+	/**
+	 * status update creator node
+	 */
+	private final Node userNode;
 
 	/**
 	 * last recent status update node of the user
@@ -27,11 +48,12 @@ public class StatusUpdateUser {
 	/**
 	 * create a new user for the reading process
 	 * 
-	 * @param user
+	 * @param userNode
 	 *            user node represented
 	 */
-	public StatusUpdateUser(final Node user) {
-		this.nextStatusUpdateNode = user;
+	public StatusUpdateUser(final Node userNode) {
+		this.userNode = userNode;
+		this.nextStatusUpdateNode = userNode;
 
 		this.nextStatusUpdate();
 	}
@@ -68,9 +90,24 @@ public class StatusUpdateUser {
 	 * 
 	 * @return status update loaded before
 	 */
-	public String getStatusUpdate() {
-		final String statusUpdate = (String) this.nextStatusUpdateNode
-				.getProperty(Properties.StatusUpdate.CONTENT);
+	@SuppressWarnings("unchecked")
+	public JSONObject getStatusUpdate() {
+		JSONObject statusUpdate = null;
+		try {
+			statusUpdate = (JSONObject) JSON_PARSER
+					.parse((String) this.nextStatusUpdateNode
+							.getProperty(Properties.StatusUpdate.CONTENT));
+		} catch (final ParseException e) {
+			e.printStackTrace();
+		}
+
+		// (create and) add user object
+		if (this.userJSON == null) {
+			final User user = new User(this.userNode);
+			this.userJSON = user.toActorJSON();
+		}
+		statusUpdate.put("actor", this.userJSON);
+
 		this.nextStatusUpdate();
 		return statusUpdate;
 	}

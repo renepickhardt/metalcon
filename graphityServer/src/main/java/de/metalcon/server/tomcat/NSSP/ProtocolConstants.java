@@ -1,4 +1,4 @@
-package de.metalcon.server.tomcat;
+package de.metalcon.server.tomcat.NSSP;
 
 /**
  * NewsStreamServerProtocol constants
@@ -6,7 +6,7 @@ package de.metalcon.server.tomcat;
  * @author sebschlicht
  * 
  */
-public class NSSProtocol {
+public class ProtocolConstants {
 
 	/**
 	 * JSON field name for the status message

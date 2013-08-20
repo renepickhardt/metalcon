@@ -2,6 +2,8 @@ package de.metalcon.socialgraph.operations;
 
 import java.util.List;
 
+import org.json.simple.JSONObject;
+
 import de.metalcon.server.tomcat.GraphityHttpServlet;
 import de.metalcon.server.tomcat.NSSP.read.ReadRequest;
 import de.metalcon.server.tomcat.NSSP.read.ReadResponse;
@@ -44,7 +46,7 @@ public class ReadStatusUpdates extends SocialGraphOperation {
 
 	@Override
 	protected boolean execute(final SocialGraph graph) {
-		final List<String> activities = graph.readStatusUpdates(
+		final List<JSONObject> activities = graph.readStatusUpdates(
 				this.request.getPoster(), this.user,
 				this.request.getNumItems(), this.request.getOwnUpdates());
 

@@ -1,6 +1,6 @@
 package de.metalcon.server.tomcat.NSSP.delete.statusupdate;
 
-import de.metalcon.server.tomcat.NSSProtocol;
+import de.metalcon.server.tomcat.NSSP.ProtocolConstants;
 import de.metalcon.server.tomcat.NSSP.delete.DeleteResponse;
 
 /**
@@ -16,7 +16,7 @@ public class DeleteStatusUpdateResponse extends DeleteResponse {
 	 */
 	public void userIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Delete.StatusUpdate.USER_IDENTIFIER,
+				ProtocolConstants.Parameters.Delete.StatusUpdate.USER_IDENTIFIER,
 				"Please provide a user identifier matching to an existing user.");
 	}
 
@@ -25,7 +25,7 @@ public class DeleteStatusUpdateResponse extends DeleteResponse {
 	 */
 	public void statusUpdateIdentifierMissing() {
 		this.parameterMissing(
-				NSSProtocol.Parameters.Delete.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
+				ProtocolConstants.Parameters.Delete.StatusUpdate.STATUS_UPDATE_IDENTIFIER,
 				"Please provide a status update identifier matching to an existing status update.");
 	}
 
@@ -37,7 +37,7 @@ public class DeleteStatusUpdateResponse extends DeleteResponse {
 	 */
 	public void userIdentifierInvalid(final String userId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Delete.StatusUpdate.USER_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Delete.StatusUpdate.USER_NOT_EXISTING,
 				"there is no user with the identifier \"" + userId
 						+ "\". Please provide a valid user identifier.");
 	}
@@ -50,7 +50,7 @@ public class DeleteStatusUpdateResponse extends DeleteResponse {
 	 */
 	public void statusUpdateIdentifierInvalid(final String statusUpdateId) {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Delete.StatusUpdate.STATUS_UPDATE_NOT_EXISTING,
+				ProtocolConstants.StatusCodes.Delete.StatusUpdate.STATUS_UPDATE_NOT_EXISTING,
 				"there is no status update with the identifier \""
 						+ statusUpdateId
 						+ "\". Please provide a valid status update identifier.");
@@ -61,7 +61,7 @@ public class DeleteStatusUpdateResponse extends DeleteResponse {
 	 */
 	public void deleteStatusUpdateSucceeded() {
 		this.addStatusMessage(
-				NSSProtocol.StatusCodes.Delete.StatusUpdate.SUCCEEDED, "");
+				ProtocolConstants.StatusCodes.Delete.StatusUpdate.SUCCEEDED, "");
 	}
 
 }
