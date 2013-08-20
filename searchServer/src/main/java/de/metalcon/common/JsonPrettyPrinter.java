@@ -13,7 +13,7 @@ public class JsonPrettyPrinter {
     }
     
     public static String prettyPrintJson(String json) {
-        int tabWidth = 2;
+        int tabWidth = 4;
         
         int     indent   = 0;
         boolean inString = false;
