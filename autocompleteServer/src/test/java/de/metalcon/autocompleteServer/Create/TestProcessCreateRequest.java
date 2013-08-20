@@ -50,30 +50,53 @@ public class TestProcessCreateRequest {
 	// status.
 
 	@Test
+	public void testFullFormWithImage() {
+
+		// TODO insert base64 encoded image
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
+				.getContainer().getKey());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				testResponse.getContainer().getSuggestString());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				testResponse.getContainer().getWeight().toString());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
+				.getContainer().getIndexName());
+		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
+				testResponse.getResponse().toString());
+		// assert image is B64 encoded and not null
+	}
+
+	@Test
 	public void testFullFormWithoutImage() {
 
 		ProcessCreateResponse testResponse = this.processTestRequest(
 				ProtocolTestConstants.VALID_SUGGESTION_KEY,
 				ProtocolTestConstants.VALID_SUGGESTION_STRING,
 				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				ProtocolTestConstants.VALID_SUGGESTION_INDEX);
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
 
-		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
-				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
-				testResponse.getResponse().toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
 				.getContainer().getKey());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
 				testResponse.getContainer().getSuggestString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				testResponse.getContainer().getWeight());
+				testResponse.getContainer().getWeight().toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
 				.getContainer().getIndexName());
-
+		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
+				testResponse.getResponse().toString());
 	}
 
 	private ProcessCreateResponse processTestRequest(String key, String term,
-			String weight, String index) {
+			String weight, String index, String imageBase64) {
 
 		ProcessCreateResponse response = new ProcessCreateResponse(
 				this.servletConfig.getServletContext());
@@ -82,6 +105,7 @@ public class TestProcessCreateRequest {
 		testItems.addField(ProtocolConstants.SUGGESTION_STRING, term);
 		testItems.addField(ProtocolConstants.SUGGESTION_WEIGHT, weight);
 		testItems.addField(ProtocolConstants.INDEX_PARAMETER, index);
+		testItems.addField(ProtocolConstants.IMAGE, imageBase64);
 
 		return ProcessCreateRequest.checkRequestParameter(testItems, response,
 				this.servletConfig.getServletContext());
