@@ -164,10 +164,14 @@ public class StatusUpdateManager {
 
 		// crawl XML files
 		StatusUpdateTemplate template, previousTemplate;
-		final File[] xmlFiles = loadXmlFiles(new File(config.templatesPath()));
+		final File templatesDir = new File(config.templatesPath());
+		if (!templatesDir.exists()) {
+			templatesDir.mkdir();
+		}
+		final File[] xmlFiles = loadXmlFiles(templatesDir);
 
 		// create basic status update template
-		if (xmlFiles == null) {
+		if (xmlFiles.length == 0) {
 			final File plainTemplate = new File(config.templatesPath()
 					+ "Plain.xml");
 			final PrintWriter writer = new PrintWriter(plainTemplate);
