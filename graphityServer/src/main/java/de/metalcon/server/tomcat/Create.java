@@ -179,8 +179,10 @@ public class Create extends GraphityHttpServlet {
 								}
 							}
 						} catch (final Exception e) {
+							// TODO: remove exception transparency
 							responder.error(500,
-									"errors encountered while writing files");
+									"errors encountered while writing files: "
+											+ e.getMessage());
 						}
 					}
 					break;
