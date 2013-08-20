@@ -58,8 +58,9 @@ public class TestProcessCreateRequest {
 				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
 				ProtocolTestConstants.VALID_SUGGESTION_INDEX);
 
-		assertEquals("\"Status\":\"OK\",\"term\":\"test\"}", testResponse
-				.getResponse().toString());
+		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+				+ "\"Warning:noImage\"" + ":" + "No image inserted" + "}",
+				testResponse.getResponse().toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
 				.getContainer().getKey());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,

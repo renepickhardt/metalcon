@@ -16,7 +16,7 @@ public class CreateStatusCodes {
 	public static final String WEIGHT_NOT_GIVEN = "weight not given";
 	public static final String WEIGHT_NOT_A_NUMBER = "weight is NaN";
 	public static final String SUGGESTION_KEY_NOT_GIVEN = "Suggestion key not given";
-	public static final String NO_IMAGE = "no image";
+	public static final String NO_IMAGE = "No image inserted";
 	public static final String IMAGE_GEOMETRY_TOO_BIG = "your image is too big";
 	public static final String IMAGE_FILE_TOO_LARGE = "your image file is too big";
 	public static final String KEY_TOO_LONG = "key too long";
