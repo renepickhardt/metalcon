@@ -1,6 +1,6 @@
 package de.metalcon.autocompleteServer.Create;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -11,27 +11,32 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
+import de.metalcon.utils.FormItemList;
 
 public class TestProcessCreateRequest {
 
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 	final private ServletContext servletContext = mock(ServletContext.class);
 
-	SuggestTree generalIndex = new SuggestTree(7);
-	
-	private HttpServletRequest initializeTest() {
+	private HttpServletRequest request;
 
-		HttpServletRequest request = mock(HttpServletRequest.class);
+	@Before
+	public void initializeTest() {
+
+		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
-		when(this.servletConfig.getServletContext()).thenReturn(
-				this.servletContext);
-
-	//	SuggestTree generalIndex = new SuggestTree(7);
+		SuggestTree generalIndex = new SuggestTree(7);
+		when(
+				this.servletContext
+						.getAttribute(ProtocolConstants.INDEX_PARAMETER
+								+ "testIndex")).thenReturn(generalIndex);
 
 		try {
 			servlet.init(this.servletConfig);
@@ -39,72 +44,45 @@ public class TestProcessCreateRequest {
 			fail("could not initialize servlet");
 			e.printStackTrace();
 		}
-		return request;
 	}
 
-	@Test
-	public void testContainerRun() {
-		
-		//TODO: include an image to this test or make another one with an image
-		HttpServletRequest request = this.initializeTest();
-		ProcessCreateResponse response = ProcessCreateRequest
-				.checkRequestParameter(request,
-						this.servletConfig.getServletContext());
-		
-		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
-		
-		suggestTreeCreateRequestContainer.setSuggestString("testband");
-		suggestTreeCreateRequestContainer.setIndexName("testIndex");
-		suggestTreeCreateRequestContainer.setKey("testkey");
-		suggestTreeCreateRequestContainer.setWeight(1);
-		
-		suggestTreeCreateRequestContainer.run(this.servletConfig.getServletContext());
-		
-		String retrieveResponse = generalIndex.getBestSuggestions("test").toString();
-		
-		//FIXME: insert correct response-string.
-		//assertTrue(output.equals("testband, testIndex, testkey"));
-		
-	}
-	
-	
+	// TODO: add tests according to protocol specifications. Check each possible
+	// status.
+
 	@Test
 	public void testFullFormWithoutImage() {
-		HttpServletRequest request = this.initializeTest();
 
-		when(request.getParameter("term")).thenReturn("testband");
-		when(request.getParameter("key")).thenReturn("testkey");
-		when(request.getParameter("weight")).thenReturn("1");
-		when(request.getParameter("index")).thenReturn("testIndex");
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX);
 
-		ProcessCreateResponse response = ProcessCreateRequest
-				.checkRequestParameter(request,
-						this.servletConfig.getServletContext());
+		assertEquals("\"Status\":\"OK\",\"term\":\"test\"}", testResponse
+				.getResponse().toString());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
+				.getContainer().getKey());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				testResponse.getContainer().getSuggestString());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				testResponse.getContainer().getWeight());
+		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
+				.getContainer().getIndexName());
 
-		// if (response != null) {
-		// if (response.getContainer() != null) {
-		// CreateRequestContainer resp = response.getContainer();
-		// if (resp.getKey() != null) {
-		// assertTrue(response.getContainer().getKey()
-		// .equals("testkey"));
-		// } else {
-		// System.out.println(response.getResponse().toString());
-		// System.out.println("key null");
-		// }
-		// } else {
-		// System.out.println("resp null");
-		// }
-		// } else {
-		// System.out.println("response null");
-		// }
+	}
 
-		// FIXME: The Form-check recognizes this not being actual form-data and
-		// thus throws its exception
-		assertTrue(response.getContainer().getKey().equals("testKey"));
-		assertTrue(response.getContainer().getSuggestString()
-				.equals("testband"));
-		assertTrue(response.getContainer().getWeight().equals("1"));
-		assertTrue(response.getContainer().getIndexName().equals("testIndex"));
+	private ProcessCreateResponse processTestRequest(String key, String term,
+			String weight, String index) {
 
+		ProcessCreateResponse response = new ProcessCreateResponse(
+				this.servletConfig.getServletContext());
+		FormItemList testItems = new FormItemList();
+		testItems.addField(ProtocolConstants.SUGGESTION_KEY, key);
+		testItems.addField(ProtocolConstants.SUGGESTION_STRING, term);
+		testItems.addField(ProtocolConstants.SUGGESTION_WEIGHT, weight);
+		testItems.addField(ProtocolConstants.INDEX_PARAMETER, index);
+
+		return ProcessCreateRequest.checkRequestParameter(testItems, response,
+				this.servletConfig.getServletContext());
 	}
 }

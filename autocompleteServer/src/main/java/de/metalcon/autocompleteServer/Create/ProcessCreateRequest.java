@@ -1,17 +1,7 @@
 package de.metalcon.autocompleteServer.Create;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,9 +9,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
+import de.metalcon.utils.FormFile;
+import de.metalcon.utils.FormItemList;
 
 /**
  * 
@@ -29,21 +20,41 @@ import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
  * 
  */
 public class ProcessCreateRequest {
+
+	/**
+	 * 
+	 */
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
-	public static ProcessCreateResponse checkRequestParameter(
+	public static ProcessCreateResponse handleServlet(
 			HttpServletRequest request, ServletContext context) {
 		ProcessCreateResponse response = new ProcessCreateResponse(context);
-		System.out.println("HELP");
-		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
-//		if (!checkIsMultiPart(request, response)) {
-//			return response;
-//		}
+		FormItemList items = null;
+		try {
+			items = FormItemList.extractFormItems(request, factory);
+		} catch (FileUploadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// items is == null, when request is not multipart
+		if (items == null) {
+			response.addError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
+			// TODO double-check if return correct
+			return response;
+		}
+
+		return checkRequestParameter(items, response, context);
+	}
+
+	public static ProcessCreateResponse checkRequestParameter(
+			FormItemList items, ProcessCreateResponse response,
+			ServletContext context) {
+		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.
-		final FormItemList items = extractFormItems(request);
 		String suggestionString = checkSuggestionString(items, response);
 		if (suggestionString == null) {
 			suggestTreeCreateRequestContainer = null;
@@ -57,7 +68,7 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.setIndexName(indexName);
 
 		String suggestionKey = checkSuggestionKey(items, response);
-		//response.addSuggestionKeyToContainer(suggestionKey);
+		// response.addSuggestionKeyToContainer(suggestionKey);
 		suggestTreeCreateRequestContainer.setKey(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
@@ -91,12 +102,12 @@ public class ProcessCreateRequest {
 		FormFile image = null;
 		String imageB64 = null;
 		FileItem imageFile;
-		//FormItem imageFile = null;
+		// FormItem imageFile = null;
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
 			imageFile = image.getFormItem();
-//			imageFile = image.get;
+			// imageFile = image.get;
 		} catch (IllegalArgumentException e) {
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
@@ -106,10 +117,10 @@ public class ProcessCreateRequest {
 		byte[] tmp = null;
 		try {
 			int size = imageFile.getInputStream().read(buffer);
-			if (size > 0){
-				//System.out.println(buffer);
+			if (size > 0) {
+				// System.out.println(buffer);
 				tmp = new byte[size];
-				for (int i = 0;i< size; i++){
+				for (int i = 0; i < size; i++) {
 					tmp[i] = buffer[i];
 				}
 			}
@@ -117,68 +128,67 @@ public class ProcessCreateRequest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if (tmp!=null){
+
+		if (tmp != null) {
 			byte[] base64EncodedImage = Base64.encodeBase64(tmp);
 			imageB64 = new String(base64EncodedImage);
-		}
-		else {
+		} else {
 			return null;
 		}
-		
-		
-		
-//		BufferedImage bufferedImage = null;
-//		FileReader fileReader = null;
-//		try {
-//			fileReader = new FileReader(imageFile);
-//		} catch (IOException e2) {
-//			// TODO Auto-generated catch block
-//			e2.printStackTrace();
-//			return null;
-//		}
+
+		// BufferedImage bufferedImage = null;
+		// FileReader fileReader = null;
+		// try {
+		// fileReader = new FileReader(imageFile);
+		// } catch (IOException e2) {
+		// // TODO Auto-generated catch block
+		// e2.printStackTrace();
+		// return null;
+		// }
 		// maybe there is a better way for verifying image encoding than MIME?
-//		String mimeType = new MimetypesFileTypeMap().getContentType(imageFile);
-//		if (!(mimeType.equals("image/JPEG"))) {
-//			try {
-//				fileReader.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			return null;
-//		}
-//
-//		long fileLength = imageFile.length();
-//		char[] cbuf = null;
-//		try {
-//			fileReader.read(cbuf, 0, (int) fileLength);
-//			fileReader.close();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//			return null;
-//		}
-//		byte[] rawImageData = new byte[(int) fileLength];
-//		for (int i = 0; i < fileLength; i++) {
-//			rawImageData[i] = (byte) cbuf[i];
-//		}
-//		byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
-//		String result = new String(base64EncodedImage);
-//
-//		try {
-//			ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
-//			bufferedImage = ImageIO.read(bais);
-//			// TODO: maybe less strong
-//			if ((ProtocolConstants.IMAGE_WIDTH < bufferedImage.getWidth()) || (ProtocolConstants.IMAGE_HEIGHT < bufferedImage
-//					.getHeight())) {
-//				return null;
-//			}
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
+		// String mimeType = new
+		// MimetypesFileTypeMap().getContentType(imageFile);
+		// if (!(mimeType.equals("image/JPEG"))) {
+		// try {
+		// fileReader.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// return null;
+		// }
+		//
+		// long fileLength = imageFile.length();
+		// char[] cbuf = null;
+		// try {
+		// fileReader.read(cbuf, 0, (int) fileLength);
+		// fileReader.close();
+		// } catch (IOException e1) {
+		// e1.printStackTrace();
+		// return null;
+		// }
+		// byte[] rawImageData = new byte[(int) fileLength];
+		// for (int i = 0; i < fileLength; i++) {
+		// rawImageData[i] = (byte) cbuf[i];
+		// }
+		// byte[] base64EncodedImage = Base64.encodeBase64(rawImageData);
+		// String result = new String(base64EncodedImage);
+		//
+		// try {
+		// ByteArrayInputStream bais = new ByteArrayInputStream(rawImageData);
+		// bufferedImage = ImageIO.read(bais);
+		// // TODO: maybe less strong
+		// if ((ProtocolConstants.IMAGE_WIDTH < bufferedImage.getWidth()) ||
+		// (ProtocolConstants.IMAGE_HEIGHT < bufferedImage
+		// .getHeight())) {
+		// return null;
+		// }
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// return null;
+		// }
 		System.out.println(imageB64);
-		return "data:image/jpg;base64," +imageB64;
+		return "data:image/jpg;base64," + imageB64;
 	}
 
 	private static Integer checkWeight(FormItemList items,
@@ -252,54 +262,6 @@ public class ProcessCreateRequest {
 			return null;
 		}
 		return suggestString;
-	}
-
-	// checkContentType(); Accept must be text/x-json.
-
-	/**
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	private static boolean checkIsMultiPart(HttpServletRequest request,
-			ProcessCreateResponse response) {
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		if (isMultipart) {
-			return true;
-		}
-		response.addError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
-		return false;
-	}
-
-	private static FormItemList extractFormItems(
-			final HttpServletRequest request) {
-		final ServletFileUpload upload = new ServletFileUpload(factory);
-		final FormItemList formItems = new FormItemList();
-
-		try {
-			for (FileItem item : upload.parseRequest(request)) {
-				if (item.isFormField()) {
-					formItems.addField(item.getFieldName(), item.getString());
-
-					// TODO: remove after debugging!
-					System.out.println(item);
-
-				} else {
-					formItems.addFile(item.getFieldName(), item);
-					System.out.println(item);
-
-				}
-			}
-		} catch (final FileUploadException e) {
-			// TODO make status message instead of STrace
-			e.printStackTrace();
-		} catch (final FormItemDoubleUsageException e) {
-			// TODO make status message instead of STrace
-			e.printStackTrace();
-		}
-
-		return formItems;
 	}
 
 }

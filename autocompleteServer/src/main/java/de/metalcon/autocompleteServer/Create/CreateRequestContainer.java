@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Command;
 import de.metalcon.autocompleteServer.Helper.ContextListener;
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class CreateRequestContainer extends Command {
@@ -64,20 +65,21 @@ public class CreateRequestContainer extends Command {
 	public void run(ServletContext context) {
 
 		SuggestTree suggestTree = (SuggestTree) context
-				.getAttribute("indexName:" + this.indexName);
+				.getAttribute(ProtocolConstants.INDEX_PARAMETER
+						+ this.indexName);
 
 		suggestTree.put(this.suggestString, this.weight, this.key);
-		
-		System.out.println(suggestString + weight + key);
+
+		System.out.println(this.suggestString + this.weight + this.key);
 		if (this.imageBase64 != null) {
 			HashMap<String, String> map = ContextListener
 					.getImageIndex(context);
 			System.out.println("fetched image index");
 			map.put(this.key, this.imageBase64);
-			System.out.println(key + imageBase64);
+			System.out.println(this.key + this.imageBase64);
 			ContextListener.setImageIndex(map, context);
 		}
-		
+
 		// This creates the database file if it doesn't exist
 		File createFile = new File("Database.save");
 

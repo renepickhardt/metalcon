@@ -16,8 +16,8 @@ public class CreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException {
 
-		ProcessCreateResponse resp = ProcessCreateRequest
-				.checkRequestParameter(request, this.getServletContext());
+		ProcessCreateResponse resp = ProcessCreateRequest.handleServlet(
+				request, this.getServletContext());
 		try {
 			// response.setContentType("text/json");
 			response.getWriter().write(resp.getResponse().toJSONString());
