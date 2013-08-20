@@ -198,7 +198,8 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.WEIGHT_NOT_GIVEN + e.toString());
+			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_GIVEN
+					+ e.toString());
 			e.printStackTrace();
 			return null;
 		}
@@ -208,7 +209,7 @@ public class ProcessCreateRequest {
 		}
 		// TODO: verify this is the right exception
 		catch (NumberFormatException e) {
-			response.addError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			response.addQueryNameError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
 			return null;
 		}
 	}
@@ -234,12 +235,12 @@ public class ProcessCreateRequest {
 
 		// this exception is no reason to abort processing!
 		catch (IllegalArgumentException e) {
-			response.addSuggestionKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			response.addQueryNameError(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addError(CreateStatusCodes.KEY_TOO_LONG);
+			response.addQueryNameError(CreateStatusCodes.KEY_TOO_LONG);
 			return null;
 		}
 		return key;
@@ -253,12 +254,12 @@ public class ProcessCreateRequest {
 			suggestString = items.getField(ProtocolConstants.SUGGESTION_STRING);
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
-			response.addError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
+			response.addQueryNameError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
 			return null;
 		}
 		// checks if the suggestion String length matches ASTP requirements
 		if (suggestString.length() > ProtocolConstants.SUGGESTION_LENGTH) {
-			response.addError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			response.addQueryNameError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
 			return null;
 		}
 		return suggestString;
