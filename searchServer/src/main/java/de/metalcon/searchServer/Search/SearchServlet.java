@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
+
 public class SearchServlet extends HttpServlet {
 
     final private static long serialVersionUID = 1L;
@@ -16,8 +18,10 @@ public class SearchServlet extends HttpServlet {
         throws IOException {
         response.setContentType("application/json");
         
+        JSONObject result = new JSONObject();
+        
         PrintWriter out = response.getWriter();
-        out.println("I'm the searchServer.");
+        out.print(result);
         out.flush();
     }
     
