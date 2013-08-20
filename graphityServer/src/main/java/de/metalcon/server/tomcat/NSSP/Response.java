@@ -2,7 +2,6 @@ package de.metalcon.server.tomcat.NSSP;
 
 import org.json.simple.JSONObject;
 
-
 /**
  * basic response according to NSSP
  * 
@@ -32,8 +31,8 @@ public abstract class Response {
 	@SuppressWarnings("unchecked")
 	protected void addStatusMessage(final String statusMessage,
 			final String solution) {
-		this.json.put(ProtocolConstants.STATUS_MESSAGE, statusMessage);
 		this.json.put(ProtocolConstants.SOLUTION, solution);
+		this.json.put(ProtocolConstants.STATUS_MESSAGE, statusMessage);
 	}
 
 	/**
