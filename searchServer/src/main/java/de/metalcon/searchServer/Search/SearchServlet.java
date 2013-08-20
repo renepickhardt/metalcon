@@ -30,7 +30,7 @@ public class SearchServlet extends HttpServlet {
             result = SearchError.toJson(e);
         }
         
-        Object indent = request.getParameter("indent");
+        String indent = request.getParameter("indent");
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
