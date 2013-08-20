@@ -59,8 +59,7 @@ public class Server implements ServletContextListener {
 
 	public Server() {
 		// load server configuration
-		this.config = Configs
-				.get("/usr/local/apache-tomcat-7.0.39/databases/graphity-server.txt");
+		this.config = Configs.get("/etc/graphity/graphity.conf");
 
 		// load social graph database
 		this.graphDatabase = NeoUtils.getSocialGraphDatabase(this.config);
