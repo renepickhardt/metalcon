@@ -19,6 +19,7 @@ public class CreateRequestContainer extends Command {
 	private String key;
 	private String imageBase64;
 	private String indexName;
+	private CreateServlet servlet;
 
 	public String getSuggestString() {
 		return this.suggestString;
@@ -96,6 +97,16 @@ public class CreateRequestContainer extends Command {
 			e.printStackTrace();
 		}
 
+		this.servlet.commandFinished();
+
+	}
+
+	public CreateServlet getRequestServlet() {
+		return this.servlet;
+	}
+
+	public void setRequestServlet(final CreateServlet servlet) {
+		this.servlet = servlet;
 	}
 
 }

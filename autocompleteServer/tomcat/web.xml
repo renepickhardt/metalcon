@@ -1,7 +1,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee">
 	<display-name>autocompleteServer</display-name>
  	<listener>
-   		<listener-class>de.metalcon.autocompleteServer.Helper.ContextListener</listener-class>
+   		<listener-class>de.metalcon.autocompleteServer.Server</listener-class>
    	</listener>   	
 	<servlet> 
 		<servlet-name>suggest</servlet-name>
