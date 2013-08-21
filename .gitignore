@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.class
 
 # Package Files #
@@ -5,6 +6,8 @@
 *.war
 *.ear
 
+=======
+>>>>>>> 8bb7d32a0be60767bc74cc5022c1e8301ed8d6a1
 # ignore Maven output directory
 target/
 # ignore Eclipse files
@@ -15,3 +18,13 @@ target/
 .settings/
 bin/
 
+<<<<<<< HEAD
+=======
+# Java class files
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+>>>>>>> 8bb7d32a0be60767bc74cc5022c1e8301ed8d6a1
