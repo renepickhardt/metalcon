@@ -17,6 +17,7 @@ public class JsonPrettyPrinter {
     public static String prettyPrintJson(String json) {
         int     indent   = 0;
         boolean inString = false;
+        boolean inEscape = false;
         
         String result = "";
         
@@ -53,10 +54,12 @@ public class JsonPrettyPrinter {
                     break;
                     
                 case '"':
-                    if (i == 0 || json.charAt(i - 1) != '\\')
-                        // actually we want to check (i > 0) but since we know
-                        // i starts at 0, we can check (i != 0) which is faster.
+                    if (!inEscape)
                         inString = !inString;
+                    break;
+                    
+                case '\\':
+                    inEscape = !inEscape;
                     break;
             }
             

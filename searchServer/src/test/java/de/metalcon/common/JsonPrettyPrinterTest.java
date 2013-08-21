@@ -105,6 +105,12 @@ public class JsonPrettyPrinterTest {
                 "]"
                 );
         assertPrettyPrint("\"a,b\\\",c\"", "\"a,b\\\",c\"");
+        assertPrettyPrint("[\"a\\\\\",\"b\"]",
+                "[\n" +
+                in() + "\"a\\\\\",\n" +
+                in() + "\"b\"\n" +
+                "]"
+                );
     }
     
 }
