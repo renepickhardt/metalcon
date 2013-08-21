@@ -9,8 +9,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
 import de.metalcon.searchServer.Error.NonCompleteSearchRequestSearchError;
 import de.metalcon.searchServer.Error.SolrServerExceptionSearchError;
@@ -57,31 +55,35 @@ public class SearchRequest {
             throw new SolrServerExceptionSearchError(e);
         }
         
-        SolrDocumentList docs = qr.getResults();
+        List<DocExtern> docs = qr.getBeans(DocExtern.class);
         
         // -- assemble json
         
         String jsonSpellcheck = "";
         
-        List<Object> jsonInternSearchResultsDocs = new LinkedList<Object>();
-        Map<String, Object> jsonInternSearchResults =
+        List<Object> jsonInternDocs = new LinkedList<Object>();
+        Map<String, Object> jsonIntern =
                 new LinkedHashMap<String, Object>();
-        jsonInternSearchResults.put("numDocs", 0);
-        jsonInternSearchResults.put("docs", jsonInternSearchResultsDocs);
+        jsonIntern.put("numDocs", 0);
+        jsonIntern.put("docs", jsonInternDocs);
         
-        List<Object> jsonExternSearchResultsDocs = new LinkedList<Object>();
-        for (SolrDocument doc : docs)
-            jsonExternSearchResultsDocs.add(doc);
-        Map<String, Object> jsonExternSearchResults =
+        List<Object> jsonExternDocs = new LinkedList<Object>();
+        for (DocExtern doc : docs) {
+            Map<String, Object> jsonDoc = new LinkedHashMap<String, Object>();
+            jsonDoc.put("title", doc.getTitle());
+            jsonDoc.put("url", doc.getUrl());
+            jsonExternDocs.add(jsonDoc);
+        }
+        Map<String, Object> jsonExtern =
                 new LinkedHashMap<String, Object>();
-        jsonExternSearchResults.put("numDocs", 0);
-        jsonExternSearchResults.put("docs", jsonExternSearchResultsDocs);
+        jsonExtern.put("numDocs", 0);
+        jsonExtern.put("docs", jsonExternDocs);
         
         Map<String, Object> json = new LinkedHashMap<String, Object>();
-        json.put("requestHeader",       assembleJsonRequestHeader());
-        json.put("spellcheck",          jsonSpellcheck);
-        json.put("internSearchResults", jsonInternSearchResults);
-        json.put("externSearchResults", jsonExternSearchResults);
+        json.put("requestHeader", assembleJsonRequestHeader());
+        json.put("spellcheck",    jsonSpellcheck);
+        json.put("intern",        jsonIntern);
+        json.put("extern",        jsonExtern);
         
         return json;
     }
