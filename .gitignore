@@ -4,5 +4,14 @@ target/
 .classpath
 .project
 # ignore Eclipse directories
+.metadata/
 .settings/
 bin/
+
+# Java class files
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
