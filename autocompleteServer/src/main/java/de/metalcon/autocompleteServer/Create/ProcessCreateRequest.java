@@ -113,6 +113,7 @@ public class ProcessCreateRequest {
 			return null;
 		}
 
+		// TODO replace hard-coded value with file size of imageFile objects
 		byte[] buffer = new byte[50000];
 		byte[] tmp = null;
 		try {

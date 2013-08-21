@@ -67,6 +67,23 @@ public class TestProcessCreateRequest {
 	}
 
 	@Test
+	public void testFormMissingKey() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(null,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+
+		if (testResponse.getResponse().containsKey("Warning:MissingKey")) {
+			assertEquals(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN,
+					testResponse.getResponse().get("Warning:MissingKey"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
 	public void testFormSuggestStringTooLong() {
 
 		ProcessCreateResponse testResponse = this.processTestRequest(
