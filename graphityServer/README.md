@@ -78,19 +78,19 @@ The configuration has 7 fields that have to be set at the moment.
 You set a field using the following syntax:
 >field_name = value
 
-**database_path**
+**database_path**  
 Sets the path to the directory containing the Neo4j database.  
 If the directory does not contain a database it will get created at startup.  
 Default value is
 >/etc/graphity/database/
 
-**templates_path**
+**templates_path**  
 Sets the path to the directory containing the status update template files.  
 If the directory does not contain a template file a default template "Plain" will get created.  
 Default value is
 >/etc/graphity/templates/
 
-**picture_path**
+**picture_path**  
 Demonstrates the usage of custom file paths in the configuration file.  
 It sets the path to the directory containing picture files used for status updates.  
 By default there is no status update template that would allow image files to be sent, but you want to create a matching tempalte on your own.
@@ -99,24 +99,24 @@ At the moment the server does use this path to store all files sent. To change t
 Default value is
 >/etc/graphity/pictures/
 
-**read_only**
+**read_only**  
 Sets the database state.  
 Use "false" to allow the server to make changes to the database, use "true" to let the server read only.  
 Default value is
 >false
 
-**algorithm**
+**algorithm**  
 Sets the Graphity algorithm used.  
 Use "read-optimized" to use the Graphity algorithm optimized for read requests, use "write-optimized" to use the one optimized for write requests.  
 Default value is
 >read-optimized
 
-**use_memory_mapped_buffers**
+**use_memory_mapped_buffers**  
 Database configuration field. See the Neo4j documentation for more information.  
 Default value is
 >false
 
-**cache_type**
+**cache_type**  
 Database configuration field. See the Neo4j documentation for more information.  
 Default value is
 >strong
