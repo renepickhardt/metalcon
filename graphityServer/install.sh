@@ -12,7 +12,11 @@ database_path = /etc/graphity/database/
 templates_path = /etc/graphity/templates/
 picture_path = /etc/graphity/pictures/
 read_only = false
-algorithm = graphity
+
+# you can set the algorithm acting at the database
+# use \"read-optimized\" to use the algorithm optimized for reading processes or
+# \"write-optimized\" for the one optimized for writing operation
+algorithm = read-optimized
 
 #neo4j settings
 use_memory_mapped_buffers = false
