@@ -46,7 +46,13 @@ public class SearchRequest {
         
         SolrQuery q = new SolrQuery();
         q.setQuery(query);
-        q.setFields("title", "url");
+        q.setFields("id", "title", "url", "content");
+        q.setHighlight(true);
+        q.setHighlightSimplePre("<<");
+        q.setHighlightSimplePost(">>");
+        q.setHighlightSnippets(2);
+        q.setParam("hl.fl", "content");
+        q.setParam("hl.mergeContinous", "true");
         
         QueryResponse qr;
         try {
@@ -56,26 +62,26 @@ public class SearchRequest {
         }
         
         List<DocExtern> docs = qr.getBeans(DocExtern.class);
+        Map<String, Map<String, List<String>>> hl = qr.getHighlighting();
+        for (DocExtern doc : docs) {
+            Map<String, List<String>> docHl = hl.get(doc.getId());
+            if (docHl != null)
+                doc.highlight = docHl.get("content");
+        }
         
         // -- assemble json
         
         String jsonSpellcheck = "";
         
         List<Object> jsonInternDocs = new LinkedList<Object>();
-        Map<String, Object> jsonIntern =
-                new LinkedHashMap<String, Object>();
+        Map<String, Object> jsonIntern = new LinkedHashMap<String, Object>();
         jsonIntern.put("numDocs", 0);
         jsonIntern.put("docs", jsonInternDocs);
         
         List<Object> jsonExternDocs = new LinkedList<Object>();
-        for (DocExtern doc : docs) {
-            Map<String, Object> jsonDoc = new LinkedHashMap<String, Object>();
-            jsonDoc.put("title", doc.getTitle());
-            jsonDoc.put("url", doc.getUrl());
-            jsonExternDocs.add(jsonDoc);
-        }
-        Map<String, Object> jsonExtern =
-                new LinkedHashMap<String, Object>();
+        for (DocExtern doc : docs)
+            jsonExternDocs.add(doc.toJson());
+        Map<String, Object> jsonExtern = new LinkedHashMap<String, Object>();
         jsonExtern.put("numDocs", 0);
         jsonExtern.put("docs", jsonExternDocs);
         
