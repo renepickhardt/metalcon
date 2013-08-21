@@ -44,7 +44,9 @@ This will create the directory
 
 >/etc/graphity/
 
-in which the server will live for now.
+in which the server will live for now.  
+Therefore make sure to have enough space available there for your database.
+Otherwise you can change the database directory in the configuration file.
 
 ## 4. Deploy to Tomcat
 
