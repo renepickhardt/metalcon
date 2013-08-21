@@ -56,11 +56,12 @@ public class JsonPrettyPrinter {
                     if (!inEscape)
                         inString = !inString;
                     break;
-                    
-                case '\\':
-                    inEscape = !inEscape;
-                    break;
             }
+            
+            if (inEscape)
+                inEscape = false;
+            else if (c == '\\')
+                inEscape = true;
         }
         
         return result;
