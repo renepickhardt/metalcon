@@ -1,6 +1,7 @@
 package de.metalcon.searchServer.Search;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,8 @@ import org.apache.solr.client.solrj.beans.Field;
 
 public class DocExtern {
 
+    final public static int maxContentLength = 1000;
+    
     private String id = "";
     private String title = "";
     private String url = "";
@@ -61,21 +64,30 @@ public class DocExtern {
     public Map<String, Object> toJson() {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         
-        String title   = this.title;
-        String url     = this.url;
-        Object content = this.content;
-        
         List<String> hlTitle, hlUrl, hlContent;
         hlTitle   = highlight.get("title");
         hlUrl     = highlight.get("url");
         hlContent = highlight.get("content");
         
+        String title;
         if (hlTitle != null)
             title = hlTitle.get(0);
+        else
+            title = this.title;
+        
+        String url;
         if (hlUrl != null)
             url = hlUrl.get(0);
+        else
+            url = this.url;
+        
+        List<String> content;
         if (hlContent != null)
             content = hlContent;
+        else {
+            content = new LinkedList<String>();
+            content.add(this.content.substring(0, maxContentLength));
+        }
         
         result.put("title", title);
         result.put("url",   url);
