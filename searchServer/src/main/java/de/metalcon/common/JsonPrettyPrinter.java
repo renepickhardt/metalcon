@@ -24,9 +24,8 @@ public class JsonPrettyPrinter {
         // reflection, this would improve performance for string longer than
         // 500 chars. See:
         // http://stackoverflow.com/questions/8894258/fastest-way-to-iterate-over-all-the-chars-in-a-string
-        for (int i = 0; i != json.length(); ++i) {
-            char c = json.charAt(i);
-            
+        int i = 0;
+        for (char c : json.toCharArray()) {
             switch (c) {
                 case '}':
                 case ']':
@@ -60,6 +59,8 @@ public class JsonPrettyPrinter {
                         inString = !inString;
                     break;
             }
+            
+            ++i;
         }
         
         return result;
