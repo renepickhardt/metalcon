@@ -46,6 +46,10 @@ public class JsonPrettyPrinter {
                         result += "\n" + strrepeat(" ", indent * tabWidth);
                     }
                     break;
+                   
+                case ':':
+                    result += " ";
+                    break;
                     
                 case ',':
                     if (!inString)

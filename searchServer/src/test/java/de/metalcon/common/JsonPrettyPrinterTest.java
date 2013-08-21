@@ -64,7 +64,7 @@ public class JsonPrettyPrinterTest {
     public void testOneElemObject() {
         assertPrettyPrint("{\"foo\":\"bar\"}",
                 "{\n" +
-                in() + "\"foo\":\"bar\"\n" +
+                in() + "\"foo\": \"bar\"\n" +
                 "}"
                 );
     }
@@ -73,8 +73,8 @@ public class JsonPrettyPrinterTest {
     public void testTwoElemObject() {
         assertPrettyPrint("{\"foo1\":\"bar1\",\"foo2\":\"bar2\"}",
                 "{\n" +
-                in() + "\"foo1\":\"bar1\",\n" +
-                in() + "\"foo2\":\"bar2\"\n" +
+                in() + "\"foo1\": \"bar1\",\n" +
+                in() + "\"foo2\": \"bar2\"\n" +
                 "}"
                 );
     }
