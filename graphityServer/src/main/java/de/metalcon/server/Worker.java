@@ -55,15 +55,12 @@ public class Worker implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("worker thread started");
 		this.running = true;
-		System.out.println("worker status changing to running");
 
 		try {
 			// exit execution loop if worker has been stopped
 			SocialGraphOperation command = null;
 			while (!this.stopping) {
-				System.out.println("waiting for the next command...");
 				command = this.commands.take();
 				command.run(this.graph);
 			}
@@ -85,7 +82,6 @@ public class Worker implements Runnable {
 	 * start the worker thread
 	 */
 	public void start() {
-		System.out.println("creating worker thread...");
 		this.workerThread = new Thread(this);
 		System.out.println("starting worker thread");
 		this.workerThread.start();

@@ -90,19 +90,17 @@ public class Server implements ServletContextListener {
 	 * start the server and wait for it to be running
 	 */
 	public void start() {
-		System.out.println("starting command worker");
 		this.commandWorker.start();
 		while (!this.commandWorker.isRunning()) {
 			// wait for the command worker to be ready
+			System.out.println("waiting for worker to connect...");
 			try {
 				Thread.sleep(50);
 			} catch (final InterruptedException e) {
 				System.out.println("server thread could not wait for worker");
 				e.printStackTrace();
 			}
-			System.out.println("waiting for worker to connect...");
 		}
-		System.out.println("command worker running");
 	}
 
 	/**
@@ -153,14 +151,12 @@ public class Server implements ServletContextListener {
 
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("server", this);
-		this.config.working_path = context.getRealPath("/")
-				+ "WEB-INF/classes/";
-		System.out.println(this.config.working_path);
 
 		// load status update types
 		try {
 			System.out.println("loading status update templates");
-			StatusUpdateManager.loadStatusUpdateTemplates(this.config,
+			StatusUpdateManager.loadStatusUpdateTemplates(
+					context.getRealPath("/") + "WEB-INF/", this.config,
 					this.graphDatabase);
 			System.out.println("status update templates loaded");
 		} catch (ParserConfigurationException | SAXException | IOException e) {

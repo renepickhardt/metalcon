@@ -66,15 +66,16 @@ public class StatusUpdateManager {
 	 * 
 	 * @param template
 	 *            status update template
+	 * @param workingPath
+	 *            working path including JAVA and/or CLASS-files
 	 * @throws FileNotFoundException
 	 */
 	private static void generateJavaFiles(final StatusUpdateTemplate template,
-			final Configs config) throws FileNotFoundException {
+			final String workingPath) throws FileNotFoundException {
 		final String javaPath = WORKING_DIR + template.getName() + ".java";
 		final File javaFile = new File(javaPath);
-		final String[] optionsAndSources = { "-classpath",
-				config.workingPath(), "-proc:none", "-source", "1.7",
-				"-target", "1.7", javaPath };
+		final String[] optionsAndSources = { "-classpath", workingPath,
+				"-proc:none", "-source", "1.7", "-target", "1.7", javaPath };
 
 		// write java file
 		final PrintWriter writer = new PrintWriter(javaFile);
@@ -133,6 +134,8 @@ public class StatusUpdateManager {
 	/**
 	 * load the status update allowed
 	 * 
+	 * @param rootDir
+	 *            classes directory parent
 	 * @param config
 	 *            server configuration
 	 * @param graphDatabase
@@ -144,13 +147,14 @@ public class StatusUpdateManager {
 	 * @throws ParserConfigurationException
 	 *             - DocumentBuilder cannot match the current configuration
 	 */
-	public static void loadStatusUpdateTemplates(final Configs config,
-			final AbstractGraphDatabase graphDatabase)
+	public static void loadStatusUpdateTemplates(final String rootDir,
+			final Configs config, final AbstractGraphDatabase graphDatabase)
 			throws ParserConfigurationException, SAXException, IOException {
 		// set working directory
+		final String workingPath = rootDir + "classes/";
 		final String targetPackage = StatusUpdate.class.getPackage().getName()
 				+ ".templates.";
-		WORKING_DIR = config.workingPath() + targetPackage.replace(".", "/");
+		WORKING_DIR = workingPath + targetPackage.replace(".", "/");
 		final File dirWorking = new File(WORKING_DIR);
 		if (!dirWorking.exists()) {
 			dirWorking.mkdir();
@@ -160,7 +164,7 @@ public class StatusUpdateManager {
 		// create class loader
 		final ClassLoader classLoader = StatusUpdate.class.getClassLoader();
 		final URLClassLoader loader = new URLClassLoader(new URL[] { new File(
-				config.workingPath()).toURI().toURL() }, classLoader);
+				workingPath).toURI().toURL() }, classLoader);
 
 		// crawl XML files
 		StatusUpdateTemplate template, previousTemplate;
@@ -210,7 +214,7 @@ public class StatusUpdateManager {
 					previousTemplateNode);
 
 			// generate class file
-			generateJavaFiles(template, config);
+			generateJavaFiles(template, workingPath);
 
 			// register the new template
 			try {

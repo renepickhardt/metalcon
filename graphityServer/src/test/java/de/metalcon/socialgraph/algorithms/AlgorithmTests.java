@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -84,7 +82,6 @@ public class AlgorithmTests {
 		}
 	}
 
-	@BeforeClass
 	public static void setUp() {
 		// delete existing test database
 		final File databaseDir = new File(DATABASE_PATH);
@@ -105,7 +102,8 @@ public class AlgorithmTests {
 
 		// load status update templates
 		try {
-			StatusUpdateManager.loadStatusUpdateTemplates(config, DATABASE);
+			StatusUpdateManager.loadStatusUpdateTemplates("target/", config,
+					DATABASE);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			System.err.println("failed to load status update templates!");
 			e.printStackTrace();
@@ -115,7 +113,6 @@ public class AlgorithmTests {
 		USED = false;
 	}
 
-	@AfterClass
 	public static void tearDown() {
 		// close the test database
 		DATABASE.shutdown();
