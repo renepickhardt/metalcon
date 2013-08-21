@@ -48,6 +48,7 @@ public class SearchRequest {
         
         SolrQuery q = new SolrQuery();
         q.setQuery(query);
+        q.setFields("title", "url");
         
         QueryResponse qr;
         try {
@@ -62,11 +63,19 @@ public class SearchRequest {
         
         String jsonSpellcheck = "";
         
-        List<Object> jsonInternSearchResults = new LinkedList<Object>();
+        List<Object> jsonInternSearchResultsDocs = new LinkedList<Object>();
+        Map<String, Object> jsonInternSearchResults =
+                new LinkedHashMap<String, Object>();
+        jsonInternSearchResults.put("numDocs", 0);
+        jsonInternSearchResults.put("docs", jsonInternSearchResultsDocs);
         
-        List<Object> jsonExternSearchResults = new LinkedList<Object>();
+        List<Object> jsonExternSearchResultsDocs = new LinkedList<Object>();
         for (SolrDocument doc : docs)
-            jsonExternSearchResults.add(doc);
+            jsonExternSearchResultsDocs.add(doc);
+        Map<String, Object> jsonExternSearchResults =
+                new LinkedHashMap<String, Object>();
+        jsonExternSearchResults.put("numDocs", 0);
+        jsonExternSearchResults.put("docs", jsonExternSearchResultsDocs);
         
         Map<String, Object> json = new LinkedHashMap<String, Object>();
         json.put("requestHeader",       assembleJsonRequestHeader());
