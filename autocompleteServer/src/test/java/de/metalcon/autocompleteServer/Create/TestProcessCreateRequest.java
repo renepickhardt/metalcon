@@ -38,6 +38,12 @@ public class TestProcessCreateRequest {
 						.getAttribute(ProtocolConstants.INDEX_PARAMETER
 								+ "testIndex")).thenReturn(generalIndex);
 
+		// TODO: see fix-me at missingIndex-Test
+		when(
+				this.servletContext
+						.getAttribute(ProtocolConstants.INDEX_PARAMETER
+								+ "defaultIndex")).thenReturn(generalIndex);
+
 		try {
 			servlet.init(this.servletConfig);
 		} catch (ServletException e) {
@@ -83,6 +89,7 @@ public class TestProcessCreateRequest {
 
 	}
 
+	// FIXME: testing it this way does not provoke the warning to be added
 	@Test
 	public void testFormMissingIndex() {
 
