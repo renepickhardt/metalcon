@@ -4,5 +4,6 @@ target/
 .classpath
 .project
 # ignore Eclipse directories
+.metadata/
 .settings/
 bin/
