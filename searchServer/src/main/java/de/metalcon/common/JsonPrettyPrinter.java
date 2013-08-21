@@ -1,6 +1,8 @@
 package de.metalcon.common;
 
 public class JsonPrettyPrinter {
+    
+    final public static int tabWidth = 4; 
 
     private static String strrepeat(String str, int times) {
         assert(times >= 0);
@@ -13,8 +15,6 @@ public class JsonPrettyPrinter {
     }
     
     public static String prettyPrintJson(String json) {
-        int tabWidth = 4;
-        
         int     indent   = 0;
         boolean inString = false;
         
@@ -30,8 +30,10 @@ public class JsonPrettyPrinter {
             switch (c) {
                 case '}':
                 case ']':
-                    --indent;
-                    result += "\n" + strrepeat(" ", indent * tabWidth);
+                    if (!inString) {
+                        --indent;
+                        result += "\n" + strrepeat(" ", indent * tabWidth);
+                    }
                     break;
             }
             
@@ -40,12 +42,22 @@ public class JsonPrettyPrinter {
             switch (c) {
                 case '{':
                 case '[':
-                    ++indent;
-                    result += "\n" + strrepeat(" ", indent * tabWidth);
+                    if (!inString) {
+                        ++indent;
+                        result += "\n" + strrepeat(" ", indent * tabWidth);
+                    }
                     break;
                     
                 case ',':
-                    result += "\n" + strrepeat(" ", indent * tabWidth);
+                    if (!inString)
+                        result += "\n" + strrepeat(" ", indent * tabWidth);
+                    break;
+                    
+                case '"':
+                    if (i == 0 || json.charAt(i - 1) != '\\')
+                        // actually we want to check (i > 0) but since we know
+                        // i starts at 0, we can check (i != 0) which is faster.
+                        inString = !inString;
                     break;
             }
         }
