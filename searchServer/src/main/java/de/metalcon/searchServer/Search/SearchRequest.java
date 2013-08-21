@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import de.metalcon.searchServer.Error.NonCompleteSearchRequestSearchError;
@@ -26,9 +27,15 @@ public class SearchRequest {
         this.query = query;
     }
     
-    public void checkIfComplete() {
+    private void checkIfComplete() {
         if (query == null)
             throw new NonCompleteSearchRequestSearchError(this);
+    }
+    
+    private Map<String, Object> assembleJsonRequestHeader() {
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        result.put("q", query);
+        return result;
     }
     
     public Map<String, Object> execute() {
@@ -53,19 +60,16 @@ public class SearchRequest {
         
         // -- assemble json
         
-        Map<String, Object> jsonRequest = new LinkedHashMap<String, Object>();
-        jsonRequest.put("q", query);
-        
         String jsonSpellcheck = "";
         
         List<Object> jsonInternSearchResults = new LinkedList<Object>();
         
         List<Object> jsonExternSearchResults = new LinkedList<Object>();
-        for (int i = 0; i != docs.size(); ++i)
-            jsonExternSearchResults.add(docs.get(i));
+        for (SolrDocument doc : docs)
+            jsonExternSearchResults.add(doc);
         
         Map<String, Object> json = new LinkedHashMap<String, Object>();
-        json.put("request",             jsonRequest);
+        json.put("requestHeader",       assembleJsonRequestHeader());
         json.put("spellcheck",          jsonSpellcheck);
         json.put("internSearchResults", jsonInternSearchResults);
         json.put("externSearchResults", jsonExternSearchResults);
