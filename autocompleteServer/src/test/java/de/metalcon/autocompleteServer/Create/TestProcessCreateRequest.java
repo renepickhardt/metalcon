@@ -84,6 +84,23 @@ public class TestProcessCreateRequest {
 	}
 
 	@Test
+	public void testFormMissingIndex() {
+
+		ProcessCreateResponse testResponse = this.processTestRequest(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY,
+				ProtocolTestConstants.VALID_SUGGESTION_STRING,
+				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT, null, null);
+
+		if (testResponse.getResponse().containsKey("Warning:DefaultIndex")) {
+			assertEquals(CreateStatusCodes.INDEXNAME_NOT_GIVEN, testResponse
+					.getResponse().get("Warning:DefaultIndex"));
+		} else {
+			fail("Error-Message missing!");
+		}
+
+	}
+
+	@Test
 	public void testFormSuggestStringTooLong() {
 
 		ProcessCreateResponse testResponse = this.processTestRequest(
