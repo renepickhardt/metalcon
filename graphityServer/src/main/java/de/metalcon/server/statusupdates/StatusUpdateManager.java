@@ -172,7 +172,7 @@ public class StatusUpdateManager {
 		if (!templatesDir.exists()) {
 			templatesDir.mkdir();
 		}
-		final File[] xmlFiles = loadXmlFiles(templatesDir);
+		File[] xmlFiles = loadXmlFiles(templatesDir);
 
 		// create basic status update template
 		if (xmlFiles.length == 0) {
@@ -184,7 +184,7 @@ public class StatusUpdateManager {
 			writer.println("</class>");
 			writer.flush();
 			writer.close();
-			loadXmlFiles(new File(config.templatesPath()));
+			xmlFiles = loadXmlFiles(new File(config.templatesPath()));
 		}
 
 		System.out.println("TEMPLATES:" + xmlFiles.length);
