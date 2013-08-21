@@ -131,9 +131,8 @@ This gets done using status update templates which are XML files following a con
 By default the Graphity server knows only one status update template called "Plain".  
 You can find this template after a first startup and you have to put all your custom templates in the template path set in the server configuration which is
 >/etc/graphity/templates
-by default.
 
-If you open the file it will contain
+by default. If you open the file it will contain
 ```
 <class name="Plain" version="1.0">
   <param name="message" type="String" />
