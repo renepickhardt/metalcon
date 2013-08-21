@@ -12,7 +12,7 @@ public class DocExtern {
     private String title = "";
     private String url = "";
     private String content = "";
-    public List<String> highlight = null;
+    private Map<String, List<String>> highlight;
     
     public String getId() {
         return id;
@@ -50,12 +50,36 @@ public class DocExtern {
         this.content = content;
     }
     
+    public Map<String, List<String>> getHighlight() {
+        return highlight;
+    }
+    
+    public void setHighlight(Map<String, List<String>> highlight) {
+        this.highlight = highlight;
+    }
+    
     public Map<String, Object> toJson() {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
-        result.put("title",   title);
-        result.put("url",     url);
-        result.put("content", content);
-        result.put("highlight", highlight);
+        
+        String title   = this.title;
+        String url     = this.url;
+        Object content = this.content;
+        
+        List<String> hlTitle, hlUrl, hlContent;
+        hlTitle   = highlight.get("title");
+        hlUrl     = highlight.get("url");
+        hlContent = highlight.get("content");
+        
+        if (hlTitle != null)
+            title = hlTitle.get(0);
+        if (hlUrl != null)
+            url = hlUrl.get(0);
+        if (hlContent != null)
+            content = hlContent;
+        
+        result.put("title", title);
+        result.put("url",   url);
+        result.put("text",  content);
         return result;
     }
 

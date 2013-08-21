@@ -51,7 +51,7 @@ public class SearchRequest {
         q.setHighlightSimplePre("<<");
         q.setHighlightSimplePost(">>");
         q.setHighlightSnippets(2);
-        q.setParam("hl.fl", "content");
+        q.setParam("hl.fl", "title", "url", "content");
         q.setParam("hl.mergeContinous", "true");
         
         QueryResponse qr;
@@ -63,11 +63,8 @@ public class SearchRequest {
         
         List<DocExtern> docs = qr.getBeans(DocExtern.class);
         Map<String, Map<String, List<String>>> hl = qr.getHighlighting();
-        for (DocExtern doc : docs) {
-            Map<String, List<String>> docHl = hl.get(doc.getId());
-            if (docHl != null)
-                doc.highlight = docHl.get("content");
-        }
+        for (DocExtern doc : docs)
+            doc.setHighlight(hl.get(doc.getId()));
         
         // -- assemble json
         
