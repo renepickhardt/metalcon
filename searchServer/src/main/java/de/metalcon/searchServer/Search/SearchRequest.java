@@ -49,14 +49,14 @@ public class SearchRequest {
         SolrQuery q = new SolrQuery();
         q.setQuery(query);
         
-        QueryResponse r;
+        QueryResponse qr;
         try {
-            r = solr.query(q);
+            qr = solr.query(q);
         } catch (SolrServerException e) {
             throw new SolrServerExceptionSearchError(e);
         }
         
-        SolrDocumentList docs = r.getResults();
+        SolrDocumentList docs = qr.getResults();
         
         // -- assemble json
         
