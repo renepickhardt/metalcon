@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -13,7 +14,9 @@ import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
-public class CreateRequestContainer extends Command {
+public class CreateRequestContainer extends Command implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String suggestString;
 	private Integer weight;
 	private String key;
@@ -61,7 +64,6 @@ public class CreateRequestContainer extends Command {
 		this.indexName = indexName;
 	}
 
-	// TODO replace this example suggestTree with concrete ones.
 	@Override
 	public void run(ServletContext context) {
 

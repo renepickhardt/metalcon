@@ -9,7 +9,6 @@ import java.util.HashMap;
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Create.CreateRequestContainer;
-import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
@@ -29,19 +28,16 @@ public class Search {
 	// return resultList.toString();
 	// }
 
-	public static void initilizeSuggestTree(ServletContext context) { // can't
+	public static void initilizeSuggestTree(ServletContext context) {
 		SuggestTree suggestTree = new SuggestTree(
 				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 		context.setAttribute("indexName:"
 				+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
-		int priority = 100000;
 
 		try {
 			FileInputStream saveFile = new FileInputStream("Database.save");
 			ObjectInputStream restore = new ObjectInputStream(saveFile);
-
-			Object obj = restore.readObject();
 
 			while (true) {
 				try {
@@ -53,6 +49,7 @@ public class Search {
 					imageIndex.put(suggestTreeEntry.getKey(),
 							suggestTreeEntry.getImageBase64());
 				} catch (EOFException e) {
+					restore.close();
 					break;
 				}
 
@@ -60,9 +57,11 @@ public class Search {
 
 		} catch (IOException | ClassNotFoundException e1) {
 
+			e1.printStackTrace();
+
 			// ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
 			// ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
-			ContextListener.setImageIndex(imageIndex, context);
+			// ContextListener.setImageIndex(imageIndex, context);
 
 			// BufferedReader in = new BufferedReader(new FileReader(filename));
 			// String zeile = null;

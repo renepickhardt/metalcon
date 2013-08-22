@@ -89,7 +89,6 @@ public class TestProcessCreateRequest {
 
 	}
 
-	// FIXME: testing it this way does not provoke the warning to be added
 	@Test
 	public void testFormMissingIndex() {
 
