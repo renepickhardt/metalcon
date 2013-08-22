@@ -75,11 +75,11 @@ public class DocExtern {
         else
             title = this.title;
         
-        String url;
+        String url, rawurl = this.url;
         if (hlUrl != null)
             url = hlUrl.get(0);
         else
-            url = this.url;
+            url = rawurl;
         
         List<String> content;
         if (hlContent != null)
@@ -89,9 +89,10 @@ public class DocExtern {
             content.add(this.content.substring(0, maxContentLength));
         }
         
-        result.put("title", title);
-        result.put("url",   url);
-        result.put("text",  content);
+        result.put("title",  title);
+        result.put("url",    url);
+        result.put("rawurl", rawurl);
+        result.put("text",   content);
         return result;
     }
 

@@ -42,9 +42,10 @@ public class SearchRequest {
         // -- read from solr
         
         HttpSolrServer solr = new HttpSolrServer(
-                "http://localhost:8080/solr/core0");
+                "http://localhost:8080/solr/extern");
         
         SolrQuery q = new SolrQuery();
+        // maybe vulnerable to xss?
         q.setQuery(query);
         q.setFields("id", "title", "url", "content");
         q.setHighlight(true);
