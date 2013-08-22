@@ -235,12 +235,12 @@ public class ProcessCreateRequest {
 
 		// this exception is no reason to abort processing!
 		catch (IllegalArgumentException e) {
-			response.addQueryNameMissingError(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			response.addNoKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
 			return null;
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
-			response.addQueryNameMissingError(CreateStatusCodes.KEY_TOO_LONG);
+			response.addKeyTooLongWarning(CreateStatusCodes.KEY_TOO_LONG);
 			return null;
 		}
 		return key;

@@ -83,6 +83,14 @@ public class ProcessCreateResponse {
 		this.jsonResponse.put("Error:WeightNotANumber", weightNotANumber);
 	}
 
+	public void addNoKeyWarning(String keyNotGiven) {
+		this.jsonResponse.put("Warning:KeyNotGiven", keyNotGiven);
+	}
+
+	public void addKeyTooLongWarning(String keyTooLong) {
+		this.jsonResponse.put("Warning:KeyTooLong", keyTooLong);
+	}
+
 	/**
 	 * Getter for the response as JSONObject.
 	 * 

@@ -63,11 +63,11 @@ public class TestProcessCreateRequest {
 				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
 				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
 
-		if (testResponse.getResponse().containsKey("Error:queryName")) {
+		if (testResponse.getResponse().containsKey("Error:queryNameNotGiven")) {
 			assertEquals(CreateStatusCodes.QUERYNAME_NOT_GIVEN, testResponse
-					.getResponse().get("Error:queryName"));
+					.getResponse().get("Error:queryNameNotGiven"));
 		} else {
-			fail("Error-Message missing!");
+			fail("noTerm Status-Message missing!");
 		}
 
 	}
@@ -80,9 +80,9 @@ public class TestProcessCreateRequest {
 				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
 				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
 
-		if (testResponse.getResponse().containsKey("Warning:MissingKey")) {
+		if (testResponse.getResponse().containsKey("Warning:KeyNotGiven")) {
 			assertEquals(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN,
-					testResponse.getResponse().get("Warning:MissingKey"));
+					testResponse.getResponse().get("Warning:KeyNotGiven"));
 		} else {
 			fail("Error-Message missing!");
 		}
@@ -201,7 +201,8 @@ public class TestProcessCreateRequest {
 				testResponse.getContainer().getWeight().toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
 				.getContainer().getIndexName());
-		assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+		assertEquals("{" + "\"term\"" + ":" + "\""
+				+ ProtocolTestConstants.VALID_SUGGESTION_STRING + "\"" + ","
 				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
 				testResponse.getResponse().toString());
 	}
