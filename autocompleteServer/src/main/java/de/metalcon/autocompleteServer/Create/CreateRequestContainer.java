@@ -15,10 +15,15 @@ import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class CreateRequestContainer extends Command {
 
-	private SuggestionComponents suggestionComponents;
+	public CreateRequestContainer() {
+		this.suggestionComponents = new SuggestionComponents();
+	}
+
+	private final SuggestionComponents suggestionComponents;
 	private CreateServlet servlet;
 
 	public SuggestionComponents getComponents() {
+
 		return this.suggestionComponents;
 	}
 
