@@ -13,7 +13,6 @@ public class ProcessCreateResponse {
 	public ProcessCreateResponse(ServletContext context) {
 		this.context = context;
 		this.jsonResponse = new JSONObject();
-		this.container = new CreateRequestContainer();
 
 	}
 
