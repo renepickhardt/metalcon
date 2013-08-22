@@ -45,15 +45,9 @@ public class SearchRequest {
                 "http://localhost:8080/solr/extern");
         
         SolrQuery q = new SolrQuery();
+        q.setRequestHandler("/search");
         // maybe vulnerable to xss?
         q.setQuery(query);
-        q.setFields("id", "title", "url", "content");
-        q.setHighlight(true);
-        q.setHighlightSimplePre("<em>");
-        q.setHighlightSimplePost("</em>");
-        q.setHighlightSnippets(2);
-        q.setParam("hl.fl", "title", "url", "content");
-        q.setParam("hl.mergeContinous", "true");
         
         QueryResponse qr;
         try {
