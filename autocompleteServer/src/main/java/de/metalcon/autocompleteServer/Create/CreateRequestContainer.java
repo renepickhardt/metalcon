@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
@@ -14,54 +13,13 @@ import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
-public class CreateRequestContainer extends Command implements Serializable {
+public class CreateRequestContainer extends Command {
 
-	private static final long serialVersionUID = 1L;
-	private String suggestString;
-	private Integer weight;
-	private String key;
-	private String imageBase64;
-	private String indexName;
+	private SuggestionComponents suggestionComponents;
 	private CreateServlet servlet;
 
-	public String getSuggestString() {
-		return this.suggestString;
-	}
-
-	public void setSuggestString(String suggestString) {
-		this.suggestString = suggestString;
-	}
-
-	public Integer getWeight() {
-		return this.weight;
-	}
-
-	public void setWeight(Integer weight) {
-		this.weight = weight;
-	}
-
-	public String getKey() {
-		return this.key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public String getImageBase64() {
-		return this.imageBase64;
-	}
-
-	public void setImageBase64(String image) {
-		this.imageBase64 = image;
-	}
-
-	public String getIndexName() {
-		return this.indexName;
-	}
-
-	public void setIndexName(String indexName) {
-		this.indexName = indexName;
+	public SuggestionComponents getComponents() {
+		return this.suggestionComponents;
 	}
 
 	@Override
@@ -69,17 +27,23 @@ public class CreateRequestContainer extends Command implements Serializable {
 
 		SuggestTree suggestTree = (SuggestTree) context
 				.getAttribute(ProtocolConstants.INDEX_PARAMETER
-						+ this.indexName);
+						+ this.suggestionComponents.getIndexName());
 
-		suggestTree.put(this.suggestString, this.weight, this.key);
+		suggestTree.put(this.suggestionComponents.getSuggestString(),
+				this.suggestionComponents.getWeight(),
+				this.suggestionComponents.getKey());
 
-		System.out.println(this.suggestString + this.weight + this.key);
-		if (this.imageBase64 != null) {
+		// System.out.println(this.suggestionComponents.getSuggestString() +
+		// this.suggestionComponents.getWeight().toString() +
+		// this.suggestionComponents.getKey());
+		if (this.suggestionComponents.getImageBase64() != null) {
 			HashMap<String, String> map = ContextListener
 					.getImageIndex(context);
-			System.out.println("fetched image index");
-			map.put(this.key, this.imageBase64);
-			System.out.println(this.key + this.imageBase64);
+			// System.out.println("fetched image index");
+			map.put(this.suggestionComponents.getKey(),
+					this.suggestionComponents.getImageBase64());
+			// System.out.println(this.suggestionComponents.getKey() +
+			// this.suggestionComponents.getImageBase64());
 			ContextListener.setImageIndex(map, context);
 		}
 
@@ -89,7 +53,7 @@ public class CreateRequestContainer extends Command implements Serializable {
 		try {
 			FileOutputStream saveFile = new FileOutputStream("Database.save");
 			ObjectOutputStream save = new ObjectOutputStream(saveFile);
-			save.writeObject(CreateRequestContainer.this);
+			save.writeObject(this.suggestionComponents);
 			save.close();
 
 		}

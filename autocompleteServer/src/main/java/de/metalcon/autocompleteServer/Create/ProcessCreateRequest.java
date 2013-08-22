@@ -61,15 +61,17 @@ public class ProcessCreateRequest {
 			return response;
 		}
 		response.addSuggestStringToContainer(suggestionString);
-		suggestTreeCreateRequestContainer.setSuggestString(suggestionString);
+		suggestTreeCreateRequestContainer.getComponents().setSuggestString(
+				suggestionString);
 
 		String indexName = checkIndexName(items, response);
 		// response.addIndexToContainer(indexName);
-		suggestTreeCreateRequestContainer.setIndexName(indexName);
+		suggestTreeCreateRequestContainer.getComponents().setIndexName(
+				indexName);
 
 		String suggestionKey = checkSuggestionKey(items, response);
 		// response.addSuggestionKeyToContainer(suggestionKey);
-		suggestTreeCreateRequestContainer.setKey(suggestionKey);
+		suggestTreeCreateRequestContainer.getComponents().setKey(suggestionKey);
 
 		Integer weight = checkWeight(items, response);
 		if (weight == null) {
@@ -77,7 +79,7 @@ public class ProcessCreateRequest {
 			return response;
 		}
 		// response.addWeightToContainer(weight);
-		suggestTreeCreateRequestContainer.setWeight(weight);
+		suggestTreeCreateRequestContainer.getComponents().setWeight(weight);
 
 		// Protocol forbids images for suggestions without keys
 		// TODO: add this piece of information to nokey-Warning
@@ -87,7 +89,8 @@ public class ProcessCreateRequest {
 				response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			}
 
-			suggestTreeCreateRequestContainer.setImageBase64(image);
+			suggestTreeCreateRequestContainer.getComponents().setImageBase64(
+					image);
 		}
 		response.addContainer(suggestTreeCreateRequestContainer);
 

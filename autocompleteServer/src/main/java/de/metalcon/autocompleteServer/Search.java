@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
-import de.metalcon.autocompleteServer.Create.CreateRequestContainer;
+import de.metalcon.autocompleteServer.Create.SuggestionComponents;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
@@ -41,7 +41,7 @@ public class Search {
 
 			while (true) {
 				try {
-					CreateRequestContainer suggestTreeEntry = (CreateRequestContainer) restore
+					SuggestionComponents suggestTreeEntry = (SuggestionComponents) restore
 							.readObject();
 					suggestTree.put(suggestTreeEntry.getSuggestString(),
 							suggestTreeEntry.getWeight(),

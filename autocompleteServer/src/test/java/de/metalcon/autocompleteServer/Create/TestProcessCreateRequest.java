@@ -170,13 +170,14 @@ public class TestProcessCreateRequest {
 				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
 
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
-				.getContainer().getKey());
+				.getContainer().getComponents().getKey());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
-				testResponse.getContainer().getSuggestString());
+				testResponse.getContainer().getComponents().getSuggestString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				testResponse.getContainer().getWeight().toString());
+				testResponse.getContainer().getComponents().getWeight()
+						.toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
-				.getContainer().getIndexName());
+				.getContainer().getComponents().getIndexName());
 		// assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
 		// + "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
 		// testResponse.getResponse().toString());
@@ -193,13 +194,14 @@ public class TestProcessCreateRequest {
 				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
 
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
-				.getContainer().getKey());
+				.getContainer().getComponents().getKey());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
-				testResponse.getContainer().getSuggestString());
+				testResponse.getContainer().getComponents().getSuggestString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				testResponse.getContainer().getWeight().toString());
+				testResponse.getContainer().getComponents().getWeight()
+						.toString());
 		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
-				.getContainer().getIndexName());
+				.getContainer().getComponents().getIndexName());
 		assertEquals("{" + "\"term\"" + ":" + "\""
 				+ ProtocolTestConstants.VALID_SUGGESTION_STRING + "\"" + ","
 				+ "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
