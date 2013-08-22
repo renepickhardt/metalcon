@@ -48,8 +48,8 @@ public class SearchRequest {
         q.setQuery(query);
         q.setFields("id", "title", "url", "content");
         q.setHighlight(true);
-        q.setHighlightSimplePre("<<");
-        q.setHighlightSimplePost(">>");
+        q.setHighlightSimplePre("<em>");
+        q.setHighlightSimplePost("</em>");
         q.setHighlightSnippets(2);
         q.setParam("hl.fl", "title", "url", "content");
         q.setParam("hl.mergeContinous", "true");
