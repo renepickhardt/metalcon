@@ -103,6 +103,8 @@ public class TestProcessCreateRequest {
 		} else {
 			fail("Error-Message missing!");
 		}
+		assertEquals(ProtocolTestConstants.DEFAULT_INDEX, testResponse
+				.getContainer().getComponents().getIndexName());
 
 	}
 
