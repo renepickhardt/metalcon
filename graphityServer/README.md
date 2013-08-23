@@ -43,7 +43,7 @@ This will create the directory
 in which the server will live for now.  
 Therefore make sure to have enough space available there for your database.
 Otherwise you can change the database directory in the configuration file.
-[Step 6.1](#6.1 Configuration) describes how to make changes to the server configuration.
+[Step 6.1](#61-configuration) describes how to make changes to the server configuration.
 
 ## 4. Deploy to Tomcat
 
