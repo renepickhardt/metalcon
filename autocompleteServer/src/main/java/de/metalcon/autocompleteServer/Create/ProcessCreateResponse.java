@@ -49,7 +49,7 @@ public class ProcessCreateResponse {
 	 * @param indexnameNotGiven
 	 */
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
-		this.jsonResponse.put("Warning:defaultIndex", indexnameNotGiven);
+		this.jsonResponse.put("Warning:DefaultIndex", indexnameNotGiven);
 	}
 
 	/**

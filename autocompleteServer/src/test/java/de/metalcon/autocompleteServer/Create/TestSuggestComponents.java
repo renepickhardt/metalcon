@@ -1,0 +1,104 @@
+package de.metalcon.autocompleteServer.Create;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
+import de.metalcon.autocompleteServer.Helper.SuggestTree;
+
+public class TestSuggestComponents {
+
+	SuggestionComponents testComponents = new SuggestionComponents();
+
+	File testFile = new File("TestFile.save");
+
+	@Before
+	public void initializeTest() {
+		this.testComponents.setIndexName("testindex");
+		this.testComponents.setKey("testKey");
+		this.testComponents.setSuggestString("testTerm");
+		this.testComponents.setWeight(1);
+	}
+
+	@Test
+	public void testFileSaving() {
+
+		// new file to write to
+
+		// new object to load stored-to-disc data for comparison with
+		// original-data
+		SuggestionComponents restoredComponents = null;
+
+		// write file to disc
+		this.testComponents.saveToDisc(this.testFile);
+
+		try {
+			FileInputStream saveFile = new FileInputStream(this.testFile);
+			ObjectInputStream restore = new ObjectInputStream(saveFile);
+
+			restoredComponents = (SuggestionComponents) restore.readObject();
+			restore.close();
+		} catch (IOException | ClassNotFoundException e1) {
+
+			e1.printStackTrace();
+
+		}
+		// testing each component for correct recreation
+		assertEquals(this.testComponents.getSuggestString(),
+				restoredComponents.getSuggestString());
+		assertEquals(this.testComponents.getKey(), restoredComponents.getKey());
+		assertEquals(this.testComponents.getIndexName(),
+				restoredComponents.getIndexName());
+		assertEquals(this.testComponents.getWeight(),
+				restoredComponents.getWeight());
+
+	}
+
+	@Test
+	public void testServerInitialization() {
+		SuggestTree suggestTree = new SuggestTree(
+				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
+
+		HashMap<String, String> imageIndex = new HashMap<String, String>();
+
+		try {
+			FileInputStream saveFile = new FileInputStream("TestFile.save");
+			ObjectInputStream restore = new ObjectInputStream(saveFile);
+
+			while (true) {
+				try {
+					SuggestionComponents suggestTreeEntry = (SuggestionComponents) restore
+							.readObject();
+					suggestTree.put(suggestTreeEntry.getSuggestString(),
+							suggestTreeEntry.getWeight(),
+							suggestTreeEntry.getKey());
+					imageIndex.put(suggestTreeEntry.getKey(),
+							suggestTreeEntry.getImageBase64());
+				} catch (EOFException e) {
+					restore.close();
+					break;
+				}
+
+			}
+
+		} catch (IOException | ClassNotFoundException e1) {
+
+			e1.printStackTrace();
+
+		}
+
+		System.out.println(suggestTree.getBestSuggestions("test")
+				.getSuggestion(0));
+
+	}
+
+}

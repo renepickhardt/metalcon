@@ -1,10 +1,16 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class SuggestionComponents implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7311975384159541028L;
+
+	// FIXME: remove transient-modifier after debugging!
 	private String suggestString;
 	private Integer weight;
 	private String key;
@@ -49,5 +55,20 @@ public class SuggestionComponents implements Serializable {
 
 	public void setIndexName(String indexName) {
 		this.indexName = indexName;
+	}
+
+	public void saveToDisc(File createFile) {
+		try {
+			FileOutputStream saveFile = new FileOutputStream(createFile);
+			ObjectOutputStream save = new ObjectOutputStream(saveFile);
+			save.writeObject(this);
+			save.close();
+
+		}
+		// maybe there is a way to store failed save-processes, to try them
+		// again, when the issue is solved?^
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
