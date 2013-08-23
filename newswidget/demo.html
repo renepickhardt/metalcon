@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+	<title>Objects</title>
+
+	<link rel="Stylesheet" href="theme/style.css" media="screen" type="text/css"/> 
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="src/newsfeed_script.js"></script>
+	<script type="text/javascript" src="src/formdata_script.js"></script>
+
+	<script type="text/javascript">
+		$(function(){
+			$("#metal .reader").metalconReader({
+				user	: "1",
+				items	: 5
+			});
+		});
+	</script>
+	</head>
+	<body>
+	<fieldset>
+		<legend>create status message</legend>
+		<label for="message">message:</label>
+		<input id="message" name="message" type="text" />
+		<input id="submit_button" type="submit" value="create status update" />
+	</fieldset>
+	<div id="metal">
+		<div>
+			<div class="reader"></div>
+		</div>
+	</div>
+
+	</body>
+</html>		
