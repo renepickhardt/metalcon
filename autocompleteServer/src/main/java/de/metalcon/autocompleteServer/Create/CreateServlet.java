@@ -45,10 +45,12 @@ public class CreateServlet extends HttpServlet {
 			// stack command
 			container.setRequestServlet(this);
 			this.commandQueue.add(container);
+			System.out.println("command stacked");
 
 			// wait for the command to be finished
 			try {
 				this.responseQueue.take();
+				System.out.println("command executed");
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -58,6 +60,7 @@ public class CreateServlet extends HttpServlet {
 			// response.setContentType("text/json");
 			response.getWriter().write(resp.getResponse().toJSONString());
 			response.getWriter().flush();
+			response.getWriter().close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

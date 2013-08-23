@@ -17,7 +17,8 @@ public class TestCreateRequestContainerProcessing {
 	final private ServletContext servletContext = mock(ServletContext.class);
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 
-	CreateRequestContainer testContainer = new CreateRequestContainer();
+	CreateRequestContainer testContainer = new CreateRequestContainer(
+			this.servletContext);
 
 	SuggestTree testIndex = new SuggestTree(7);
 
@@ -43,7 +44,7 @@ public class TestCreateRequestContainerProcessing {
 
 	@Test
 	public void test() {
-		this.testContainer.run(this.servletConfig.getServletContext());
+		this.testContainer.run();
 	}
 
 }

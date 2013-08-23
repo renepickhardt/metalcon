@@ -13,22 +13,30 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Worker implements Runnable {
 	private final BlockingQueue<Command> commands;
+	private final Thread workerThread;
 
 	public Worker(BlockingQueue<Command> commands) {
 		this.commands = commands;
+		this.workerThread = new Thread(this);
+		this.workerThread.start();
 	}
 
 	@Override
 	public void run() {
 		Command command;
 
-		while (true) {
-			try {
+		try {
+			while (true) {
 				command = this.commands.take();
-				command.run(command.getContext());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				command.run();
 			}
+		} catch (InterruptedException e) {
+			System.out.println("worker stopped");
+			e.printStackTrace();
 		}
+	}
+
+	public void stop() {
+		this.workerThread.interrupt();
 	}
 }

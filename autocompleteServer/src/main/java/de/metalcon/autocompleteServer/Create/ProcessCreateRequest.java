@@ -51,7 +51,8 @@ public class ProcessCreateRequest {
 	public static ProcessCreateResponse checkRequestParameter(
 			FormItemList items, ProcessCreateResponse response,
 			ServletContext context) {
-		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer();
+		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer(
+				context);
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.

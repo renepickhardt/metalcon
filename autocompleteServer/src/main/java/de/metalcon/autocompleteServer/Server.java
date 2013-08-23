@@ -19,7 +19,7 @@ public class Server implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-
+		this.worker.stop();
 	}
 
 	@Override

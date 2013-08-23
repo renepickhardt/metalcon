@@ -4,9 +4,15 @@ import javax.servlet.ServletContext;
 
 public abstract class Command {
 
-	public abstract void run(ServletContext context);
+	protected final ServletContext context;
+
+	public Command(ServletContext context) {
+		this.context = context;
+	}
+
+	public abstract void run();
 
 	public ServletContext getContext() {
-		return this.getContext();
+		return this.context;
 	}
 }

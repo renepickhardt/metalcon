@@ -12,7 +12,8 @@ import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class CreateRequestContainer extends Command {
 
-	public CreateRequestContainer() {
+	public CreateRequestContainer(final ServletContext context) {
+		super(context);
 		this.suggestionComponents = new SuggestionComponents();
 	}
 
@@ -25,9 +26,9 @@ public class CreateRequestContainer extends Command {
 	}
 
 	@Override
-	public void run(ServletContext context) {
+	public void run() {
 
-		SuggestTree suggestTree = (SuggestTree) context
+		SuggestTree suggestTree = (SuggestTree) this.context
 				.getAttribute(ProtocolConstants.INDEX_PARAMETER
 						+ this.suggestionComponents.getIndexName());
 
@@ -39,10 +40,10 @@ public class CreateRequestContainer extends Command {
 
 		if (this.suggestionComponents.getImageBase64() != null) {
 			HashMap<String, String> map = ContextListener
-					.getImageIndex(context);
+					.getImageIndex(this.context);
 			map.put(this.suggestionComponents.getKey(),
 					this.suggestionComponents.getImageBase64());
-			ContextListener.setImageIndex(map, context);
+			ContextListener.setImageIndex(map, this.context);
 		}
 
 		// This creates the database file if it doesn't exist
