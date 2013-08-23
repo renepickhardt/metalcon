@@ -40,7 +40,12 @@ algorithm = read-optimized
 use_memory_mapped_buffers = false
 
 # Database configuration field. Look in the Neo4j documentation for more information.
-cache_type = strong" > /etc/graphity/graphity.conf
+cache_type = strong
+
+#Tomcat settings
+
+# Sets the HTTP header \"Access-Control-Allow-Origin\".
+headerAccessControl = *" > /etc/graphity/graphity.conf
 
 # set directory permissions
 chown -R tomcat.tomcat /etc/graphity/

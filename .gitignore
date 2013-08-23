@@ -15,3 +15,6 @@ bin/
 *.jar
 *.war
 *.ear
+
+# Backup Files
+*.*~

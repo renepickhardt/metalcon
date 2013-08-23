@@ -48,21 +48,21 @@ public class NeoUtils {
 	private static Index<Node> INDEX_STATUS_UPDATES;
 
 	/**
-	 * create the database configuration map for neo4j databases
+	 * load the database configuration map for neo4j databases
 	 * 
 	 * @param config
-	 *            neo4j graph configuration containing the configuration values
+	 *            Graphity configuration containing the configuration values
 	 * @return neo4j database configuration map
 	 */
-	private static Map<String, String> createDatabaseConfig(
-			final NeoGraphConfiguration config) {
+	private static Map<String, String> loadDatabaseConfig(
+			final Configuration config) {
 		// create database configuration
 		final Map<String, String> databaseConfig = new HashMap<String, String>();
 
 		// fill database configuration
-		databaseConfig.put("cache_type", config.cacheType());
+		databaseConfig.put("cache_type", config.getCacheType());
 		databaseConfig.put("use_memory_mapped_buffers",
-				config.useMemoryMappedBuffers());
+				config.getUseMemoryMappedBuffers());
 
 		return databaseConfig;
 	}
@@ -84,21 +84,21 @@ public class NeoUtils {
 	 * open the neo4j graph database
 	 * 
 	 * @param config
-	 *            neo4j graph configuration
+	 *            Graphity configuration
 	 * @return abstract graph database
 	 */
 	public static AbstractGraphDatabase getSocialGraphDatabase(
-			final NeoGraphConfiguration config) {
+			final Configuration config) {
 		// prepare neo4j graph configuration
-		final Map<String, String> graphConfig = createDatabaseConfig(config);
+		final Map<String, String> graphConfig = loadDatabaseConfig(config);
 
 		// load database from path specified
 		AbstractGraphDatabase database;
-		if (config.readOnly()) {
-			database = new EmbeddedReadOnlyGraphDatabase(config.databasePath(),
-					graphConfig);
+		if (config.getReadOnly()) {
+			database = new EmbeddedReadOnlyGraphDatabase(
+					config.getDatabasePath(), graphConfig);
 		} else {
-			database = new EmbeddedGraphDatabase(config.databasePath(),
+			database = new EmbeddedGraphDatabase(config.getDatabasePath(),
 					graphConfig);
 		}
 
