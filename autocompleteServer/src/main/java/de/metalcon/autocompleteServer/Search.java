@@ -10,6 +10,7 @@ import java.util.HashMap;
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Create.SuggestionComponents;
+import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
@@ -68,7 +69,8 @@ public class Search {
 			e1.printStackTrace();
 
 		}
-		context.setAttribute(ProtocolConstants.INDEX_PARAMETER
-				+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
+		ContextListener.setIndex(ProtocolConstants.DEFAULT_INDEX_NAME,
+				suggestTree, context);
+		ContextListener.setImageIndex(imageIndex, context);
 	}
 }
