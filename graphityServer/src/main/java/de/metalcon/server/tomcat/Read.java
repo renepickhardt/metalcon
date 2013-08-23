@@ -26,6 +26,7 @@ public class Read extends GraphityHttpServlet {
 	protected void doGet(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
+		response.setHeader("Access-Control-Allow-Origin","*");
 		final TomcatClientResponder responder = new TomcatClientResponder(
 				response);
 
