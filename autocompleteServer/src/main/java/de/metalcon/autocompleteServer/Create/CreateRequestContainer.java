@@ -44,7 +44,7 @@ public class CreateRequestContainer extends Command {
 		}
 
 		// This creates the database file if it doesn't exist
-		File createFile = new File("Database.save", "a");
+		File createFile = new File("/var/lib/tomcat/Database.save");
 
 		this.suggestionComponents.saveToDisc(createFile);
 

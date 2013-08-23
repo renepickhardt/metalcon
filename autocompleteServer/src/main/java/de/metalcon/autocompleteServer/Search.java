@@ -37,7 +37,8 @@ public class Search {
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 
 		try {
-			File saveFile = new File("Database.save");
+			// FIXME change after debugging
+			File saveFile = new File("/var/lib/tomcat/Database.save");
 
 			if (saveFile.exists()) {
 

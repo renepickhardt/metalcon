@@ -59,7 +59,7 @@ public class SuggestionComponents implements Serializable {
 
 	public void saveToDisc(File createFile) {
 		try {
-			FileOutputStream saveFile = new FileOutputStream(createFile);
+			FileOutputStream saveFile = new FileOutputStream(createFile, true);
 			ObjectOutputStream save = new ObjectOutputStream(saveFile);
 			save.writeObject(this);
 			save.close();
