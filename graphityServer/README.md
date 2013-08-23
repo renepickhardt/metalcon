@@ -43,7 +43,7 @@ This will create the directory
 in which the server will live for now.  
 Therefore make sure to have enough space available there for your database.
 Otherwise you can change the database directory in the configuration file.
-[Step 6.1](### 6.1 Configuration) describes how to make changes to the server configuration.
+[Step 6.1](#6.1 Configuration) describes how to make changes to the server configuration.
 
 ## 4. Deploy to Tomcat
 
@@ -129,8 +129,8 @@ Therefore the server allows you to define the status update types that are allow
 This gets done using status update templates which are XML files following a concrete syntax.
 
 By default the Graphity server knows only one status update template called "Plain".  
-You can find this template after a first startup and you have to put all your custom templates in the template path set in the server configuration which is
->/etc/graphity/templates
+You can find this template after a first startup and you have to put all your custom templates in the template path set in the server configuration, so its path is
+>/etc/graphity/templates/Plain.xml
 
 by default. If you open the file it will contain
 ```
