@@ -43,7 +43,8 @@ The Graphity server should start up succesfully after the deployment.
 
 Congratulations!
 
-You now own a working news stream server.  
+You now own a working news stream server. 
+Read the [Protocol Specifications of the servers REST API](PROTOCOL-OF-REST-API.MD) to lear how to store status updates and friendships and how to retrieve activity streams.
 
 To test this manually feel free to use the following test files:
 * [create a user](src/test/java/de/metalcon/server/tomcat/createUser.html)
@@ -145,3 +146,10 @@ At the moment only "String", "Integer" and "Boolean" are allowed.
 This String sets the MIME-type the file sent by the user has to match to.
 
 Please keep in mind that the templates get loaded **at startup** and therefore the server needs to restart to know new templates.
+
+## 7 joining the developer team:
+* there is our mailinglist at http://lists.metalcon.de/cgi-bin/mailman/listinfo/developer
+* feel free to add bugs to the bug tracker or even fix them. you might be interested in the following open issues
+  * adding the feature to allow [comments of status updates](../../issues/4)
+  * adding [support for multiple parents of a status update](../../issues/5)
+  * adding [support for requesting a single status update in it's own uri](../../issues/7)

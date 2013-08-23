@@ -47,7 +47,7 @@ public class ServletBenchmark {
 
 	public static void main(final String[] args) throws IOException {
 		final FileReader fileReader = new FileReader(
-				"/home/sebschlicht/de-events.log");
+				"/var/lib/datasets/rawdata/wikievents/simple-events.logSortedByTime");
 		final BufferedReader reader = new BufferedReader(fileReader);
 		final HashSet<String> userExists = new HashSet<String>();
 
@@ -153,7 +153,7 @@ public class ServletBenchmark {
 		params.add(new BasicNameValuePair(
 				ProtocolConstants.Parameters.Read.OWN_UPDATES, "0"));
 
-		final String url = "http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/read?"
+		final String url = "http://localhost:8080/Graphity-Server-0.1/read?"
 				+ URLEncodedUtils.format(params, "utf-8");
 		final String response = readRequest(url);
 
@@ -209,7 +209,7 @@ public class ServletBenchmark {
 		}
 
 		postRequest(
-				"http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/create",
+				"http://localhost:8080/Graphity-Server-0.1/create",
 				entity);
 		timeCreateUser = System.nanoTime() - timeCreateUser;
 		time += timeCreateUser;
@@ -244,7 +244,7 @@ public class ServletBenchmark {
 		}
 
 		postRequest(
-				"http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/create",
+				"http://localhost:8080/Graphity-Server-0.1/create",
 				entity);
 
 		timeCreateStatusUpdate = System.nanoTime() - timeCreateStatusUpdate;
@@ -273,7 +273,7 @@ public class ServletBenchmark {
 		}
 
 		postRequest(
-				"http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/create",
+				"http://localhost:8080/Graphity-Server-0.1/create",
 				entity);
 
 		timeCreateFollow = System.nanoTime() - timeCreateFollow;
@@ -299,7 +299,7 @@ public class ServletBenchmark {
 		final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(values);
 
 		postRequest(
-				"http://localhost:8080/Graphity-Server-0.0.1-SNAPSHOT/delete",
+				"http://localhost:8080/Graphity-Server-0.1/delete",
 				entity);
 
 		timeDeleteFollow = System.nanoTime() - timeDeleteFollow;
