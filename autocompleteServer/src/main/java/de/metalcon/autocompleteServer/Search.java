@@ -1,6 +1,7 @@
 package de.metalcon.autocompleteServer;
 
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -35,21 +36,29 @@ public class Search {
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 
 		try {
-			FileInputStream saveFile = new FileInputStream("Database.save");
-			ObjectInputStream restore = new ObjectInputStream(saveFile);
+			File saveFile = new File("Database.save");
 
-			while (true) {
-				try {
-					SuggestionComponents suggestTreeEntry = (SuggestionComponents) restore
-							.readObject();
-					suggestTree.put(suggestTreeEntry.getSuggestString(),
-							suggestTreeEntry.getWeight(),
-							suggestTreeEntry.getKey());
-					imageIndex.put(suggestTreeEntry.getKey(),
-							suggestTreeEntry.getImageBase64());
-				} catch (EOFException e) {
-					restore.close();
-					break;
+			if (saveFile.exists()) {
+
+				FileInputStream fileInputStream = new FileInputStream(saveFile);
+
+				ObjectInputStream restore = new ObjectInputStream(
+						fileInputStream);
+
+				while (true) {
+					try {
+						SuggestionComponents suggestTreeEntry = (SuggestionComponents) restore
+								.readObject();
+						suggestTree.put(suggestTreeEntry.getSuggestString(),
+								suggestTreeEntry.getWeight(),
+								suggestTreeEntry.getKey());
+						imageIndex.put(suggestTreeEntry.getKey(),
+								suggestTreeEntry.getImageBase64());
+					} catch (EOFException e) {
+						restore.close();
+						break;
+					}
+
 				}
 
 			}
