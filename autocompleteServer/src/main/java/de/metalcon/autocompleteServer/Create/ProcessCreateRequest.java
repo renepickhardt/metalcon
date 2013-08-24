@@ -204,7 +204,6 @@ public class ProcessCreateRequest {
 		} catch (IllegalArgumentException e) {
 			// TODO: RefactorName
 			response.addWeightNotGivenError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
-			e.printStackTrace();
 			return null;
 		}
 
