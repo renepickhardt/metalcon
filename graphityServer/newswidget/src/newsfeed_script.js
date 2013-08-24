@@ -9,8 +9,7 @@ jQuery.fn.metalconReader = function(options){
  
 var MetalconReader = function(options){
     jQuery.extend(this,options || {});
-    this.url = "http://141.26.71.115:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items=15&own_updates=1";
-	//this.url = "https://api.flattr.com/rest/v2/users/"+this.user+"/things.as";
+    this.url = "http://localhost:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items=15&own_updates=1";
 	if(this.user === "") throw "The 'user' property is required";
 	if(this.renderTo === "") throw "The 'renderTo' property is required";
 	this.read();

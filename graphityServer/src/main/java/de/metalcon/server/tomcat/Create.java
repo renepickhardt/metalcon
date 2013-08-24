@@ -63,7 +63,8 @@ public class Create extends GraphityHttpServlet {
 		// store response item for the server response creation
 		final TomcatClientResponder responder = new TomcatClientResponder(
 				response);
-
+		response.setHeader("Access-Control-Allow-Origin",
+				this.config.getHeaderAccessControl());
 		CreateResponse createResponse = new CreateResponse();
 		FormItemList formItemList = null;
 		try {

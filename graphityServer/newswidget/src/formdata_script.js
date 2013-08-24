@@ -14,7 +14,7 @@ $(document).ready(function() {
 		fd.append('message' ,message);
 		fd.append('status_update_type',"Plain");
 		$.ajax({
-		  url: 'http://141.26.71.115:8080/Graphity-Server-0.1/create',
+		  url: 'http://localhost:8080/Graphity-Server-0.1/create',
 		  data: fd,
 		  headers: {'Origin': '*'},
 		  processData: false,
