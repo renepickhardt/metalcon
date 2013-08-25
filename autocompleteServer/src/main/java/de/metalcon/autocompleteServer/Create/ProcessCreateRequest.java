@@ -113,9 +113,7 @@ public class ProcessCreateRequest {
 			return null;
 		}
 
-		// TODO find better approximation for resulting file size (after Base64
-		// encoding)
-		byte[] buffer = new byte[(int) imageFile.getSize() * 3 / 2];
+		byte[] buffer = new byte[(int) imageFile.getSize()];
 		byte[] tmp = null;
 		try {
 			int size = imageFile.getInputStream().read(buffer);

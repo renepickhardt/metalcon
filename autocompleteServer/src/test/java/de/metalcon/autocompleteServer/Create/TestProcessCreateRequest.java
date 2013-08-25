@@ -5,12 +5,16 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -162,28 +166,132 @@ public class TestProcessCreateRequest {
 	}
 
 	@Test
-	public void testFullFormWithImage() {
+	public void testFullFormWithImage() throws Exception {
 
-		// TODO insert base64 encoded image
-		ProcessCreateResponse testResponse = this.processTestRequest(
-				ProtocolTestConstants.VALID_SUGGESTION_KEY,
-				ProtocolTestConstants.VALID_SUGGESTION_STRING,
-				ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				ProtocolTestConstants.VALID_SUGGESTION_INDEX, null);
+		// FIXME imageFileItem does not get any data
+		File image = new File("testImage_valid.jpg");
 
-		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY, testResponse
-				.getContainer().getComponents().getKey());
-		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
-				testResponse.getContainer().getComponents().getSuggestString());
-		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
-				testResponse.getContainer().getComponents().getWeight()
-						.toString());
-		assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX, testResponse
-				.getContainer().getComponents().getIndexName());
-		// assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
-		// + "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
-		// testResponse.getResponse().toString());
-		// assert image is B64 encoded and not null
+		if (image.length() > 0) {
+
+			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
+					true, "file", 50000, null);
+			// imageFileItem = image.toFileItem();
+
+			ProcessCreateResponse testResponse = this
+					.processTestRequest(
+							ProtocolTestConstants.VALID_SUGGESTION_KEY,
+							ProtocolTestConstants.VALID_SUGGESTION_STRING,
+							ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
+							imageFileItem);
+
+			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_KEY,
+					testResponse.getContainer().getComponents().getKey());
+			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_STRING,
+					testResponse.getContainer().getComponents()
+							.getSuggestString());
+			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+					testResponse.getContainer().getComponents().getWeight()
+							.toString());
+			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX,
+					testResponse.getContainer().getComponents().getIndexName());
+			// assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+			// + "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
+			// testResponse.getResponse().toString());
+			// assert image is B64 encoded and not null
+
+			System.out.println(testResponse.getContainer().getComponents()
+					.getImageBase64());
+		} else {
+			fail("no image to test with provided!");
+		}
+	}
+
+	@Test
+	public void testFullFormWithImageTooWide() throws Exception {
+
+		// FIXME imageFileItem does not get any data
+		File image = new File("testImage_tooWide.jpg");
+
+		if (image.length() > 0) {
+
+			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
+					true, "file", 50000, null);
+			// imageFileItem = image.toFileItem();
+
+			ProcessCreateResponse testResponse = this
+					.processTestRequest(
+							ProtocolTestConstants.VALID_SUGGESTION_KEY,
+							ProtocolTestConstants.VALID_SUGGESTION_STRING,
+							ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
+							imageFileItem);
+
+			// TODO: Insert Assertion
+
+			System.out.println(testResponse.getContainer().getComponents()
+					.getImageBase64());
+		} else {
+			fail("no image to test with provided!");
+		}
+	}
+
+	@Test
+	public void testFullFormWithImageTooHigh() throws Exception {
+
+		// FIXME imageFileItem does not get any data
+		File image = new File("testImage_tooHigh.jpg");
+
+		if (image.length() > 0) {
+
+			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
+					true, "file", 50000, null);
+			// imageFileItem = image.toFileItem();
+
+			ProcessCreateResponse testResponse = this
+					.processTestRequest(
+							ProtocolTestConstants.VALID_SUGGESTION_KEY,
+							ProtocolTestConstants.VALID_SUGGESTION_STRING,
+							ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
+							imageFileItem);
+
+			// TODO: Insert Assertion
+
+			System.out.println(testResponse.getContainer().getComponents()
+					.getImageBase64());
+		} else {
+			fail("no image to test with provided!");
+		}
+	}
+
+	@Test
+	public void testFullFormWithImageWrongType() throws Exception {
+
+		// FIXME imageFileItem does not get any data
+		File image = new File("testImage_wrongType.png");
+
+		if (image.length() > 0) {
+
+			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
+					true, "file", 50000, null);
+			// imageFileItem = image.toFileItem();
+
+			ProcessCreateResponse testResponse = this
+					.processTestRequest(
+							ProtocolTestConstants.VALID_SUGGESTION_KEY,
+							ProtocolTestConstants.VALID_SUGGESTION_STRING,
+							ProtocolTestConstants.VALID_SUGGESTION_WEIGHT,
+							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
+							imageFileItem);
+
+			// TODO: Insert Assertion
+
+			System.out.println(testResponse.getContainer().getComponents()
+					.getImageBase64());
+		} else {
+			fail("no image to test with provided!");
+		}
 	}
 
 	@Test
@@ -211,7 +319,7 @@ public class TestProcessCreateRequest {
 	}
 
 	private ProcessCreateResponse processTestRequest(String key, String term,
-			String weight, String index, String imageBase64) {
+			String weight, String index, FileItem image) {
 
 		ProcessCreateResponse response = new ProcessCreateResponse(
 				this.servletConfig.getServletContext());
@@ -228,10 +336,9 @@ public class TestProcessCreateRequest {
 		if (index != null) {
 			testItems.addField(ProtocolConstants.INDEX_PARAMETER, index);
 		}
-		if (imageBase64 != null) {
-			testItems.addField(ProtocolConstants.IMAGE, imageBase64);
+		if (image != null) {
+			testItems.addFile(ProtocolConstants.IMAGE, image);
 		}
-
 		return ProcessCreateRequest.checkRequestParameter(testItems, response,
 				this.servletConfig.getServletContext());
 	}

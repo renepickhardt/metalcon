@@ -10,4 +10,5 @@ public class ProtocolTestConstants {
 	public static final String TOO_LONG_SUGGESTION_STRING = "thisisaverylongwordyouarenotsupposedtouseasasuggestionstringasitslengthisfarbeyondreasonletsinsertsomemorecharacterstomakeitevenlongerblablablaithinkyougettheideaokletsstopitenoughisenough";
 	public static final String NOT_A_NUMBER_WEIGHT = "thisisnotanumber";
 	public static final String DEFAULT_INDEX = "generalindex";
+	public static final String IMAGE_PATH = "testImage.jpg";
 }
