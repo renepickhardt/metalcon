@@ -15,7 +15,6 @@ public class ImageFileItem implements FileItem {
 	private final File file;
 
 	public ImageFileItem(File file) {
-		super();
 		this.file = file;
 	}
 

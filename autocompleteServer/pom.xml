@@ -76,5 +76,10 @@
       <artifactId>commons-codec</artifactId>
       <version>20041127.091804</version>
     </dependency>
+    <dependency>
+      <groupId>de.metalcon.utils</groupId>
+      <artifactId>form-item-list</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 </project>
