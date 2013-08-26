@@ -13,7 +13,6 @@ public class CreateStatusCodes {
 
 	public static final String QUERYNAME_NOT_GIVEN = "No search term given. A suggest item always needs a term. Please enter a search term for your item.";
 	public static final String INDEXNAME_NOT_GIVEN = "Missing index name. You need to specify which index the entry should be inserted into.";
-	// TODO: replace "null" with better human readable Strings.
 	public static final String REQUEST_MUST_BE_MULTIPART = "The HTTP request must be multipart/form-data. Your request has another content-type and can't be processed.";
 	public static final String WEIGHT_NOT_GIVEN = "weight not given";
 	public static final String WEIGHT_NOT_A_NUMBER = "weight is not a number and was discarded. Weight needs to be a positive integer.";

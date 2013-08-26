@@ -62,7 +62,6 @@ public class CreateServlet extends HttpServlet {
 			response.getWriter().flush();
 			response.getWriter().close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

@@ -42,7 +42,6 @@ public class TestProcessCreateRequest {
 						.getAttribute(ProtocolConstants.INDEX_PARAMETER
 								+ "testIndex")).thenReturn(generalIndex);
 
-		// TODO: see fix-me at missingIndex-Test
 		when(
 				this.servletContext
 						.getAttribute(ProtocolConstants.INDEX_PARAMETER
@@ -56,8 +55,7 @@ public class TestProcessCreateRequest {
 		}
 	}
 
-	// TODO: add tests according to protocol specifications. Check each possible
-	// status.
+	// TODO: Check if all possible states are tested
 
 	@Test
 	public void testFormMissingSuggestString() {

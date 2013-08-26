@@ -48,7 +48,6 @@ public class ProcessCreateRequest {
 		// items is == null, when request Content-Type is not multipart
 		if (items == null) {
 			response.addHttpRequestError(CreateStatusCodes.REQUEST_MUST_BE_MULTIPART);
-			// TODO double-check if return correct
 			return response;
 		}
 
@@ -110,9 +109,6 @@ public class ProcessCreateRequest {
 		}
 		response.addContainer(suggestTreeCreateRequestContainer);
 
-		// TODO remove this line, when the queue is ready.
-		// suggestTreeCreateRequestContainer.run(context);
-
 		return response;
 	}
 
@@ -143,7 +139,6 @@ public class ProcessCreateRequest {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

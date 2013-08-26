@@ -9,12 +9,15 @@ public class ContextListener {
 	// TODO: make this cleaner and nicer. having this constant prefix here calls
 	// for trouble
 	public static SuggestTree getIndex(String indexName, ServletContext context) {
-		return (SuggestTree) context.getAttribute("indexName:" + indexName);
+		return (SuggestTree) context
+				.getAttribute(ProtocolConstants.INDEX_PARAMETER + ":"
+						+ indexName);
 	}
 
 	public static void setIndex(String indexName, SuggestTree index,
 			ServletContext context) {
-		context.setAttribute("indexName:" + indexName, index);
+		context.setAttribute(ProtocolConstants.INDEX_PARAMETER + ":"
+				+ indexName, index);
 	}
 
 	public static HashMap<String, String> getImageIndex(ServletContext context) {
