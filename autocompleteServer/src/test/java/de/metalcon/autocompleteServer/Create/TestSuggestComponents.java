@@ -1,6 +1,7 @@
 package de.metalcon.autocompleteServer.Create;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.EOFException;
 import java.io.File;
@@ -23,10 +24,13 @@ public class TestSuggestComponents {
 
 	@Before
 	public void initializeTest() {
-		this.testComponents.setIndexName("testindex");
-		this.testComponents.setKey("testKey");
-		this.testComponents.setSuggestString("testTerm");
-		this.testComponents.setWeight(1);
+		this.testComponents
+				.setIndexName(ProtocolTestConstants.VALID_SUGGESTION_INDEX);
+		this.testComponents.setKey(ProtocolTestConstants.VALID_SUGGESTION_KEY);
+		this.testComponents
+				.setSuggestString(ProtocolTestConstants.VALID_SUGGESTION_STRING);
+		this.testComponents.setWeight(Integer
+				.parseInt(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT));
 	}
 
 	@Test
@@ -93,12 +97,12 @@ public class TestSuggestComponents {
 		} catch (IOException | ClassNotFoundException e1) {
 
 			e1.printStackTrace();
+			fail("Data could not be restored");
 
 		}
-
-		System.out.println(suggestTree.getBestSuggestions("test")
-				.getSuggestion(0));
-
+		assertEquals(suggestTree.getBestSuggestions("test").getSuggestion(0),
+				"testTerm");
+		this.testFile.deleteOnExit();
 	}
 
 }

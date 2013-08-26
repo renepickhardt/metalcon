@@ -6,6 +6,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+/**
+ * 
+ * Contains the data extracted from the HTTP-request, which will be inserted
+ * into the suggestTree and stored to disc.
+ * 
+ * @author Christian Schowalter
+ * 
+ */
 public class SuggestionComponents implements Serializable {
 
 	private static final long serialVersionUID = 7311975384159541028L;
@@ -59,6 +67,8 @@ public class SuggestionComponents implements Serializable {
 	public void saveToDisc(File createFile) {
 		try {
 			FileOutputStream saveFile = new FileOutputStream(createFile, true);
+
+			// TODO check if AppendableObjectOutputStream has to be used instead
 			ObjectOutputStream save = new ObjectOutputStream(saveFile);
 			save.writeObject(this);
 			save.close();

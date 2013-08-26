@@ -21,11 +21,19 @@ import de.metalcon.utils.FormItemList;
  */
 public class ProcessCreateRequest {
 
-	/**
-	 * 
-	 */
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
+	/**
+	 * 
+	 * processes HTTP-Requests by extracting the form-data. If extraction is
+	 * successful, data is passed to checkRequestParameter() which also takes on
+	 * generating a response. If extraction fails a response containing an
+	 * error-message is returned.
+	 * 
+	 * @param request
+	 * @param context
+	 * @author Christian Schowalter
+	 */
 	public static ProcessCreateResponse handleServlet(
 			HttpServletRequest request, ServletContext context) {
 		ProcessCreateResponse response = new ProcessCreateResponse(context);
@@ -47,6 +55,17 @@ public class ProcessCreateRequest {
 		return checkRequestParameter(items, response, context);
 	}
 
+	/**
+	 * 
+	 * Checks extracted form-items for ASTP-compliance. Also generates
+	 * Status-Message for the response, which tells if there are any problems
+	 * with the given data.
+	 * 
+	 * @param items
+	 * @param response
+	 * @param context
+	 * @return response
+	 */
 	public static ProcessCreateResponse checkRequestParameter(
 			FormItemList items, ProcessCreateResponse response,
 			ServletContext context) {
