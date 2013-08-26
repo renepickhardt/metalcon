@@ -31,6 +31,16 @@ public class ProtocolConstants {
 	public static final int IMAGE_WIDTH = 64;
 	public static final int IMAGE_HEIGHT = 64;
 	public static final long MAX_IMAGE_FILE_LENGTH = 3000000;
+	public static final String STATUS_OK = "Status:OK";
+	public static final String STATUS_NO_QUERY = "Error:queryNameNotGiven";
+	public static final String STATUS_QUERY_TOO_LONG = "Error:queryNameTooLong";
+	public static final String STATUS_DEFAULT_INDEX = "Warning:DefaultIndex";
+	public static final String STATUS_NO_IMAGE = "Warning:noImage";
+	public static final String STATUS_REQUEST_NOT_MULTIPART = "Error:RequestNotMultipart";
+	public static final String STATUS_NO_WEIGHT = "Error:WeightNotGiven";
+	public static final String STATUS_WEIGHT_NOT_A_NUMBER = "Error:WeightNotANumber";
+	public static final String STATUS_NO_KEY = "Warning:KeyNotGiven";
+	public static final String STATUS_KEY_TOO_LONG = "Warning:KeyTooLong";
 
 	/**
 	 * the default Number of Items which can be retrieved from the Suggest

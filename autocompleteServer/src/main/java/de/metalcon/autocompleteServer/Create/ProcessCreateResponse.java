@@ -4,6 +4,8 @@ import javax.servlet.ServletContext;
 
 import org.json.simple.JSONObject;
 
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
+
 public class ProcessCreateResponse {
 
 	private final ServletContext context;
@@ -16,8 +18,6 @@ public class ProcessCreateResponse {
 
 	}
 
-	// TODO: Change JSON-Keys (not values!) to constants
-
 	/**
 	 * Adds a queryName-Error to the container object.Expects the String to be
 	 * not NULL and correctly formatted.
@@ -25,11 +25,13 @@ public class ProcessCreateResponse {
 	 * @param querynameNotGiven
 	 */
 	public void addQueryNameMissingError(String querynameNotGiven) {
-		this.jsonResponse.put("Error:queryNameNotGiven", querynameNotGiven);
+		this.jsonResponse.put(ProtocolConstants.STATUS_NO_QUERY,
+				querynameNotGiven);
 	}
 
 	public void addQueryNameTooLongError(String querynameTooLong) {
-		this.jsonResponse.put("Error:queryNameTooLong", querynameTooLong);
+		this.jsonResponse.put(ProtocolConstants.STATUS_QUERY_TOO_LONG,
+				querynameTooLong);
 	}
 
 	/**
@@ -39,7 +41,8 @@ public class ProcessCreateResponse {
 	 * @param suggestionString
 	 */
 	public void addSuggestStringToContainer(String suggestionString) {
-		this.jsonResponse.put("term", suggestionString);
+		this.jsonResponse.put(ProtocolConstants.QUERY_PARAMETER,
+				suggestionString);
 	}
 
 	/**
@@ -49,7 +52,8 @@ public class ProcessCreateResponse {
 	 * @param indexnameNotGiven
 	 */
 	public void addDefaultIndexWarning(String indexnameNotGiven) {
-		this.jsonResponse.put("Warning:DefaultIndex", indexnameNotGiven);
+		this.jsonResponse.put(ProtocolConstants.STATUS_DEFAULT_INDEX,
+				indexnameNotGiven);
 	}
 
 	/**
@@ -59,7 +63,7 @@ public class ProcessCreateResponse {
 	 * @param noImage
 	 */
 	public void addNoImageWarning(String noImage) {
-		this.jsonResponse.put("Warning:noImage", noImage);
+		this.jsonResponse.put(ProtocolConstants.STATUS_NO_IMAGE, noImage);
 	}
 
 	/**
@@ -69,25 +73,28 @@ public class ProcessCreateResponse {
 	 * @param noImage
 	 */
 	public void addHttpRequestError(String requestMustBeMultipart) {
-		this.jsonResponse.put("Error:RequestNotMultipart",
+		this.jsonResponse.put(ProtocolConstants.STATUS_REQUEST_NOT_MULTIPART,
 				requestMustBeMultipart);
 	}
 
 	public void addWeightNotGivenError(String weightNotGiven) {
-		this.jsonResponse.put("Error:WeightNotGiven", weightNotGiven);
+		this.jsonResponse.put(ProtocolConstants.STATUS_NO_WEIGHT,
+				weightNotGiven);
 
 	}
 
 	public void addWeightNotANumberError(String weightNotANumber) {
-		this.jsonResponse.put("Error:WeightNotANumber", weightNotANumber);
+		this.jsonResponse.put(ProtocolConstants.STATUS_WEIGHT_NOT_A_NUMBER,
+				weightNotANumber);
 	}
 
 	public void addNoKeyWarning(String keyNotGiven) {
-		this.jsonResponse.put("Warning:KeyNotGiven", keyNotGiven);
+		this.jsonResponse.put(ProtocolConstants.STATUS_NO_KEY, keyNotGiven);
 	}
 
 	public void addKeyTooLongWarning(String keyTooLong) {
-		this.jsonResponse.put("Warning:KeyTooLong", keyTooLong);
+		this.jsonResponse
+				.put(ProtocolConstants.STATUS_KEY_TOO_LONG, keyTooLong);
 	}
 
 	/**

@@ -31,14 +31,21 @@ public class TestCreateRequestContainerProcessing {
 		when(
 				this.servletContext
 						.getAttribute(ProtocolConstants.INDEX_PARAMETER
-								+ "testIndex")).thenReturn(this.testIndex);
+								+ ProtocolTestConstants.VALID_SUGGESTION_INDEX))
+				.thenReturn(this.testIndex);
 
 		this.testContainer.setRequestServlet(servlet);
 
-		this.testContainer.getComponents().setIndexName("testIndex");
-		this.testContainer.getComponents().setKey("testKey");
-		this.testContainer.getComponents().setSuggestString("testTerm");
-		this.testContainer.getComponents().setWeight(1);
+		this.testContainer.getComponents().setIndexName(
+				ProtocolTestConstants.VALID_SUGGESTION_INDEX);
+		this.testContainer.getComponents().setKey(
+				ProtocolTestConstants.VALID_SUGGESTION_KEY);
+		this.testContainer.getComponents().setSuggestString(
+				ProtocolTestConstants.VALID_SUGGESTION_STRING);
+		this.testContainer
+				.getComponents()
+				.setWeight(
+						Integer.parseInt(ProtocolTestConstants.VALID_SUGGESTION_WEIGHT));
 
 	}
 
