@@ -6,8 +6,6 @@ import javax.servlet.ServletContext;
 
 public class ContextListener {
 
-	// TODO: make this cleaner and nicer. having this constant prefix here calls
-	// for trouble
 	public static SuggestTree getIndex(String indexName, ServletContext context) {
 		return (SuggestTree) context
 				.getAttribute(ProtocolConstants.INDEX_PARAMETER + ":"
