@@ -94,9 +94,7 @@ public class FormItemList {
 	}
 
 	/**
-	 * get a set containing all file identifiers
-	 * 
-	 * @return
+	 * @return set containing all file identifiers
 	 */
 	public Set<String> getFileIdentifiers() {
 		return this.files.keySet();
