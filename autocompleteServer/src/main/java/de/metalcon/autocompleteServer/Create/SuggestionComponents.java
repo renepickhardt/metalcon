@@ -10,7 +10,6 @@ public class SuggestionComponents implements Serializable {
 
 	private static final long serialVersionUID = 7311975384159541028L;
 
-	// FIXME: remove transient-modifier after debugging!
 	private String suggestString;
 	private Integer weight;
 	private String key;

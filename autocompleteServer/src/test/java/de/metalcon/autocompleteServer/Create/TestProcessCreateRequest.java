@@ -173,8 +173,7 @@ public class TestProcessCreateRequest {
 
 		if (image.length() > 0) {
 
-			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
-					true, "file", 50000, null);
+			ImageFileItem imageFileItem = new ImageFileItem(image);
 			// imageFileItem = image.toFileItem();
 
 			ProcessCreateResponse testResponse = this
