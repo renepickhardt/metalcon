@@ -26,10 +26,8 @@ public class CreateRequestContainer extends Command {
 
 	@Override
 	public void run() {
-
 		SuggestTree suggestTree = ContextListener.getIndex(
 				this.suggestionComponents.getIndexName(), this.context);
-		System.out.println(suggestTree.size());
 
 		suggestTree.put(this.suggestionComponents.getSuggestString(),
 				this.suggestionComponents.getWeight(),

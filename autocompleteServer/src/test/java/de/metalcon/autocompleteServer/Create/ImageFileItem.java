@@ -22,31 +22,35 @@ public class ImageFileItem implements FileItem {
 
 	@Override
 	public FileItemHeaders getHeaders() {
+		System.out.println("getHeaders");
 		return null;
 	}
 
 	@Override
 	public void setHeaders(FileItemHeaders arg0) {
-
+		System.out.println("setHeaders");
 	}
 
 	@Override
 	public void delete() {
-
+		System.out.println("delete");
 	}
 
 	@Override
 	public byte[] get() {
+		System.out.println("get");
 		return null;
 	}
 
 	@Override
 	public String getContentType() {
+		System.out.println("getContentType");
 		return null;
 	}
 
 	@Override
 	public String getFieldName() {
+		System.out.println("getFieldName");
 		return null;
 	}
 
@@ -58,52 +62,58 @@ public class ImageFileItem implements FileItem {
 
 	@Override
 	public String getName() {
+		System.out.println("getName");
 		return null;
 	}
 
 	@Override
 	public OutputStream getOutputStream() throws IOException {
+		System.out.println("getOutputStream");
 		return null;
 	}
 
 	@Override
 	public long getSize() {
-		return 0;
+		return this.file.length();
 	}
 
 	@Override
 	public String getString() {
+		System.out.println("getStrin");
 		return null;
 	}
 
 	@Override
 	public String getString(String arg0) throws UnsupportedEncodingException {
+		System.out.println("fetString");
 		return null;
 	}
 
 	@Override
 	public boolean isFormField() {
+		System.out.println("isFormField");
 		return false;
 	}
 
 	@Override
 	public boolean isInMemory() {
+		System.out.println("isInMem");
 		return false;
 	}
 
 	@Override
 	public void setFieldName(String arg0) {
-
+		System.out.println("setFieldName");
 	}
 
 	@Override
 	public void setFormField(boolean arg0) {
-
+		System.out.println("setFormField");
 	}
 
 	@Override
 	public void write(File arg0) throws Exception {
-
+		System.out.println("write");
 	}
 
 }

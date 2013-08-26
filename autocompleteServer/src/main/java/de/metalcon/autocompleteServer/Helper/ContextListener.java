@@ -8,14 +8,13 @@ public class ContextListener {
 
 	public static SuggestTree getIndex(String indexName, ServletContext context) {
 		return (SuggestTree) context
-				.getAttribute(ProtocolConstants.INDEX_PARAMETER + ":"
-						+ indexName);
+				.getAttribute(ProtocolConstants.INDEX_PARAMETER + indexName);
 	}
 
 	public static void setIndex(String indexName, SuggestTree index,
 			ServletContext context) {
-		context.setAttribute(ProtocolConstants.INDEX_PARAMETER + ":"
-				+ indexName, index);
+		context.setAttribute(ProtocolConstants.INDEX_PARAMETER + indexName,
+				index);
 	}
 
 	public static HashMap<String, String> getImageIndex(ServletContext context) {
