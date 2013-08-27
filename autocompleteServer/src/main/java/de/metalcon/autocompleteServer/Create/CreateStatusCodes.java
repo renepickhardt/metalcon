@@ -11,6 +11,7 @@ import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
  */
 public class CreateStatusCodes {
 
+	// Status Values
 	public static final String QUERYNAME_NOT_GIVEN = "No search term given. A suggest item always needs a term. Please enter a search term for your item.";
 	public static final String INDEXNAME_NOT_GIVEN = "Missing index name. You need to specify which index the entry should be inserted into.";
 	public static final String REQUEST_MUST_BE_MULTIPART = "The HTTP request must be multipart/form-data. Your request has another content-type and can't be processed.";
@@ -27,5 +28,17 @@ public class CreateStatusCodes {
 	public static final String KEY_TOO_LONG = "Your key length exceeds the limit of ";
 	public static final String SUGGESTION_STRING_TOO_LONG = "Your suggestion string is longer than the limit of "
 			+ ProtocolConstants.MAX_SUGGESTION_LENGTH;
+
+	// Status Keys
+	public static final String STATUS_OK = "Status:OK";
+	public static final String STATUS_NO_QUERY = "Error:queryNameNotGiven";
+	public static final String STATUS_QUERY_TOO_LONG = "Error:queryNameTooLong";
+	public static final String STATUS_DEFAULT_INDEX = "Warning:DefaultIndex";
+	public static final String STATUS_NO_IMAGE = "Warning:noImage";
+	public static final String STATUS_REQUEST_NOT_MULTIPART = "Error:RequestNotMultipart";
+	public static final String STATUS_NO_WEIGHT = "Error:WeightNotGiven";
+	public static final String STATUS_WEIGHT_NOT_A_NUMBER = "Error:WeightNotANumber";
+	public static final String STATUS_NO_KEY = "Warning:KeyNotGiven";
+	public static final String STATUS_KEY_TOO_LONG = "Warning:KeyTooLong";
 
 }

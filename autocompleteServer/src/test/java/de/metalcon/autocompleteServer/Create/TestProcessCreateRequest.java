@@ -188,9 +188,18 @@ public class TestProcessCreateRequest {
 							.toString());
 			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX,
 					testResponse.getContainer().getComponents().getIndexName());
-			// assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
-			// + "\"Warning:noImage\"" + ":" + "\"No image inserted\"" + "}",
-			// testResponse.getResponse().toString());
+
+			if (testResponse.getResponse().containsKey(
+					CreateStatusCodes.STATUS_OK)) {
+				assertEquals(CreateStatusCodes.STATUS_OK, testResponse
+						.getResponse().get("Status:OK"));
+			} else {
+				fail("Error-Message missing!");
+			}
+
+			assertEquals("{" + "\"term\"" + ":" + "\"test\"" + ","
+					+ "\"Warning:noImage\"" + ":" + "\"No image inserted\""
+					+ "}", testResponse.getResponse().toString());
 			// assert image is B64 encoded and not null
 
 			System.out.println(testResponse.getContainer().getComponents()
