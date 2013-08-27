@@ -73,5 +73,10 @@
   		<version>1.9.5</version>
   		<scope>test</scope>
   	</dependency>
+  	<dependency>
+  		<groupId>de.metalcon.utils</groupId>
+  		<artifactId>form-item-list</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
   </dependencies>
 </project>
