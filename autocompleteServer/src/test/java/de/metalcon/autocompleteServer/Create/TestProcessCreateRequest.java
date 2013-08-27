@@ -11,7 +11,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
@@ -27,12 +26,9 @@ public class TestProcessCreateRequest {
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 	final private ServletContext servletContext = mock(ServletContext.class);
 
-	private HttpServletRequest request;
-
 	@Before
 	public void initializeTest() {
 
-		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);

@@ -15,6 +15,11 @@ import de.metalcon.autocompleteServer.Command;
 
 public class CreateServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8203320841384299096L;
+
 	private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(
 			1);
 
@@ -23,6 +28,7 @@ public class CreateServlet extends HttpServlet {
 	public CreateServlet() {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
