@@ -105,6 +105,16 @@ public class ProcessCreateResponse {
 				.put(CreateStatusCodes.STATUS_KEY_TOO_LONG, keyTooLong);
 	}
 
+	@SuppressWarnings("unchecked")
+	public void addStatusOk(String statusOK) {
+		this.jsonResponse.put(CreateStatusCodes.STATUS_OK, statusOK);
+	}
+
+	public void addImageGeometryTooBigWarning(String imageGeometryTooBig) {
+		this.jsonResponse.put(CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG,
+				imageGeometryTooBig);
+	}
+
 	/**
 	 * Getter for the response as JSONObject.
 	 * 

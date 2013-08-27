@@ -1,7 +1,9 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +22,8 @@ import de.metalcon.utils.FormItemList;
  * 
  */
 public class ProcessCreateRequest {
+
+	private static boolean statusOk = true;
 
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
@@ -68,6 +72,7 @@ public class ProcessCreateRequest {
 	public static ProcessCreateResponse checkRequestParameter(
 			FormItemList items, ProcessCreateResponse response,
 			ServletContext context) {
+		statusOk = true;
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer(
 				context);
 
@@ -101,11 +106,16 @@ public class ProcessCreateRequest {
 		if (suggestionKey != null) {
 			String image = checkImage(items, response);
 			if (image == null) {
+				statusOk = false;
 				response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			}
 
 			suggestTreeCreateRequestContainer.getComponents().setImageBase64(
 					image);
+		}
+		System.out.println(statusOk);
+		if (statusOk) {
+			response.addStatusOk(CreateStatusCodes.STATUS_OK);
 		}
 		response.addContainer(suggestTreeCreateRequestContainer);
 
@@ -117,14 +127,29 @@ public class ProcessCreateRequest {
 		FormFile image = null;
 		String imageB64 = null;
 		FileItem imageFile;
-		// FormItem imageFile = null;
+
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
 			imageFile = image.getFormItem();
+
+			BufferedImage bufferedImage = ImageIO.read(imageFile
+					.getInputStream());
+			if ((bufferedImage.getWidth() > ProtocolConstants.IMAGE_WIDTH)
+					|| (bufferedImage.getHeight() > ProtocolConstants.IMAGE_HEIGHT)) {
+				response.addImageGeometryTooBigWarning(CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG);
+
+				return null;
+			}
+
 			// imageFile = image.get;
 		} catch (IllegalArgumentException e) {
+			statusOk = false;
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			return null;
+		} catch (IOException e) {
+			statusOk = false;
+
 			return null;
 		}
 
@@ -146,6 +171,7 @@ public class ProcessCreateRequest {
 			byte[] base64EncodedImage = Base64.encodeBase64(tmp);
 			imageB64 = new String(base64EncodedImage);
 		} else {
+			statusOk = false;
 			return null;
 		}
 
@@ -159,6 +185,7 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			response.addWeightNotGivenError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 
@@ -166,6 +193,7 @@ public class ProcessCreateRequest {
 			return Integer.parseInt(weight);
 		} catch (NumberFormatException e) {
 			response.addWeightNotANumberError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			statusOk = false;
 			return null;
 		}
 	}
@@ -178,6 +206,7 @@ public class ProcessCreateRequest {
 		} catch (IllegalArgumentException e) {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			index = ProtocolConstants.DEFAULT_INDEX_NAME;
+			statusOk = false;
 		}
 		return index;
 	}
@@ -191,11 +220,13 @@ public class ProcessCreateRequest {
 
 		catch (IllegalArgumentException e) {
 			response.addNoKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
 			response.addKeyTooLongWarning(CreateStatusCodes.KEY_TOO_LONG);
+			statusOk = false;
 			return null;
 		}
 		return key;
@@ -208,10 +239,12 @@ public class ProcessCreateRequest {
 			suggestString = items.getField(ProtocolConstants.SUGGESTION_STRING);
 		} catch (IllegalArgumentException e) {
 			response.addQueryNameMissingError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 		if (suggestString.length() > ProtocolConstants.MAX_SUGGESTION_LENGTH) {
 			response.addQueryNameTooLongError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			statusOk = false;
 			return null;
 		}
 		return suggestString;
