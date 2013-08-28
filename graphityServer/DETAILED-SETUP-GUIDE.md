@@ -123,9 +123,9 @@ Now move the directory:
 `sudo mv ./jdk1.7.0_17 /usr/lib/jvm/jdk1.7.0`
 
 Install the important executables using  
-<pre><code>sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.7.0/bin/java" 1  
-sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.7.0/bin/javac" 1  
-sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.7.0/bin/javaws" 1</code></pre>
+<pre><code>sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.7.0/bin/java" 2000  
+sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.7.0/bin/javac" 2000  
+sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.7.0/bin/javaws" 2000</code></pre>
 
 Set the correct permissions via  
 <pre><code>sudo chmod a+x /usr/bin/java  
