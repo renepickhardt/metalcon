@@ -17,7 +17,7 @@ public class ProcessCreateResponse {
 	}
 
 	/**
-	 * Adds a queryName-Error to the container object.Expects the String to be
+	 * Adds a queryName-Error to the container object. Expects the String to be
 	 * not NULL and correctly formatted.
 	 * 
 	 * @param querynameNotGiven
@@ -47,8 +47,8 @@ public class ProcessCreateResponse {
 	}
 
 	/**
-	 * Adds a DefaultIndex-Warning to the container object.Expects the String to
-	 * be not NULL and correctly formatted.
+	 * Adds a DefaultIndex-Warning to the container object. Expects the String
+	 * to be not NULL and correctly formatted.
 	 * 
 	 * @param indexnameNotGiven
 	 */
@@ -59,7 +59,7 @@ public class ProcessCreateResponse {
 	}
 
 	/**
-	 * Adds a NoImage-Warning to the container object.Expects the String to be
+	 * Adds a NoImage-Warning to the container object. Expects the String to be
 	 * not NULL and correctly formatted.
 	 * 
 	 * @param noImage
@@ -70,7 +70,7 @@ public class ProcessCreateResponse {
 	}
 
 	/**
-	 * Adds a requestMustBeMultipart-Error to the container object.Expects the
+	 * Adds a requestMustBeMultipart-Error to the container object. Expects the
 	 * String to be not NULL and correctly formatted.
 	 * 
 	 * @param noImage
@@ -81,6 +81,12 @@ public class ProcessCreateResponse {
 				requestMustBeMultipart);
 	}
 
+	/**
+	 * Adds a WeightNotGiven-Error to the container object. Expects the String
+	 * to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
 	@SuppressWarnings("unchecked")
 	public void addWeightNotGivenError(String weightNotGiven) {
 		this.jsonResponse.put(CreateStatusCodes.STATUS_NO_WEIGHT,
@@ -88,33 +94,73 @@ public class ProcessCreateResponse {
 
 	}
 
+	/**
+	 * Adds a WeightNotANumber-Error to the container object. Expects the String
+	 * to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
 	@SuppressWarnings("unchecked")
 	public void addWeightNotANumberError(String weightNotANumber) {
 		this.jsonResponse.put(CreateStatusCodes.STATUS_WEIGHT_NOT_A_NUMBER,
 				weightNotANumber);
 	}
 
+	/**
+	 * Adds a WeightNotANumber-Error to the container object. Expects the String
+	 * to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
 	@SuppressWarnings("unchecked")
 	public void addNoKeyWarning(String keyNotGiven) {
 		this.jsonResponse.put(CreateStatusCodes.STATUS_NO_KEY, keyNotGiven);
 	}
 
+	/**
+	 * Adds a KeyTooLong-Warning to the container object. Expects the String to
+	 * be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
 	@SuppressWarnings("unchecked")
 	public void addKeyTooLongWarning(String keyTooLong) {
 		this.jsonResponse
 				.put(CreateStatusCodes.STATUS_KEY_TOO_LONG, keyTooLong);
 	}
 
+	/**
+	 * Adds Status OK to the container object. Expects the String to be not NULL
+	 * and correctly formatted. To stay conform to the ASTP, Status OK should
+	 * only be added, if the Response does not have and will get any Warning or
+	 * Error.
+	 * 
+	 * @param noImage
+	 */
 	@SuppressWarnings("unchecked")
 	public void addStatusOk(String statusOK) {
 		this.jsonResponse.put(CreateStatusCodes.STATUS_OK, statusOK);
 	}
 
+	/**
+	 * Adds a ImageGeometryTooBig-Warning to the container object.Expects the
+	 * String to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
+	@SuppressWarnings("unchecked")
 	public void addImageGeometryTooBigWarning(String imageGeometryTooBig) {
 		this.jsonResponse.put(CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG,
 				imageGeometryTooBig);
 	}
 
+	/**
+	 * Adds a ImageFileSizeTooBig-Warning to the container object.Expects the
+	 * String to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
+	@SuppressWarnings("unchecked")
 	public void addImageFileSizeTooBigWarning(String imageFileTooLarge) {
 		this.jsonResponse.put(CreateStatusCodes.IMAGE_FILE_TOO_LARGE,
 				imageFileTooLarge);
