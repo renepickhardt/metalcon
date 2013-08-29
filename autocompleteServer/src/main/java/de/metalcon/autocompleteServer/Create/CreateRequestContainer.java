@@ -32,7 +32,6 @@ public class CreateRequestContainer extends Command {
 		suggestTree.put(this.suggestionComponents.getSuggestString(),
 				this.suggestionComponents.getWeight(),
 				this.suggestionComponents.getKey());
-		System.out.println(suggestTree.size());
 		if (this.suggestionComponents.getImageBase64() != null) {
 			HashMap<String, String> map = ContextListener
 					.getImageIndex(this.context);

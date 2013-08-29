@@ -31,7 +31,7 @@ public class Worker implements Runnable {
 				command.run();
 			}
 		} catch (InterruptedException e) {
-			System.out.println("worker stopped");
+			// System.out.println("worker stopped");
 			e.printStackTrace();
 		}
 	}

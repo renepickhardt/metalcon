@@ -113,7 +113,6 @@ public class ProcessCreateRequest {
 			suggestTreeCreateRequestContainer.getComponents().setImageBase64(
 					image);
 		}
-		System.out.println(statusOk);
 		if (statusOk) {
 			response.addStatusOk(CreateStatusCodes.STATUS_OK);
 		}
