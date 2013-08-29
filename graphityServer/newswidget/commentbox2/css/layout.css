@@ -1,0 +1,126 @@
+*
+{
+	margin: 0px;
+	padding: 0px;
+	font-family: arial;
+}
+
+body 
+{
+	background: #c7c7c7;
+}
+
+a img 
+{
+	border: none;
+}
+
+.wrapper 
+{
+	background: #fff;
+	width: 750px;
+	border: 1px solid #a1a1a1;
+	margin: 10px auto 10px auto;
+	height: 600px;
+}
+
+.page-data
+{
+	width: auto;
+	height: auto;
+	color: #666;
+	margin: 10px;
+	border-bottom: 1px solid #e1e1e1;
+}
+
+.comment-wrapper
+{
+	margin: 10px;
+	border: 1px solid #e1e1e1;
+	height: auto;
+	width: auto;
+	color: #444;
+}
+
+h3.comment-title
+{
+	height: 40px;
+	line-height: 37px;
+	font-size: 14px;
+	margin: 0 5px  5px;
+	color: #555;
+	border-bottom: 1px solid #e1e1e1;
+}
+
+.comments-list
+{
+	height: auto;
+	font-size: 13px;
+	margin: 10px 5px 5px 5px;
+	color: #555;
+}
+
+ul.comments-holder-ul
+{
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: auto;
+	height: auto;
+	overflow: hidden;
+}
+
+ul.comments-holder-ul li.comment-holder
+{
+	list-style-type: none;
+	height: auto;
+	width: auto;
+	margin: 5px 0 5px 0;
+	border: 1px solid #e1e1e1;
+	overflow: hidden;
+}
+
+ul.comments-holder-ul li.comment-holder:hover
+{
+
+}
+
+ul.comments-holder-ul li.comment-holder .user-img
+{
+	float: left;
+	height: 65px;
+	width: 65px;
+	margin: 0 10px 0 0;
+}
+
+ul.comments-holder-ul li.comment-holder .user-img img.user-img-pic
+{
+	width: 55px;
+	height: auto;
+	margin: 5px;
+	border: 1px solid #a1a1a1;
+}
+
+.comment-body 
+{
+	width: auto;
+}
+
+ul.comments-holder-ul li.comment-holder h3.username-field
+{
+	height: 25px;
+
+	line-height: 22px;
+	color: #2E5CB8;
+	font-size: 11px;
+	margin: 0 0 0 10px;
+}
+
+ul.comments-holder-ul li.comment-holder .comment-text
+{
+	display: block;
+	width: auto;
+	font-size: 11px;
+	margin: 0 10px 0 75px;
+
+}
