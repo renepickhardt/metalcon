@@ -126,14 +126,14 @@ public class ProcessCreateRequest {
 			ProcessCreateResponse response) {
 		FormFile image = null;
 		String imageB64 = null;
-		FileItem imageFile;
+		FileItem imageFileItem;
 
 		try {
 			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
-			imageFile = image.getFormItem();
+			imageFileItem = image.getFormItem();
 
-			BufferedImage bufferedImage = ImageIO.read(imageFile
+			BufferedImage bufferedImage = ImageIO.read(imageFileItem
 					.getInputStream());
 			if ((bufferedImage.getWidth() > ProtocolConstants.IMAGE_WIDTH)
 					|| (bufferedImage.getHeight() > ProtocolConstants.IMAGE_HEIGHT)) {
@@ -141,7 +141,7 @@ public class ProcessCreateRequest {
 				return null;
 			}
 
-			if (imageFile.getSize() > ProtocolConstants.MAX_IMAGE_FILE_LENGTH) {
+			if (imageFileItem.getSize() > ProtocolConstants.MAX_IMAGE_FILE_LENGTH) {
 				response.addImageFileSizeTooBigWarning(CreateStatusCodes.IMAGE_FILE_TOO_LARGE);
 				return null;
 			}
@@ -156,10 +156,10 @@ public class ProcessCreateRequest {
 			return null;
 		}
 
-		byte[] buffer = new byte[(int) imageFile.getSize()];
+		byte[] buffer = new byte[(int) imageFileItem.getSize()];
 		byte[] tmp = null;
 		try {
-			int size = imageFile.getInputStream().read(buffer);
+			int size = imageFileItem.getInputStream().read(buffer);
 			if (size > 0) {
 				tmp = new byte[size];
 				for (int i = 0; i < size; i++) {
