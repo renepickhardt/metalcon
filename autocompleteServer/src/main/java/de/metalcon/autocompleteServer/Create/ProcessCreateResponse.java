@@ -115,6 +115,11 @@ public class ProcessCreateResponse {
 				imageGeometryTooBig);
 	}
 
+	public void addImageFileSizeTooBigWarning(String imageFileTooLarge) {
+		this.jsonResponse.put(CreateStatusCodes.IMAGE_FILE_TOO_LARGE,
+				imageFileTooLarge);
+	}
+
 	/**
 	 * Getter for the response as JSONObject.
 	 * 

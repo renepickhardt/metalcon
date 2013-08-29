@@ -13,7 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -162,13 +161,11 @@ public class TestProcessCreateRequest {
 	@Test
 	public void testFullFormWithImage() throws Exception {
 
-		// FIXME imageFileItem does not get any data
 		File image = new File("testImage_valid.jpg");
 
 		if (image.length() > 0) {
 
 			ImageFileItem imageFileItem = new ImageFileItem(image);
-			// imageFileItem = image.toFileItem();
 
 			ProcessCreateResponse testResponse = this
 					.processTestRequest(
@@ -189,9 +186,6 @@ public class TestProcessCreateRequest {
 			assertEquals(ProtocolTestConstants.VALID_SUGGESTION_INDEX,
 					testResponse.getContainer().getComponents().getIndexName());
 
-			System.out.println(testResponse.getResponse().get(
-					CreateStatusCodes.STATUS_OK));
-
 			if (testResponse.getResponse().containsKey(
 					CreateStatusCodes.STATUS_OK)) {
 				assertEquals(CreateStatusCodes.STATUS_OK, testResponse
@@ -208,14 +202,11 @@ public class TestProcessCreateRequest {
 	@Test
 	public void testFullFormWithImageTooWide() throws Exception {
 
-		// FIXME imageFileItem does not get any data
-		File image = new File("testImage_tooWide.jpg");
+		File image = new File("testImage_too_wide.jpg");
 
 		if (image.length() > 0) {
 
-			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
-					true, "file", 50000, null);
-			// imageFileItem = image.toFileItem();
+			ImageFileItem imageFileItem = new ImageFileItem(image);
 
 			ProcessCreateResponse testResponse = this
 					.processTestRequest(
@@ -225,10 +216,16 @@ public class TestProcessCreateRequest {
 							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
 							imageFileItem);
 
-			// TODO: Insert Assertion
+			if (testResponse.getResponse().containsKey(
+					CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG)) {
+				assertEquals(
+						CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG,
+						testResponse.getResponse().get(
+								CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG));
+			} else {
+				fail("Error-Message missing!");
+			}
 
-			System.out.println(testResponse.getContainer().getComponents()
-					.getImageBase64());
 		} else {
 			fail("no image to test with provided!");
 		}
@@ -237,14 +234,11 @@ public class TestProcessCreateRequest {
 	@Test
 	public void testFullFormWithImageTooHigh() throws Exception {
 
-		// FIXME imageFileItem does not get any data
-		File image = new File("testImage_tooHigh.jpg");
+		File image = new File("testImage_too_high.jpg");
 
 		if (image.length() > 0) {
 
-			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
-					true, "file", 50000, null);
-			// imageFileItem = image.toFileItem();
+			ImageFileItem imageFileItem = new ImageFileItem(image);
 
 			ProcessCreateResponse testResponse = this
 					.processTestRequest(
@@ -254,10 +248,16 @@ public class TestProcessCreateRequest {
 							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
 							imageFileItem);
 
-			// TODO: Insert Assertion
+			if (testResponse.getResponse().containsKey(
+					CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG)) {
+				assertEquals(
+						CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG,
+						testResponse.getResponse().get(
+								CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG));
+			} else {
+				fail("Error-Message missing!");
+			}
 
-			System.out.println(testResponse.getContainer().getComponents()
-					.getImageBase64());
 		} else {
 			fail("no image to test with provided!");
 		}
@@ -266,14 +266,12 @@ public class TestProcessCreateRequest {
 	@Test
 	public void testFullFormWithImageWrongType() throws Exception {
 
-		// FIXME imageFileItem does not get any data
-		File image = new File("testImage_wrongType.png");
+		// TODO: review specifications, which file types are allowed!
+		File image = new File("testImage_wrong_type.png");
 
 		if (image.length() > 0) {
 
-			FileItem imageFileItem = new DiskFileItem("image", "image/JPEG",
-					true, "file", 50000, null);
-			// imageFileItem = image.toFileItem();
+			ImageFileItem imageFileItem = new ImageFileItem(image);
 
 			ProcessCreateResponse testResponse = this
 					.processTestRequest(
@@ -283,10 +281,14 @@ public class TestProcessCreateRequest {
 							ProtocolTestConstants.VALID_SUGGESTION_INDEX,
 							imageFileItem);
 
-			// TODO: Insert Assertion
+			if (testResponse.getResponse().containsKey(
+					CreateStatusCodes.IMAGE_WRONG_TYPE)) {
+				assertEquals(CreateStatusCodes.IMAGE_WRONG_TYPE, testResponse
+						.getResponse().get(CreateStatusCodes.IMAGE_WRONG_TYPE));
+			} else {
+				fail("Error-Message missing!");
+			}
 
-			System.out.println(testResponse.getContainer().getComponents()
-					.getImageBase64());
 		} else {
 			fail("no image to test with provided!");
 		}

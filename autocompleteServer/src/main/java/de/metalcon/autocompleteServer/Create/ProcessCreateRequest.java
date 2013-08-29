@@ -138,11 +138,14 @@ public class ProcessCreateRequest {
 			if ((bufferedImage.getWidth() > ProtocolConstants.IMAGE_WIDTH)
 					|| (bufferedImage.getHeight() > ProtocolConstants.IMAGE_HEIGHT)) {
 				response.addImageGeometryTooBigWarning(CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG);
-
 				return null;
 			}
 
-			// imageFile = image.get;
+			if (imageFile.getSize() > ProtocolConstants.MAX_IMAGE_FILE_LENGTH) {
+				response.addImageFileSizeTooBigWarning(CreateStatusCodes.IMAGE_FILE_TOO_LARGE);
+				return null;
+			}
+
 		} catch (IllegalArgumentException e) {
 			statusOk = false;
 			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);

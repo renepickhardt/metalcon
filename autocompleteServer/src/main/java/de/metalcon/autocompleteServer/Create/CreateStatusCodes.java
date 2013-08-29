@@ -28,6 +28,7 @@ public class CreateStatusCodes {
 	public static final String KEY_TOO_LONG = "Your key length exceeds the limit of ";
 	public static final String SUGGESTION_STRING_TOO_LONG = "Your suggestion string is longer than the limit of "
 			+ ProtocolConstants.MAX_SUGGESTION_LENGTH;
+	public static final String IMAGE_WRONG_TYPE = "Wrong image encoding. Only JPEG encoded images are accepted. Please check your file's type!";
 
 	// Status Keys
 	public static final String STATUS_OK = "Status:OK";
