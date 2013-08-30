@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-public class DocExtern {
+public class DocExtern implements Doc {
 
     final public static int maxContentLength = 1000;
     
@@ -89,6 +89,7 @@ public class DocExtern {
             content.add(this.content.substring(0, maxContentLength));
         }
         
+        result.put("id",     id);
         result.put("title",  title);
         result.put("url",    url);
         result.put("rawurl", rawurl);
