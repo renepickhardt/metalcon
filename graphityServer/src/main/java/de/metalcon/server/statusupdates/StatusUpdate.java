@@ -21,7 +21,7 @@ public abstract class StatusUpdate {
 	 * activitystrea.ms date formatter
 	 */
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(
-			"yyyy-MM-dd'T'hh:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	/**
 	 * status update identifier

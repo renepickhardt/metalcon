@@ -3,17 +3,12 @@ package de.metalcon.server.tomcat;
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
-import de.metalcon.server.Configs;
-import de.metalcon.server.Server;
 import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
 import de.metalcon.server.statusupdates.StatusUpdate;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
@@ -47,11 +42,6 @@ public class Create extends GraphityHttpServlet {
 	private static final long serialVersionUID = 752658118858186708L;
 
 	/**
-	 * server configuration containing file paths
-	 */
-	private Configs config;
-
-	/**
 	 * file item factory
 	 */
 	private static DiskFileItemFactory FACTORY;
@@ -68,20 +58,13 @@ public class Create extends GraphityHttpServlet {
 	}
 
 	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
-		final ServletContext context = this.getServletContext();
-		final Server server = (Server) context.getAttribute("server");
-		this.config = server.getConfig();
-	}
-
-	@Override
 	protected void doPost(final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		// store response item for the server response creation
 		final TomcatClientResponder responder = new TomcatClientResponder(
 				response);
-
+		response.setHeader("Access-Control-Allow-Origin",
+				this.config.getHeaderAccessControl());
 		CreateResponse createResponse = new CreateResponse();
 		FormItemList formItemList = null;
 		try {
@@ -118,6 +101,7 @@ public class Create extends GraphityHttpServlet {
 					}
 					break;
 
+				// create a follow edge
 				case FOLLOW:
 					final CreateFollowResponse createFollowResponse = new CreateFollowResponse();
 					final CreateFollowRequest createFollowRequest = CreateFollowRequest
@@ -135,8 +119,8 @@ public class Create extends GraphityHttpServlet {
 					}
 					break;
 
+				// create a status update
 				default:
-					// TODO
 					final CreateStatusUpdateResponse createStatusUpdateResponse = new CreateStatusUpdateResponse();
 					final CreateStatusUpdateRequest createStatusUpdateRequest = CreateStatusUpdateRequest
 							.checkRequest(formItemList, createRequest,
@@ -159,6 +143,7 @@ public class Create extends GraphityHttpServlet {
 							createStatusUpdateRequest
 									.setStatusUpdate(statusUpdate);
 
+							// create status update
 							final CreateStatusUpdate createStatusUpdateCommand = new CreateStatusUpdate(
 									this, createStatusUpdateResponse,
 									createStatusUpdateRequest);
@@ -183,10 +168,8 @@ public class Create extends GraphityHttpServlet {
 									.statusUpdateInstantiationFailed(e
 											.getMessage());
 						} catch (final Exception e) {
-							// TODO: remove exception transparency
 							responder.error(500,
-									"errors encountered while writing files: "
-											+ e.getMessage());
+									"errors encountered while writing files");
 						}
 					}
 					break;

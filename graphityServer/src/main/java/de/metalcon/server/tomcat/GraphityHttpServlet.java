@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.neo4j.kernel.AbstractGraphDatabase;
 
+import de.metalcon.server.Configs;
 import de.metalcon.server.Server;
 import de.metalcon.socialgraph.operations.SocialGraphOperation;
 
@@ -33,6 +34,11 @@ public abstract class GraphityHttpServlet extends HttpServlet {
 	protected AbstractGraphDatabase graphDB;
 
 	/**
+	 * server configuration
+	 */
+	protected Configs config;
+
+	/**
 	 * command queue to stack commands created
 	 */
 	protected Queue<SocialGraphOperation> commandQueue;
@@ -48,6 +54,7 @@ public abstract class GraphityHttpServlet extends HttpServlet {
 		final ServletContext context = this.getServletContext();
 		final Server server = (Server) context.getAttribute("server");
 		this.graphDB = server.getGraphDatabase();
+		this.config = server.getConfig();
 		this.commandQueue = server.getCommandQueue();
 		this.workingQueue = new LinkedBlockingQueue<Object>(1);
 	}
