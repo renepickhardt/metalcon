@@ -16,10 +16,10 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
-import de.metalcon.server.Configs;
 import de.metalcon.server.statusupdates.StatusUpdateManager;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.Properties;
+import de.metalcon.socialgraph.TestConfiguration;
 
 @RunWith(Suite.class)
 @SuiteClasses({ WriteOptimizedGraphityTest.class,
@@ -31,11 +31,6 @@ import de.metalcon.socialgraph.Properties;
  *
  */
 public class AlgorithmTests {
-
-	/**
-	 * test database path
-	 */
-	private static final String DATABASE_PATH = "target/database/testlocation";
 
 	/**
 	 * database used flag
@@ -83,13 +78,13 @@ public class AlgorithmTests {
 	}
 
 	public static void setUp() {
+		final TestConfiguration config = new TestConfiguration();
+
 		// delete existing test database
-		final File databaseDir = new File(DATABASE_PATH);
+		final File databaseDir = new File(config.getDatabasePath());
 		NeoUtils.deleteFile(databaseDir);
 
 		// load the database from the test location
-		final Configs config = new Configs("config.txt");
-		config.database_path = DATABASE_PATH;
 		DATABASE = NeoUtils.getSocialGraphDatabase(config);
 
 		// fill the database with the test users

@@ -18,40 +18,28 @@ If you are not sure how to install or configure one of the components or if you 
 
 ## 1. Pull Graphity Server
 
-## 2. Test Graphity Server
+## 2. Prepare for Tomcat deployment
 
-To check that you have a working copy of the server switch to your git repository directory containing the server and run
-
-```
-mvn compile
-mvn test
-mvn war:war
-```
-
-All test must run successfully and the WAR file should get built.
-
-## 3. Prepare for Tomcat deployment
-
-Your working copy must now get installed in order to deploy the WAR file created before.
+Your copy must now get installed in order to deploy the WAR file to your Tomcat server.
 Simply run
 
 `sudo ./install.sh`
 
-This will create the directory
+This will compile and export the WAR file and create the directory
 >/etc/graphity/
 
 in which the server will live for now.  
 Therefore make sure to have enough space available there for your database.
 Otherwise you can change the database directory in the configuration file.
-[Step 6.1](### 6.1 Configuration) describes how to make changes to the server configuration.
+[Step 5.1](#51-configuration) describes how to make changes to the server configuration.
 
-## 4. Deploy to Tomcat
+## 3. Deploy to Tomcat
 
-Now you can deploy the WAR fil to Tomcat.
+Now you can deploy the WAR file to Tomcat.
 You should find it in the directory 'target'.
 The Graphity server should start up succesfully after the deployment.
 
-## 5. Have fun
+## 4. Have fun
 
 Congratulations!
 
@@ -59,18 +47,18 @@ You now own a working news stream server.
 Read the [Protocol Specifications of the servers REST API](PROTOCOL-OF-REST-API.MD) to lear how to store status updates and friendships and how to retrieve activity streams.
 
 To test this manually feel free to use the following test files:
-* [create a user](src/test/java/de/metalcon/server/tomcat/createUser.html)
-* [create a follow edge](src/test/java/de/metalcon/server/tomcat/createFriendship.html)
-* [create a status update](src/test/java/de/metalcon/server/tomcat/createStatusUpdate.html)
+* [create a user](newswidget/createUser.html)
+* [create a follow edge](newswidget/createFriendship.html)
+* [create a status update](newswidget/createStatusUpdate.html)
 
 
-## 6. Customization (optional, of course)
+## 5. Customization (optional, of course)
 
 The Graphity server is a highly configurable application.  
 You can edit the server configuration file if you do not want to use the default paths or if you want to change the server's behavior.
 In addition Graphity supports templates for status updates so you can make the server match your needs.
 
-### 6.1 Configuration
+### 5.1 Configuration
 
 The server configuration file is stored at
 >/etc/graphity/graphity.conf
@@ -108,21 +96,21 @@ Default value is
 
 **algorithm**  
 Sets the Graphity algorithm used.  
-Use "read-optimized" to use the Graphity algorithm optimized for read requests, use "write-optimized" to use the one optimized for write requests.  
+Use "read-optimized" to use the algorithm optimized for read requests, use "write-optimized" to use the one optimized for write requests.  
 Default value is
 >read-optimized
 
 **use_memory_mapped_buffers**  
-Database configuration field. See the Neo4j documentation for more information.  
+Database configuration field. Look in the Neo4j documentation for more information.  
 Default value is
 >false
 
 **cache_type**  
-Database configuration field. See the Neo4j documentation for more information.  
+Database configuration field. Look in the Neo4j documentation for more information.  
 Default value is
 >strong
 
-### 6.2 Status update templates
+### 5.2 Status update templates
 
 Graphity tries not to limit you in your control over the server and the social network you own.  
 While every news stream server provider has own needs and targets different user groups it is not possible to determine a set of status update types that will satisfy the needs of each participant.  
@@ -130,8 +118,8 @@ Therefore the server allows you to define the status update types that are allow
 This gets done using status update templates which are XML files following a concrete syntax.
 
 By default the Graphity server knows only one status update template called "Plain".  
-You can find this template after a first startup and you have to put all your custom templates in the template path set in the server configuration which is
->/etc/graphity/templates
+You can find this template after a first startup and you have to put all your custom templates in the template path set in the server configuration, so its path is
+>/etc/graphity/templates/Plain.xml
 
 by default. If you open the file it will contain
 ```
@@ -162,6 +150,6 @@ Please keep in mind that the templates get loaded **at startup** and therefore t
 ## 7 joining the developer team:
 * there is our mailinglist at http://lists.metalcon.de/cgi-bin/mailman/listinfo/developer
 * feel free to add bugs to the bug tracker or even fix them. you might be interested in the following open issues
-  * adding the feature to allow [comments of status updates](../../issues/4)
-  * adding [support for multiple parents of a status update](../../issues/5)
-  * adding [support for requesting a single status update in it's own uri](../../issues/7)
+  * adding the feature to allow [comments of status updates](../../../issues/4)
+  * adding [support for multiple parents of a status update](../../../issues/5)
+  * adding [support for requesting a single status update in it's own uri](../../../issues/7)

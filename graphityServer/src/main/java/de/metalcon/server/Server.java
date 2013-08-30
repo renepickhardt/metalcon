@@ -66,7 +66,7 @@ public class Server implements ServletContextListener {
 		System.out.println("graph database created");
 
 		// load social graph algorithm
-		switch (this.config.algorithm()) {
+		switch (this.config.getAlgorithm()) {
 
 		case Algorithm.ReadOptimizedGraphity:
 			this.graph = new ReadOptimizedGraphity(this.graphDatabase);

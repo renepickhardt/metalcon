@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
-import de.metalcon.socialgraph.NeoGraphConfiguration;
+import de.metalcon.socialgraph.Configuration;
 
 /**
  * This is an interface class to the Config file for this project. For each
@@ -17,7 +17,7 @@ import de.metalcon.socialgraph.NeoGraphConfiguration;
  * @author Jonas Kunze, Rene Pickhardt
  * 
  */
-public class Configs extends Properties implements NeoGraphConfiguration {
+public class Configs extends Properties implements Configuration {
 
 	/**
 	 * social graph database path
@@ -41,6 +41,16 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	public boolean read_only;
 
 	/**
+	 * Graphity algorithm used
+	 */
+	public String algorithm;
+
+	/**
+	 * access control HTTP header
+	 */
+	public String headerAccessControl;
+
+	/**
 	 * cache type
 	 */
 	public String cache_type;
@@ -50,11 +60,6 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	 * TODO: boolean value?
 	 */
 	public String use_memory_mapped_buffers;
-
-	/**
-	 * social graph algorithm
-	 */
-	public String algorithm;
 
 	private static final long serialVersionUID = -4439565094382127683L;
 
@@ -129,41 +134,40 @@ public class Configs extends Properties implements NeoGraphConfiguration {
 	}
 
 	@Override
-	public String databasePath() {
+	public String getDatabasePath() {
 		return this.database_path;
 	}
 
 	@Override
-	public boolean readOnly() {
+	public String getTemplatesPath() {
+		return this.templates_path;
+	}
+
+	@Override
+	public boolean getReadOnly() {
 		return this.read_only;
 	}
 
 	@Override
-	public String cacheType() {
-		return this.cache_type;
-	}
-
-	@Override
-	public String useMemoryMappedBuffers() {
-		return this.use_memory_mapped_buffers;
-	}
-
-	/**
-	 * access social graph algorithm
-	 * 
-	 * @return social graph algorithm
-	 */
-	public String algorithm() {
+	public String getAlgorithm() {
 		return this.algorithm;
 	}
 
+	@Override
+	public String getUseMemoryMappedBuffers() {
+		return this.use_memory_mapped_buffers;
+	}
+
+	@Override
+	public String getCacheType() {
+		return this.cache_type;
+	}
+
 	/**
-	 * access path for status update templates
-	 * 
-	 * @return path for status update templates
+	 * @return access control HTTP header
 	 */
-	public String templatesPath() {
-		return this.templates_path;
+	public String getHeaderAccessControl() {
+		return this.headerAccessControl;
 	}
 
 }

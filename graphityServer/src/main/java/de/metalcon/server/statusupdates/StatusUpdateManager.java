@@ -19,8 +19,8 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.xml.sax.SAXException;
 
-import de.metalcon.server.Configs;
 import de.metalcon.server.exceptions.StatusUpdateInstantiationFailedException;
+import de.metalcon.socialgraph.Configuration;
 import de.metalcon.socialgraph.NeoUtils;
 import de.metalcon.socialgraph.SocialGraphRelationshipType;
 import de.metalcon.utils.FormItemList;
@@ -137,7 +137,7 @@ public class StatusUpdateManager {
 	 * @param rootDir
 	 *            classes directory parent
 	 * @param config
-	 *            server configuration
+	 *            Graphity configuration
 	 * @param graphDatabase
 	 *            graph database to store status update version control
 	 * @throws IOException
@@ -148,7 +148,8 @@ public class StatusUpdateManager {
 	 *             - DocumentBuilder cannot match the current configuration
 	 */
 	public static void loadStatusUpdateTemplates(final String rootDir,
-			final Configs config, final AbstractGraphDatabase graphDatabase)
+			final Configuration config,
+			final AbstractGraphDatabase graphDatabase)
 			throws ParserConfigurationException, SAXException, IOException {
 		// set working directory
 		final String workingPath = rootDir + "classes/";
@@ -168,7 +169,7 @@ public class StatusUpdateManager {
 
 		// crawl XML files
 		StatusUpdateTemplate template, previousTemplate;
-		final File templatesDir = new File(config.templatesPath());
+		final File templatesDir = new File(config.getTemplatesPath());
 		if (!templatesDir.exists()) {
 			templatesDir.mkdir();
 		}
@@ -176,7 +177,7 @@ public class StatusUpdateManager {
 
 		// create basic status update template
 		if (xmlFiles.length == 0) {
-			final File plainTemplate = new File(config.templatesPath()
+			final File plainTemplate = new File(config.getTemplatesPath()
 					+ "Plain.xml");
 			final PrintWriter writer = new PrintWriter(plainTemplate);
 			writer.println("<class name=\"Plain\" version=\"1.0\">");
@@ -184,7 +185,7 @@ public class StatusUpdateManager {
 			writer.println("</class>");
 			writer.flush();
 			writer.close();
-			xmlFiles = loadXmlFiles(new File(config.templatesPath()));
+			xmlFiles = loadXmlFiles(new File(config.getTemplatesPath()));
 		}
 
 		System.out.println("TEMPLATES:" + xmlFiles.length);
