@@ -2,8 +2,6 @@ package de.metalcon.imageServer;
 
 import java.io.File;
 
-import org.json.simple.JSONObject;
-
 /**
  * prototype interface for the image server API
  * 
@@ -19,17 +17,14 @@ public interface ImageServer {
 	 *            image identifier
 	 * @param image
 	 *            binary image file
-	 * @param albumIdentifier
-	 *            album identifier
 	 * @param imageInformation
-	 *            JSON according to the image meta data model
+	 *            JSON holding the image's meta data
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
 	 */
 	void createImage(String imageIdentifier, File image,
-			String albumIdentifier, JSONObject imageInformation,
-			boolean autoRotate);
+			String imageInformation, boolean autoRotate);
 
 	/**
 	 * create a cropped image using a binary file
@@ -38,10 +33,8 @@ public interface ImageServer {
 	 *            image identifier
 	 * @param image
 	 *            binary image file
-	 * @param albumIdentifier
-	 *            album identifier
 	 * @param imageInformation
-	 *            JSON according to the image meta data model
+	 *            JSON holding the image's meta data
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
@@ -55,8 +48,8 @@ public interface ImageServer {
 	 *            new image height
 	 */
 	void createImage(String imageIdentifier, File image,
-			String albumIdentifier, JSONObject imageInformation,
-			boolean autoRotate, int left, int right, int width, int height);
+			String imageInformation, boolean autoRotate, int left, int right,
+			int width, int height);
 
 	/**
 	 * create an image using a link to an existing image
@@ -65,14 +58,11 @@ public interface ImageServer {
 	 *            image identifier
 	 * @param imageUrl
 	 *            URL to the existing image
-	 * @param albumIdentifier
-	 *            album identifier
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
 	 */
-	void createImage(String imageIdentifier, String imageUrl,
-			String albumIdentifier, boolean autoRotate);
+	void createImage(String imageIdentifier, String imageUrl, boolean autoRotate);
 
 	/**
 	 * read the image having new dimensions
@@ -101,55 +91,30 @@ public interface ImageServer {
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @return JSON according to the image meta data model
+	 * @return JSON holding the image's meta data
 	 */
-	JSONObject readImageInformation(String imageIdentifier);
-
-	/**
-	 * read the meta data of an album
-	 * 
-	 * @param albumIdentifier
-	 *            album identifier
-	 * @return JSON according to the album meta data model
-	 */
-	JSONObject readAlbumInformation(String albumIdentifier);
+	String readImageInformation(String imageIdentifier);
 
 	/**
 	 * update the meta data of an image
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @param imageInformation
-	 *            JSON according to the image meta data model
+	 * @param key
+	 *            key of the meta data value<br>
+	 *            &emsp;<b>if the meta already has a value for this key the old
+	 *            value will get overridden</b>
+	 * @param value
+	 *            meta data value that shall be appended
 	 */
-	void updateImageInformation(String imageIdentifier,
-			JSONObject imageInformation);
+	void appendImageInformation(String imageIdentifier, String key, String value);
 
 	/**
-	 * update the meta data of an album
-	 * 
-	 * @param albumIdentifier
-	 *            album identifier
-	 * @param albumInformation
-	 *            JSON according to the album meta data model
-	 */
-	void updateAlbumInformation(String albumIdentifier,
-			JSONObject albumInformation);
-
-	/**
-	 * delete an image from the file system and the album
+	 * delete an image from the server
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
 	 */
 	void deleteImage(String imageIdentifier);
-
-	/**
-	 * delete an album and all images it includes
-	 * 
-	 * @param albumIdentifier
-	 *            album identifier
-	 */
-	void deleteAlbum(String albumIdentifier);
 
 }
