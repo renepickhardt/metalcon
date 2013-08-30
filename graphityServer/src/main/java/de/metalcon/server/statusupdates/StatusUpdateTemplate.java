@@ -292,6 +292,14 @@ public class StatusUpdateTemplate {
 			builder.append(");");
 			builder.append(newLine);
 		}
+		for (String fileName : this.files.keySet()) {
+			builder.append("objectJSON.put(\"");
+			builder.append(fileName);
+			builder.append("\", this.");
+			builder.append(fileName);
+			builder.append(");");
+			builder.append(newLine);
+		}
 		builder.append("return objectJSON;");
 		builder.append(newLine);
 		builder.append("}");
