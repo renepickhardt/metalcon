@@ -168,27 +168,27 @@ public class TestProcessRetrieveRequest {
 		JSONObject jsonResponse = this.testRequest(request, "D", "7",
 				"venueIndex");
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 7);
 
 		jsonResponse = this.testRequest(request, "M", "7", "venueIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 
 		jsonResponse = this.testRequest(request, "D", "7", "generalIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 
 		jsonResponse = this.testRequest(request, "M", "7", "generalIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 7);
 
 		jsonResponse = this.testRequest(request, "Me", "7", "someRandomIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(jsonResponse.get("warning:noIndexGiven").equals(
 				RetrieveStatusCodes.INDEX_UNKNOWN));
 		assertTrue(suggestionList.size() == 7);

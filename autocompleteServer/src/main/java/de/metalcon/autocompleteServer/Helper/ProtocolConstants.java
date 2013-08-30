@@ -37,6 +37,6 @@ public class ProtocolConstants {
 	 * Server
 	 */
 	public static final Integer MAX_NUMBER_OF_SUGGESTIONS = 7;
-	public static final String DEFAULT_INDEX_NAME = "generalindex";
+	public static final String DEFAULT_INDEX_NAME = "generalIndex";
 	public static final String IMAGE_SERVER_CONTEXT_KEY = "image-index-hashMap";
 }
