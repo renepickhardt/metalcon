@@ -1,29 +1,30 @@
 package de.metalcon.imageServer;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
- * prototype interface for the image server API
+ * prototype interface for the image storage server API
  * 
  * @author sebschlicht
  * 
  */
-public interface ImageServer {
+public interface ImageStorageServerAPI {
 
 	/**
 	 * create an image using a binary file
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @param image
-	 *            binary image file
+	 * @param imageStream
+	 *            image input stream
 	 * @param imageInformation
 	 *            JSON holding the image's meta data
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
 	 */
-	void createImage(String imageIdentifier, File image,
+	void createImage(String imageIdentifier, InputStream imageStream,
 			String imageInformation, boolean autoRotate);
 
 	/**
@@ -31,8 +32,8 @@ public interface ImageServer {
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @param image
-	 *            binary image file
+	 * @param imageStream
+	 *            image input stream
 	 * @param imageInformation
 	 *            JSON holding the image's meta data
 	 * @param autoRotate
@@ -47,7 +48,7 @@ public interface ImageServer {
 	 * @param height
 	 *            new image height
 	 */
-	void createImage(String imageIdentifier, File image,
+	void createImage(String imageIdentifier, InputStream imageStream,
 			String imageInformation, boolean autoRotate, int left, int right,
 			int width, int height);
 
