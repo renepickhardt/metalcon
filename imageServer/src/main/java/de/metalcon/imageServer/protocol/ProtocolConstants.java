@@ -18,4 +18,10 @@ public class ProtocolConstants {
 	 */
 	public static final String SOLUTION = "solution";
 
+	public class StatusMessage {
+		public class Create {
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+		}
+	}
+
 }
