@@ -21,7 +21,7 @@ public class MetaDatabase {
 	public boolean addDatabaseEntry(final String identifier,
 			final String metaData) {
 		// TODO
-		return false;
+		return true;
 	}
 
 	/**

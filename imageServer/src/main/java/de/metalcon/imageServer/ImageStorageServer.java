@@ -1,7 +1,6 @@
 package de.metalcon.imageServer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,15 +52,20 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			String metaData, boolean autoRotate) {
 		// TODO: use response object
 		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
-			final MagickImage image = storeAndLoadImage(imageIdentifier,
-					imageStream);
-			if (autoRotate) {
-				try {
-					// warning: no documentation available!
-					image.autoOrientImage();
-				} catch (final MagickException e) {
-					e.printStackTrace();
+
+			try {
+				final MagickImage image = storeAndLoadImage(imageIdentifier,
+						imageStream);
+				if (image != null) {
+					if (autoRotate) {
+						// warning: no documentation available!
+						image.autoOrientImage();
+					}
 				}
+			} catch (final MagickException e) {
+				e.printStackTrace();
+			} catch (final IOException e) {
+				e.printStackTrace();
 			}
 
 			// TODO: save basic version
@@ -138,43 +142,40 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * create the relative file path for an image
+	 * generate the relative directory path for an image
 	 * 
-	 * @param imageIdentifier
-	 *            image identifier
+	 * @param hash
+	 *            image identifier hash
 	 * @param depth
 	 *            number of sub directories
-	 * @return relative file path using hashes
+	 * @return relative directory path using hashes
 	 */
-	private static String getRelativeFilePath(final String imageIdentifier,
+	private static String getRelativeDirectory(final String hash,
 			final int depth) {
-		final String hash = generateHash(imageIdentifier);
-
-		int pathLength = hash.length();
+		int pathLength = 0;
 		for (int i = 0; i < depth; i++) {
 			pathLength += i + 1;
 		}
 
 		final StringBuilder path = new StringBuilder(pathLength);
 		for (int i = 0; i < depth; i++) {
-			path.append(hash.substring(0, depth));
-			path.append(File.pathSeparator);
+			path.append(hash.substring(0, i + 1));
+			path.append(File.separator);
 		}
-		path.append(hash);
 
 		return path.toString();
 	}
 
 	/**
-	 * create the path for an original image
+	 * generate the parental directory for an original image
 	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @return path for the original image passed
+	 * @param hash
+	 *            image identifier hash
+	 * @return parental directory for the original image passed
 	 */
-	private static String getOriginalImagePath(final String imageIdentifier) {
-		return "/etc/imageStorageServer/originals/" + getFormattedDay() + "/"
-				+ getRelativeFilePath(imageIdentifier, 2);
+	private static String getOriginalImageDirectory(final String hash) {
+		return "/etc/imageStorageServer/originals/" + getFormattedDay()
+				+ File.separator + getRelativeDirectory(hash, 2);
 	}
 
 	/**
@@ -185,28 +186,27 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @param imageInputStream
 	 *            image input stream
 	 * @return file handle to the original image<br>
-	 *         <b>null</b> if the file could not be written successfully
+	 *         <b>null</b> if there was a collision between two original image
+	 *         files
+	 * @throws IOException
+	 *             failed to write original image to the destination file
 	 */
 	private static File storeOriginalImage(final String imageIdentifier,
-			final InputStream imageInputStream) {
-		final File imageFile = new File(getOriginalImagePath(imageIdentifier));
+			final InputStream imageInputStream) throws IOException {
+		final String hash = generateHash(imageIdentifier);
+		final File imageFileDir = new File(getOriginalImageDirectory(hash));
+		imageFileDir.mkdirs();
+
+		final File imageFile = new File(imageFileDir, hash);
+		System.out.println("original image: " + imageFile.getAbsolutePath());
 		if (imageFile.exists()) {
 			// hash codes of two image identifiers overlap
 			return null;
 		}
 
-		try {
-			final OutputStream imageOutputStream = new FileOutputStream(
-					imageFile);
-			IOUtils.copy(imageInputStream, imageOutputStream);
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-
-		// failed to store file
-		return null;
+		final OutputStream imageOutputStream = new FileOutputStream(imageFile);
+		IOUtils.copy(imageInputStream, imageOutputStream);
+		return imageFile;
 	}
 
 	/**
@@ -216,10 +216,14 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            image identifier
 	 * @param imageStream
 	 *            image input stream
-	 * @return magick image for editing
+	 * @return magick image for editing<br>
+	 *         <b>null</b> if the image is not valid or there was a collision
+	 *         between original images
+	 * @throws IOException
+	 *             failed to store the original image
 	 */
 	private static MagickImage storeAndLoadImage(final String imageIdentifier,
-			final InputStream imageStream) {
+			final InputStream imageStream) throws IOException {
 		final File imageFile = storeOriginalImage(imageIdentifier, imageStream);
 		if (imageFile != null) {
 			try {
@@ -232,7 +236,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			}
 		}
 
-		// failed to load original image
+		// collision between original image files
 		return null;
 	}
 
