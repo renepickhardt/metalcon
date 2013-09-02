@@ -12,7 +12,7 @@ public class ServerTest {
 	public static void main(String[] args) throws FileNotFoundException {
 		ImageStorageServerAPI server = new ImageStorageServer();
 
-		final File testImageFile = new File("/home/sebschlicht/mr_t_ba.jpg");
+		final File testImageFile = new File("/home/sebschlicht/mr_t_ba.png");
 		final InputStream imageStream = new FileInputStream(testImageFile);
 		final CreateResponse response = new CreateResponse();
 		server.createImage("img1", imageStream, "{author:\"Testy\"}", true,

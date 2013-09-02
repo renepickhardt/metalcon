@@ -1,5 +1,6 @@
 package de.metalcon.imageServer;
 
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,8 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
+import magick.CompressionType;
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
@@ -34,9 +36,19 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private static final Format FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
-	 * day represented by the current formatted day
+	 * year represented by the current formatted year
 	 */
-	private static long DAY;
+	private static int YEAR;
+
+	/**
+	 * day of the year represented by the current formatted day
+	 */
+	private static int DAY;
+
+	/**
+	 * formatted year
+	 */
+	private static String FORMATTED_YEAR;
 
 	/**
 	 * formatted day
@@ -58,20 +70,20 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * read the current date string
-	 * 
-	 * @return current date as formatted string
+	 * update the current date strings
 	 */
-	private static String getFormattedDay() {
-		final long crrMs = System.currentTimeMillis();
-		final long day = crrMs / 1000 / 60 / 60 / 24;
-		if (DAY != day) {
-			DAY = day;
-			FORMATTED_DAY = FORMATTER.format(new Date(System
-					.currentTimeMillis()));
-		}
+	private static void updateDateLabels() {
+		final Calendar calendar = Calendar.getInstance();
+		final int day = calendar.get(Calendar.DAY_OF_YEAR);
+		final int year = calendar.get(Calendar.YEAR);
 
-		return FORMATTED_DAY;
+		if ((day != DAY) || (year != YEAR)) {
+			YEAR = year;
+			DAY = day;
+
+			FORMATTED_YEAR = String.valueOf(year);
+			FORMATTED_DAY = FORMATTER.format(calendar.getTime());
+		}
 	}
 
 	/**
@@ -110,33 +122,71 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return path.toString();
 	}
 
+	/**
+	 * crop an image
+	 * 
+	 * @param image
+	 *            image to be cropped
+	 * @param left
+	 *            distance between the old and the new left border of the image
+	 * @param top
+	 *            distance between the old and the new upper border of the image
+	 * @param width
+	 *            target width
+	 * @param height
+	 *            target height
+	 * @return true - if the image was cropped successfully<br>
+	 *         false - otherwise
+	 */
+	private static boolean cropImage(final MagickImage image, final int left,
+			final int top, final int width, final int height) {
+		try {
+			image.cropImage(new Rectangle(left, top, width, height));
+			return true;
+		} catch (final MagickException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 	@Override
 	public boolean createImage(final String imageIdentifier,
 			final InputStream imageStream, final String metaData,
 			final boolean autoRotate, final CreateResponse response) {
+		final String hash = generateHash(imageIdentifier);
+
 		// TODO: use response object
 		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
 
 			try {
-				final MagickImage image = this.storeAndLoadImage(
-						imageIdentifier, imageStream);
+				// store original image
+				final MagickImage image = this.storeAndLoadImage(hash,
+						imageStream);
+
 				if (image != null) {
 					if (autoRotate) {
-						// warning: no documentation available!
+						// WARNING: no documentation available!
 						image.autoOrientImage();
 					}
+
+					// store basis version
+					this.storeImage(hash, image);
+
+					return true;
 				}
 			} catch (final MagickException e) {
+				// TODO error: no image file/error while rotating
 				e.printStackTrace();
 			} catch (final IOException e) {
+				// TODO error: failed to store image(s)
 				e.printStackTrace();
 			}
 
-			// TODO: save basic version
-			return true;
+		} else {
+			// TODO error: image identifier in use
 		}
 
-		// TODO: image identifier in use
 		return false;
 	}
 
@@ -205,16 +255,29 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @return parental directory for the original image passed
 	 */
 	private String getOriginalImageDirectory(final String hash) {
+		updateDateLabels();
 		return this.imageDirectory + "originals" + File.separator
-				+ getFormattedDay() + File.separator
-				+ getRelativeDirectory(hash, 2);
+				+ FORMATTED_YEAR + File.separator + FORMATTED_DAY
+				+ File.separator + getRelativeDirectory(hash, 2);
+	}
+
+	/**
+	 * generate the parental directory for the basis image
+	 * 
+	 * @param hash
+	 *            image identifier hash
+	 * @return parental directory for the basis image passed
+	 */
+	private String getBasisImageDirectory(final String hash) {
+		return this.imageDirectory + getRelativeDirectory(hash, 3)
+				+ File.separator + "basis";
 	}
 
 	/**
 	 * store the original image to the file system
 	 * 
-	 * @param imageIdentifier
-	 *            image identifier
+	 * @param hash
+	 *            image identifier hash
 	 * @param imageInputStream
 	 *            image input stream
 	 * @return file handle to the original image<br>
@@ -223,9 +286,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @throws IOException
 	 *             failed to write original image to the destination file
 	 */
-	private File storeOriginalImage(final String imageIdentifier,
+	private File storeOriginalImage(final String hash,
 			final InputStream imageInputStream) throws IOException {
-		final String hash = generateHash(imageIdentifier);
 		final File imageFileDir = new File(this.getOriginalImageDirectory(hash));
 		imageFileDir.mkdirs();
 
@@ -244,8 +306,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	/**
 	 * store the original image and load it for editing
 	 * 
-	 * @param imageIdentifier
-	 *            image identifier
+	 * @param hash
+	 *            image identifier hash
 	 * @param imageStream
 	 *            image input stream
 	 * @return magick image for editing<br>
@@ -253,24 +315,31 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *         between original images
 	 * @throws IOException
 	 *             failed to store the original image
+	 * @throws MagickException
+	 *             image stream invalid
 	 */
-	private MagickImage storeAndLoadImage(final String imageIdentifier,
-			final InputStream imageStream) throws IOException {
-		final File imageFile = this.storeOriginalImage(imageIdentifier,
-				imageStream);
+	private MagickImage storeAndLoadImage(final String hash,
+			final InputStream imageStream) throws IOException, MagickException {
+		final File imageFile = this.storeOriginalImage(hash, imageStream);
 		if (imageFile != null) {
-			try {
-				final ImageInfo imageInfo = new ImageInfo(
-						imageFile.getAbsolutePath());
-				return new MagickImage(imageInfo);
-			} catch (final MagickException e) {
-				// file is no valid image file
-				return null;
-			}
+			final ImageInfo imageInfo = new ImageInfo(
+					imageFile.getAbsolutePath());
+			return new MagickImage(imageInfo);
 		}
 
 		// collision between original image files
 		return null;
 	}
 
+	private void storeImage(final String hash, final MagickImage image)
+			throws MagickException {
+		final File imageFileDir = new File(this.getBasisImageDirectory(hash));
+		imageFileDir.mkdirs();
+
+		final File imageFile = new File(imageFileDir, hash);
+		final ImageInfo imageInfo = new ImageInfo(imageFile.getAbsolutePath());
+		imageInfo.setCompression(CompressionType.JPEGCompression);
+
+		image.writeImage(imageInfo);
+	}
 }
