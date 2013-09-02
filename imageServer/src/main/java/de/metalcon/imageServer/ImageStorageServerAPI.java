@@ -44,9 +44,6 @@ public interface ImageStorageServerAPI {
 	 *            image input stream
 	 * @param metaData
 	 *            image meta data (JSON)
-	 * @param autoRotate
-	 *            rotation flag - if set to <b>true</b> the server will rotate
-	 *            the image using its EXIF data automatically
 	 * @param left
 	 *            distance between the old and the new left border of the image
 	 * @param top
@@ -61,8 +58,8 @@ public interface ImageStorageServerAPI {
 	 *         false - otherwise
 	 */
 	boolean createImage(String imageIdentifier, InputStream imageStream,
-			String metaData, boolean autoRotate, int left, int right,
-			int width, int height, CreateResponse response);
+			String metaData, int left, int top, int width, int height,
+			CreateResponse response);
 
 	/**
 	 * create an image using a link to an existing image

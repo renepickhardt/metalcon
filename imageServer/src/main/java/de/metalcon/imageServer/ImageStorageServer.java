@@ -192,9 +192,39 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 	@Override
 	public boolean createImage(String imageIdentifier, InputStream imageStream,
-			String metaData, boolean autoRotate, int left, int right,
-			int width, int height, final CreateResponse response) {
-		// TODO Auto-generated method stub
+			String metaData, int left, int top, int width, int height,
+			final CreateResponse response) {
+		final String hash = generateHash(imageIdentifier);
+
+		// TODO: use response object
+		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
+
+			try {
+				// store original image
+				final MagickImage image = this.storeAndLoadImage(hash,
+						imageStream);
+
+				if (image != null) {
+					// crop the image
+					cropImage(image, left, top, width, height);
+
+					// store basis version
+					this.storeImage(hash, image);
+
+					return true;
+				}
+			} catch (final MagickException e) {
+				// TODO error: no image file/error while rotating
+				e.printStackTrace();
+			} catch (final IOException e) {
+				// TODO error: failed to store image(s)
+				e.printStackTrace();
+			}
+
+		} else {
+			// TODO error: image identifier in use
+		}
+
 		return false;
 	}
 
