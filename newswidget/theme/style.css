@@ -1,0 +1,262 @@
+*
+{
+	margin: 0px;
+	padding: 0px;
+	font-family: arial;
+}
+
+html, body{
+	height: 100%;
+}
+
+.form-control
+{
+	resize: none;
+}
+
+iframe
+{
+	width: 800px; height: 1200px; border: 1px solid black;
+    zoom: 0.75;
+    -moz-transform: scale(0.75);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.75);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.75);
+    -webkit-transform-origin: 0 0;
+}
+
+.website-preview
+{
+	width: 600px; height: 1200px; padding: 0; overflow: hidden;
+}
+
+body 
+{
+	height: 100%;
+	background: #B8B8B8;
+}
+
+.wrapper
+{
+	background: #fff;
+	width: 800px;
+	border: 1px solid #a1a1a1;
+	margin: 10px auto 20px auto;
+	height: auto;
+}
+
+.form-group.message-input
+{
+	position: relative;	
+	width: 50%;
+	height: auto;
+	color: #666;
+	margin: 10px;
+}
+
+.btn.btn-primary.message-submit
+{
+	display: none;
+	margin: 5px 0 5px 0;
+}
+
+.btn.btn-default.button-clear
+{
+	display:none;
+	margin: 5px 0 5px 0;
+}
+
+.btn.btn-default.button-cancel
+{
+	display:none;
+	margin: 5px 0 5px 0;
+}
+
+.message-display-wrapper
+{
+	margin: 10px;
+	border: 1px solid #e1e1e1;
+	height: 100%;
+	width: auto;
+	color: #444;
+	overflow: auto;
+}
+
+.comments-holder-outside
+{
+	height: auto;
+	font-size: 13px;
+	margin: 10px 5px 5px 5px;
+	color: #555;
+}
+
+ul.comments-holder
+{
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: auto;
+	height: auto;
+	overflow: hidden;
+}
+
+ul.comments-holder li.single-comment-holder
+{
+	list-style-type: none;
+	height: auto;
+	width: auto;
+	margin: 5px 0 5px 0;
+	border: 1px solid #e1e1e1;
+	overflow: hidden;
+	position: relative;
+}
+
+ul.comments-holder li.single-comment-holder:hover
+{
+	border: 1px solid #c1c1c1;
+}
+
+ul.comments-holder li.single-comment-holder .user-img
+{
+	float: left;
+	height: 65px;
+	width: 65px;
+	margin: 0 10px 0 0;
+}
+
+ul.comments-holder li.single-comment-holder .user-img img.user-img-pic
+{
+	width: 55px;
+	height: auto;
+	margin: 5px;
+	border: 1px solid #a1a1a1;
+}
+
+ul.comments-holder li.single-comment-holder .user-img img.user-img-pic:hover
+{
+		border: 1px solid #717171;
+}
+
+.comment-body 
+{
+	width: auto;
+}
+
+ul.comments-holder li.single-comment-holder h3.username-field
+{
+	height: 30px;
+	line-height: 27px;
+	color: #2E5CB8;
+	font-size: 14px;
+	margin: 0 0 0 10px;
+}
+
+ul.comments-holder li.single-comment-holder h3.username-field:hover
+{
+	color: #254A93;
+}
+
+ul.comments-holder li.single-comment-holder .comment-text
+{
+	display: block;
+	width: auto;
+	font-size: 13px;
+	margin: 0 10px 10px 75px;
+	word-wrap: normal;
+	max-height: 175px;
+	overflow: auto;
+}
+
+.comment-date
+{
+	position: absolute;
+	top: 0px;
+	right: 10px;
+	line-height: 27px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+#metal 
+{
+	width:400px;
+	margin:100px auto;
+	border:1px solid #AFAFAF;
+}
+
+#metal > div
+{
+	background-color:#333333;
+	border:1px solid #F6F6F6;
+	padding:10px;
+}
+
+#metal .reader
+{
+	height:400px;
+	overflow:auto;
+	border:1px solid #F6F6F6;
+	padding:80px 10px 10px 10px;
+	background:#fff url(metalcon.jpg) center 0 no-repeat;
+}
+
+#metal ul
+{
+	margin:0;
+	padding:0;
+}
+
+#metal ul li
+{
+	list-style-type:none;
+	color:#A3A3A3;
+	border-bottom:1px solid #E4E4E4;
+	margin-bottom:5px;
+	padding-bottom:5px;
+}
+
+#metal ul li div
+{
+	color:#777;
+}
+
+#metal ul li a
+{
+	color:#444;
+	text-decoration:none;
+	font-weight:normal;
+}
+
+#metal ul li a:hover
+{
+	text-decoration:underline;
+}
+
+#metal ul li span
+{
+	float:center;
+}
+
+#metal .buzz-loading
+{
+	position:absolute;
+	margin-left:240px;
+	width:16px;
+	height:16px;
+	background:transparent url(ajax-loader.gif) center center no-repeat;
+}
+
+*/
