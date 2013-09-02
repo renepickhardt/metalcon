@@ -1,7 +1,11 @@
 package de.metalcon.imageServer;
 
-import java.io.File;
 import java.io.InputStream;
+
+import de.metalcon.imageServer.protocol.create.CreateResponse;
+import de.metalcon.imageServer.protocol.delete.DeleteResponse;
+import de.metalcon.imageServer.protocol.read.ReadResponse;
+import de.metalcon.imageServer.protocol.update.UpdateResponse;
 
 /**
  * prototype interface for the image storage server API
@@ -18,14 +22,18 @@ public interface ImageStorageServerAPI {
 	 *            image identifier
 	 * @param imageStream
 	 *            image input stream
-	 * @param imageInformation
-	 *            JSON holding the image's meta data
+	 * @param metaData
+	 *            image meta data (JSON)
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
+	 * @param response
+	 *            create response object
+	 * @return true - if the image has been created successfully<br>
+	 *         false - otherwise
 	 */
-	void createImage(String imageIdentifier, InputStream imageStream,
-			String imageInformation, boolean autoRotate);
+	boolean createImage(String imageIdentifier, InputStream imageStream,
+			String metaData, boolean autoRotate, CreateResponse response);
 
 	/**
 	 * create a cropped image using a binary file
@@ -34,8 +42,8 @@ public interface ImageStorageServerAPI {
 	 *            image identifier
 	 * @param imageStream
 	 *            image input stream
-	 * @param imageInformation
-	 *            JSON holding the image's meta data
+	 * @param metaData
+	 *            image meta data (JSON)
 	 * @param autoRotate
 	 *            rotation flag - if set to <b>true</b> the server will rotate
 	 *            the image using its EXIF data automatically
@@ -47,10 +55,14 @@ public interface ImageStorageServerAPI {
 	 *            new image width
 	 * @param height
 	 *            new image height
+	 * @param response
+	 *            create response object
+	 * @return true - if the image has been created successfully<br>
+	 *         false - otherwise
 	 */
-	void createImage(String imageIdentifier, InputStream imageStream,
-			String imageInformation, boolean autoRotate, int left, int right,
-			int width, int height);
+	boolean createImage(String imageIdentifier, InputStream imageStream,
+			String metaData, boolean autoRotate, int left, int right,
+			int width, int height, CreateResponse response);
 
 	/**
 	 * create an image using a link to an existing image
@@ -59,11 +71,26 @@ public interface ImageStorageServerAPI {
 	 *            image identifier
 	 * @param imageUrl
 	 *            URL to the existing image
-	 * @param autoRotate
-	 *            rotation flag - if set to <b>true</b> the server will rotate
-	 *            the image using its EXIF data automatically
+	 * @param response
+	 *            create response object
+	 * @return true - if the image has been created successfully<br>
+	 *         false - otherwise
 	 */
-	void createImage(String imageIdentifier, String imageUrl, boolean autoRotate);
+	boolean createImage(String imageIdentifier, String imageUrl,
+			CreateResponse response);
+
+	/**
+	 * read the image in its original state with meta data
+	 * 
+	 * @param imageIdentifier
+	 *            image identifier
+	 * @param response
+	 *            read response object
+	 * @return stream of the original image<br>
+	 *         <b>null</b> if the image identifier is invalid
+	 */
+	ImageData readImageWithMetaData(String imageIdentifier,
+			ReadResponse response);
 
 	/**
 	 * read the image having new dimensions
@@ -74,27 +101,44 @@ public interface ImageStorageServerAPI {
 	 *            alternate width
 	 * @param height
 	 *            alternate height
-	 * @return file handle to the image version having the dimensions passed
+	 * @param response
+	 *            read response object
+	 * @return stream of the image version having the dimensions passed
 	 */
-	File readImage(String imageIdentifier, int width, int height);
+	InputStream readImage(String imageIdentifier, int width, int height,
+			ReadResponse response);
 
 	/**
-	 * read the image in its original state
+	 * read the image having new dimensions with meta data
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @return file handle to the original image
+	 * @param width
+	 *            alternate width
+	 * @param height
+	 *            alternate height
+	 * @param response
+	 *            read response object
+	 * @return stream of the image version having the dimensions passed
 	 */
-	File readImage(String imageIdentifier);
+	ImageData readImageWithMetaData(String imageIdentifier, int width,
+			int height, ReadResponse response);
 
 	/**
-	 * read the meta data of an image
+	 * read a bunch of images
 	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @return JSON holding the image's meta data
+	 * @param imageIdentifiers
+	 *            array of image identifiers
+	 * @param width
+	 *            alternate width
+	 * @param height
+	 *            alternate height
+	 * @param response
+	 *            read response object
+	 * @return stream of the archive including the images
 	 */
-	String readImageInformation(String imageIdentifier);
+	InputStream readImages(String[] imageIdentifiers, int width, int height,
+			ReadResponse response);
 
 	/**
 	 * update the meta data of an image
@@ -107,15 +151,20 @@ public interface ImageStorageServerAPI {
 	 *            value will get overridden</b>
 	 * @param value
 	 *            meta data value that shall be appended
+	 * @param response
+	 *            update response object
 	 */
-	void appendImageInformation(String imageIdentifier, String key, String value);
+	void appendImageInformation(String imageIdentifier, String key,
+			String value, UpdateResponse response);
 
 	/**
 	 * delete an image from the server
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
+	 * @param response
+	 *            delete response object
 	 */
-	void deleteImage(String imageIdentifier);
+	void deleteImage(String imageIdentifier, DeleteResponse response);
 
 }

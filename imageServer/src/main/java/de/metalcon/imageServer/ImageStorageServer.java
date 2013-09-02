@@ -15,6 +15,11 @@ import magick.MagickImage;
 
 import org.apache.commons.io.IOUtils;
 
+import de.metalcon.imageServer.protocol.create.CreateResponse;
+import de.metalcon.imageServer.protocol.delete.DeleteResponse;
+import de.metalcon.imageServer.protocol.read.ReadResponse;
+import de.metalcon.imageServer.protocol.update.UpdateResponse;
+
 /**
  * image storage server
  * 
@@ -39,6 +44,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private static String FORMATTED_DAY;
 
 	/**
+	 * root directory for the image storage server
+	 */
+	private final String imageDirectory = "/etc/imageStorageServer/";
+
+	/**
 	 * database for image meta data
 	 */
 	private final MetaDatabase imageMetaDatabase;
@@ -47,77 +57,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		this.imageMetaDatabase = new MetaDatabase();
 	}
 
-	@Override
-	public void createImage(String imageIdentifier, InputStream imageStream,
-			String metaData, boolean autoRotate) {
-		// TODO: use response object
-		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
-
-			try {
-				final MagickImage image = storeAndLoadImage(imageIdentifier,
-						imageStream);
-				if (image != null) {
-					if (autoRotate) {
-						// warning: no documentation available!
-						image.autoOrientImage();
-					}
-				}
-			} catch (final MagickException e) {
-				e.printStackTrace();
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-
-			// TODO: save basic version
-		}
-	}
-
-	@Override
-	public void createImage(String imageIdentifier, InputStream imageStream,
-			String imageInformation, boolean autoRotate, int left, int right,
-			int width, int height) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void createImage(String imageIdentifier, String imageUrl,
-			boolean autoRotate) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public File readImage(String imageIdentifier, int width, int height) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public File readImage(String imageIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String readImageInformation(String imageIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void appendImageInformation(String imageIdentifier, String key,
-			String value) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void deleteImage(String imageIdentifier) {
-		// TODO Auto-generated method stub
-
-	}
-
+	/**
+	 * read the current date string
+	 * 
+	 * @return current date as formatted string
+	 */
 	private static String getFormattedDay() {
 		final long crrMs = System.currentTimeMillis();
 		final long day = crrMs / 1000 / 60 / 60 / 24;
@@ -166,6 +110,93 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return path.toString();
 	}
 
+	@Override
+	public boolean createImage(final String imageIdentifier,
+			final InputStream imageStream, final String metaData,
+			final boolean autoRotate, final CreateResponse response) {
+		// TODO: use response object
+		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
+
+			try {
+				final MagickImage image = this.storeAndLoadImage(
+						imageIdentifier, imageStream);
+				if (image != null) {
+					if (autoRotate) {
+						// warning: no documentation available!
+						image.autoOrientImage();
+					}
+				}
+			} catch (final MagickException e) {
+				e.printStackTrace();
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+
+			// TODO: save basic version
+			return true;
+		}
+
+		// TODO: image identifier in use
+		return false;
+	}
+
+	@Override
+	public boolean createImage(String imageIdentifier, InputStream imageStream,
+			String imageInformation, boolean autoRotate, int left, int right,
+			int width, int height, final CreateResponse response) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean createImage(String imageIdentifier, String imageUrl,
+			final CreateResponse response) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public ImageData readImageWithMetaData(String imageIdentifier,
+			final ReadResponse response) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InputStream readImage(String imageIdentifier, int width, int height,
+			final ReadResponse response) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ImageData readImageWithMetaData(String imageIdentifier, int width,
+			int height, final ReadResponse response) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InputStream readImages(final String[] imageIdentifiers, int width,
+			final int height, final ReadResponse response) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void appendImageInformation(String imageIdentifier, String key,
+			String value, final UpdateResponse response) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteImage(String imageIdentifier,
+			final DeleteResponse response) {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * generate the parental directory for an original image
 	 * 
@@ -173,9 +204,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            image identifier hash
 	 * @return parental directory for the original image passed
 	 */
-	private static String getOriginalImageDirectory(final String hash) {
-		return "/etc/imageStorageServer/originals/" + getFormattedDay()
-				+ File.separator + getRelativeDirectory(hash, 2);
+	private String getOriginalImageDirectory(final String hash) {
+		return this.imageDirectory + "originals" + File.separator
+				+ getFormattedDay() + File.separator
+				+ getRelativeDirectory(hash, 2);
 	}
 
 	/**
@@ -191,10 +223,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @throws IOException
 	 *             failed to write original image to the destination file
 	 */
-	private static File storeOriginalImage(final String imageIdentifier,
+	private File storeOriginalImage(final String imageIdentifier,
 			final InputStream imageInputStream) throws IOException {
 		final String hash = generateHash(imageIdentifier);
-		final File imageFileDir = new File(getOriginalImageDirectory(hash));
+		final File imageFileDir = new File(this.getOriginalImageDirectory(hash));
 		imageFileDir.mkdirs();
 
 		final File imageFile = new File(imageFileDir, hash);
@@ -222,9 +254,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @throws IOException
 	 *             failed to store the original image
 	 */
-	private static MagickImage storeAndLoadImage(final String imageIdentifier,
+	private MagickImage storeAndLoadImage(final String imageIdentifier,
 			final InputStream imageStream) throws IOException {
-		final File imageFile = storeOriginalImage(imageIdentifier, imageStream);
+		final File imageFile = this.storeOriginalImage(imageIdentifier,
+				imageStream);
 		if (imageFile != null) {
 			try {
 				final ImageInfo imageInfo = new ImageInfo(
