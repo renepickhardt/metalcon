@@ -142,7 +142,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 	@Override
 	public boolean createImage(String imageIdentifier, InputStream imageStream,
-			String imageInformation, boolean autoRotate, int left, int right,
+			String metaData, boolean autoRotate, int left, int right,
 			int width, int height, final CreateResponse response) {
 		// TODO Auto-generated method stub
 		return false;
