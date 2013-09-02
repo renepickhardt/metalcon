@@ -1,5 +1,7 @@
 package de.metalcon.imageServer.protocol.create;
 
-public class CreateResponse {
+import de.metalcon.imageServer.protocol.Response;
+
+public class CreateResponse extends Response {
 
 }

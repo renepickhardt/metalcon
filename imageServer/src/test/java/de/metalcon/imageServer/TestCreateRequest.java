@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -21,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageServer.protocol.Response;
 import de.metalcon.imageServer.protocol.create.CreateRequest;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 
@@ -82,7 +84,7 @@ public class TestCreateRequest {
 
 		CreateRequest.checkRequest(imageIdentifier, imageStream, metaData,
 				autoRotate, this.createResponse);
-		// this.response = extractJson(this.createResponse);
+		this.response = extractJson(this.createResponse);
 	}
 
 	@Test
@@ -95,6 +97,25 @@ public class TestCreateRequest {
 	public void testCreateRequestPerURL() {
 		fail("Not yet implemented");
 
+	}
+
+	/**
+	 * extract the JSON object from the response, failing the test if this is
+	 * not possible
+	 * 
+	 * @param response
+	 *            NSSP response
+	 * @return JSON object in the response passed
+	 */
+	protected static JSONObject extractJson(final Response response) {
+		try {
+			final Field field = Response.class.getDeclaredField("json");
+			field.setAccessible(true);
+			return (JSONObject) field.get(response);
+		} catch (final Exception e) {
+			fail("failed to extract the JSON object from class Response");
+			return null;
+		}
 	}
 
 }
