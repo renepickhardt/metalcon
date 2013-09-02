@@ -61,5 +61,16 @@
 	<artifactId>neo4j-lucene-index</artifactId>
 	<version>1.9.3</version>
 	</dependency>
+	<dependency>
+	<groupId>org.apache.lucene</groupId>
+	<artifactId>lucene-core</artifactId>
+	<version>4.4.0</version>
+	</dependency>
+	<dependency>
+	<groupId>org.apache.lucene</groupId>
+	<artifactId>lucene-analyzers-common</artifactId>
+	<version>4.4.0</version>
+	</dependency>	 
+
   </dependencies>
 </project>

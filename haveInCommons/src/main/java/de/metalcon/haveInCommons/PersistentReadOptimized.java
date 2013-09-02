@@ -141,7 +141,7 @@ public class PersistentReadOptimized implements HaveInCommons {
 					DynamicRelationshipType.withName("follows"));
 			relIndex.add(r, "id", from + ":" + to);
 		}
-		updateCommons(f, t);
+//		updateCommons(f, t);
 	}
 
 	/*
