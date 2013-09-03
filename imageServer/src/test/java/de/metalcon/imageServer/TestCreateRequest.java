@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.imageServer.protocol.Response;
-import de.metalcon.imageServer.protocol.create.CreateRequest;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 import de.metalcon.utils.FormItemList;
 
@@ -33,8 +32,6 @@ public class TestCreateRequest {
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 	final private ServletContext servletContext = mock(ServletContext.class);
 
-	private CreateResponse createResponse;
-	private JSONObject response;
 	private static FileItem imageFileItem;
 	private HttpServletRequest request;
 
@@ -75,14 +72,16 @@ public class TestCreateRequest {
 
 	@Test
 	public void testImageIdentifierMissing() {
-		this.processCreateRequest(null, imageFileItem,
-				ProtocolTestConstants.VALID_IMAGE_METADATA,
+		CreateResponse createResponse = this.processCreateRequest(null,
+				imageFileItem, ProtocolTestConstants.VALID_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+		if (createResponse.getResponse().containsKey(
+				ProtocolConstants.STATUS_MESSAGE)) {
 			assertEquals(
 					ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_MISSING,
 
-					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+					createResponse.getResponse().get(
+							ProtocolConstants.STATUS_MESSAGE));
 		} else {
 			fail("Status missing");
 		}
@@ -90,14 +89,17 @@ public class TestCreateRequest {
 
 	@Test
 	public void testImageStreamMissing() {
-		this.processCreateRequest("validIdentifier", null,
+		CreateResponse createResponse = this.processCreateRequest(
+				"validIdentifier", null,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+		if (createResponse.getResponse().containsKey(
+				ProtocolConstants.STATUS_MESSAGE)) {
 			assertEquals(
 					ProtocolConstants.StatusMessage.Create.IMAGESTREAM_MISSING,
 
-					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+					createResponse.getResponse().get(
+							ProtocolConstants.STATUS_MESSAGE));
 		} else {
 			fail("Status missing");
 		}
@@ -105,13 +107,16 @@ public class TestCreateRequest {
 
 	@Test
 	public void testImageMetadataMissing() {
-		this.processCreateRequest("validIdentifier", imageFileItem, null,
+		CreateResponse createResponse = this.processCreateRequest(
+				"validIdentifier", imageFileItem, null,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+		if (createResponse.getResponse().containsKey(
+				ProtocolConstants.STATUS_MESSAGE)) {
 			assertEquals(
 					ProtocolConstants.StatusMessage.Create.IMAGE_METADATA_MISSING,
 
-					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+					createResponse.getResponse().get(
+							ProtocolConstants.STATUS_MESSAGE));
 		} else {
 			fail("Status missing");
 		}
@@ -119,13 +124,16 @@ public class TestCreateRequest {
 
 	@Test
 	public void testImageAutorotateFlagMissing() {
-		this.processCreateRequest("validIdentifier", imageFileItem,
+		CreateResponse createResponse = this.processCreateRequest(
+				"validIdentifier", imageFileItem,
 				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
-		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+		if (createResponse.getResponse().containsKey(
+				ProtocolConstants.STATUS_MESSAGE)) {
 			assertEquals(
-					ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MISSING,
+					ProtocolConstants.StatusMessage.Create.IMAGE_METADATA_MISSING,
 
-					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+					createResponse.getResponse().get(
+							ProtocolConstants.STATUS_MESSAGE));
 		} else {
 			fail("Status missing");
 		}
@@ -133,25 +141,30 @@ public class TestCreateRequest {
 
 	@Test
 	public void testImageAutorotateFlagMalformed() {
-		this.processCreateRequest("validIdentifier", imageFileItem,
+		CreateResponse createResponse = this.processCreateRequest(
+				"validIdentifier", imageFileItem,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
 				ProtocolTestConstants.INVALID_BOOLEAN_AUTOROTATE);
-		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+		if (createResponse.getResponse().containsKey(
+				ProtocolConstants.STATUS_MESSAGE)) {
 			assertEquals(
 					ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
 
-					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+					createResponse.getResponse().get(
+							ProtocolConstants.STATUS_MESSAGE));
 		} else {
 			fail("Status missing");
 		}
 	}
 
-	private void processCreateRequest(final String imageIdentifier,
+	private CreateResponse processCreateRequest(final String imageIdentifier,
 			final FileItem imageStream, final String metaData,
 			final String autoRotate) {
 		FormItemList formItemList = new FormItemList();
-		this.createResponse = new CreateResponse(
+		CreateResponse createResponse = new CreateResponse(
 				this.servletConfig.getServletContext());
+
+		System.out.println(imageIdentifier);
 
 		if (imageIdentifier != null) {
 			formItemList.addField(
@@ -176,8 +189,7 @@ public class TestCreateRequest {
 					autoRotate);
 		}
 
-		CreateRequest.checkRequest(formItemList, this.createResponse);
-		this.response = extractJson(this.createResponse);
+		return createResponse;
 	}
 
 	/**

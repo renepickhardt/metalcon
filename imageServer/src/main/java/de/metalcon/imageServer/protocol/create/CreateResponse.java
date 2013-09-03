@@ -18,25 +18,33 @@ public class CreateResponse extends Response {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addNoIdentifierError(String noIdentifier) {
 		this.jsonResponse.put(
 				ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
 				noIdentifier);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addNoImageStreamError(String imagestreamMissing) {
 		this.jsonResponse.put(ProtocolConstants.Parameters.Create.IMAGESTREAM,
 				imagestreamMissing);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addNoMetadataError(String imageMetadataMissing) {
 		this.jsonResponse.put(ProtocolConstants.Parameters.Create.META_DATA,
 				imageMetadataMissing);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addAutoRotateFlagMissingError(String autorotateFlagMissing) {
 		this.jsonResponse.put(
 				ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
 				autorotateFlagMissing);
+	}
+
+	public JSONObject getResponse() {
+		return this.jsonResponse;
 	}
 }

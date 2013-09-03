@@ -12,6 +12,7 @@ public class CreateRequest {
 		// File imageStream = checkImageStream(formItemList, response);
 		String metaData = checkMetaData(formItemList, response);
 		String autoRotateFlag = checkAutoRotateFlag(formItemList, response);
+		System.out.println(response);
 		return response;
 	}
 
