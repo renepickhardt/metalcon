@@ -100,7 +100,8 @@ public interface ImageStorageServerAPI {
 	 *            alternate height
 	 * @param response
 	 *            read response object
-	 * @return stream of the image version having the dimensions passed
+	 * @return stream of the image version having the dimensions passed<br>
+	 *         <b>null</b> if the image identifier is invalid
 	 */
 	InputStream readImage(String imageIdentifier, int width, int height,
 			ReadResponse response);

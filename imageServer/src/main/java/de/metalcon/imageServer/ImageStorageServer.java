@@ -158,7 +158,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final boolean autoRotate, final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
 
-		// TODO: use response object
 		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
 
 			try {
@@ -173,7 +172,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					}
 
 					// store basis version
-					this.storeImage(hash, image);
+					this.storeCompressedImage(hash, image,
+							new File(this.getBasisImageDirectory(hash)));
 
 					return true;
 				}
@@ -211,15 +211,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					cropImage(image, left, top, width, height);
 
 					// store basis version
-					this.storeImage(hash, image);
+					this.storeCompressedImage(hash, image,
+							new File(this.getBasisImageDirectory(hash)));
 
 					return true;
+				} else {
+					// TODO error: no valid image file
 				}
-			} catch (final MagickException e) {
-				// TODO error: no image file/error while rotating
-				e.printStackTrace();
 			} catch (final IOException e) {
-				// TODO error: failed to store image(s)
+				// internal server error: failed to store image(s)
+				e.printStackTrace();
+			} catch (final MagickException e) {
+				// internal server error: failed to rotate the image
 				e.printStackTrace();
 			}
 
@@ -245,13 +248,14 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				.getMetadata(imageIdentifier);
 
 		if (metaData != null) {
-			final InputStream imageStream = this
-					.accessOriginalImageStream(hash);
-
-			if (imageStream != null) {
-				return new ImageData(metaData, imageStream);
-			} else {
-				// TODO error: image not found
+			final File originalImageDir = new File(
+					this.getOriginalImageDirectory(hash));
+			try {
+				return new ImageData(metaData, this.accessImageStream(
+						originalImageDir, hash));
+			} catch (final FileNotFoundException e) {
+				// internal server error: file not found
+				e.printStackTrace();
 			}
 		} else {
 			// TODO error: no image with such identifier
@@ -265,7 +269,35 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final int height, final ReadResponse response) {
 		final String hash = generateHash(imageIdentifier);
 		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
-			return this.loadImage(hash, width, height);
+			try {
+				final File imageFileDir = new File(
+						this.getImageDirectoryForSize(hash, width, height));
+
+				if (this.imageMetaDatabase.imageHasSizeRegistered(
+						imageIdentifier, width, height)) {
+					return this.accessImageStream(imageFileDir, hash);
+				} else {
+					// try to create the scaled version
+					final String largerImagePath = this.imageMetaDatabase
+							.getSmallestImagePath(width, height);
+					if (largerImagePath != null) {
+						return this.storeAndAccessScaledImage(hash, width,
+								height, largerImagePath, imageFileDir);
+					} else {
+						// TODO warning: requested size larger than the original
+						final File basisImageDir = new File(
+								this.getBasisImageDirectory(hash));
+						return this.accessImageStream(basisImageDir, hash);
+					}
+				}
+
+			} catch (final FileNotFoundException e) {
+				// internal server error: file not found
+				e.printStackTrace();
+			} catch (final MagickException e) {
+				// internal server error: failed to load/scale/store image
+				e.printStackTrace();
+			}
 		} else {
 			// error: no image with such identifier
 		}
@@ -276,7 +308,45 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	@Override
 	public ImageData readImageWithMetaData(String imageIdentifier, int width,
 			int height, final ReadResponse response) {
-		// TODO Auto-generated method stub
+		final String metaData = this.imageMetaDatabase
+				.getMetadata(imageIdentifier);
+		if (metaData != null) {
+			final String hash = generateHash(imageIdentifier);
+			final File imageFileDir = new File(this.getImageDirectoryForSize(
+					hash, width, height));
+
+			try {
+				if (this.imageMetaDatabase.imageHasSizeRegistered(
+						imageIdentifier, width, height)) {
+					return new ImageData(metaData, this.accessImageStream(
+							imageFileDir, hash));
+				} else {
+					// try to create the scaled version
+					final String largerImagePath = this.imageMetaDatabase
+							.getSmallestImagePath(width, height);
+					if (largerImagePath != null) {
+						return new ImageData(metaData,
+								this.storeAndAccessScaledImage(hash, width,
+										height, largerImagePath, imageFileDir));
+					} else {
+						// TODO warning: requested size larger than the original
+						final File basisImageDir = new File(
+								this.getBasisImageDirectory(hash));
+						return new ImageData(metaData, this.accessImageStream(
+								basisImageDir, hash));
+					}
+				}
+			} catch (final FileNotFoundException e) {
+				// internal server error: file not found
+				e.printStackTrace();
+			} catch (final MagickException e) {
+				// internal server error: failed to store image
+				e.printStackTrace();
+			}
+		} else {
+			// TODO error: no image with such identifier
+		}
+
 		return null;
 	}
 
@@ -394,9 +464,14 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final InputStream imageStream) throws IOException, MagickException {
 		final File imageFile = this.storeOriginalImage(hash, imageStream);
 		if (imageFile != null) {
-			final ImageInfo imageInfo = new ImageInfo(
-					imageFile.getAbsolutePath());
-			return new MagickImage(imageInfo);
+			try {
+				final ImageInfo imageInfo = new ImageInfo(
+						imageFile.getAbsolutePath());
+				return new MagickImage(imageInfo);
+			} catch (final MagickException e) {
+				// no valid image file
+				return null;
+			}
 		}
 
 		// collision between original image files
@@ -404,18 +479,20 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * store an image
+	 * store an image using compression
 	 * 
 	 * @param hash
 	 *            image identifier hash
 	 * @param image
 	 *            magick image to be stored
+	 * @param imageFileDir
+	 *            parental directory of the image
 	 * @throws MagickException
-	 *             if the compression/writing fails
+	 *             if the compression/writing failed
 	 */
-	private void storeImage(final String hash, final MagickImage image)
+	private void storeCompressedImage(final String hash,
+			final MagickImage image, final File imageFileDir)
 			throws MagickException {
-		final File imageFileDir = new File(this.getBasisImageDirectory(hash));
 		imageFileDir.mkdirs();
 
 		final File imageFile = new File(imageFileDir, hash);
@@ -426,44 +503,49 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * access the stream of the original image
+	 * access the stream of an image
+	 * 
+	 * @param imageFileDir
+	 *            parental directory of the image
+	 * @param hash
+	 *            image identifier hash
+	 * @return input stream of the image
+	 * @throws FileNotFoundException
+	 *             if the image was not found
+	 */
+	private InputStream accessImageStream(final File imageFileDir,
+			final String hash) throws FileNotFoundException {
+		return new FileInputStream(new File(imageFileDir, hash));
+	}
+
+	/**
+	 * store and access a scaled image
 	 * 
 	 * @param hash
 	 *            image identifier hash
-	 * @return input stream of the original image<br>
-	 *         <b>null</b> if the original image was not found
+	 * @param width
+	 *            target width
+	 * @param height
+	 *            target height
+	 * @param largerImagePath
+	 *            path to the basic version for scaling
+	 * @param imageFileDir
+	 *            parental directory of the scaled image
+	 * @return input stream of the scaled image
+	 * @throws MagickException
+	 *             if the writing failed
+	 * @throws FileNotFoundException
+	 *             if the image was not found
 	 */
-	private InputStream accessOriginalImageStream(final String hash) {
-		final File imageFile = new File(this.getOriginalImageDirectory(hash)
-				+ File.separator + hash);
-		try {
-			return new FileInputStream(imageFile);
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		// file not found
-		return null;
-	}
-
-	private InputStream loadImage(final String hash, final int width,
-			final int height) {
-		final File imageFile = new File(this.getImageDirectoryForSize(hash,
-				width, height) + File.separator + hash);
-
-		if (imageFile.exists()) {
-			try {
-				return new FileInputStream(imageFile);
-			} catch (final FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			// file not found
-			return null;
-		} else {
-			// TODO: load, scale, store image and return a stream to memory disk
-			return null;
-		}
+	private InputStream storeAndAccessScaledImage(final String hash,
+			final int width, final int height, final String largerImagePath,
+			final File imageFileDir) throws MagickException,
+			FileNotFoundException {
+		final MagickImage image = new MagickImage(
+				new ImageInfo(largerImagePath));
+		image.scaleImage(width, height);
+		this.storeCompressedImage(hash, image, imageFileDir);
+		return this.accessImageStream(imageFileDir, hash);
 	}
 
 }
