@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.imageServer.protocol.Response;
+import de.metalcon.imageServer.protocol.create.CreateRequest;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 import de.metalcon.utils.FormItemList;
 
@@ -164,8 +165,6 @@ public class TestCreateRequest {
 		CreateResponse createResponse = new CreateResponse(
 				this.servletConfig.getServletContext());
 
-		System.out.println(imageIdentifier);
-
 		if (imageIdentifier != null) {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
@@ -188,8 +187,9 @@ public class TestCreateRequest {
 					ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
 					autoRotate);
 		}
-
-		return createResponse;
+		System.out.println(CreateRequest.checkRequest(formItemList,
+				createResponse));
+		return CreateRequest.checkRequest(formItemList, createResponse);
 	}
 
 	/**
