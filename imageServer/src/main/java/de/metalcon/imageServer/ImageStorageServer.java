@@ -2,6 +2,8 @@ package de.metalcon.imageServer;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -191,16 +193,16 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public boolean createImage(String imageIdentifier, InputStream imageStream,
-			String metaData, int left, int top, int width, int height,
+	public boolean createImage(final String imageIdentifier,
+			final InputStream imageStream, final String metaData,
+			final int left, final int top, final int width, final int height,
 			final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
 
-		// TODO: use response object
 		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
 
 			try {
-				// store original image
+				// store and load original image
 				final MagickImage image = this.storeAndLoadImage(hash,
 						imageStream);
 
@@ -236,16 +238,38 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public ImageData readImageWithMetaData(String imageIdentifier,
+	public ImageData readImageWithMetaData(final String imageIdentifier,
 			final ReadResponse response) {
-		// TODO Auto-generated method stub
+		final String hash = generateHash(imageIdentifier);
+		final String metaData = this.imageMetaDatabase
+				.getMetadata(imageIdentifier);
+
+		if (metaData != null) {
+			final InputStream imageStream = this
+					.accessOriginalImageStream(hash);
+
+			if (imageStream != null) {
+				return new ImageData(metaData, imageStream);
+			} else {
+				// TODO error: image not found
+			}
+		} else {
+			// TODO error: no image with such identifier
+		}
+
 		return null;
 	}
 
 	@Override
-	public InputStream readImage(String imageIdentifier, int width, int height,
-			final ReadResponse response) {
-		// TODO Auto-generated method stub
+	public InputStream readImage(final String imageIdentifier, final int width,
+			final int height, final ReadResponse response) {
+		final String hash = generateHash(imageIdentifier);
+		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+			return this.loadImage(hash, width, height);
+		} else {
+			// error: no image with such identifier
+		}
+
 		return null;
 	}
 
@@ -301,6 +325,24 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private String getBasisImageDirectory(final String hash) {
 		return this.imageDirectory + getRelativeDirectory(hash, 3)
 				+ File.separator + "basis";
+	}
+
+	/**
+	 * generate the parental directory for a specific size
+	 * 
+	 * @param hash
+	 *            image identifier hash
+	 * @param width
+	 *            target width
+	 * @param height
+	 *            target height
+	 * @return parental directory for the scaled version of the image
+	 */
+	private String getImageDirectoryForSize(final String hash, final int width,
+			final int height) {
+		return this.imageDirectory + getRelativeDirectory(hash, 3)
+				+ File.separator + String.valueOf(width) + "x"
+				+ String.valueOf(height);
 	}
 
 	/**
@@ -361,6 +403,16 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
+	/**
+	 * store an image
+	 * 
+	 * @param hash
+	 *            image identifier hash
+	 * @param image
+	 *            magick image to be stored
+	 * @throws MagickException
+	 *             if the compression/writing fails
+	 */
 	private void storeImage(final String hash, final MagickImage image)
 			throws MagickException {
 		final File imageFileDir = new File(this.getBasisImageDirectory(hash));
@@ -372,4 +424,46 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 		image.writeImage(imageInfo);
 	}
+
+	/**
+	 * access the stream of the original image
+	 * 
+	 * @param hash
+	 *            image identifier hash
+	 * @return input stream of the original image<br>
+	 *         <b>null</b> if the original image was not found
+	 */
+	private InputStream accessOriginalImageStream(final String hash) {
+		final File imageFile = new File(this.getOriginalImageDirectory(hash)
+				+ File.separator + hash);
+		try {
+			return new FileInputStream(imageFile);
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		// file not found
+		return null;
+	}
+
+	private InputStream loadImage(final String hash, final int width,
+			final int height) {
+		final File imageFile = new File(this.getImageDirectoryForSize(hash,
+				width, height) + File.separator + hash);
+
+		if (imageFile.exists()) {
+			try {
+				return new FileInputStream(imageFile);
+			} catch (final FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			// file not found
+			return null;
+		} else {
+			// TODO: load, scale, store image and return a stream to memory disk
+			return null;
+		}
+	}
+
 }

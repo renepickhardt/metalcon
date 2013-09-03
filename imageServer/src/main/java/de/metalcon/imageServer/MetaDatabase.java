@@ -9,6 +9,19 @@ package de.metalcon.imageServer;
 public class MetaDatabase {
 
 	/**
+	 * check if the database contains an entry with an identifier
+	 * 
+	 * @param identifier
+	 *            identifier to be searched for
+	 * @return true - if there is an entry with such identifier<br>
+	 *         false - otherwise
+	 */
+	public boolean hasEntryWithIdentifier(final String identifier) {
+		// TODO
+		return true;
+	}
+
+	/**
 	 * add an entry to the database
 	 * 
 	 * @param identifier
