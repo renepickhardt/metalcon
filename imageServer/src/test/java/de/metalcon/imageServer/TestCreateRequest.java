@@ -57,7 +57,6 @@ public class TestCreateRequest {
 		}
 	}
 
-	@Test
 	public void testCreateRequest() {
 		this.processCreateRequest("validIdentifier",
 				ProtocolTestConstants.VALID_IMAGESTREAM,
@@ -72,8 +71,75 @@ public class TestCreateRequest {
 				ProtocolTestConstants.VALID_IMAGESTREAM,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		assertEquals(ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER,
-				this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+			assertEquals(
+					ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_MISSING,
+
+					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		} else {
+			fail("Status missing");
+		}
+	}
+
+	@Test
+	public void testImageStreamMissing() {
+		this.processCreateRequest("validIdentifier", null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+			assertEquals(
+					ProtocolConstants.StatusMessage.Create.IMAGESTREAM_MISSING,
+
+					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		} else {
+			fail("Status missing");
+		}
+	}
+
+	@Test
+	public void testImageMetadataMissing() {
+		this.processCreateRequest("validIdentifier",
+				ProtocolTestConstants.VALID_IMAGESTREAM, null,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+			assertEquals(
+					ProtocolConstants.StatusMessage.Create.IMAGE_METADATA_MISSING,
+
+					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		} else {
+			fail("Status missing");
+		}
+	}
+
+	@Test
+	public void testImageAutorotateFlagMissing() {
+		this.processCreateRequest("validIdentifier",
+				ProtocolTestConstants.VALID_IMAGESTREAM,
+				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
+		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+			assertEquals(
+					ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MISSING,
+
+					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		} else {
+			fail("Status missing");
+		}
+	}
+
+	@Test
+	public void testImageAutorotateFlagMalformed() {
+		this.processCreateRequest("validIdentifier",
+				ProtocolTestConstants.VALID_IMAGESTREAM,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.INVALID_BOOLEAN_AUTOROTATE);
+		if (this.response.containsKey(ProtocolConstants.STATUS_MESSAGE)) {
+			assertEquals(
+					ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
+
+					this.response.get(ProtocolConstants.STATUS_MESSAGE));
+		} else {
+			fail("Status missing");
+		}
 	}
 
 	private void processCreateRequest(final String imageIdentifier,
@@ -85,18 +151,6 @@ public class TestCreateRequest {
 		CreateRequest.checkRequest(imageIdentifier, imageStream, metaData,
 				autoRotate, this.createResponse);
 		this.response = extractJson(this.createResponse);
-	}
-
-	@Test
-	public void testCreateRequestWithCropping() {
-		fail("Not yet implemented");
-
-	}
-
-	@Test
-	public void testCreateRequestPerURL() {
-		fail("Not yet implemented");
-
 	}
 
 	/**

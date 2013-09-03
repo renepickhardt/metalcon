@@ -20,7 +20,22 @@ public class ProtocolConstants {
 
 	public class StatusMessage {
 		public class Create {
+
+			public static final String IMAGE_IDENTIFIER_MISSING = "No Image Identifier given";
+			public static final String IMAGESTREAM_MISSING = "No ImageStream found";
+			public static final String IMAGE_METADATA_MISSING = "No meta data given";
+			public static final String AUTOROTATE_FLAG_MISSING = "Autorotate flag not found";
+			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
+		}
+	}
+
+	public class Parameters {
+		public class Create {
+
 			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+			public static final String IMAGESTREAM = "imageStream";
+			public static final String META_DATA = "metaData";
+			public static final String AUTOROTATE_FLAG = "autoRotateFlag";
 		}
 	}
 
