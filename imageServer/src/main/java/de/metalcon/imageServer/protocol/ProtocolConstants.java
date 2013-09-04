@@ -37,6 +37,12 @@ public class ProtocolConstants {
 			public static final String META_DATA = "metaData";
 			public static final String AUTOROTATE_FLAG = "autoRotateFlag";
 		}
+
+		public class Read {
+
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+			public static final String ORIGINAL_FLAG = "originalFlag";
+		}
 	}
 
 }
