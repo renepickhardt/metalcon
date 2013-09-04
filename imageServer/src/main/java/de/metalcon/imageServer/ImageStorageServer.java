@@ -1,6 +1,8 @@
 package de.metalcon.imageServer;
 
 import java.awt.Rectangle;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +13,8 @@ import java.io.OutputStream;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import magick.CompressionType;
 import magick.ImageInfo;
@@ -353,7 +357,82 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	@Override
 	public InputStream readImages(final String[] imageIdentifiers, int width,
 			final int height, final ReadResponse response) {
-		// TODO
+
+		boolean succeeded = true;
+		try {
+			final ByteArrayOutputStream memoryOutputStream = new ByteArrayOutputStream();
+			final ZipOutputStream archiveStream = new ZipOutputStream(
+					memoryOutputStream);
+
+			File imageFileDir;
+			try {
+				for (String imageIdentifier : imageIdentifiers) {
+					final String hash = generateHash(imageIdentifier);
+					if (this.imageMetaDatabase
+							.hasEntryWithIdentifier(imageIdentifier)) {
+						imageFileDir = new File(this.getImageDirectoryForSize(
+								hash, width, height));
+
+						archiveStream
+								.putNextEntry(new ZipEntry(imageIdentifier));
+
+						if (this.imageMetaDatabase.imageHasSizeRegistered(
+								imageIdentifier, width, height)) {
+							IOUtils.copy(
+									this.accessImageStream(imageFileDir, hash),
+									archiveStream);
+						} else {
+							// try to create the scaled version
+							final String largerImagePath = this.imageMetaDatabase
+									.getSmallestImagePath(width, height);
+							if (largerImagePath != null) {
+								IOUtils.copy(this.storeAndAccessScaledImage(
+										hash, width, height, largerImagePath,
+										imageFileDir), archiveStream);
+							} else {
+								// TODO warning: requested size larger than the
+								// original
+								final File basisImageDir = new File(
+										this.getBasisImageDirectory(hash));
+								IOUtils.copy(this.accessImageStream(
+										basisImageDir, hash), archiveStream);
+							}
+						}
+
+						archiveStream.closeEntry();
+
+					} else {
+						// TODO error: no image with such identifier
+						succeeded = false;
+						break;
+					}
+				}
+			} catch (final FileNotFoundException e) {
+				// internal server error: file not found
+				e.printStackTrace();
+				succeeded = false;
+			} catch (final IOException e) {
+				// internal server error: failed to write to archive stream
+				e.printStackTrace();
+				succeeded = false;
+			} catch (final MagickException e) {
+				// internal server error: failed to load/scale/store image
+				e.printStackTrace();
+				succeeded = false;
+			}
+
+			archiveStream.close();
+			memoryOutputStream.close();
+
+			if (succeeded) {
+				return new ByteArrayInputStream(
+						memoryOutputStream.toByteArray());
+			}
+		} catch (final IOException e) {
+			// internal server error: failed to create archive
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
