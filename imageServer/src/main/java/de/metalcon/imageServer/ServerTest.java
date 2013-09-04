@@ -14,9 +14,9 @@ public class ServerTest {
 
 		final File testImageFile = new File("/home/sebschlicht/mr_t_ba.png");
 		final InputStream imageStream = new FileInputStream(testImageFile);
-		final CreateResponse response = new CreateResponse();
-		server.createImage("img1", imageStream, "{author:\"Testy\"}", true,
-				response);
+		final CreateResponse response = new CreateResponse(null);
+		server.createImage("img1", imageStream, "{author:\"Testy\"}", 100, 100,
+				200, 200, response);
 		System.out.println("image saved!");
 	}
 
