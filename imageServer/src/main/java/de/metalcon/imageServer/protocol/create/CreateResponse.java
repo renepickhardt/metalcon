@@ -1,50 +1,39 @@
 package de.metalcon.imageServer.protocol.create;
 
-import javax.servlet.ServletContext;
-
-import org.json.simple.JSONObject;
-
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.imageServer.protocol.Response;
 
 public class CreateResponse extends Response {
 
-	private final ServletContext context;
-	private final JSONObject jsonResponse;
+	// TODO: write helpful solution messages!
 
-	public CreateResponse(ServletContext context) {
-		this.context = context;
-		this.jsonResponse = new JSONObject();
-
-	}
-
-	@SuppressWarnings("unchecked")
-	public void addNoIdentifierError(String noIdentifier) {
-		this.jsonResponse.put(
+	public void addNoIdentifierError() {
+		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
-				noIdentifier);
+				"The image identifier is missing. Please deliver one");
 	}
 
-	@SuppressWarnings("unchecked")
-	public void addNoImageStreamError(String imagestreamMissing) {
-		this.jsonResponse.put(ProtocolConstants.Parameters.Create.IMAGESTREAM,
-				imagestreamMissing);
+	public void addNoImageStreamError() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.IMAGESTREAM,
+				"The image stream is missing. Please deliver one");
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addNoMetadataError(String imageMetadataMissing) {
-		this.jsonResponse.put(ProtocolConstants.Parameters.Create.META_DATA,
-				imageMetadataMissing);
+		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
+				"The image meta data is missing. Please deliver some");
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addAutoRotateFlagMissingError(String autorotateFlagMissing) {
-		this.jsonResponse.put(
+		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
-				autorotateFlagMissing);
+				"The autoRotate flag is missing. Please deliver one");
 	}
 
-	public JSONObject getResponse() {
-		return this.jsonResponse;
+	public void addAutoRotateFlagMalformedError() {
+		this.addStatusMessage(
+				"request corrupt: parameter \"autoRotateFlag\" is malformed",
+				"The autoRotate flag String is malformed");
+
 	}
+
 }
