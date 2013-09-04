@@ -27,6 +27,12 @@ public class ProtocolConstants {
 			public static final String AUTOROTATE_FLAG_MISSING = "Autorotate flag not found";
 			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
 		}
+
+		public class Read {
+
+			public static final String IMAGE_IDENTIFIER_MISSING = "Image identifier misssing";
+
+		}
 	}
 
 	public class Parameters {

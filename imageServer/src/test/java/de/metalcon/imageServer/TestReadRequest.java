@@ -1,8 +1,11 @@
 package de.metalcon.imageServer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Field;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -10,12 +13,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.FileItem;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageServer.protocol.Response;
+import de.metalcon.imageServer.protocol.read.ReadRequest;
 import de.metalcon.imageServer.protocol.read.ReadResponse;
 import de.metalcon.utils.FormItemList;
 
@@ -26,8 +30,14 @@ public class TestReadRequest {
 
 	private ReadResponse readResponse;
 	private JSONObject jsonResponse;
-	private static FileItem imageFileItem;
+	// private static FileItem imageFileItem;
 	private HttpServletRequest request;
+	private final String responseBeginMissing = "request incomplete: parameter \"";
+	// private final String responseBeginCorrupt =
+	// "request corrupt: parameter \"";
+	private final String responseEndMissing = "\" is missing";
+
+	// private final String responseEndMalformed = "\" is malformed";
 
 	@Before
 	public void initializeTest() {
@@ -52,7 +62,11 @@ public class TestReadRequest {
 		// assert(status message given)
 		this.processReadRequest(null,
 				ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
-		fail("Not yet implemented");
+		System.out.println(this.readResponse);
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	private void processReadRequest(String imageIdentifier, String originalFlag) {
@@ -64,7 +78,26 @@ public class TestReadRequest {
 					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
 					imageIdentifier);
 		}
-
+		ReadRequest.checkRequest(formItemList, this.readResponse);
+		this.jsonResponse = extractJson(this.readResponse);
 	}
 
+	/**
+	 * extract the JSON object from the response, failing the test if this is
+	 * not possible
+	 * 
+	 * @param response
+	 *            NSSP response
+	 * @return JSON object in the response passed
+	 */
+	protected static JSONObject extractJson(final Response response) {
+		try {
+			final Field field = Response.class.getDeclaredField("json");
+			field.setAccessible(true);
+			return (JSONObject) field.get(response);
+		} catch (final Exception e) {
+			fail("failed to extract the JSON object from class Response");
+			return null;
+		}
+	}
 }
