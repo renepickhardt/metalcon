@@ -55,16 +55,21 @@ public class TestReadRequest {
 	}
 
 	@Test
-	public void testNoIdentifierGive() {
-		// this.processReadRequest(imageIdentifier (null), OriginalFlag
-		// (true||false))
-		// ?(assert(no Image returned))
-		// assert(status message given)
-		this.processReadRequest(null,
-				ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
+	public void testNoIdentifierGiven() {
+		this.processReadRequest(null, "0");
 		System.out.println(this.readResponse);
 		assertEquals(this.responseBeginMissing
 				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testNoOriginalFlagGiven() {
+		this.processReadRequest("testIdentifier", null);
+		System.out.println(this.readResponse);
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
 				+ this.responseEndMissing,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
@@ -78,6 +83,13 @@ public class TestReadRequest {
 					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
 					imageIdentifier);
 		}
+
+		if (originalFlag != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
+					imageIdentifier);
+		}
+
 		ReadRequest.checkRequest(formItemList, this.readResponse);
 		this.jsonResponse = extractJson(this.readResponse);
 	}
