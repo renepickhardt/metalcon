@@ -14,18 +14,6 @@ html, body{
 	resize: none;
 }
 
-iframe
-{
-	width: 800px; height: 1200px; border: 1px solid black;
-    zoom: 0.75;
-    -moz-transform: scale(0.75);
-    -moz-transform-origin: 0 0;
-    -o-transform: scale(0.75);
-    -o-transform-origin: 0 0;
-    -webkit-transform: scale(0.75);
-    -webkit-transform-origin: 0 0;
-}
-
 .website-preview
 {
 	width: 600px; height: 1200px; padding: 0; overflow: hidden;
@@ -175,88 +163,3 @@ ul.comments-holder li.single-comment-holder .comment-text
 	right: 10px;
 	line-height: 27px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-#metal 
-{
-	width:400px;
-	margin:100px auto;
-	border:1px solid #AFAFAF;
-}
-
-#metal > div
-{
-	background-color:#333333;
-	border:1px solid #F6F6F6;
-	padding:10px;
-}
-
-#metal .reader
-{
-	height:400px;
-	overflow:auto;
-	border:1px solid #F6F6F6;
-	padding:80px 10px 10px 10px;
-	background:#fff url(metalcon.jpg) center 0 no-repeat;
-}
-
-#metal ul
-{
-	margin:0;
-	padding:0;
-}
-
-#metal ul li
-{
-	list-style-type:none;
-	color:#A3A3A3;
-	border-bottom:1px solid #E4E4E4;
-	margin-bottom:5px;
-	padding-bottom:5px;
-}
-
-#metal ul li div
-{
-	color:#777;
-}
-
-#metal ul li a
-{
-	color:#444;
-	text-decoration:none;
-	font-weight:normal;
-}
-
-#metal ul li a:hover
-{
-	text-decoration:underline;
-}
-
-#metal ul li span
-{
-	float:center;
-}
-
-#metal .buzz-loading
-{
-	position:absolute;
-	margin-left:240px;
-	width:16px;
-	height:16px;
-	background:transparent url(ajax-loader.gif) center center no-repeat;
-}
-
-*/

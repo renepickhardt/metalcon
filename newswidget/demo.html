@@ -5,10 +5,12 @@
 	<title>Objects</title>
 	<link type="text/css" rel="stylesheet" href="theme/bootstrap.css"/> 
 	<link rel="Stylesheet" href="theme/style.css" media="screen" type="text/css"/>
-	<link rel="stylesheet" href="theme/liveurl.css" type="text/css" />
+	<link rel="stylesheet" href="theme/liveurl.css" type="text/css" />  
+    <link href='theme/jquery.mentionsInput.css' rel='stylesheet' type='text/css'>
+
 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script type="text/javascript" src="src/newsfeed_script.js"></script>
+    <script type="text/javascript" src="src/newsfeed_script.js"></script>
 	<script type="text/javascript" src="src/formdata_script.js"></script>
 
 	<script type="text/javascript">
@@ -19,48 +21,53 @@
 			});
 		});
 	</script>
+
 	</head>
 	<body>
 		<div class="wrapper">
 			<div class="form-group message-input">
 				<label for="message">Message:</label>
-				<textarea id="message" class="form-control message-input" rows="4" name="message" type="text" placeholder="Enter your Message"></textarea>
+				<textarea id="message" class="form-control message-input" rows="2" name="message" type="text" placeholder="Enter your Message"></textarea>
 				<input id="submit_button" class="btn btn-primary message-submit" type="submit" value="create status update" />
 				<button class="btn btn-default button-clear"> Clear </button>
 				<button class="btn btn-default button-cancel"> Cancel </button>
 			</div>
-			<div class="liveurl">
-            	<div class="close" title="Entfernen"></div>
-            <div class="inner">
-                <div class="image"> </div>
-                <div class="details">
-                    <div class="info">
-                        <div class="title"> </div>
-                        <div class="description"></div> 
-                        <div class="url"> </div>
-                    </div>
-                    <div class="thumbnail">
-                        <div class="pictures">
-                            <div class="controls">
-                                <div class="prev button inactive"></div>
-                                <div class="next button inactive"></div>
-                                <div class="count">
-                                    <span class="current">0</span><span> von </span><span class="max">0</span>
+    		<div class="outer-liveurl">	
+                <div class="liveurl">
+                	<div class="close" title="Entfernen"></div>
+                    <div class="inner">
+                        <div class="image"> </div>
+                        <div class="details">
+                            <div class="info">
+                                <div class="title"> </div>
+                                <div class="description"></div> 
+                                <div class="url"> </div>
+                            </div>
+                            <div class="thumbnail">
+                                <div class="pictures">
+                                    <div class="controls">
+                                        <div class="prev button inactive"></div>
+                                        <div class="next button inactive"></div>
+                                        <div class="count">
+                                            <span class="current">0</span><span> von </span><span class="max">0</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="video"></div>
                         </div>
-                    </div>
-                    <div class="video"></div>
-                </div>
 
+                    </div>
+                </div>
             </div>
-        </div>
 			<div class="message-display-wrapper" id="message-display">
 				<div class="comments-holder-outside"></div>
 			</div>
 		</div>
+
 	<script src="src/bootstrap.js"></script>
-	<script src="src/jquery.liveurl.js"> </script>
+	<script src="src/jquery.liveurl.js"></script>
+
 	<script type="text/javascript">
 		$(function () {
 			$(".form-control.message-input").focus(function() {
@@ -91,6 +98,7 @@
 
 		});
 	</script>
+	
     <script> 
                 var curImages = new Array();
                 var temp_url;
