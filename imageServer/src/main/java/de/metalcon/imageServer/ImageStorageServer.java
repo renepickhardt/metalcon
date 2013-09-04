@@ -66,13 +66,15 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	private final String imageDirectory = "/etc/imageStorageServer/";
 
+	private final String temporaryDirectory = "/dev/shm/";
+
 	/**
 	 * database for image meta data
 	 */
-	private final MetaDatabase imageMetaDatabase;
+	private final ImageMetaDatabase imageMetaDatabase;
 
 	public ImageStorageServer() {
-		this.imageMetaDatabase = new MetaDatabase();
+		this.imageMetaDatabase = new ImageMetaDatabase();
 	}
 
 	/**
@@ -141,19 +143,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            target width
 	 * @param height
 	 *            target height
-	 * @return true - if the image was cropped successfully<br>
-	 *         false - otherwise
+	 * @return cropped image<br>
+	 *         <b>null</b> if the cropping failed
 	 */
-	private static boolean cropImage(final MagickImage image, final int left,
-			final int top, final int width, final int height) {
+	private static MagickImage cropImage(final MagickImage image,
+			final int left, final int top, final int width, final int height) {
 		try {
-			image.cropImage(new Rectangle(left, top, width, height));
-			return true;
+			return image.cropImage(new Rectangle(left, top, width, height));
 		} catch (final MagickException e) {
 			e.printStackTrace();
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
@@ -171,8 +172,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				if (image != null) {
 					if (autoRotate) {
+						// TODO: implement auto orientation
 						// WARNING: no documentation available!
-						image.autoOrientImage();
+						// image.autoOrientImage();
 					}
 
 					// store basis version
@@ -185,7 +187,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// TODO error: no image file/error while rotating
 				e.printStackTrace();
 			} catch (final IOException e) {
-				// TODO error: failed to store image(s)
+				// internal server error: failed to store image(s)
 				e.printStackTrace();
 			}
 
@@ -207,12 +209,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 			try {
 				// store and load original image
-				final MagickImage image = this.storeAndLoadImage(hash,
-						imageStream);
+				MagickImage image = this.storeAndLoadImage(hash, imageStream);
 
 				if (image != null) {
 					// crop the image
-					cropImage(image, left, top, width, height);
+					image = cropImage(image, left, top, width, height);
 
 					// store basis version
 					this.storeCompressedImage(hash, image,
@@ -240,7 +241,32 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	@Override
 	public boolean createImage(String imageIdentifier, String imageUrl,
 			final CreateResponse response) {
-		// TODO Auto-generated method stub
+		final String hash = generateHash(imageIdentifier);
+		final File tmpImageFile = new File(
+				this.getTemporaryImageDirectory(hash));
+
+		try {
+			// TODO: download image
+
+			// store original image
+			final MagickImage image = this.storeAndLoadImage(hash,
+					new FileInputStream(tmpImageFile));
+			if (image != null) {
+				// store basis version
+				this.storeCompressedImage(hash, image,
+						new File(this.getBasisImageDirectory(hash)));
+
+				return true;
+			}
+
+		} catch (final FileNotFoundException e) {
+			// internal server error: file not found
+		} catch (final IOException e) {
+			// internal server error: failed to store image(s)
+		} catch (final MagickException e) {
+			// TODO error: no image file
+		}
+
 		return false;
 	}
 
@@ -283,7 +309,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				} else {
 					// try to create the scaled version
 					final String largerImagePath = this.imageMetaDatabase
-							.getSmallestImagePath(width, height);
+							.getSmallestImagePath(imageIdentifier, width,
+									height);
 					if (largerImagePath != null) {
 						return this.storeAndAccessScaledImage(hash, width,
 								height, largerImagePath, imageFileDir);
@@ -327,7 +354,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				} else {
 					// try to create the scaled version
 					final String largerImagePath = this.imageMetaDatabase
-							.getSmallestImagePath(width, height);
+							.getSmallestImagePath(imageIdentifier, width,
+									height);
 					if (largerImagePath != null) {
 						return new ImageData(metaData,
 								this.storeAndAccessScaledImage(hash, width,
@@ -365,6 +393,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					memoryOutputStream);
 
 			File imageFileDir;
+			ZipEntry zipEntry;
 			try {
 				for (String imageIdentifier : imageIdentifiers) {
 					final String hash = generateHash(imageIdentifier);
@@ -373,8 +402,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						imageFileDir = new File(this.getImageDirectoryForSize(
 								hash, width, height));
 
-						archiveStream
-								.putNextEntry(new ZipEntry(imageIdentifier));
+						// no ZIP compression while JPEG is already compressed
+						zipEntry = new ZipEntry(imageIdentifier);
+						zipEntry.setMethod(ZipEntry.STORED);
+						archiveStream.putNextEntry(zipEntry);
 
 						if (this.imageMetaDatabase.imageHasSizeRegistered(
 								imageIdentifier, width, height)) {
@@ -384,7 +415,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						} else {
 							// try to create the scaled version
 							final String largerImagePath = this.imageMetaDatabase
-									.getSmallestImagePath(width, height);
+									.getSmallestImagePath(imageIdentifier,
+											width, height);
 							if (largerImagePath != null) {
 								IOUtils.copy(this.storeAndAccessScaledImage(
 										hash, width, height, largerImagePath,
@@ -422,7 +454,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			}
 
 			archiveStream.close();
-			memoryOutputStream.close();
 
 			if (succeeded) {
 				return new ByteArrayInputStream(
@@ -437,17 +468,34 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public void appendImageInformation(String imageIdentifier, String key,
-			String value, final UpdateResponse response) {
-		// TODO Auto-generated method stub
+	public boolean appendImageInformation(final String imageIdentifier,
+			final String key, final String value, final UpdateResponse response) {
+		if (this.imageMetaDatabase.appendMetadata(imageIdentifier, key, value)) {
+			return true;
+		} else {
+			// TODO error: no image with such identifier
+		}
 
+		return false;
 	}
 
 	@Override
-	public void deleteImage(String imageIdentifier,
+	public boolean deleteImage(String imageIdentifier,
 			final DeleteResponse response) {
-		// TODO Auto-generated method stub
+		final String[] imagePaths = this.imageMetaDatabase
+				.getRegisteredImagePaths(imageIdentifier);
+		if (this.imageMetaDatabase.deleteDatabaseEntry(imageIdentifier)) {
+			// delete all registered images
+			File imageFile;
+			for (String imagePath : imagePaths) {
+				imageFile = new File(imagePath);
+				imageFile.delete();
+			}
+		} else {
+			// TODO error: no image with such identifier
+		}
 
+		return false;
 	}
 
 	/**
@@ -465,7 +513,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * generate the parental directory for the basis image
+	 * generate the parental directory for a basis image
 	 * 
 	 * @param hash
 	 *            image identifier hash
@@ -474,6 +522,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private String getBasisImageDirectory(final String hash) {
 		return this.imageDirectory + getRelativeDirectory(hash, 3)
 				+ File.separator + "basis";
+	}
+
+	/**
+	 * generate the parental directory for a temporary image
+	 * 
+	 * @param hash
+	 *            image identifier hash
+	 * @return parental directory for the temporary image passed
+	 */
+	private String getTemporaryImageDirectory(final String hash) {
+		return this.temporaryDirectory;
 	}
 
 	/**
@@ -574,10 +633,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			throws MagickException {
 		imageFileDir.mkdirs();
 
-		final File imageFile = new File(imageFileDir, hash);
-		final ImageInfo imageInfo = new ImageInfo(imageFile.getAbsolutePath());
+		final File imageFile = new File(imageFileDir, hash + ".jpg");
+		final ImageInfo imageInfo = new ImageInfo();
 		imageInfo.setCompression(CompressionType.JPEGCompression);
 
+		image.setFileName(imageFile.getAbsolutePath());
 		image.writeImage(imageInfo);
 	}
 

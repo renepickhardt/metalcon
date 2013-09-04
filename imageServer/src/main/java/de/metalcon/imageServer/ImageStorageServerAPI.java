@@ -84,7 +84,7 @@ public interface ImageStorageServerAPI {
 	 * @param response
 	 *            read response object
 	 * @return stream of the original image<br>
-	 *         <b>null</b> if the image identifier is invalid
+	 *         <b>null</b> if the image identifier was invalid
 	 */
 	ImageData readImageWithMetaData(String imageIdentifier,
 			ReadResponse response);
@@ -101,7 +101,7 @@ public interface ImageStorageServerAPI {
 	 * @param response
 	 *            read response object
 	 * @return stream of the image version having the dimensions passed<br>
-	 *         <b>null</b> if the image identifier is invalid
+	 *         <b>null</b> if the image identifier was invalid
 	 */
 	InputStream readImage(String imageIdentifier, int width, int height,
 			ReadResponse response);
@@ -117,7 +117,8 @@ public interface ImageStorageServerAPI {
 	 *            alternate height
 	 * @param response
 	 *            read response object
-	 * @return stream of the image version having the dimensions passed
+	 * @return stream of the image version having the dimensions passed<br>
+	 *         <b>null</b> if the image identifier was invalid
 	 */
 	ImageData readImageWithMetaData(String imageIdentifier, int width,
 			int height, ReadResponse response);
@@ -133,7 +134,8 @@ public interface ImageStorageServerAPI {
 	 *            alternate height
 	 * @param response
 	 *            read response object
-	 * @return stream of the archive including the images
+	 * @return stream of the archive including the images<br>
+	 *         <b>null</b> if any image identifier was invalid
 	 */
 	InputStream readImages(String[] imageIdentifiers, int width, int height,
 			ReadResponse response);
@@ -151,8 +153,10 @@ public interface ImageStorageServerAPI {
 	 *            meta data value that shall be appended
 	 * @param response
 	 *            update response object
+	 * @return true - if the meta data was appended successfully<br>
+	 *         false - if the image identifier was invalid
 	 */
-	void appendImageInformation(String imageIdentifier, String key,
+	boolean appendImageInformation(String imageIdentifier, String key,
 			String value, UpdateResponse response);
 
 	/**
@@ -162,7 +166,9 @@ public interface ImageStorageServerAPI {
 	 *            image identifier
 	 * @param response
 	 *            delete response object
+	 * @return true - if the image was deleted successfully<br>
+	 *         false - if the image identifier was invalid
 	 */
-	void deleteImage(String imageIdentifier, DeleteResponse response);
+	boolean deleteImage(String imageIdentifier, DeleteResponse response);
 
 }

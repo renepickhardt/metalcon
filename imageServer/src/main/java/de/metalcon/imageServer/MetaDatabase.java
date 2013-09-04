@@ -83,37 +83,4 @@ public class MetaDatabase {
 		return false;
 	}
 
-	/**
-	 * get the path to the smallest image larger than the dimension passed
-	 * 
-	 * @param width
-	 *            minimum width
-	 * @param height
-	 *            minimum height
-	 * @return path to the smallest image larger than the dimension passed<br>
-	 *         <b>null</b> if there is no such version
-	 */
-	public String getSmallestImagePath(final int width, final int height) {
-		// TODO
-		return null;
-	}
-
-	/**
-	 * check if there is a certain size for an image
-	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @param width
-	 *            requested width
-	 * @param height
-	 *            requested height
-	 * @return true - if the size is registered for the image passed<br>
-	 *         false - otherwise
-	 */
-	public boolean imageHasSizeRegistered(final String imageIdentifier,
-			final int width, final int height) {
-		// TODO
-		return false;
-	}
-
 }
