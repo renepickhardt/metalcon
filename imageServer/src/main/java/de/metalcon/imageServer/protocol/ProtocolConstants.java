@@ -27,6 +27,12 @@ public class ProtocolConstants {
 			public static final String AUTOROTATE_FLAG_MISSING = "Autorotate flag not found";
 			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
 		}
+
+		public class Read {
+
+			public static final String IMAGE_IDENTIFIER_MISSING = "Image identifier misssing";
+
+		}
 	}
 
 	public class Parameters {
@@ -36,6 +42,25 @@ public class ProtocolConstants {
 			public static final String IMAGESTREAM = "imageStream";
 			public static final String META_DATA = "metaData";
 			public static final String AUTOROTATE_FLAG = "autoRotateFlag";
+		}
+
+		public class Read {
+
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+			public static final String ORIGINAL_FLAG = "originalFlag";
+			public static final String IMAGE_WIDTH = "imageWidth";
+			public static final String IMAGE_HEIGHT = "imageHeight";
+		}
+
+		public class Update {
+
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+			public static final String META_DATA = "metaData";
+		}
+
+		public class Delete {
+
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
 		}
 	}
 

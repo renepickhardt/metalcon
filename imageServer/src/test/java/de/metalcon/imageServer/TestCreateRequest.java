@@ -37,6 +37,8 @@ public class TestCreateRequest {
 	private JSONObject jsonResponse;
 	private static FileItem imageFileItem;
 	private HttpServletRequest request;
+
+	// maybe make global constants out of this variables?
 	private final String responseBeginMissing = "request incomplete: parameter \"";
 	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
