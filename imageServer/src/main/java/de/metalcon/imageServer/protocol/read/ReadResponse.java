@@ -14,7 +14,7 @@ public class ReadResponse extends Response {
 
 	public void addOriginalImageFlagMalformedError() {
 		this.addStatusMessage(
-				"request corrupt: parameter \"originalImageFlag\" is malformed",
+				"request corrupt: parameter \"originalFlag\" is malformed",
 				"The originalImage flag String is malformed");
 
 	}

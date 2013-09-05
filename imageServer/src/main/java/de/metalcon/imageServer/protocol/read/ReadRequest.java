@@ -17,13 +17,9 @@ public class ReadRequest {
 			ReadResponse response) {
 		String originalImageFlagString = null;
 		try {
-			// FIXME: Field is null but should contain flag
-			System.out.println(formItemList
-					.getField(ProtocolConstants.Parameters.Read.ORIGINAL_FLAG));
 			originalImageFlagString = formItemList
 					.getField(ProtocolConstants.Parameters.Read.ORIGINAL_FLAG);
 		} catch (IllegalArgumentException e) {
-			System.out.println("ouch");
 			response.addNoOriginalFlagError();
 			return null;
 		}

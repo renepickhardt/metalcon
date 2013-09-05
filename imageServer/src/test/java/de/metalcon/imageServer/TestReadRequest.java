@@ -33,11 +33,10 @@ public class TestReadRequest {
 	// private static FileItem imageFileItem;
 	private HttpServletRequest request;
 	private final String responseBeginMissing = "request incomplete: parameter \"";
-	// private final String responseBeginCorrupt =
-	// "request corrupt: parameter \"";
+	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
 
-	// private final String responseEndMalformed = "\" is malformed";
+	private final String responseEndMalformed = "\" is malformed";
 
 	@Before
 	public void initializeTest() {
@@ -72,6 +71,56 @@ public class TestReadRequest {
 				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
 				+ this.responseEndMissing,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testOriginalFlagMalformed() {
+		this.processReadRequest("testIdentifier", "wrong");
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testWithScalingNoHeightGiven() {
+		this.processReadRequest("testIdentifier", "0", null, "100");
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	private void processReadRequest(String imageIdentifier,
+			String originalFlag, String height, String width) {
+
+		FormItemList formItemList = new FormItemList();
+		this.readResponse = new ReadResponse();
+
+		if (imageIdentifier != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
+					imageIdentifier);
+		}
+
+		if (originalFlag != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
+					originalFlag);
+		}
+
+		if (height != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Read.IMAGE_HEIGHT, height);
+		}
+
+		if (height != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Read.IMAGE_WIDTH, width);
+		}
+
+		ReadRequest.checkRequest(formItemList, this.readResponse);
+		this.jsonResponse = extractJson(this.readResponse);
 	}
 
 	private void processReadRequest(String imageIdentifier, String originalFlag) {
