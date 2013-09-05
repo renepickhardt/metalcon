@@ -30,7 +30,6 @@ public class ReadRequest {
 			imageHeightString = formItemList
 					.getField(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
 		} catch (IllegalArgumentException e) {
-
 			response.addNoImageHeightError();
 			return null;
 		}
@@ -49,17 +48,17 @@ public class ReadRequest {
 		try {
 			imageWidthString = formItemList
 					.getField(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
+			System.out.println(imageWidthString + "here");
 		} catch (IllegalArgumentException e) {
 			response.addNoImageWidthError();
-
+			System.out.println(imageWidthString + "here");
 			return null;
 		}
 		try {
 			Integer imageWidthInteger = Integer.parseInt(imageWidthString);
-			System.out.println(imageWidthString);
 			return imageWidthInteger;
 		} catch (NumberFormatException e) {
-
+			System.out.println(imageWidthString + "here");
 			response.addImageWidthMalformedError();
 			return null;
 		}

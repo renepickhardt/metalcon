@@ -123,7 +123,7 @@ public class TestReadRequest {
 					ProtocolConstants.Parameters.Read.IMAGE_HEIGHT, height);
 		}
 
-		if (height != null) {
+		if (width != null) {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Read.IMAGE_WIDTH, width);
 		}

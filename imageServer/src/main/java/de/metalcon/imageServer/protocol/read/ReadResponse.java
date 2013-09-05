@@ -33,6 +33,12 @@ public class ReadResponse extends Response {
 				"The image width is not given. Either deliver width AND height or leave them out and ask for the unscaled image");
 	}
 
+	public void addNoImageHeightError() {
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Read.IMAGE_HEIGHT,
+				"The image height is not given. Either deliver width AND height or leave them out and ask for the unscaled image");
+	}
+
 	public void addImageWidthMalformedError() {
 		this.addStatusMessage(
 				"request corrupt: parameter \"imageWidth\" is malformed",
@@ -45,12 +51,6 @@ public class ReadResponse extends Response {
 				"request corrupt: parameter \"imageHeight\" is malformed",
 				"The imageHeight flag String is malformed");
 
-	}
-
-	public void addNoImageHeightError() {
-		this.parameterMissing(
-				ProtocolConstants.Parameters.Read.IMAGE_HEIGHT,
-				"The image height is not given. Either deliver width AND height or leave them out and ask for the unscaled image");
 	}
 
 }
