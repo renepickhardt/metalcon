@@ -51,6 +51,11 @@ public class ProtocolConstants {
 			public static final String IMAGE_WIDTH = "imageWidth";
 			public static final String IMAGE_HEIGHT = "imageHeight";
 		}
+
+		public class Delete {
+
+			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
+		}
 	}
 
 }
