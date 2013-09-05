@@ -9,6 +9,23 @@ package de.metalcon.imageServer;
 public class ImageMetaDatabase extends MetaDatabase {
 
 	/**
+	 * register a size for an image
+	 * 
+	 * @param imageIdentifier
+	 *            image identifier
+	 * @param width
+	 *            new width
+	 * @param height
+	 *            new height
+	 * @param imagePath
+	 *            path to the image
+	 */
+	public void registerImageSize(final String imageIdentifier,
+			final int width, final int height, final String imagePath) {
+		// TODO
+	}
+
+	/**
 	 * check if there is a certain size for an image
 	 * 
 	 * @param imageIdentifier
