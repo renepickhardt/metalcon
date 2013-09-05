@@ -100,6 +100,24 @@ public class TestReadRequest {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
+	@Test
+	public void testWithScalingWidthMalformed() {
+		this.processReadRequest("testIdentifier", "0", "100", "wrong");
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testWithScalingHeightMalformed() {
+		this.processReadRequest("testIdentifier", "0", "wrong", "100");
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
 	private void processReadRequest(String imageIdentifier,
 			String originalFlag, String height, String width) {
 
