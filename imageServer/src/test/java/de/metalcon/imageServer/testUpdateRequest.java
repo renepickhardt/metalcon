@@ -54,11 +54,6 @@ public class testUpdateRequest {
 	}
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testNoIdentifierGiven() {
 		this.processUpdateRequest(null,
 				ProtocolTestConstants.VALID_IMAGE_METADATA);
@@ -69,28 +64,42 @@ public class testUpdateRequest {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
-	private void processUpdateRequest(Object object, String validImageMetadata) {
-		// TODO Auto-generated method stub
+	@Test
+	public void testNoMetadataGiven() {
+		this.processUpdateRequest("testIdentifier", null);
 
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Update.META_DATA
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
-	// test if exists
+	@Test
+	public void testMetadataNotJson() {
+		this.processUpdateRequest("testIdentifier",
+				ProtocolTestConstants.INVALID_IMAGE_METADATA);
+
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Update.META_DATA
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
 	// test if json
 
-	private void processReadRequest(String imageIdentifier, String originalFlag) {
+	private void processUpdateRequest(String imageIdentifier, String metaData) {
 		FormItemList formItemList = new FormItemList();
 		this.updateResponse = new UpdateResponse();
 
 		if (imageIdentifier != null) {
 			formItemList.addField(
-					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
+					ProtocolConstants.Parameters.Update.IMAGE_IDENTIFIER,
 					imageIdentifier);
 		}
 
-		if (originalFlag != null) {
+		if (metaData != null) {
 			formItemList.addField(
-					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
-					originalFlag);
+					ProtocolConstants.Parameters.Update.META_DATA, metaData);
 		}
 
 		UpdateRequest.checkRequest(formItemList, this.updateResponse);
