@@ -10,7 +10,7 @@ public class ProtocolTestConstants {
 	public static InputStream VALID_IMAGESTREAM;
 	public static InputStream INVALID_IMAGESTREAM = null;
 
-	public final static String VALID_IMAGE_METADATA = "";
+	public final static String VALID_IMAGE_METADATA = "\"key\":\"value\"";
 
 	// Usable constants below
 	public final static String VALID_BOOLEAN_AUTOROTATE_TRUE = "1";
