@@ -13,6 +13,58 @@ public class ReadRequest {
 				readResponse);
 	}
 
+	public static void checkRequestWithScaling(FormItemList formItemList,
+			ReadResponse readResponse) {
+		String imageIdentifier = checkImageIdentifier(formItemList,
+				readResponse);
+		Boolean originalImageFlag = checkOriginalImageFlag(formItemList,
+				readResponse);
+		Integer imageWidth = checkImageWidth(formItemList, readResponse);
+		Integer imageHeight = checkImageHeight(formItemList, readResponse);
+	}
+
+	private static Integer checkImageHeight(FormItemList formItemList,
+			ReadResponse response) {
+		String imageHeightString = null;
+		try {
+			imageHeightString = formItemList
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
+		} catch (IllegalArgumentException e) {
+
+			response.addNoImageHeightError();
+			return null;
+		}
+		try {
+			Integer imageHeightInteger = Integer.parseInt(imageHeightString);
+			return imageHeightInteger;
+		} catch (NumberFormatException e) {
+			response.addImageHeightMalformedError();
+			return null;
+		}
+	}
+
+	private static Integer checkImageWidth(FormItemList formItemList,
+			ReadResponse response) {
+		String imageWidthString = null;
+		try {
+			imageWidthString = formItemList
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
+		} catch (IllegalArgumentException e) {
+			response.addNoImageWidthError();
+
+			return null;
+		}
+		try {
+			Integer imageWidthInteger = Integer.parseInt(imageWidthString);
+			System.out.println(imageWidthString);
+			return imageWidthInteger;
+		} catch (NumberFormatException e) {
+
+			response.addImageWidthMalformedError();
+			return null;
+		}
+	}
+
 	private static Boolean checkOriginalImageFlag(FormItemList formItemList,
 			ReadResponse response) {
 		String originalImageFlagString = null;

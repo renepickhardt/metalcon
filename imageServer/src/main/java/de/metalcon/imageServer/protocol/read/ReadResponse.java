@@ -5,6 +5,8 @@ import de.metalcon.imageServer.protocol.Response;
 
 public class ReadResponse extends Response {
 
+	// TODO: refactor code using constants (in malformed-error methods)
+
 	public void addNoImageIdentifierError() {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
@@ -23,6 +25,32 @@ public class ReadResponse extends Response {
 		this.parameterMissing(ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
 				"The originalImage flag is missing. Please deliver one");
 
+	}
+
+	public void addNoImageWidthError() {
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Read.IMAGE_WIDTH,
+				"The image width is not given. Either deliver width AND height or leave them out and ask for the unscaled image");
+	}
+
+	public void addImageWidthMalformedError() {
+		this.addStatusMessage(
+				"request corrupt: parameter \"imageWidth\" is malformed",
+				"The imageWidth flag String is malformed");
+
+	}
+
+	public void addImageHeightMalformedError() {
+		this.addStatusMessage(
+				"request corrupt: parameter \"imageHeight\" is malformed",
+				"The imageHeight flag String is malformed");
+
+	}
+
+	public void addNoImageHeightError() {
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Read.IMAGE_HEIGHT,
+				"The image height is not given. Either deliver width AND height or leave them out and ask for the unscaled image");
 	}
 
 }

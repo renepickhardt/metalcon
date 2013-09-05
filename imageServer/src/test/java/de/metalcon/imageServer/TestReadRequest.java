@@ -86,6 +86,15 @@ public class TestReadRequest {
 	public void testWithScalingNoHeightGiven() {
 		this.processReadRequest("testIdentifier", "0", null, "100");
 		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testWithScalingNoWidthGiven() {
+		this.processReadRequest("testIdentifier", "0", "100", null);
+		assertEquals(this.responseBeginMissing
 				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
 				+ this.responseEndMissing,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
@@ -119,7 +128,7 @@ public class TestReadRequest {
 					ProtocolConstants.Parameters.Read.IMAGE_WIDTH, width);
 		}
 
-		ReadRequest.checkRequest(formItemList, this.readResponse);
+		ReadRequest.checkRequestWithScaling(formItemList, this.readResponse);
 		this.jsonResponse = extractJson(this.readResponse);
 	}
 
