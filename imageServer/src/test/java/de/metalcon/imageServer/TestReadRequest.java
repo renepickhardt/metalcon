@@ -87,7 +87,7 @@ public class TestReadRequest {
 		if (originalFlag != null) {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
-					imageIdentifier);
+					originalFlag);
 		}
 
 		ReadRequest.checkRequest(formItemList, this.readResponse);
