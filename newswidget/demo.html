@@ -7,7 +7,7 @@
 	<link rel="Stylesheet" href="theme/style.css" media="screen" type="text/css"/>
 	<link rel="stylesheet" href="theme/liveurl.css" type="text/css" />  
     <link href='theme/jquery.mentionsInput.css' rel='stylesheet' type='text/css'>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="src/newsfeed_script.js"></script>
@@ -16,7 +16,7 @@
 	<script type="text/javascript">
 		$(function(){
 			$("#message-display").metalconReader({
-				user	: "user1",
+				user	: "user4",
 				items	: 100
 			});
 		});
@@ -28,12 +28,14 @@
 			<div class="form-group message-input">
 				<label for="message">Message:</label>
 				<textarea id="message" class="form-control message-input" rows="2" name="message" type="text" placeholder="Enter your Message"></textarea>
-				<input id="submit_button" class="btn btn-primary message-submit" type="submit" value="create status update" />
-				<button class="btn btn-default button-clear"> Clear </button>
-				<button class="btn btn-default button-cancel"> Cancel </button>
+				<div class="textbox_buttons-holder">
+                    <input id="submit_button" class="btn btn-primary message-submit" type="submit" value="create status update" />
+    				<button class="btn btn-default button-clear-link"> Clear Link</button>
+    				<button class="btn btn-default button-clear"> Cancel Text</button>
+                    <button class="btn btn-default button-cancel"> Cancel </button>
+                </div>
 			</div>
-    		<div class="outer-liveurl">	
-                <div class="liveurl">
+            <div class="liveurl">
                 	<div class="close" title="Entfernen"></div>
                     <div class="inner">
                         <div class="image"> </div>
@@ -59,7 +61,6 @@
 
                     </div>
                 </div>
-            </div>
 			<div class="message-display-wrapper" id="message-display">
 				<div class="comments-holder-outside"></div>
 			</div>
@@ -74,27 +75,44 @@
 				$(this).animate({width:"+150%", height:"135px" }, 1000);
 				$(".form-group.message-input").animate({left:'50px'}, 1000);
 				$(".btn.btn-primary.message-submit").css('display', 'inline');
+                $(".btn.btn-default.button-clear-link").css('display', 'inline');
 				$(".btn.btn-default.button-clear").css('display', 'inline');
 				$(".btn.btn-default.button-cancel").css('display', 'inline');
+
+
 			});
-			$(".btn.btn-primary.message-submit").click(function() {
+			
+            $(".btn.btn-primary.message-submit").click(function() {
 				$(".form-control.message-input").animate({width:"100%", height:"100%"}, 1000);
 				$(".form-group.message-input").animate({left:'-=50px'}, 1000);	
 				$(".btn.btn-primary.message-submit").css('display', 'none');
 				$(".btn.btn-default.button-clear").css('display', 'none');
+                $(".btn.btn-default.button-clear-link").css('display', 'none');
 				$(".btn.btn-default.button-cancel").css('display', 'none');
 				$(".form-control.message-input").val('');
+                $(".close").trigger("click");
+
 			});
+
 			$(".btn.btn-default.button-cancel").click(function() {
 				$(".form-control.message-input").animate({width:"100%", height:"100%"}, 1000);
 				$(".form-group.message-input").animate({left:'-=50px'}, 1000);
 				$(".btn.btn-primary.message-submit").css('display', 'none');
 				$(".btn.btn-default.button-clear").css('display', 'none');
 				$(".btn.btn-default.button-cancel").css('display', 'none');
+
 			});
+            
 			$(".btn.btn-default.button-clear").click(function() {
 				$(".form-control.message-input").val('');
+                $(".close").trigger("click");
+                $(".form-control.message-input").focus();
 			});
+
+            $(".btn.btn-default.button-clear-link").click(function() {
+                $(".close").trigger("click");
+                $(".form-control.message-input").focus();
+            });
 
 		});
 	</script>
@@ -113,7 +131,7 @@
                     {                        
                         var output = $('.liveurl');
                         output.find('.title').text(data.title);
-                        $('.title').wrap("<a href=\"temp_url\"></a>");
+                        $('.title').wrap("<a href=\""+data.url+"\"></a>");
                         output.find('.description').text(data.description);
                         output.find('.url').text(data.url);
                         output.find('.image').empty();

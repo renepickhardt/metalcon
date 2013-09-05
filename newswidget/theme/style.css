@@ -43,6 +43,11 @@ body
 	margin: 10px;
 }
 
+.textbox_buttons-holder
+{
+	width: auto;
+}
+
 .btn.btn-primary.message-submit
 {
 	display: none;
@@ -55,6 +60,11 @@ body
 	margin: 5px 0 5px 0;
 }
 
+.btn.btn-default.button-clear-link
+{
+	display:none;
+	margin: 5px 0 5px 0;
+}
 .btn.btn-default.button-cancel
 {
 	display:none;
@@ -162,4 +172,43 @@ ul.comments-holder li.single-comment-holder .comment-text
 	top: 0px;
 	right: 10px;
 	line-height: 27px;
+}
+
+.link_box
+{
+	height: 100px;
+	width: 500px;
+	margin: 5px 0 5px 0;
+	border: 1px solid #B4B4B4;
+	overflow: hidden;
+	position: relative;
+}
+
+.link_picture img
+{
+	float: left;
+	height: 95px;
+	width: 95px;
+	margin: 0 10px 0 0;
+}
+
+.link_text_wrapper
+{
+
+}
+
+.link_title
+{
+
+}
+
+.link_description
+{
+	display: block;
+	width: auto;
+	font-size: 11px;
+	margin: 0 10px 10px 75px;
+	word-wrap: normal;
+	max-height: 100px;
+	overflow: auto;
 }

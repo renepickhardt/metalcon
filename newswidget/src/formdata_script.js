@@ -4,14 +4,21 @@ $(document).ready(function() {
 		if(message) {
 			var fd = new FormData();  
 
-			var live_url = $(".outer-liveurl").html();
+			var link_pic = "<img src=\""+$(".image .active").attr("src")+"\">";
+			var link_title = "<a href=\""+$(".url").html()+"\">"+$(".title").html()+"</a>"; 
+			var link_desc = $(".description").html();
+
+			var link_box_string = "<div class=\"link_box\"><div class=\"link_picture\">"+link_pic+"</div><div class=\"link_text_wrapper\"><div class=\"link_title\">"+link_title+"</div><div class=\"link_description\">"+link_desc+"</div></div></div>";
+
+
+			//var link_preview = link_var+link_title+link_desc;
 			var type = "status_update";
-			var userid = "user1";
+			var userid = "user4";
 			var displayName = "Tobi"; 
 			var localDate = renderer.format(new Date());
 			var rand = "AB" + Math.round(Math.random() * 1000000);
 			message = message.replace(/\n/g, '<br />');
-			message += live_url;
+			message +=link_box_string;
 
 			fd.append('type' ,type);
 			fd.append('user_id' ,userid);
