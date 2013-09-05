@@ -18,11 +18,6 @@ public class CreateResponse extends Response {
 				"The image stream is missing. Please deliver one");
 	}
 
-	public void addNoMetadataError(String imageMetadataMissing) {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
-				"The image meta data is missing. Please deliver some");
-	}
-
 	public void addAutoRotateFlagMissingError(String autorotateFlagMissing) {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
@@ -34,6 +29,17 @@ public class CreateResponse extends Response {
 				"request corrupt: parameter \"autoRotateFlag\" is malformed",
 				"The autoRotate flag String is malformed");
 
+	}
+
+	public void addMetadataMalformedError() {
+		this.addStatusMessage(
+				"request corrupt: parameter \"metaData\" is malformed",
+				"The metaData String is malformed");
+	}
+
+	public void addNoMetadataError() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
+				"The image meta data is missing. Please deliver some");
 	}
 
 }
