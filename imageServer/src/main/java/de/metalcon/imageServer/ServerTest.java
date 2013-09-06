@@ -14,7 +14,8 @@ import de.metalcon.imageServer.protocol.read.ReadResponse;
 public class ServerTest {
 
 	public static void main(String[] args) throws IOException {
-		ImageStorageServerAPI server = new ImageStorageServer();
+		ImageStorageServerAPI server = new ImageStorageServer("localhost",
+				27017);
 
 		final File testImageFile = new File("/home/sebschlicht/mr_t_ba.png");
 		final InputStream imageStream = new FileInputStream(testImageFile);

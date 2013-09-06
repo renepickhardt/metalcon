@@ -1,5 +1,9 @@
 package de.metalcon.imageServer;
 
+import java.net.UnknownHostException;
+
+import com.mongodb.MongoClient;
+
 /**
  * database for meta data
  * 
@@ -7,6 +11,23 @@ package de.metalcon.imageServer;
  * 
  */
 public class MetaDatabase {
+
+	protected final MongoClient mongoDB;
+
+	/**
+	 * create a new database for meta data
+	 * 
+	 * @param hostAddress
+	 *            host address of the server the database runs at
+	 * @param port
+	 *            port to connect to the database
+	 * @throws UnknownHostException
+	 *             if the database server could not be reached
+	 */
+	public MetaDatabase(final String hostAddress, final int port)
+			throws UnknownHostException {
+		this.mongoDB = new MongoClient(hostAddress, port);
+	}
 
 	/**
 	 * check if the database contains an entry with an identifier

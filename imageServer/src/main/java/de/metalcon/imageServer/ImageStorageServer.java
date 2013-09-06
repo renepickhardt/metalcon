@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.UnknownHostException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -73,11 +74,27 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	private final ImageMetaDatabase imageMetaDatabase;
 
+	/**
+	 * server running flag
+	 */
+	private boolean running = false;
+
 	// TODO: remove image from temporary directory and load it into the "real"
 	// memory
 
-	public ImageStorageServer() {
-		this.imageMetaDatabase = new ImageMetaDatabase();
+	public ImageStorageServer(final String hostAddress, final int port) {
+		ImageMetaDatabase imageMetaDatabase = null;
+
+		try {
+			imageMetaDatabase = new ImageMetaDatabase(hostAddress, port);
+			this.running = true;
+		} catch (final UnknownHostException e) {
+			System.err.println("failed to connect to the mongoDB server at "
+					+ hostAddress + ":" + port);
+			e.printStackTrace();
+		}
+
+		this.imageMetaDatabase = imageMetaDatabase;
 	}
 
 	/**
@@ -136,22 +153,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * access the stream of an image
-	 * 
-	 * @param directory
-	 *            path to the parental directory
-	 * @param fileName
-	 *            name of the image file to be accessed
-	 * @return input stream of the image
-	 * @throws FileNotFoundException
-	 *             if the image was not found
-	 */
-	private static InputStream accessImageStream(final String directory,
-			final String fileName) throws FileNotFoundException {
-		return new FileInputStream(new File(directory, fileName));
-	}
-
-	/**
 	 * write an image stream to a file
 	 * 
 	 * @param imageInputStream
@@ -174,58 +175,47 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	/**
 	 * store an image
 	 * 
-	 * @param fileName
-	 *            destination file name
-	 * @param imageFileDir
-	 *            destination directory (will be created if not existing)
 	 * @param imageInputStream
 	 *            input stream of the image
-	 * @return file handle to the destination file<br>
-	 *         <b>null</b> if the destination file is already existing
+	 * @param imageFile
+	 *            destination file handle
 	 * @throws IOException
-	 *             if the storing fails due to IO errors
+	 *             if the writing failed
 	 */
-	private static File storeImage(final String fileName,
-			final File imageFileDir, final InputStream imageInputStream)
-			throws IOException {
-		imageFileDir.mkdirs();
-
-		final File imageFile = new File(imageFileDir, fileName);
-		if (imageFile.exists()) {
-			// hash codes of two image identifiers overlap
-			return null;
+	private static void storeImage(final InputStream imageInputStream,
+			final File imageFile) throws IOException {
+		// create the parental directories
+		final File imageFileDir = imageFile.getParentFile();
+		if (imageFileDir != null) {
+			imageFileDir.mkdirs();
 		}
 
-		// write image stream
 		writeImageStream(imageInputStream, imageFile);
-		return imageFile;
 	}
 
 	/**
 	 * store an image using compression
 	 * 
-	 * @param hash
-	 *            image identifier hash
 	 * @param image
 	 *            magick image to be stored
-	 * @param imageFileDir
-	 *            parental directory of the image
-	 * @return file handle to the compressed image
+	 * @param imageFile
+	 *            destination file handle
 	 * @throws MagickException
 	 *             if the compression/writing failed
 	 */
-	private static File storeCompressedImage(final String hash,
-			final MagickImage image, final File imageFileDir)
-			throws MagickException {
-		imageFileDir.mkdirs();
+	private static void storeCompressedImage(final MagickImage image,
+			final File imageFile) throws MagickException {
+		// create the parental directories
+		final File imageFileDir = imageFile.getParentFile();
+		if (imageFileDir != null) {
+			imageFileDir.mkdirs();
+		}
 
-		final File imageFile = new File(imageFileDir, hash + ".jpg");
 		final ImageInfo imageInfo = new ImageInfo();
 		imageInfo.setCompression(CompressionType.JPEGCompression);
 
 		image.setFileName(imageFile.getAbsolutePath());
 		image.writeImage(imageInfo);
-		return imageFile;
 	}
 
 	/**
@@ -299,8 +289,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					}
 
 					// store basis version
-					storeCompressedImage(hash, image,
-							new File(this.getBasisImageDirectory(hash)));
+					storeCompressedImage(image, this.getBasisFile(hash));
 
 					return true;
 				} else {
@@ -340,8 +329,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 					if (image != null) {
 						// store basis version
-						storeCompressedImage(hash, image,
-								new File(this.getBasisImageDirectory(hash)));
+						storeCompressedImage(image, this.getBasisFile(hash));
 
 						return true;
 					}
@@ -369,8 +357,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	public boolean createImage(String imageIdentifier, String imageUrl,
 			final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
-		final File tmpImageFile = new File(
-				this.getTemporaryImageDirectory(hash));
+		final File tmpImageFile = this.getTemporaryFile(hash);
 
 		try {
 			// TODO: download image
@@ -381,8 +368,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 			if (image != null) {
 				// store basis version
-				storeCompressedImage(hash, image,
-						new File(this.getBasisImageDirectory(hash)));
+				storeCompressedImage(image, this.getBasisFile(hash));
 
 				return true;
 			} else {
@@ -408,8 +394,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		if (metaData != null) {
 			try {
 				// return the original image
-				return new ImageData(metaData, accessImageStream(
-						this.getOriginalImageDirectory(hash), hash));
+				return new ImageData(metaData, new FileInputStream(
+						this.getOriginalFile(hash)));
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				e.printStackTrace();
@@ -427,13 +413,13 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		final String hash = generateHash(imageIdentifier);
 		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 			try {
-				final String imageFileDirPath = this.getImageDirectoryForSize(
-						hash, width, height);
+				final File scaledImageFile = this.getScaledFile(hash, width,
+						height);
 
 				if (this.imageMetaDatabase.imageHasSizeRegistered(
 						imageIdentifier, width, height)) {
 					// read the scaled image
-					return accessImageStream(imageFileDirPath, hash + ".jpg");
+					return new FileInputStream(scaledImageFile);
 				} else {
 					// try to create the scaled version
 					final String largerImagePath = this.imageMetaDatabase
@@ -443,7 +429,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					if (largerImagePath != null) {
 						final InputStream imageStream = this
 								.storeAndAccessScaledImage(hash, width, height,
-										largerImagePath, imageFileDirPath,
+										largerImagePath, scaledImageFile,
 										imageIdentifier);
 						if (imageStream != null) {
 							return imageStream;
@@ -453,9 +439,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 					} else {
 						// TODO warning: requested size larger than the original
-						return accessImageStream(
-								this.getBasisImageDirectory(hash), hash
-										+ ".jpg");
+
+						// read the basis image
+						return new FileInputStream(this.getBasisFile(hash));
 					}
 				}
 
@@ -480,15 +466,15 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				.getMetadata(imageIdentifier);
 		if (metaData != null) {
 			final String hash = generateHash(imageIdentifier);
-			final String imageFileDirPath = this.getImageDirectoryForSize(hash,
-					width, height);
+			final File scaledImageFile = this
+					.getScaledFile(hash, width, height);
 
 			try {
 				if (this.imageMetaDatabase.imageHasSizeRegistered(
 						imageIdentifier, width, height)) {
 					// read the scaled image
-					return new ImageData(metaData, accessImageStream(
-							imageFileDirPath, hash));
+					return new ImageData(metaData, new FileInputStream(
+							scaledImageFile));
 				} else {
 					// try to create the scaled version
 					final String largerImagePath = this.imageMetaDatabase
@@ -498,7 +484,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					if (largerImagePath != null) {
 						final InputStream imageStream = this
 								.storeAndAccessScaledImage(hash, width, height,
-										largerImagePath, imageFileDirPath,
+										largerImagePath, scaledImageFile,
 										imageIdentifier);
 
 						if (imageStream != null) {
@@ -508,8 +494,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						// TODO: internal server error: scaling failed
 					} else {
 						// TODO warning: requested size larger than the original
-						return new ImageData(metaData, accessImageStream(
-								this.getBasisImageDirectory(hash), hash));
+
+						// read the basis image
+						return new ImageData(metaData, new FileInputStream(
+								this.getBasisFile(hash)));
 					}
 				}
 			} catch (final FileNotFoundException e) {
@@ -542,8 +530,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					final String hash = generateHash(imageIdentifier);
 					if (this.imageMetaDatabase
 							.hasEntryWithIdentifier(imageIdentifier)) {
-						final String imageFileDirPath = this
-								.getImageDirectoryForSize(hash, width, height);
+						final File scaledImageFile = this.getScaledFile(hash,
+								width, height);
 
 						// no ZIP compression while JPEG is already compressed
 						zipEntry = new ZipEntry(imageIdentifier);
@@ -553,8 +541,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						if (this.imageMetaDatabase.imageHasSizeRegistered(
 								imageIdentifier, width, height)) {
 							// add scaled image
-							IOUtils.copy(
-									accessImageStream(imageFileDirPath, hash),
+							IOUtils.copy(new FileInputStream(scaledImageFile),
 									archiveStream);
 						} else {
 							// try to create the scaled version
@@ -565,15 +552,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 								// add scaled image
 								IOUtils.copy(this.storeAndAccessScaledImage(
 										hash, width, height, largerImagePath,
-										imageFileDirPath, imageIdentifier),
+										scaledImageFile, imageIdentifier),
 										archiveStream);
 							} else {
 								// TODO warning: requested size larger than the
 								// original
+
+								// add basis image
 								IOUtils.copy(
-										accessImageStream(this
-												.getBasisImageDirectory(hash),
-												hash), archiveStream);
+										new FileInputStream(this
+												.getBasisFile(hash)),
+										archiveStream);
 							}
 						}
 
@@ -647,44 +636,44 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
-	 * generate the parental directory for an original image
+	 * generate the file handle to the original version of an image
 	 * 
 	 * @param hash
 	 *            image identifier hash
-	 * @return parental directory for the original image passed
+	 * @return file handle to the original version of the image passed
 	 */
-	private String getOriginalImageDirectory(final String hash) {
+	private File getOriginalFile(final String hash) {
 		updateDateLabels();
-		return this.imageDirectory + "originals" + File.separator
+		return new File(this.imageDirectory + "originals" + File.separator
 				+ FORMATTED_YEAR + File.separator + FORMATTED_DAY
-				+ File.separator + getRelativeDirectory(hash, 2);
+				+ File.separator + getRelativeDirectory(hash, 2), hash);
 	}
 
 	/**
-	 * generate the parental directory for a basis image
+	 * generate the file handle to the basis version of an image
 	 * 
 	 * @param hash
 	 *            image identifier hash
-	 * @return parental directory for the basis image passed
+	 * @return file handle to the basis version of the image passed
 	 */
-	private String getBasisImageDirectory(final String hash) {
-		return this.imageDirectory + getRelativeDirectory(hash, 3)
-				+ File.separator + "basis";
+	private File getBasisFile(final String hash) {
+		return new File(this.imageDirectory + getRelativeDirectory(hash, 3)
+				+ File.separator + "basis", hash + ".jpg");
 	}
 
 	/**
-	 * generate the parental directory for a temporary image
+	 * generate the file handle to the temporary version of an image
 	 * 
 	 * @param hash
 	 *            image identifier hash
-	 * @return parental directory for the temporary image passed
+	 * @return file handle to the temporary version of the image passed
 	 */
-	private String getTemporaryImageDirectory(final String hash) {
-		return this.temporaryDirectory;
+	private File getTemporaryFile(final String hash) {
+		return new File(this.temporaryDirectory, hash);
 	}
 
 	/**
-	 * generate the parental directory for a specific size
+	 * generate the file handle to a scaled version of an image
 	 * 
 	 * @param hash
 	 *            image identifier hash
@@ -692,13 +681,13 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            target width
 	 * @param height
 	 *            target height
-	 * @return parental directory for the scaled version of the image
+	 * @return file handle to the scaled version of the image passed
 	 */
-	private String getImageDirectoryForSize(final String hash, final int width,
+	private File getScaledFile(final String hash, final int width,
 			final int height) {
-		return this.imageDirectory + getRelativeDirectory(hash, 3)
+		return new File(this.imageDirectory + getRelativeDirectory(hash, 3)
 				+ File.separator + String.valueOf(width) + "x"
-				+ String.valueOf(height);
+				+ String.valueOf(height), hash + ".jpg");
 	}
 
 	/**
@@ -718,10 +707,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private MagickImage storeAndLoadImage(final String hash,
 			final InputStream imageStream) throws IOException, MagickException {
 		// store the original image
-		final File tmpFileDir = new File(this.getTemporaryImageDirectory(hash));
-		final File tmpFile = storeImage(hash, tmpFileDir, imageStream);
+		final File tmpFile = this.getTemporaryFile(hash);
 
-		if (tmpFile != null) {
+		if (!tmpFile.exists()) {
+			storeImage(imageStream, tmpFile);
+
 			try {
 				final MagickImage originalImage = new MagickImage(
 						new ImageInfo(tmpFile.getAbsolutePath()));
@@ -729,12 +719,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// save the original image to the disk
 				final FileInputStream tmpInputStream = new FileInputStream(
 						tmpFile);
-				final File originalFileDir = new File(
-						this.getOriginalImageDirectory(hash));
-				storeImage(hash, originalFileDir, tmpInputStream);
+				final File originalFile = this.getOriginalFile(hash);
 
-				return originalImage;
-
+				if (!originalFile.exists()) {
+					storeImage(tmpInputStream, originalFile);
+					return originalImage;
+				}
 			} catch (final MagickException e) {
 				// delete invalid (image) file
 				tmpFile.delete();
@@ -760,8 +750,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            target height
 	 * @param basisImagePath
 	 *            path to the basic version for scaling
-	 * @param imageFileDirPath
-	 *            path to the parental directory of the scaled image
+	 * @param imageFile
+	 *            file handle to the scaled image version that shall be created
 	 * @param imageIdentifier
 	 *            image identifier
 	 * @return input stream of the scaled image<br>
@@ -773,22 +763,27 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	private InputStream storeAndAccessScaledImage(final String hash,
 			final int width, final int height, final String basisImagePath,
-			final String imageFileDirPath, final String imageIdentifier)
+			final File imageFile, final String imageIdentifier)
 			throws MagickException, FileNotFoundException {
 		final MagickImage image = scaleImage(new MagickImage(new ImageInfo(
 				basisImagePath)), width, height);
 
 		if (image != null) {
-			final File imageFileDir = new File(imageFileDirPath);
-			final File imageFile = storeCompressedImage(hash, image,
-					imageFileDir);
+			storeCompressedImage(image, imageFile);
 			this.imageMetaDatabase.registerImageSize(imageIdentifier, width,
 					height, imageFile.getAbsolutePath());
 
-			return accessImageStream(imageFileDirPath, hash);
+			return new FileInputStream(imageFile);
 		}
 
 		return null;
+	}
+
+	/**
+	 * @return server running flag
+	 */
+	public boolean isRunning() {
+		return this.running;
 	}
 
 }

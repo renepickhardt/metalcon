@@ -1,5 +1,7 @@
 package de.metalcon.imageServer;
 
+import java.net.UnknownHostException;
+
 /**
  * database for image meta data
  * 
@@ -7,6 +9,21 @@ package de.metalcon.imageServer;
  * 
  */
 public class ImageMetaDatabase extends MetaDatabase {
+
+	/**
+	 * create a new database for image meta data
+	 * 
+	 * @param hostAddress
+	 *            host address of the server the database runs at
+	 * @param port
+	 *            port to connect to the database
+	 * @throws UnknownHostException
+	 *             if the database server could not be reached
+	 */
+	public ImageMetaDatabase(String hostAddress, int port)
+			throws UnknownHostException {
+		super(hostAddress, port);
+	}
 
 	/**
 	 * register a size for an image
