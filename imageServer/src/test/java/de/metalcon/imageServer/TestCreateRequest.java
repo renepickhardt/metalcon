@@ -119,6 +119,18 @@ public class TestCreateRequest {
 	}
 
 	@Test
+	public void testImageMetadataNotJson() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.INVALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Create.META_DATA
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
 	public void testImageAutorotateFlagMissing() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
 				ProtocolTestConstants.VALID_IMAGE_METADATA, null);

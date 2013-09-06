@@ -1,5 +1,8 @@
 package de.metalcon.imageServer.protocol.create;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
@@ -63,8 +66,15 @@ public class CreateRequest {
 			metaData = formItemList
 					.getField(ProtocolConstants.Parameters.Create.META_DATA);
 		} catch (IllegalArgumentException e) {
-			response.addNoMetadataError(ProtocolConstants.StatusMessage.Create.IMAGE_METADATA_MISSING);
+			response.addNoMetadataError();
 			return null;
+		}
+		try {
+			JSONParser jsonparser = new JSONParser();
+			jsonparser.parse(metaData);
+		} catch (ParseException e) {
+			// System.out.println(metaData + "broken");
+			response.addMetadataMalformedError();
 		}
 		return metaData;
 	}
