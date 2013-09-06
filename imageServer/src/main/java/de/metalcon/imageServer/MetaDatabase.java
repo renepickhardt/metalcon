@@ -2,7 +2,14 @@ package de.metalcon.imageServer;
 
 import java.net.UnknownHostException;
 
+import org.json.simple.JSONObject;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 
 /**
  * database for meta data
@@ -12,7 +19,30 @@ import com.mongodb.MongoClient;
  */
 public class MetaDatabase {
 
-	protected final MongoClient mongoDB;
+	/**
+	 * name of the database table for meta data
+	 */
+	private static final String TABLE_METADATA = "meta_data";
+
+	/**
+	 * BSON key for the identifier in a meta data entry
+	 */
+	private static final String META_DATA_IDENTIFIER = "id";
+
+	/**
+	 * BSON key for meta data in a meta data entry
+	 */
+	private static final String META_DATA_META_DATA = "meta_data";
+
+	/**
+	 * mongo database
+	 */
+	protected final DB mongoDB;
+
+	/**
+	 * database table for meta data
+	 */
+	protected final DBCollection tableMetaData;
 
 	/**
 	 * create a new database for meta data
@@ -21,12 +51,16 @@ public class MetaDatabase {
 	 *            host address of the server the database runs at
 	 * @param port
 	 *            port to connect to the database
+	 * @param database
+	 *            name of the database used
 	 * @throws UnknownHostException
 	 *             if the database server could not be reached
 	 */
-	public MetaDatabase(final String hostAddress, final int port)
-			throws UnknownHostException {
-		this.mongoDB = new MongoClient(hostAddress, port);
+	public MetaDatabase(final String hostAddress, final int port,
+			final String database) throws UnknownHostException {
+		final MongoClient client = new MongoClient(hostAddress, port);
+		this.mongoDB = client.getDB(database);
+		this.tableMetaData = this.mongoDB.getCollection(TABLE_METADATA);
 	}
 
 	/**
@@ -38,8 +72,10 @@ public class MetaDatabase {
 	 *         false - otherwise
 	 */
 	public boolean hasEntryWithIdentifier(final String identifier) {
-		// TODO
-		return true;
+		final BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+
+		return (this.tableMetaData.findOne(searchQuery) != null);
 	}
 
 	/**
@@ -53,9 +89,23 @@ public class MetaDatabase {
 	 *         false - if there is already an entry with such identifier
 	 */
 	public boolean addDatabaseEntry(final String identifier,
-			final String metaData) {
-		// TODO
-		return true;
+			final JSONObject metaData) {
+		final BasicDBObject entry = new BasicDBObject();
+		entry.put(META_DATA_IDENTIFIER, identifier);
+
+		if (this.tableMetaData.findOne(entry) == null) {
+			// add the image to the database
+			final BasicDBObject metaDataEntry = new BasicDBObject();
+			for (Object key : metaData.keySet()) {
+				metaDataEntry.put((String) key, metaData.get(key));
+			}
+			entry.put(META_DATA_META_DATA, metaDataEntry);
+			this.tableMetaData.insert(entry);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -67,7 +117,16 @@ public class MetaDatabase {
 	 *         <b>null</b> if there is no entry with such identifier
 	 */
 	public String getMetadata(final String identifier) {
-		// TODO
+		final BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+
+		final DBObject entry = this.tableMetaData.findOne(searchQuery);
+		if (entry != null) {
+			final BasicDBObject metaDataEntry = (BasicDBObject) entry
+					.get(META_DATA_META_DATA);
+			return metaDataEntry.toString();
+		}
+
 		return null;
 	}
 
@@ -87,7 +146,19 @@ public class MetaDatabase {
 	 */
 	public boolean appendMetadata(final String identifier, final String key,
 			final String value) {
-		// TODO
+		final BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+
+		final DBObject entry = this.tableMetaData.findOne(searchQuery);
+		if (entry != null) {
+			final BasicDBObject metaDataEntry = (BasicDBObject) entry
+					.get(META_DATA_META_DATA);
+			metaDataEntry.put(key, value);
+			entry.put(META_DATA_META_DATA, metaDataEntry);
+			this.tableMetaData.update(searchQuery, entry);
+			return true;
+		}
+
 		return false;
 	}
 
@@ -100,8 +171,19 @@ public class MetaDatabase {
 	 *         false - if there is no entry with such identifier
 	 */
 	public boolean deleteDatabaseEntry(final String identifier) {
-		// TODO
-		return false;
+		final BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+
+		final WriteResult deleteResult = this.tableMetaData.remove(searchQuery);
+		return (deleteResult.getN() == 1);
+	}
+
+	/**
+	 * clear the meta data table<br>
+	 * <b>removes all existing data!</b>
+	 */
+	public void clear() {
+		this.tableMetaData.drop();
 	}
 
 }

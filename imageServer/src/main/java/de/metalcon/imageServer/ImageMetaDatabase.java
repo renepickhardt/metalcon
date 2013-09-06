@@ -11,6 +11,11 @@ import java.net.UnknownHostException;
 public class ImageMetaDatabase extends MetaDatabase {
 
 	/**
+	 * name of the database used for image meta data
+	 */
+	private static final String DATABASE_NAME = "imagedb";
+
+	/**
 	 * create a new database for image meta data
 	 * 
 	 * @param hostAddress
@@ -22,7 +27,7 @@ public class ImageMetaDatabase extends MetaDatabase {
 	 */
 	public ImageMetaDatabase(String hostAddress, int port)
 			throws UnknownHostException {
-		super(hostAddress, port);
+		super(hostAddress, port, DATABASE_NAME);
 	}
 
 	/**
@@ -90,6 +95,12 @@ public class ImageMetaDatabase extends MetaDatabase {
 	public String[] getRegisteredImagePaths(final String imageIdentifier) {
 		// TODO
 		return null;
+	}
+
+	@Override
+	public boolean deleteDatabaseEntry(final String identifier) {
+		// TODO
+		return super.deleteDatabaseEntry(identifier);
 	}
 
 }

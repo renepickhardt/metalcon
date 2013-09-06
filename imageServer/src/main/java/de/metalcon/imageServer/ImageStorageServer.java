@@ -23,6 +23,9 @@ import magick.MagickException;
 import magick.MagickImage;
 
 import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 import de.metalcon.imageServer.protocol.delete.DeleteResponse;
@@ -41,6 +44,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * date formatter
 	 */
 	private static final Format FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+
+	/**
+	 * JSON parser
+	 */
+	private static final JSONParser PARSER = new JSONParser();
 
 	/**
 	 * year represented by the current formatted year
@@ -273,8 +281,16 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final InputStream imageStream, final String metaData,
 			final boolean autoRotate, final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
+		JSONObject metaDataJSON;
+		try {
+			metaDataJSON = (JSONObject) PARSER.parse(metaData);
+		} catch (final ParseException e) {
+			// TODO error: meta data format invalid
+			return false;
+		}
 
-		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
+		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+				metaDataJSON)) {
 
 			try {
 				// store and try to load original image
@@ -316,8 +332,16 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final int left, final int top, final int width, final int height,
 			final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
+		JSONObject metaDataJSON;
+		try {
+			metaDataJSON = (JSONObject) PARSER.parse(metaData);
+		} catch (final ParseException e) {
+			// TODO error: meta data format invalid
+			return false;
+		}
 
-		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier, metaData)) {
+		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+				metaDataJSON)) {
 
 			try {
 				// store and try to load original image
