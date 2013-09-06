@@ -7,6 +7,7 @@ package de.metalcon.autocompleteServer.Helper;
  * @author Christian Schowalter
  */
 public class ProtocolConstants {
+	public static final String STATUS_MESSAGE = "status";
 	public static final String QUERY_PARAMETER = "term";
 	public static final String INDEX_PARAMETER = "indexName";
 	public static final String NUM_ITEMS = "numItems";
