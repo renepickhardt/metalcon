@@ -12,8 +12,7 @@ public class NewIndexRequest {
 			ServletContext servletContext) {
 
 		String indexName = checkIndexName(formItemList, response);
-		System.out.println("hello!");
-		return null;
+		return response;
 	}
 
 	private static String checkIndexName(FormItemList formItemList,
