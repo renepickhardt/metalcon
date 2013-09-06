@@ -19,6 +19,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -44,13 +45,16 @@ public class LuceneRead implements HaveInCommons {
 	 * 
 	 */
 	public LuceneRead() throws IOException {
+		
+		//TODO: proper initialization
 		this.dir = FSDirectory.open(new File(INDEX_DIRECTORY));
-		this.analyzer = new StandardAnalyzer(Version.LUCENE_40);
-		this.iwc = new IndexWriterConfig(Version.LUCENE_40, this.analyzer);
+		this.analyzer = new StandardAnalyzer(Version.LUCENE_44);
+		this.iwc = new IndexWriterConfig(Version.LUCENE_44, this.analyzer);
 
 		if (true) {
 			this.iwc.setOpenMode(OpenMode.CREATE);
 		} else {
+			//TODO: fix me!
 			this.iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		}
 		this.iw = new IndexWriter(this.dir, this.iwc);
@@ -59,16 +63,6 @@ public class LuceneRead implements HaveInCommons {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		/*
-		 * Document doc = new Document(); Field pathField = new
-		 * StringField("neighbour", "patrik", Field.Store.YES);
-		 * doc.add(pathField);
-		 * 
-		 * this.iw.updateDocument(new Term("rene"), doc);
-		 * 
-		 * this.iw.close();
-		 */
 	}
 
 	/*
@@ -84,14 +78,44 @@ public class LuceneRead implements HaveInCommons {
 		Query query1 = new TermQuery(new Term("id", uuid1));
 		Query query2 = new TermQuery(new Term("id", uuid2));
 
-		BooleanQuery bQuery = new BooleanQuery();
-		bQuery.add(query1, BooleanClause.Occur.MUST);
-
-		TopDocs tdocs = null;
 		IndexSearcher indexSearcher = new IndexSearcher(this.ir);
+		
+		// setup query for uuid1
+		BooleanQuery combiQuery1 = new BooleanQuery();
+	    combiQuery1.add(query1, BooleanClause.Occur.MUST);
 
-		Set<String> items = new HashSet<String>();
+	    // setup query for uuid2
+	    BooleanQuery combiQuery2 = new BooleanQuery();
+	    combiQuery2.add(query2, BooleanClause.Occur.MUST);
 
+	    // combine to form intersection of entities
+	    BooleanQuery query1AND2 = new BooleanQuery();
+	    query1AND2.add(combiQuery1, BooleanClause.Occur.MUST);
+	    query1AND2.add(combiQuery2, BooleanClause.Occur.MUST);
+
+	    TopDocs results1AND2 = null;
+
+	    try {
+			results1AND2 = indexSearcher.search(query1AND2, 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ScoreDoc[] scoreDocs = results1AND2.scoreDocs;
+		String[] val = null;
+	    for(ScoreDoc scoreDoc: scoreDocs){
+	    	try {
+				Document doc = indexSearcher.doc(scoreDoc.doc);
+				val = doc.getValues("neighbour");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	    
+	    Set<String> items = new HashSet<String>();
+	    
+	    for(String s : val){
+	    	items.add(s);
+	    }
 		return items;
 	}
 
@@ -124,7 +148,6 @@ public class LuceneRead implements HaveInCommons {
 			this.iw.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -138,7 +161,7 @@ public class LuceneRead implements HaveInCommons {
 	 */
 	@Override
 	public boolean delegeEdge(String from, String to) {
-		// TODO Auto-generated method stub
+		// TODO Search for Term and delete all ocurrences as neighbour
 		return false;
 	}
 
