@@ -2,23 +2,26 @@ $(document).ready(function() {
 	$("#submit_button").click(function(){
 		var message = document.getElementById("message").value;
 		if(message) {
-			var fd = new FormData();  
-
-			var link_pic = "<img src=\""+$(".image .active").attr("src")+"\">";
-			var link_title = "<a href=\""+$(".url").html()+"\">"+$(".title").html()+"</a>"; 
-			var link_desc = $(".description").html();
-
-			var link_box_string = "<div class=\"link_box\"><div class=\"link_picture\">"+link_pic+"</div><div class=\"link_text_wrapper\"><div class=\"link_title\">"+link_title+"</div><div class=\"link_description\">"+link_desc+"</div></div></div>";
-
-
-			//var link_preview = link_var+link_title+link_desc;
+			var fd = new FormData();
+			var link_box_string;
+			if($(".description").html()){	
+				var link_title = "<a href=\""+$(".url").html()+"\">"+$(".title").html()+"</a>"; 
+				var link_desc = $(".description").html();  
+				if($(".video").html()) {
+					var link_vid = $(".video").html();
+					link_box_string +="<div class=\"link_box\">" + link_vid + "</div>";
+				} else if($(".image .active").attr("src")){
+					var link_pic = "<img src=\""+$(".image .active").attr("src")+"\" class=\"img-rounded\">";
+					link_box_string = "<div class=\"link_box\"><div class=\"link_picture\">"+link_pic+"</div><div class=\"link_text_wrapper\"><div class=\"link_title\">"+link_title+"</div><div class=\"link_description\">"+link_desc+"</div></div></div>";
+				} else link_box_string = "<div class=\"link_box\"><div class=\"link_text_wrapper\"><div class=\"link_title\">"+link_title+"</div><div class=\"link_description\">"+link_desc+"</div></div></div>";
+				message +=link_box_string;
+			}  
 			var type = "status_update";
-			var userid = "user4";
-			var displayName = "Tobi"; 
+			var userid = renderer.user;
+			var displayName = "Post"; 
 			var localDate = renderer.format(new Date());
 			var rand = "AB" + Math.round(Math.random() * 1000000);
 			message = message.replace(/\n/g, '<br />');
-			message +=link_box_string;
 
 			fd.append('type' ,type);
 			fd.append('user_id' ,userid);

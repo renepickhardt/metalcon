@@ -49,6 +49,7 @@ MetalconReader.prototype = {
 		}//End if
 		html.push("</ul>");
 		this.el.append(html.join(""));
+		$("div.comment-text").not(".link_box").shorten({"showChars": 250, "moreText" : "Mehr", "lessText" : "Weniger"});
 	}, //End render function
 	createDate	: function(str){
 		str = str.substring(0,19).replace(/[ZT]/," ").replace(/\-/g,"/");

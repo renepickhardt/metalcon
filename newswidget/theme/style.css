@@ -162,7 +162,6 @@ ul.comments-holder li.single-comment-holder .comment-text
 	font-size: 13px;
 	margin: 0 10px 10px 75px;
 	word-wrap: normal;
-	max-height: 175px;
 	overflow: auto;
 }
 
@@ -176,7 +175,8 @@ ul.comments-holder li.single-comment-holder .comment-text
 
 .link_box
 {
-	height: 100px;
+	min-height: 100px;
+	height: auto;
 	width: 500px;
 	margin: 5px 0 5px 0;
 	border: 1px solid #B4B4B4;
@@ -187,9 +187,9 @@ ul.comments-holder li.single-comment-holder .comment-text
 .link_picture img
 {
 	float: left;
-	height: 95px;
-	width: 95px;
-	margin: 0 10px 0 0;
+	height: 90px;
+	width: 90px;
+	margin: 5px;
 }
 
 .link_text_wrapper
@@ -212,3 +212,4 @@ ul.comments-holder li.single-comment-holder .comment-text
 	max-height: 100px;
 	overflow: auto;
 }
+

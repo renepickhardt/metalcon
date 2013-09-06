@@ -12,11 +12,12 @@
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="src/newsfeed_script.js"></script>
 	<script type="text/javascript" src="src/formdata_script.js"></script>
+    <script type="text/javascript" src="src/jquery.shorten.js"></script>
 
-	<script type="text/javascript">
+	<script type="text/javascript">  //this script is used to initialize the newsfeed
 		$(function(){
 			$("#message-display").metalconReader({
-				user	: "user4",
+				user	: "user5",
 				items	: 100
 			});
 		});
@@ -29,10 +30,10 @@
 				<label for="message">Message:</label>
 				<textarea id="message" class="form-control message-input" rows="2" name="message" type="text" placeholder="Enter your Message"></textarea>
 				<div class="textbox_buttons-holder">
-                    <input id="submit_button" class="btn btn-primary message-submit" type="submit" value="create status update" />
-    				<button class="btn btn-default button-clear-link"> Clear Link</button>
-    				<button class="btn btn-default button-clear"> Cancel Text</button>
-                    <button class="btn btn-default button-cancel"> Cancel </button>
+                    <input id="submit_button" class="btn btn-primary btn-sm message-submit" type="submit" value="create status update" />
+    				<button class="btn btn-default btn-sm button-clear-link"> Clear Link</button>
+    				<button class="btn btn-default btn-sm button-clear"> Clear Text</button>
+                    <button class="btn btn-default btn-sm button-cancel"> Cancel </button>
                 </div>
 			</div>
             <div class="liveurl">
@@ -68,8 +69,25 @@
 
 	<script src="src/bootstrap.js"></script>
 	<script src="src/jquery.liveurl.js"></script>
+    <script src="src/ba-linkify.js"></script>
 
-	<script type="text/javascript">
+    <script type="text/javascript"> //this script controls linkify, currently not working
+        $(function() {
+            $('li.single-comment-holder').each(function() {
+                var that = $(this),
+                    txt = that.html(),
+                    options = {
+                        callback: function(text, href) {
+                            href && debug.log([text, href]);
+                            return href ? '<a href="' + href + '" title="' + href + '">' + text + '</a>' : text;
+                        }
+                    };
+                 that.html( txt + ' (orig)<br/>' + linkify( txt, options ) + ' (linkified)' );
+            });
+        });
+    </script>
+
+	<script type="text/javascript"> //this script controls the behavior of the textbox, animation and hiding / showing buttons
 		$(function () {
 			$(".form-control.message-input").focus(function() {
 				$(this).animate({width:"+150%", height:"135px" }, 1000);
@@ -78,7 +96,6 @@
                 $(".btn.btn-default.button-clear-link").css('display', 'inline');
 				$(".btn.btn-default.button-clear").css('display', 'inline');
 				$(".btn.btn-default.button-cancel").css('display', 'inline');
-
 
 			});
 			
@@ -100,7 +117,7 @@
 				$(".btn.btn-primary.message-submit").css('display', 'none');
 				$(".btn.btn-default.button-clear").css('display', 'none');
 				$(".btn.btn-default.button-cancel").css('display', 'none');
-
+                $(".btn.btn-default.button-clear-link").css('display', 'none');
 			});
             
 			$(".btn.btn-default.button-clear").click(function() {
@@ -113,11 +130,10 @@
                 $(".close").trigger("click");
                 $(".form-control.message-input").focus();
             });
-
 		});
 	</script>
 	
-    <script> 
+    <script>  //this script controls the url-parsing that shows in a box under the input
                 var curImages = new Array();
                 var temp_url;
                 $('textarea').liveUrl({
@@ -142,6 +158,7 @@
                             liveUrl.hide('fast');
                             liveUrl.find('.video').html('').hide();
                             liveUrl.find('.image').html('');
+                            liveUrl.find('.description').html('');
                             liveUrl.find('.controls .prev').addClass('inactive');
                             liveUrl.find('.controls .next').addClass('inactive');
                             liveUrl.find('.thumbnail').hide();
@@ -154,7 +171,7 @@
                         
                         if (data.video != null) {                       
                             var ratioW        = data.video.width  /350;
-                            data.video.width  = 350;
+                            data.video.width  = 250;
                             data.video.height = data.video.height / ratioW;
         
                             var video = 
