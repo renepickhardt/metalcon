@@ -303,13 +303,19 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			return false;
 		}
 
-		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-				metaDataJSON)) {
+		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 
 			try {
 				// store and try to load original image
 				final MagickImage image = this.storeAndLoadImage(hash,
 						imageStream);
+				final JSONObject extractedJson = ImageMetaDataExporter
+						.exportExifData(image);
+				metaDataJSON = ImageMetaDataExporter.mergeExifData(
+						metaDataJSON, extractedJson);
+
+				this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+						metaDataJSON);
 
 				if (image != null) {
 					if (autoRotate) {
