@@ -27,7 +27,7 @@ public class MetaDatabase {
 	/**
 	 * BSON key for the identifier in a meta data entry
 	 */
-	private static final String META_DATA_IDENTIFIER = "id";
+	protected static final String ENTRY_IDENTIFIER = "id";
 
 	/**
 	 * BSON key for meta data in a meta data entry
@@ -42,7 +42,7 @@ public class MetaDatabase {
 	/**
 	 * database table for meta data
 	 */
-	protected final DBCollection tableMetaData;
+	private final DBCollection tableMetaData;
 
 	/**
 	 * create a new database for meta data
@@ -73,7 +73,7 @@ public class MetaDatabase {
 	 */
 	public boolean hasEntryWithIdentifier(final String identifier) {
 		final BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+		searchQuery.put(ENTRY_IDENTIFIER, identifier);
 
 		return (this.tableMetaData.findOne(searchQuery) != null);
 	}
@@ -91,7 +91,7 @@ public class MetaDatabase {
 	public boolean addDatabaseEntry(final String identifier,
 			final JSONObject metaData) {
 		final BasicDBObject entry = new BasicDBObject();
-		entry.put(META_DATA_IDENTIFIER, identifier);
+		entry.put(ENTRY_IDENTIFIER, identifier);
 
 		if (this.tableMetaData.findOne(entry) == null) {
 			// add the image to the database
@@ -118,7 +118,7 @@ public class MetaDatabase {
 	 */
 	public String getMetadata(final String identifier) {
 		final BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+		searchQuery.put(ENTRY_IDENTIFIER, identifier);
 
 		final DBObject entry = this.tableMetaData.findOne(searchQuery);
 		if (entry != null) {
@@ -147,7 +147,7 @@ public class MetaDatabase {
 	public boolean appendMetadata(final String identifier, final String key,
 			final String value) {
 		final BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+		searchQuery.put(ENTRY_IDENTIFIER, identifier);
 
 		final DBObject entry = this.tableMetaData.findOne(searchQuery);
 		if (entry != null) {
@@ -167,12 +167,12 @@ public class MetaDatabase {
 	 * 
 	 * @param identifier
 	 *            database entry identifier
-	 * @return true - if the entry has been added successfully<br>
+	 * @return true - if the entry has been deleted successfully<br>
 	 *         false - if there is no entry with such identifier
 	 */
 	public boolean deleteDatabaseEntry(final String identifier) {
 		final BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put(META_DATA_IDENTIFIER, identifier);
+		searchQuery.put(ENTRY_IDENTIFIER, identifier);
 
 		final WriteResult deleteResult = this.tableMetaData.remove(searchQuery);
 		return (deleteResult.getN() == 1);

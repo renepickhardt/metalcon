@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -75,7 +77,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	private final String imageDirectory = "/etc/imageStorageServer/";
 
-	private final String temporaryDirectory = "/dev/shm/";
+	private final String temporaryDirectory = "/tmp/";
 
 	/**
 	 * database for image meta data
@@ -90,11 +92,23 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	// TODO: remove image from temporary directory and load it into the "real"
 	// memory
 
-	public ImageStorageServer(final String hostAddress, final int port) {
+	/**
+	 * create a new image storage server
+	 * 
+	 * @param hostAddress
+	 *            host address of the server the database runs at
+	 * @param port
+	 *            port to connect to the database
+	 * @param database
+	 *            name of the database used
+	 */
+	public ImageStorageServer(final String hostAddress, final int port,
+			final String database) {
 		ImageMetaDatabase imageMetaDatabase = null;
 
 		try {
-			imageMetaDatabase = new ImageMetaDatabase(hostAddress, port);
+			imageMetaDatabase = new ImageMetaDatabase(hostAddress, port,
+					database);
 			this.running = true;
 		} catch (final UnknownHostException e) {
 			System.err.println("failed to connect to the mongoDB server at "
@@ -384,7 +398,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		final File tmpImageFile = this.getTemporaryFile(hash);
 
 		try {
-			// TODO: download image
+			// download image
+			final URL url = new URL(imageUrl);
+			storeImage(url.openStream(), tmpImageFile);
 
 			// store original image
 			final MagickImage image = this.storeAndLoadImage(hash,
@@ -399,8 +415,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// TODO internal server error: hash collision
 			}
 
+		} catch (final MalformedURLException e) {
+			// TODO error: no valid URL
 		} catch (final MagickException e) {
 			// TODO error: no image file
+			tmpImageFile.delete();
 		} catch (final IOException e) {
 			// internal server error: failed to store image(s)
 		}

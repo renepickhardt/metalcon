@@ -15,17 +15,35 @@ import org.junit.Test;
 
 public class MetaDatabaseTest {
 
-	private static final String VALID_READ_IDENTIFIER = "img1";
+	/**
+	 * valid identifier for reading
+	 */
+	protected static final String VALID_READ_IDENTIFIER = "img1";
 
-	private static final String INVALID_READ_IDENTIFIER = "noimg";
+	/**
+	 * invalid identifier for reading
+	 */
+	protected static final String INVALID_READ_IDENTIFIER = "noimg";
 
-	private static final String VALID_CREATE_IDENTIFIER = "img2";
+	/**
+	 * valid identifier for a new entry
+	 */
+	protected static final String VALID_CREATE_IDENTIFIER = "img2";
 
-	private static final JSONObject META_DATA = new JSONObject();
+	/**
+	 * (valid) meta data for a new entry
+	 */
+	protected static final JSONObject META_DATA = new JSONObject();
 
-	private static final JSONParser PARSER = new JSONParser();
+	/**
+	 * JSON parser
+	 */
+	protected static final JSONParser PARSER = new JSONParser();
 
-	private static MetaDatabase DB;
+	/**
+	 * meta database being tested
+	 */
+	protected static MetaDatabase DB;
 
 	@SuppressWarnings("unchecked")
 	@BeforeClass
