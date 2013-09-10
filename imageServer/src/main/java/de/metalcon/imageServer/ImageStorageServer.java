@@ -29,6 +29,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 import de.metalcon.imageServer.protocol.delete.DeleteResponse;
 import de.metalcon.imageServer.protocol.read.ReadResponse;
@@ -329,18 +330,25 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 					return true;
 				} else {
-					// TODO internal server error: hash collision
+					response.addInternalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
+					// TODO check whether this is enough information for server
+					// admins to solve the problem
 				}
 			} catch (final MagickException e) {
-				// TODO error: no image file
+				response.addImageInvalidError();
+
+				// TODO: check if this stack trace is useful!
 				e.printStackTrace();
 			} catch (final IOException e) {
 				// internal server error: failed to store image(s)
+				response.addInternalServerError();
 				e.printStackTrace();
 			}
 
 		} else {
-			// TODO error: image identifier in use
+			response.addImageIdentifierAlreadyInUseError();
 		}
 
 		return false;
@@ -357,6 +365,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			metaDataJSON = (JSONObject) PARSER.parse(metaData);
 		} catch (final ParseException e) {
 			// TODO error: meta data format invalid
+			response.addMetadataMalformedError();
 			return false;
 		}
 

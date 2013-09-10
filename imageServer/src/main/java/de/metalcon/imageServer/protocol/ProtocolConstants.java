@@ -18,10 +18,16 @@ public class ProtocolConstants {
 	 */
 	public static final String SOLUTION = "solution";
 
+	public class LogMessage {
+		public static final String HASH_COLLISION = "Hash collision occured";
+	}
+
 	public class Solution {
 		public class Create {
 			// TODO: improve solution hints
 			public static final String IMAGE_METADATA_MALFORMED = "Please check the data format of the meta data";
+			public static final String IMAGE_INVALID = "The image provided can't be processed. Please check if your file is an image encoded in a format supported by ImageMagick";
+			public static final String IMAGE_IDENTIFIER_ALREADY_EXISTS = "Please provide a unique identifier for each image. You should consider checking your identifier identifier management system";
 		}
 	}
 
@@ -35,6 +41,8 @@ public class ProtocolConstants {
 			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
 			public static final String REQUEST_BROKEN_RESPONSE_BEGIN = "request corrupt: parameter ";
 			public static final String REQUEST_BROKEN_RESPONSE_END = "is malformed";
+			public static final String IMAGE_IDENTIFIER_ALREADY_EXISTS = "Image identifier already exists";
+			public static final String PROBLEM_WITH_REQUEST = "Problem occured while processing the request: ";
 		}
 
 		public class Read {
@@ -42,6 +50,9 @@ public class ProtocolConstants {
 			public static final String IMAGE_IDENTIFIER_MISSING = "Image identifier misssing";
 
 		}
+
+		public static final String INTERNAL_SERVER_ERROR = "An internal server error has occured";
+		public static final String INTERNAL_SERVER_ERROR_SOLUTION = "Please check the server logs";
 	}
 
 	public class Parameters {
