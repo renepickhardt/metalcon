@@ -299,7 +299,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		try {
 			metaDataJSON = (JSONObject) PARSER.parse(metaData);
 		} catch (final ParseException e) {
-			// TODO error: meta data format invalid
+			response.addMetadataMalformedError();
 			return false;
 		}
 

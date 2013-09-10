@@ -18,6 +18,13 @@ public class ProtocolConstants {
 	 */
 	public static final String SOLUTION = "solution";
 
+	public class Solution {
+		public class Create {
+			// TODO: improve solution hints
+			public static final String IMAGE_METADATA_MALFORMED = "Please check the data format of the meta data";
+		}
+	}
+
 	public class StatusMessage {
 		public class Create {
 
@@ -26,6 +33,8 @@ public class ProtocolConstants {
 			public static final String IMAGE_METADATA_MISSING = "No meta data given";
 			public static final String AUTOROTATE_FLAG_MISSING = "Autorotate flag not found";
 			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
+			public static final String REQUEST_BROKEN_RESPONSE_BEGIN = "request corrupt: parameter ";
+			public static final String REQUEST_BROKEN_RESPONSE_END = "is malformed";
 		}
 
 		public class Read {

@@ -33,8 +33,13 @@ public class CreateResponse extends Response {
 
 	public void addMetadataMalformedError() {
 		this.addStatusMessage(
-				"request corrupt: parameter \"metaData\" is malformed",
-				"The metaData String is malformed");
+
+				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ ProtocolConstants.Parameters.Create.META_DATA
+						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
+
+				ProtocolConstants.Solution.Create.IMAGE_METADATA_MALFORMED);
+
 	}
 
 	public void addNoMetadataError() {
