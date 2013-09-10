@@ -93,9 +93,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	private boolean running = false;
 
-	// TODO: remove image from temporary directory and load it into the "real"
-	// memory
-
 	/**
 	 * create a new image storage server
 	 * 
@@ -344,11 +341,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					}
 
 					// store basis version
-					storeCompressedImage(image, this.getBasisFile(hash));
+					final File basisFile = this.getBasisFile(hash);
+					storeCompressedImage(image, basisFile);
 
 					// create image in database
 					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
 							metaDataJSON);
+
+					// register basis size
+					final int width = (int) image.getDimension().getWidth();
+					final int height = (int) image.getDimension().getHeight();
+					this.imageMetaDatabase.registerImageSize(imageIdentifier,
+							width, height, basisFile.getAbsolutePath());
 
 					return true;
 				} else {
@@ -403,11 +407,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 					if (image != null) {
 						// store basis version
-						storeCompressedImage(image, this.getBasisFile(hash));
+						final File basisFile = this.getBasisFile(hash);
+						storeCompressedImage(image, basisFile);
 
 						// create image in database
 						this.imageMetaDatabase.addDatabaseEntry(
 								imageIdentifier, metaDataJSON);
+
+						// register basis size
+						this.imageMetaDatabase.registerImageSize(
+								imageIdentifier, width, height,
+								basisFile.getAbsolutePath());
 
 						return true;
 					}
@@ -451,10 +461,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				if (image != null) {
 					// store basis version
-					storeCompressedImage(image, this.getBasisFile(hash));
+					final File basisFile = this.getBasisFile(hash);
+					storeCompressedImage(image, basisFile);
 
 					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
 							null);
+
+					// register basis size
+					final int width = (int) image.getDimension().getWidth();
+					final int height = (int) image.getDimension().getHeight();
+					this.imageMetaDatabase.registerImageSize(imageIdentifier,
+							width, height, basisFile.getAbsolutePath());
 
 					return true;
 				} else {

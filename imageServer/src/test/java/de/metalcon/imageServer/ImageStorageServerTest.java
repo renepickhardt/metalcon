@@ -64,8 +64,6 @@ public class ImageStorageServerTest {
 
 	private ReadResponse readResponse;
 
-	private BufferedImage image;
-
 	@Before
 	public void setUp() throws Exception {
 		this.server = new ImageStorageServer("test.iss.config");
@@ -139,7 +137,7 @@ public class ImageStorageServerTest {
 	}
 
 	@Test
-	public void testReadOriginalImage() throws IOException {
+	public void testReadOriginalImage() {
 		final ImageData imageData = this.server.readImageWithMetaData(
 				VALID_READ_IDENTIFIER, this.readResponse);
 		assertNotNull(imageData);
@@ -155,23 +153,87 @@ public class ImageStorageServerTest {
 				this.readResponse));
 	}
 
+	@Test
+	public void testReadImageScaling() {
+		final InputStream imageStream = this.server.readImage(
+				VALID_READ_IDENTIFIER, VALID_WIDTH, VALID_HEIGHT,
+				this.readResponse);
+
+		this.checkImageDimension(imageStream, VALID_WIDTH, VALID_HEIGHT);
+	}
+
+	@Test
+	public void testReadScaledImage() {
+		this.testReadImageScaling();
+		this.testReadImageScaling();
+	}
+
+	@Test
+	public void testReadImageScalingWithMetadata() {
+		final ImageData imageData = this.server.readImageWithMetaData(
+				VALID_READ_IDENTIFIER, VALID_WIDTH, VALID_HEIGHT,
+				this.readResponse);
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+
+		this.checkImageDimension(imageData.getImageStream(), VALID_WIDTH,
+				VALID_HEIGHT);
+	}
+
+	/**
+	 * check the dimension of an image
+	 * 
+	 * @param imageStream
+	 *            stream of the image being checked
+	 * @param width
+	 *            expected width
+	 * @param height
+	 *            expected height
+	 */
+	private void checkImageDimension(final InputStream imageStream,
+			final int width, final int height) {
+		try {
+			final BufferedImage image = ImageIO.read(imageStream);
+
+			assertEquals(width, image.getWidth());
+			assertEquals(height, image.getHeight());
+		} catch (final IOException e) {
+			fail("IO exception occurred!");
+		}
+	}
+
+	/**
+	 * compare two images
+	 * 
+	 * @param refImagePath
+	 *            path to the reference file
+	 * @param imageStream
+	 *            stream of the image to be compared
+	 * @throws IOException
+	 *             if IO errors occurred
+	 */
 	private void compareImages(final String refImagePath,
-			final InputStream imageStream) throws IOException {
-		final BufferedImage image1 = ImageIO.read(new File(refImagePath));
-		final BufferedImage image2 = ImageIO.read(imageStream);
+			final InputStream imageStream) {
+		try {
+			final BufferedImage image1 = ImageIO.read(new File(refImagePath));
+			final BufferedImage image2 = ImageIO.read(imageStream);
 
-		assertEquals(image1.getWidth(), image2.getWidth());
-		assertEquals(image1.getHeight(), image2.getHeight());
+			assertEquals(image1.getWidth(), image2.getWidth());
+			assertEquals(image1.getHeight(), image2.getHeight());
 
-		final DataBufferByte buffer1 = (DataBufferByte) image1.getRaster()
-				.getDataBuffer();
-		final DataBufferByte buffer2 = (DataBufferByte) image2.getRaster()
-				.getDataBuffer();
-		assertEquals(buffer1.getNumBanks(), buffer2.getNumBanks());
+			final DataBufferByte buffer1 = (DataBufferByte) image1.getRaster()
+					.getDataBuffer();
+			final DataBufferByte buffer2 = (DataBufferByte) image2.getRaster()
+					.getDataBuffer();
+			assertEquals(buffer1.getNumBanks(), buffer2.getNumBanks());
 
-		for (int bank = 0; bank < buffer1.getNumBanks(); bank++) {
-			assertTrue(Arrays.equals(buffer1.getData(bank),
-					buffer2.getData(bank)));
+			for (int bank = 0; bank < buffer1.getNumBanks(); bank++) {
+				assertTrue(Arrays.equals(buffer1.getData(bank),
+						buffer2.getData(bank)));
+			}
+		} catch (final IOException e) {
+			fail("IO exception occurred!");
 		}
 	}
 
