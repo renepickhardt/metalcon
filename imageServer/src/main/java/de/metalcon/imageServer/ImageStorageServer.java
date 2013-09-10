@@ -364,7 +364,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		try {
 			metaDataJSON = (JSONObject) PARSER.parse(metaData);
 		} catch (final ParseException e) {
-			// TODO error: meta data format invalid
 			response.addMetadataMalformedError();
 			return false;
 		}
@@ -387,20 +386,26 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						return true;
 					}
 
-					// TODO: internal server error: cropping failed
-
+					response.addInternalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.CROPPING_FAILURE);
 				} else {
-					// TODO internal server error: hash collision
+					response.addInternalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
 			} catch (final MagickException e) {
-				// TODO error: no image file
+
+				response.addImageInvalidError();
+				// TODO: check if this stack trace is useful
 				e.printStackTrace();
 			} catch (final IOException e) {
 				// internal server error: failed to store image(s)
+				response.addInternalServerError();
 				e.printStackTrace();
 			}
 		} else {
-			// TODO error: image identifier in use
+			response.addImageIdentifierAlreadyInUseError();
 		}
 
 		return false;
@@ -427,16 +432,19 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				return true;
 			} else {
-				// TODO internal server error: hash collision
+				response.addInternalServerError();
+				System.err.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 			}
 
 		} catch (final MalformedURLException e) {
-			// TODO error: no valid URL
+			response.addURLMalformedError();
 		} catch (final MagickException e) {
-			// TODO error: no image file
+			response.addImageInvalidError();
 			tmpImageFile.delete();
 		} catch (final IOException e) {
 			// internal server error: failed to store image(s)
+			response.addInternalServerError();
+			e.printStackTrace();
 		}
 
 		return false;
@@ -455,11 +463,14 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				return new ImageData(metaData, new FileInputStream(
 						this.getOriginalFile(hash)));
 			} catch (final FileNotFoundException e) {
+				// TODO: check if this is necessarily an _internal_ problem
 				// internal server error: file not found
+				response.addInternalServerError();
 				e.printStackTrace();
 			}
 		} else {
 			// TODO error: no image with such identifier
+			response.addImageNotFoundError();
 		}
 
 		return null;

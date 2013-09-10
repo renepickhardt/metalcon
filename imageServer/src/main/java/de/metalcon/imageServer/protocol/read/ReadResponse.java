@@ -53,4 +53,16 @@ public class ReadResponse extends Response {
 
 	}
 
+	public void addInternalServerError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR,
+				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR_SOLUTION);
+
+	}
+
+	public void addImageNotFoundError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND,
+				ProtocolConstants.Solution.Read.NO_IMAGE_FOUND);
+	}
 }

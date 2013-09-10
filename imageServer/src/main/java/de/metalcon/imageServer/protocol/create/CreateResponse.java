@@ -47,7 +47,6 @@ public class CreateResponse extends Response {
 				"The image meta data is missing. Please deliver some");
 	}
 
-	// TODO: check if this method should be in another class
 	public void addInternalServerError() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR,
@@ -58,6 +57,7 @@ public class CreateResponse extends Response {
 	public void addImageInvalidError() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ "parameter "
 						+ "image "
 						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
 				ProtocolConstants.Solution.Create.IMAGE_INVALID);
@@ -69,6 +69,15 @@ public class CreateResponse extends Response {
 				ProtocolConstants.StatusMessage.Create.PROBLEM_WITH_REQUEST
 						+ ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
 				ProtocolConstants.Solution.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS);
+	}
+
+	public void addURLMalformedError() {
+
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ "the provided URL"
+						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
+				ProtocolConstants.Solution.Create.URL_MALFORMED);
 	}
 
 }
