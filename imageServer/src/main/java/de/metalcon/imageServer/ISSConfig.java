@@ -18,6 +18,11 @@ import java.util.Properties;
 public class ISSConfig extends Properties {
 
 	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = -6300405088342248623L;
+
+	/**
 	 * root directory for the image storage server
 	 */
 	public String image_directory;
