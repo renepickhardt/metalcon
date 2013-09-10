@@ -22,11 +22,13 @@ import de.metalcon.utils.FormItemList;
 
 /**
  * 
- * @author Christian Schowalter This TestClass makes sure that the ASTP Create
- *         part of the protocol is implemented properly.
+ * This TestClass makes sure that the ASTP Create part of the protocol is
+ * implemented properly.
  * 
- *         It tests whether the correct responses are given in any case of
- *         correct or incorrect requests.
+ * It tests whether the correct responses are given in any case of correct or
+ * incorrect requests.
+ * 
+ * @author Christian Schowalter
  */
 public class TestProcessCreateRequest {
 
