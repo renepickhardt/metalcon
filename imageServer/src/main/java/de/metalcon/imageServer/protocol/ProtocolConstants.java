@@ -24,6 +24,8 @@ public class ProtocolConstants {
 		public static final String CROPPING_FAILURE = "Cropping failed";
 		public static final String SCALING_FAILURE = "Scaling failed";
 		public static final String READ_PROCESS_FAILED = "Read Process failed";
+		public static final String FILE_NOT_FOUND = "File not found";
+		public static final String ARCHIVE_STREAM_WRITING_FAILED = "Writing the archive stream failed";
 	}
 
 	public class Solution {

@@ -518,6 +518,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.addInternalServerError();
+				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
@@ -565,10 +566,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 							return new ImageData(metaData, imageStream);
 						}
 
-						// TODO: internal server error: scaling failed
+						response.addInternalServerError();
+						System.err
+								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
 					} else {
-						// TODO warning: requested size larger than the original
-
+						response.addGeometryBiggerThanOriginalWarning();
 						// read the basis image
 						return new ImageData(metaData, new FileInputStream(
 								this.getBasisFile(hash)));
@@ -576,13 +578,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
+				response.addInternalServerError();
+				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
-				// internal server error: failed to store image
+				// internal server error: failed to load/scale/store image
+				response.addInternalServerError();
+				System.err
+						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 			}
 		} else {
-			// TODO error: no image with such identifier
+			response.addImageNotFoundError();
 		}
 
 		return null;
@@ -629,8 +636,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 										scaledImageFile, imageIdentifier),
 										archiveStream);
 							} else {
-								// TODO warning: requested size larger than the
-								// original
+								response.addGeometryBiggerThanOriginalWarning();
 
 								// add basis image
 								IOUtils.copy(
@@ -643,21 +649,28 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						archiveStream.closeEntry();
 
 					} else {
-						// TODO error: no image with such identifier
+						response.addImageNotFoundError();
 						succeeded = false;
 						break;
 					}
 				}
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
+				response.addInternalServerError();
+				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 				succeeded = false;
 			} catch (final IOException e) {
 				// internal server error: failed to write to archive stream
+				response.addInternalServerError();
+				System.err
+						.println(ProtocolConstants.LogMessage.ARCHIVE_STREAM_WRITING_FAILED);
 				e.printStackTrace();
 				succeeded = false;
 			} catch (final MagickException e) {
-				// internal server error: failed to load/scale/store image
+				response.addInternalServerError();
+				System.err
+						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 				succeeded = false;
 			}
