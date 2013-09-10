@@ -70,16 +70,19 @@ public class MongoDBStore {
 		BasicDBObject query = new BasicDBObject("from", from).append("to", to);
 		DBCursor cursor = this.db.getCollection(collection).find(query);
 
-		Set<String> items = new HashSet<String>();
+		Set<String> items = new HashSet<String>((int)(cursor.size()/0.75)+1);
 
+		DBObject item = null;
+		BasicDBList list = null;
+		
 		try {
-			for (DBObject obj : cursor.toArray()) {
-				String item = (String) obj.get("neighbours");
-				item = item.substring(1, item.length() - 1);
-				String[] val = item.split(" ");
-
-				for (String s : val) {
-					items.add(s);
+			while(cursor.hasNext()){
+				
+				item = cursor.next();
+				list = (BasicDBList)item.get("neighbours");
+				
+				for(Object itemid : list){
+					items.add((String)itemid);
 				}
 			}
 		} finally {
@@ -89,9 +92,16 @@ public class MongoDBStore {
 		return null;
 	}
 
-	public void delete(int id, DBCollection collection) {
-		collection.remove(new BasicDBObject("from", id));
-		// TODO: Remove all occourences of "id" in arrays of other
-		// elements/documents
+	/**
+	 * deletes all occurences of id "from"
+	 * 
+	 * @param id to delete
+	 * @param collection
+	 */
+	public void delete(int id, String collection) {
+		db.getCollection(collection).remove(new BasicDBObject("from", id));
+		
+		BasicDBObject pullquery = new BasicDBObject("neighbours", id);
+		db.getCollection(collection).update(pullquery, new BasicDBObject("$pull", pullquery));
 	}
 }
