@@ -10,6 +10,11 @@ import org.json.simple.JSONObject;
  */
 public abstract class Response {
 
+	/**
+	 * HTTP status code
+	 */
+	protected int statusCode;
+
 	// response JSON object
 	protected final JSONObject json;
 
@@ -47,6 +52,23 @@ public abstract class Response {
 			final String solution) {
 		this.addStatusMessage("request incomplete: parameter \"" + paramName
 				+ "\" is missing", solution);
+	}
+
+	/**
+	 * @return HTTP status code
+	 */
+	public int getStatusCode() {
+		return this.statusCode;
+	}
+
+	/**
+	 * set the status code
+	 * 
+	 * @param statusCode
+	 *            HTTP status code
+	 */
+	public void setStatusCode(final int statusCode) {
+		this.statusCode = statusCode;
 	}
 
 	@Override

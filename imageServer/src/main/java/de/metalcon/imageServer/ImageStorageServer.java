@@ -75,9 +75,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	/**
 	 * root directory for the image storage server
 	 */
-	private final String imageDirectory = "/etc/imageStorageServer/";
+	private final String imageDirectory;
 
-	private final String temporaryDirectory = "/tmp/";
+	/**
+	 * temporary directory for image magic
+	 */
+	private final String temporaryDirectory;
 
 	/**
 	 * database for image meta data
@@ -95,24 +98,25 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	/**
 	 * create a new image storage server
 	 * 
-	 * @param hostAddress
-	 *            host address of the server the database runs at
-	 * @param port
-	 *            port to connect to the database
-	 * @param database
-	 *            name of the database used
+	 * @param configFile
+	 *            path to the configuration file
 	 */
-	public ImageStorageServer(final String hostAddress, final int port,
-			final String database) {
+	public ImageStorageServer(final String configFile) {
 		ImageMetaDatabase imageMetaDatabase = null;
+		ISSConfig config = new ISSConfig(configFile);
+		this.imageDirectory = config.getImageDirectory();
+		this.temporaryDirectory = config.getTemporaryDirectory();
 
 		try {
-			imageMetaDatabase = new ImageMetaDatabase(hostAddress, port,
-					database);
+			imageMetaDatabase = new ImageMetaDatabase(config.getDatabaseHost(),
+					config.getDatabasePort(), config.getDatabaseName());
+
 			this.running = true;
 		} catch (final UnknownHostException e) {
-			System.err.println("failed to connect to the mongoDB server at "
-					+ hostAddress + ":" + port);
+			System.err
+					.println("failed to connect to the mongoDB server at "
+							+ config.getDatabaseHost() + ":"
+							+ config.getDatabasePort());
 			e.printStackTrace();
 		}
 
@@ -290,32 +294,45 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
+	private static void deleteDirectoryContent(final File directory,
+			final boolean removeRoot) {
+		final File[] content = directory.listFiles();
+		if (content != null) {
+			for (File contentItem : content) {
+				if (contentItem.isDirectory()) {
+					deleteDirectoryContent(contentItem, true);
+				} else {
+					contentItem.delete();
+				}
+			}
+		}
+		if (removeRoot) {
+			directory.delete();
+		}
+	}
+
 	@Override
 	public boolean createImage(final String imageIdentifier,
 			final InputStream imageStream, final String metaData,
 			final boolean autoRotate, final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
-		JSONObject metaDataJSON;
-		try {
-			metaDataJSON = (JSONObject) PARSER.parse(metaData);
-		} catch (final ParseException e) {
-			// TODO error: meta data format invalid
-			return false;
+
+		JSONObject metaDataJSON = null;
+		if (metaData != null) {
+			try {
+				metaDataJSON = (JSONObject) PARSER.parse(metaData);
+			} catch (final ParseException e) {
+				// TODO error: meta data format invalid
+				return false;
+			}
 		}
 
-		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 
 			try {
 				// store and try to load original image
 				final MagickImage image = this.storeAndLoadImage(hash,
 						imageStream);
-				final JSONObject extractedJson = ImageMetaDataExporter
-						.exportExifData(image);
-				metaDataJSON = ImageMetaDataExporter.mergeExifData(
-						metaDataJSON, extractedJson);
-
-				this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-						metaDataJSON);
 
 				if (image != null) {
 					if (autoRotate) {
@@ -327,9 +344,14 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					// store basis version
 					storeCompressedImage(image, this.getBasisFile(hash));
 
+					// create image in database
+					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+							metaDataJSON);
+
 					return true;
 				} else {
 					// TODO internal server error: hash collision
+					// response.setStatusCode(ProtocolConstants.INTERNAL_SERVER_ERROR);
 				}
 			} catch (final MagickException e) {
 				// TODO error: no image file
@@ -352,16 +374,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final int left, final int top, final int width, final int height,
 			final CreateResponse response) {
 		final String hash = generateHash(imageIdentifier);
-		JSONObject metaDataJSON;
-		try {
-			metaDataJSON = (JSONObject) PARSER.parse(metaData);
-		} catch (final ParseException e) {
-			// TODO error: meta data format invalid
-			return false;
+
+		JSONObject metaDataJSON = null;
+		if (metaData != null) {
+			try {
+				metaDataJSON = (JSONObject) PARSER.parse(metaData);
+			} catch (final ParseException e) {
+				// TODO error: meta data format invalid
+				return false;
+			}
 		}
 
-		if (this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-				metaDataJSON)) {
+		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 
 			try {
 				// store and try to load original image
@@ -374,6 +398,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					if (image != null) {
 						// store basis version
 						storeCompressedImage(image, this.getBasisFile(hash));
+
+						// create image in database
+						this.imageMetaDatabase.addDatabaseEntry(
+								imageIdentifier, metaDataJSON);
 
 						return true;
 					}
@@ -403,31 +431,36 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		final String hash = generateHash(imageIdentifier);
 		final File tmpImageFile = this.getTemporaryFile(hash);
 
-		try {
-			// download image
-			final URL url = new URL(imageUrl);
-			storeImage(url.openStream(), tmpImageFile);
+		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 
-			// store original image
-			final MagickImage image = this.storeAndLoadImage(hash,
-					new FileInputStream(tmpImageFile));
+			try {
+				// download and store original image
+				final URL url = new URL(imageUrl);
+				final MagickImage image = this.storeAndLoadImage(hash,
+						url.openStream());
 
-			if (image != null) {
-				// store basis version
-				storeCompressedImage(image, this.getBasisFile(hash));
+				if (image != null) {
+					// store basis version
+					storeCompressedImage(image, this.getBasisFile(hash));
 
-				return true;
-			} else {
-				// TODO internal server error: hash collision
+					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+							null);
+
+					return true;
+				} else {
+					// TODO internal server error: hash collision
+				}
+
+			} catch (final MalformedURLException e) {
+				// TODO error: no valid URL
+			} catch (final MagickException e) {
+				// TODO error: no image file
+				tmpImageFile.delete();
+			} catch (final IOException e) {
+				// internal server error: failed to store image(s)
 			}
-
-		} catch (final MalformedURLException e) {
-			// TODO error: no valid URL
-		} catch (final MagickException e) {
-			// TODO error: no image file
-			tmpImageFile.delete();
-		} catch (final IOException e) {
-			// internal server error: failed to store image(s)
+		} else {
+			// TODO error: image identifier in use
 		}
 
 		return false;
@@ -781,6 +814,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// TODO: delete parental directory/ies?
 
 				throw e;
+			} finally {
+				// delete invalid (image) file
+				tmpFile.delete();
+
+				// TODO: delete parental directory/ies?
 			}
 		}
 
@@ -833,6 +871,16 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 */
 	public boolean isRunning() {
 		return this.running;
+	}
+
+	/**
+	 * clear the server<br>
+	 * <b>removes all images and meta data</b>
+	 */
+	public void clear() {
+		deleteDirectoryContent(new File(this.imageDirectory), false);
+		deleteDirectoryContent(new File(this.temporaryDirectory), false);
+		this.imageMetaDatabase.clear();
 	}
 
 }

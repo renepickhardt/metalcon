@@ -1,5 +1,6 @@
 package de.metalcon.imageServer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -9,6 +10,7 @@ import static org.junit.Assert.fail;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -54,8 +56,12 @@ public class MetaDatabaseTest {
 
 	@Before
 	public void setUp() throws Exception {
-		DB.clear();
 		assertTrue(DB.addDatabaseEntry(VALID_READ_IDENTIFIER, META_DATA));
+	}
+
+	@After
+	public void tearDown() {
+		DB.clear();
 	}
 
 	@Test
@@ -68,7 +74,20 @@ public class MetaDatabaseTest {
 	public void testGetAddedMetaData() {
 		// tested implicitly by all tests reading!
 		this.testAddDatabaseEntry();
+
 		assertNotNull(DB.getMetadata(VALID_CREATE_IDENTIFIER));
+	}
+
+	@Test
+	public void testAddDatabaseEntryWithoutMetadata() {
+		assertTrue(DB.addDatabaseEntry(VALID_CREATE_IDENTIFIER, null));
+	}
+
+	@Test
+	public void testGetAddedEmptyMetaData() {
+		this.testAddDatabaseEntryWithoutMetadata();
+
+		assertEquals("", DB.getMetadata(VALID_CREATE_IDENTIFIER));
 	}
 
 	@Test

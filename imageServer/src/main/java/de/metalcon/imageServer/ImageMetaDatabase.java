@@ -134,13 +134,18 @@ public class ImageMetaDatabase extends MetaDatabase {
 		searchQuery.put(SIZE_HEIGHT, searchQueryHeight);
 
 		final BasicDBObject orderBy = new BasicDBObject(SIZE_WIDTH, 1);
-		final DBCursor cursor = this.tableSizes.find(searchQuery).sort(orderBy);
 
-		if (cursor.hasNext()) {
-			return (String) cursor.next().get(SIZE_IMAGE_PATH);
+		String imagePath = null;
+		final DBCursor cursor = this.tableSizes.find(searchQuery).sort(orderBy);
+		try {
+			if (cursor.hasNext()) {
+				imagePath = (String) cursor.next().get(SIZE_IMAGE_PATH);
+			}
+		} finally {
+			cursor.close();
 		}
 
-		return null;
+		return imagePath;
 	}
 
 	/**
@@ -159,9 +164,14 @@ public class ImageMetaDatabase extends MetaDatabase {
 			final BasicDBObject keys = new BasicDBObject(SIZE_IMAGE_PATH, true);
 			final DBCursor cursor = this.tableSizes.find(searchQuery, keys);
 
-			final String[] paths = new String[cursor.size()];
-			for (int i = 0; cursor.hasNext(); i++) {
-				paths[i] = (String) cursor.next().get(SIZE_IMAGE_PATH);
+			String[] paths = null;
+			try {
+				paths = new String[cursor.size()];
+				for (int i = 0; cursor.hasNext(); i++) {
+					paths[i] = (String) cursor.next().get(SIZE_IMAGE_PATH);
+				}
+			} finally {
+				cursor.close();
 			}
 
 			return paths;
