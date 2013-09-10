@@ -42,6 +42,10 @@ public class ProtocolConstants {
 			public static final String NO_IMAGE_FOUND = "Please check if the identifier is correct";
 			public static final String GEMOTRY_BIGGER_THAN_ORIGINAL = "The requested image geometry should not be greater than the original size. Otherwise you will only receive the original image scale but never an upscaled version. If you need to request a bigger image, please provide one first.";
 		}
+
+		public class Delete {
+			public static final String NO_IMAGE_FOUND = "There is no image matching the provided identifier. Please check if your request contains the right identifier";
+		}
 	}
 
 	public class StatusMessage {
@@ -64,6 +68,10 @@ public class ProtocolConstants {
 			public static final String NO_IMAGE_FOUND = "No image found";
 			public static final String GEOMETRY_BIGGER_THAN_ORIGINAL = "Requested geometry bigger than original size";
 
+		}
+
+		public class Delete {
+			public static final String NO_IMAGE_FOUND = "No image found";
 		}
 
 		public static final String INTERNAL_SERVER_ERROR = "An internal server error has occured";

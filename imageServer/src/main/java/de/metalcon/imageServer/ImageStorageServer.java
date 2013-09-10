@@ -716,7 +716,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				imageFile.delete();
 			}
 		} else {
-			// TODO error: no image with such identifier
+			response.addImageNotFoundError();
 		}
 
 		return false;

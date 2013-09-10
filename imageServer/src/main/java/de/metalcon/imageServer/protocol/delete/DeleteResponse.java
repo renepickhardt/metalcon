@@ -12,4 +12,10 @@ public class DeleteResponse extends Response {
 
 	}
 
+	public void addImageNotFoundError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Delete.NO_IMAGE_FOUND,
+				ProtocolConstants.Solution.Delete.NO_IMAGE_FOUND);
+	}
+
 }
