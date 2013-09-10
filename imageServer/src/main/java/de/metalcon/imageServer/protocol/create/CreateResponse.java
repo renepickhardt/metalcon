@@ -33,13 +33,51 @@ public class CreateResponse extends Response {
 
 	public void addMetadataMalformedError() {
 		this.addStatusMessage(
-				"request corrupt: parameter \"metaData\" is malformed",
-				"The metaData String is malformed");
+
+				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ ProtocolConstants.Parameters.Create.META_DATA
+						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
+
+				ProtocolConstants.Solution.Create.IMAGE_METADATA_MALFORMED);
+
 	}
 
 	public void addNoMetadataError() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
 				"The image meta data is missing. Please deliver some");
+	}
+
+	public void addInternalServerError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR,
+				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR_SOLUTION);
+
+	}
+
+	public void addImageInvalidError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ "parameter "
+						+ "image "
+						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
+				ProtocolConstants.Solution.Create.IMAGE_INVALID);
+	}
+
+	public void addImageIdentifierAlreadyInUseError() {
+
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.PROBLEM_WITH_REQUEST
+						+ ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
+				ProtocolConstants.Solution.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS);
+	}
+
+	public void addURLMalformedError() {
+
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_BEGIN
+						+ "the provided URL"
+						+ ProtocolConstants.StatusMessage.Create.REQUEST_BROKEN_RESPONSE_END,
+				ProtocolConstants.Solution.Create.URL_MALFORMED);
 	}
 
 }

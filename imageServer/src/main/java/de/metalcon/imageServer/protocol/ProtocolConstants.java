@@ -18,6 +18,36 @@ public class ProtocolConstants {
 	 */
 	public static final String SOLUTION = "solution";
 
+	public class LogMessage {
+		// TODO: improve log messages
+		public static final String HASH_COLLISION = "Hash collision occured";
+		public static final String CROPPING_FAILURE = "Cropping failed";
+		public static final String SCALING_FAILURE = "Scaling failed";
+		public static final String READ_PROCESS_FAILED = "Read Process failed";
+		public static final String FILE_NOT_FOUND = "File not found";
+		public static final String ARCHIVE_STREAM_WRITING_FAILED = "Writing the archive stream failed";
+	}
+
+	public class Solution {
+		// TODO: improve solution hints
+
+		public class Create {
+			public static final String IMAGE_METADATA_MALFORMED = "Please check the data format of the meta data";
+			public static final String IMAGE_INVALID = "The image provided can't be processed. Please check if your file is an image encoded in a format supported by ImageMagick";
+			public static final String IMAGE_IDENTIFIER_ALREADY_EXISTS = "Please provide a unique identifier for each image. You should consider checking your identifier identifier management system";
+			public static final String URL_MALFORMED = "Please check if the provided URL is valid";
+		}
+
+		public class Read {
+			public static final String NO_IMAGE_FOUND = "Please check if the identifier is correct";
+			public static final String GEMOTRY_BIGGER_THAN_ORIGINAL = "The requested image geometry should not be greater than the original size. Otherwise you will only receive the original image scale but never an upscaled version. If you need to request a bigger image, please provide one first.";
+		}
+
+		public class Delete {
+			public static final String NO_IMAGE_FOUND = "There is no image matching the provided identifier. Please check if your request contains the right identifier";
+		}
+	}
+
 	public class StatusMessage {
 		public class Create {
 
@@ -26,13 +56,26 @@ public class ProtocolConstants {
 			public static final String IMAGE_METADATA_MISSING = "No meta data given";
 			public static final String AUTOROTATE_FLAG_MISSING = "Autorotate flag not found";
 			public static final String AUTOROTATE_FLAG_MALFORMED = "Autorotate flag malformed";
+			public static final String REQUEST_BROKEN_RESPONSE_BEGIN = "request corrupt: ";
+			public static final String REQUEST_BROKEN_RESPONSE_END = "is malformed";
+			public static final String IMAGE_IDENTIFIER_ALREADY_EXISTS = "Image identifier already exists";
+			public static final String PROBLEM_WITH_REQUEST = "Problem occured while processing the request: ";
 		}
 
 		public class Read {
 
-			public static final String IMAGE_IDENTIFIER_MISSING = "Image identifier misssing";
+			public static final String IMAGE_IDENTIFIER_MISSING = "Image identifier missing";
+			public static final String NO_IMAGE_FOUND = "No image found";
+			public static final String GEOMETRY_BIGGER_THAN_ORIGINAL = "Requested geometry bigger than original size";
 
 		}
+
+		public class Delete {
+			public static final String NO_IMAGE_FOUND = "No image found";
+		}
+
+		public static final String INTERNAL_SERVER_ERROR = "An internal server error has occured";
+		public static final String INTERNAL_SERVER_ERROR_SOLUTION = "Please check the server logs";
 	}
 
 	public class Parameters {
