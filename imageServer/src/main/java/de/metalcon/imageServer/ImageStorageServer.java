@@ -504,10 +504,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 							return imageStream;
 						}
 
-						// TODO: internal server error: scaling failed
-
+						response.addInternalServerError();
+						System.err
+								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
 					} else {
-						// TODO warning: requested size larger than the original
+						response.addGeometryBiggerThanOriginalWarning();
 
 						// read the basis image
 						return new FileInputStream(this.getBasisFile(hash));
@@ -516,13 +517,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
+				response.addInternalServerError();
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
+				response.addInternalServerError();
+				System.err
+						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 			}
 		} else {
-			// error: no image with such identifier
+			response.addImageNotFoundError();
 		}
 
 		return null;

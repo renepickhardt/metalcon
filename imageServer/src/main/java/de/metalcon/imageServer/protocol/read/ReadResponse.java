@@ -65,4 +65,10 @@ public class ReadResponse extends Response {
 				ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND,
 				ProtocolConstants.Solution.Read.NO_IMAGE_FOUND);
 	}
+
+	public void addGeometryBiggerThanOriginalWarning() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
+				ProtocolConstants.Solution.Read.GEMOTRY_BIGGER_THAN_ORIGINAL);
+	}
 }
