@@ -9,15 +9,45 @@ import de.metalcon.utils.FormItemList;
 
 public class CreateRequest {
 
-	public static CreateResponse checkRequest(FormItemList formItemList,
+	private final String imageIdentifier;
+
+	private final FormFile imageStream;
+
+	private final String metaData;
+
+	private final boolean autoRotateFlag;
+
+	public CreateRequest(final String imageIdentifier,
+			final FormFile imageStream, final String metaData,
+			final boolean autoRotateFlag) {
+		this.imageIdentifier = imageIdentifier;
+		this.imageStream = imageStream;
+		this.metaData = metaData;
+		this.autoRotateFlag = autoRotateFlag;
+	}
+
+	public static CreateRequest checkRequest(FormItemList formItemList,
 			CreateResponse response) {
 
-		String imageIdentifier = checkImageIdentifier(formItemList, response);
-		FormFile imageStream = checkImageStream(formItemList, response);
-		String metaData = checkMetaData(formItemList, response);
-		Boolean autoRotateFlag = checkAutoRotateFlag(formItemList, response);
+		final String imageIdentifier = checkImageIdentifier(formItemList,
+				response);
+		if (imageIdentifier != null) {
+			final FormFile imageStream = checkImageStream(formItemList,
+					response);
+			if (imageStream != null) {
+				final String metaData = checkMetaData(formItemList, response);
+				if (metaData != null) {
+					final Boolean autoRotateFlag = checkAutoRotateFlag(
+							formItemList, response);
+					if (autoRotateFlag != null) {
+						return new CreateRequest(imageIdentifier, imageStream,
+								metaData, autoRotateFlag);
+					}
+				}
+			}
+		}
 
-		return response;
+		return null;
 	}
 
 	private static FormFile checkImageStream(FormItemList formItemList,
