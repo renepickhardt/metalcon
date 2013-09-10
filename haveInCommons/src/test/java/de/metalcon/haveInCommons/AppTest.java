@@ -1,5 +1,7 @@
 package de.metalcon.haveInCommons;
 
+import java.net.UnknownHostException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -32,8 +34,20 @@ public class AppTest extends TestCase {
 		assertTrue(true);
 	}
 
-	@Test
+	/**
+	 * 
+	 */
 	public void queryMongoDB() {
 		// init
+		MongoDBStore mongoDB = null;
+		try {
+			mongoDB = new MongoDBStore("");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			fail("Unknown Host");
+		}
+
+		mongoDB.insert(from, to, neighbours, collection);
+
 	}
 }
