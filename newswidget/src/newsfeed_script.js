@@ -16,8 +16,7 @@ jQuery.fn.metalconReader = function(options){
 }; //End Plugin
  
 var MetalconReader = function(options){
-	var documentStructure = "<div class=\"form-group message-input\"><label for=\"message\">Message:</label><textarea id=\"message\" class=\"form-control message-input\" rows=\"2\" name=\"message\" type=\"text\" placeholder=\"Enter your Message\"></textarea><div class=\"textbox_buttons-holder\"><input class=\"btn btn-primary btn-sm message-submit\" type=\"submit\" value=\"create status update\" /><button class=\"btn btn-default btn-sm button-clear-link\"> Clear Link</button><button class=\"btn btn-default btn-sm button-clear\"> Clear Text</button><button class=\"btn btn-default btn-sm button-cancel\"> Cancel </button></div></div><div class=\"liveurl\"><div class=\"close\" title=\"Entfernen\"></div><div class=\"inner\"><div class=\"image\"> </div><div class=\"details\"><div class=\"info\"><div class=\"title\"> </div><div class=\"description\"></div><div class=\"url\"> </div></div><div class=\"thumbnail\"><div class=\"pictures\"><div class=\"controls\"><div class=\"prev button inactive\"></div><div class=\"next button inactive\"></div><div class=\"count\"><span class=\"current\">0</span><span> von </span><span class=\"max\">0</span></div></div></div></div><div class=\"video\"></div></div></div></div>";
-	$(documentStructure).prependTo('.wrapper');
+
     jQuery.extend(this,options || {});
     this.url = "http://localhost:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items="+this.items+"&own_updates="+this.ownUpdates;
     //this.url = "http://192.168.178.36:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items="+this.items+"&own_updates=1";
@@ -49,7 +48,6 @@ MetalconReader.prototype = {
 	}, //End parse function
 
 	render	: function(element){
-		textboxBehavior();
 		var html = [];
 		var that = this;
 		html.push("<ul class=\"comments-holder\">");
