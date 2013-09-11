@@ -656,6 +656,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final ZipOutputStream archiveStream = new ZipOutputStream(
 					memoryOutputStream);
 
+			// no ZIP compression while JPEG is already compressed
+			archiveStream.setLevel(ZipOutputStream.STORED);
+
 			ZipEntry zipEntry;
 			try {
 				for (String imageIdentifier : imageIdentifiers) {
@@ -665,9 +668,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						final File scaledImageFile = this.getScaledFile(hash,
 								width, height);
 
-						// no ZIP compression while JPEG is already compressed
 						zipEntry = new ZipEntry(imageIdentifier);
-						zipEntry.setMethod(ZipEntry.STORED);
 						archiveStream.putNextEntry(zipEntry);
 
 						if (this.imageMetaDatabase.imageHasSizeRegistered(
@@ -743,7 +744,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public boolean appendImageInformation(final String imageIdentifier,
+	public boolean appendImageMetaData(final String imageIdentifier,
 			final String key, final String value, final UpdateResponse response) {
 		if (this.imageMetaDatabase.appendMetadata(imageIdentifier, key, value)) {
 			return true;

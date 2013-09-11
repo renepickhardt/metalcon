@@ -95,13 +95,13 @@ public class MetaDatabase {
 
 		if (this.tableMetaData.findOne(entry) == null) {
 			// add the meta data if passed
+			final BasicDBObject metaDataEntry = new BasicDBObject();
 			if (metaData != null) {
-				final BasicDBObject metaDataEntry = new BasicDBObject();
 				for (Object key : metaData.keySet()) {
 					metaDataEntry.put((String) key, metaData.get(key));
 				}
-				entry.put(META_DATA_META_DATA, metaDataEntry);
 			}
+			entry.put(META_DATA_META_DATA, metaDataEntry);
 
 			// add the image to the database
 			this.tableMetaData.insert(entry);
@@ -129,7 +129,7 @@ public class MetaDatabase {
 			final BasicDBObject metaDataEntry = (BasicDBObject) entry
 					.get(META_DATA_META_DATA);
 
-			return ((metaDataEntry != null) ? metaDataEntry.toString() : "");
+			return metaDataEntry.toString();
 		}
 
 		return null;

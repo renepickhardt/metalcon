@@ -11,9 +11,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -23,8 +28,11 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageServer.protocol.Response;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
 import de.metalcon.imageServer.protocol.read.ReadResponse;
+import de.metalcon.imageServer.protocol.update.UpdateResponse;
 
 public class ImageStorageServerTest {
 
@@ -32,9 +40,14 @@ public class ImageStorageServerTest {
 
 	private static final String VALID_READ_IDENTIFIER = "img1";
 
+	private static final String VALID_READ_IDENTIFIER2 = "img2";
+
 	private static final String INVALID_READ_IDENTIFIER = "img0";
 
-	private static final String VALID_CREATE_IDENTIFIER = "img2";
+	private static final String[] VALID_READ_IDENTIFIERS = {
+			VALID_READ_IDENTIFIER, VALID_READ_IDENTIFIER2 };
+
+	private static final String VALID_CREATE_IDENTIFIER = "img3";
 
 	private static final String INVALID_META_DATA = "{ author: Testy }";
 
@@ -50,19 +63,38 @@ public class ImageStorageServerTest {
 
 	private static final String VALID_IMAGE_URL = "http://mos.totalfilm.com/images/6/6-original-casting-ideas-for-the-a-team.jpg";
 
-	private static final int VALID_LEFT = 100;
+	private static final String[] IMAGES_PATHS = { VALID_IMAGE_PATH_JPEG,
+			VALID_IMAGE_PATH_PNG };
 
-	private static final int VALID_TOP = 100;
+	private static final int VALID_CROPPING_LEFT = 100;
 
-	private static final int VALID_WIDTH = 200;
+	private static final int VALID_CROPPING_TOP = 100;
 
-	private static final int VALID_HEIGHT = 200;
+	private static final int VALID_CROPPING_WIDTH = 200;
+
+	private static final int VALID_CROPPING_HEIGHT = 200;
+
+	private static final int VALID_READ_WIDTH = 200;
+
+	private static final int VALID_READ_HEIGHT = 200;
+
+	private static final int INVALID_READ_WIDTH_TOO_LARGE = 1000;
+
+	private static final int INVALID_READ_HEIGHT_TOO_LARGE = 1000;
+
+	private static final String VALID_META_DATA_KEY = "timestamp";
+
+	private static final String VALID_META_DATA_VALUE = "123456789";
 
 	private ImageStorageServer server;
+
+	private JSONObject jsonResponse;
 
 	private CreateResponse createResponse;
 
 	private ReadResponse readResponse;
+
+	private UpdateResponse updateResponse;
 
 	@Before
 	public void setUp() throws Exception {
@@ -78,6 +110,9 @@ public class ImageStorageServerTest {
 		assertTrue(this.server.createImage(VALID_READ_IDENTIFIER,
 				new FileInputStream(VALID_IMAGE_PATH_JPEG), VALID_META_DATA,
 				false, this.createResponse));
+		assertTrue(this.server.createImage(VALID_READ_IDENTIFIER2,
+				new FileInputStream(VALID_IMAGE_PATH_PNG), VALID_META_DATA,
+				false, this.createResponse));
 	}
 
 	@Test
@@ -85,9 +120,14 @@ public class ImageStorageServerTest {
 		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, false,
 				this.createResponse));
+
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, false,
 				this.createResponse));
+		this.jsonResponse = extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -95,13 +135,18 @@ public class ImageStorageServerTest {
 		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_PNG, VALID_META_DATA, false,
 				this.createResponse));
+
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_PNG, VALID_META_DATA, false,
 				this.createResponse));
+		this.jsonResponse = extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
-	public void testCreateImageNoMetaData() {
+	public void testCreateImageWithoutMetaData() {
 		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_PNG, null, false, this.createResponse));
 	}
@@ -123,62 +168,182 @@ public class ImageStorageServerTest {
 	@Test
 	public void testCreateImageCropping() {
 		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
-				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_LEFT,
-				VALID_TOP, VALID_WIDTH, VALID_HEIGHT, this.createResponse));
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
+				VALID_CROPPING_HEIGHT, this.createResponse));
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
-				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_LEFT,
-				VALID_TOP, VALID_WIDTH, VALID_HEIGHT, this.createResponse));
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
+				VALID_CROPPING_HEIGHT, this.createResponse));
 	}
 
+	/**
+	 * assert the creation of an image via URL to success
+	 */
 	@Test
 	public void testCreateImageFromUrl() {
 		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_URL, this.createResponse));
 	}
 
+	/**
+	 * assert the reading of the original image to return exactly the image/meta
+	 * data used in the create request
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	@Test
-	public void testReadOriginalImage() {
+	public void testReadOriginalImage() throws FileNotFoundException {
 		final ImageData imageData = this.server.readImageWithMetaData(
 				VALID_READ_IDENTIFIER, this.readResponse);
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
-		compareJson(VALID_META_DATA, imageData.getMetaData());
 
-		this.compareImages(VALID_IMAGE_PATH_JPEG, imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+		this.compareImages(
+				new FileInputStream(new File(VALID_IMAGE_PATH_JPEG)),
+				imageData.getImageStream());
 	}
 
+	/**
+	 * assert the reading of the original image created via URL to return
+	 * exactly the image and (empty) meta data used in the create request
+	 * 
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
+	@Test
+	public void testReadOriginalImageCreatedFromUrl()
+			throws MalformedURLException, IOException {
+		this.testCreateImageFromUrl();
+
+		final ImageData imageData = this.server.readImageWithMetaData(
+				VALID_CREATE_IDENTIFIER, this.readResponse);
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+
+		final String metaData = imageData.getMetaData();
+		final JSONObject metaDataJson = parseToJson(metaData);
+		assertTrue(metaDataJson.isEmpty());
+
+		this.compareImages(new URL(VALID_IMAGE_URL).openStream(),
+				imageData.getImageStream());
+	}
+
+	/**
+	 * assert the reading to fail if the image identifier passed is invalid
+	 */
 	@Test
 	public void testReadOriginalImageInvalid() {
 		assertNull(this.server.readImageWithMetaData(INVALID_READ_IDENTIFIER,
 				this.readResponse));
+
+		// check for status message
+		this.jsonResponse = extractJson(this.readResponse);
+		assertEquals(ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
+	/**
+	 * assert the multiple reading of a scaled image to success and to return an
+	 * image having the dimension passed
+	 */
 	@Test
 	public void testReadImageScaling() {
-		final InputStream imageStream = this.server.readImage(
-				VALID_READ_IDENTIFIER, VALID_WIDTH, VALID_HEIGHT,
-				this.readResponse);
+		// let the server create a scaled version
+		InputStream imageStream = this.server.readImage(VALID_READ_IDENTIFIER,
+				VALID_READ_WIDTH, VALID_READ_HEIGHT, this.readResponse);
 
-		this.checkImageDimension(imageStream, VALID_WIDTH, VALID_HEIGHT);
+		assertNotNull(imageStream);
+		this.checkImageDimension(imageStream, VALID_READ_WIDTH,
+				VALID_READ_HEIGHT);
+
+		// read the scaled version created before again
+		imageStream = this.server.readImage(VALID_READ_IDENTIFIER,
+				VALID_READ_WIDTH, VALID_READ_HEIGHT, this.readResponse);
+
+		assertNotNull(imageStream);
+		this.checkImageDimension(imageStream, VALID_READ_WIDTH,
+				VALID_READ_HEIGHT);
 	}
 
+	/**
+	 * assert the reading to fail if the reading dimension passed is larger than
+	 * the one of the basis image
+	 */
 	@Test
-	public void testReadScaledImage() {
-		this.testReadImageScaling();
-		this.testReadImageScaling();
+	public void testReadImageScalingTooLarge() {
+		final InputStream imageStream = this.server.readImage(
+				VALID_READ_IDENTIFIER, INVALID_READ_WIDTH_TOO_LARGE,
+				INVALID_READ_HEIGHT_TOO_LARGE, this.readResponse);
+		assertNull(imageStream);
+
+		// check for status message
+		this.jsonResponse = extractJson(this.readResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
+	/**
+	 * assert the reading of a scaled image to return an image having the
+	 * dimension passed and exactly the meta data used in the create request
+	 */
 	@Test
 	public void testReadImageScalingWithMetadata() {
 		final ImageData imageData = this.server.readImageWithMetaData(
-				VALID_READ_IDENTIFIER, VALID_WIDTH, VALID_HEIGHT,
+				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
 				this.readResponse);
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
 		compareJson(VALID_META_DATA, imageData.getMetaData());
 
-		this.checkImageDimension(imageData.getImageStream(), VALID_WIDTH,
-				VALID_HEIGHT);
+		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
+				VALID_READ_HEIGHT);
+	}
+
+	@Test
+	public void testReadImages() throws IOException {
+		// let the server create the scaled versions
+		InputStream inputStream = this.server.readImages(
+				VALID_READ_IDENTIFIERS, VALID_READ_WIDTH, VALID_READ_WIDTH,
+				this.readResponse);
+		assertNotNull(inputStream);
+
+		ZipInputStream archiveStream = new ZipInputStream(inputStream);
+
+		int numEntries = 0;
+		while (archiveStream.getNextEntry() != null) {
+			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
+					VALID_READ_HEIGHT);
+
+			numEntries += 1;
+		}
+		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
+
+		// read the scaled versions created before
+		inputStream = this.server.readImages(VALID_READ_IDENTIFIERS,
+				VALID_READ_WIDTH, VALID_READ_WIDTH, this.readResponse);
+		assertNotNull(inputStream);
+
+		archiveStream = new ZipInputStream(inputStream);
+
+		numEntries = 0;
+		while (archiveStream.getNextEntry() != null) {
+			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
+					VALID_READ_HEIGHT);
+
+			numEntries += 1;
+		}
+		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
+	}
+
+	@Test
+	public void testAppendMetaData() {
+		assertTrue(this.server
+				.appendImageMetaData(VALID_READ_IDENTIFIER,
+						VALID_META_DATA_KEY, VALID_META_DATA_VALUE,
+						this.updateResponse));
 	}
 
 	/**
@@ -206,18 +371,18 @@ public class ImageStorageServerTest {
 	/**
 	 * compare two images
 	 * 
-	 * @param refImagePath
-	 *            path to the reference file
-	 * @param imageStream
+	 * @param imageStream1
+	 *            stream of the reference image
+	 * @param imageStream2
 	 *            stream of the image to be compared
 	 * @throws IOException
 	 *             if IO errors occurred
 	 */
-	private void compareImages(final String refImagePath,
-			final InputStream imageStream) {
+	private void compareImages(final InputStream imageStream1,
+			final InputStream imageStream2) {
 		try {
-			final BufferedImage image1 = ImageIO.read(new File(refImagePath));
-			final BufferedImage image2 = ImageIO.read(imageStream);
+			final BufferedImage image1 = ImageIO.read(imageStream1);
+			final BufferedImage image2 = ImageIO.read(imageStream2);
 
 			assertEquals(image1.getWidth(), image2.getWidth());
 			assertEquals(image1.getHeight(), image2.getHeight());
@@ -246,20 +411,48 @@ public class ImageStorageServerTest {
 	 *            second JSON string
 	 */
 	private static void compareJson(final String json1, final String json2) {
-		JSONObject object1 = null;
-		try {
-			object1 = (JSONObject) PARSER.parse(json1);
-		} catch (final ParseException e) {
-			fail("first argument no valid JSON!");
-		}
-
-		JSONObject object2 = null;
-		try {
-			object2 = (JSONObject) PARSER.parse(json2);
-		} catch (final ParseException e) {
-			fail("second argument no valid JSON!");
-		}
+		final JSONObject object1 = parseToJson(json1);
+		final JSONObject object2 = parseToJson(json2);
 
 		assertEquals(object1, object2);
 	}
+
+	/**
+	 * parse a String to a JSON object<br>
+	 * <b>fails the test</b> if the parsing failed
+	 * 
+	 * @param value
+	 *            String to be parsed
+	 * @return JSON object represented by the String passed<br>
+	 *         <b>null</b> if the parsing failed
+	 */
+	private static JSONObject parseToJson(final String value) {
+		try {
+			return (JSONObject) PARSER.parse(value);
+		} catch (final ParseException e) {
+			fail("failed to parse to JSON object!");
+		}
+
+		return null;
+	}
+
+	/**
+	 * extract the JSON object from the response, failing the test if this is
+	 * not possible
+	 * 
+	 * @param response
+	 *            NSSP response
+	 * @return JSON object in the response passed
+	 */
+	private static JSONObject extractJson(final Response response) {
+		try {
+			final Field field = Response.class.getDeclaredField("json");
+			field.setAccessible(true);
+			return (JSONObject) field.get(response);
+		} catch (final Exception e) {
+			fail("failed to extract the JSON object from class Response");
+			return null;
+		}
+	}
+
 }

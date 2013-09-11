@@ -156,7 +156,7 @@ public interface ImageStorageServerAPI {
 	 * @return true - if the meta data was appended successfully<br>
 	 *         false - if the image identifier was invalid
 	 */
-	boolean appendImageInformation(String imageIdentifier, String key,
+	boolean appendImageMetaData(String imageIdentifier, String key,
 			String value, UpdateResponse response);
 
 	/**

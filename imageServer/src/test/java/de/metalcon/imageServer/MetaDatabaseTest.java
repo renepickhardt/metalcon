@@ -1,6 +1,5 @@
 package de.metalcon.imageServer;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -51,6 +50,7 @@ public class MetaDatabaseTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DB = new MetaDatabase("localhost", 27017, "testdb");
+		DB.clear();
 		META_DATA.put("pos", "home");
 	}
 
@@ -87,7 +87,9 @@ public class MetaDatabaseTest {
 	public void testGetAddedEmptyMetaData() {
 		this.testAddDatabaseEntryWithoutMetadata();
 
-		assertEquals("", DB.getMetadata(VALID_CREATE_IDENTIFIER));
+		final String metaData = DB.getMetadata(VALID_CREATE_IDENTIFIER);
+		final JSONObject metaDataJson = parseToJSON(metaData);
+		assertTrue(metaDataJson.isEmpty());
 	}
 
 	@Test
