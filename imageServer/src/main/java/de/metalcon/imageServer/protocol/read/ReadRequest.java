@@ -1,26 +1,80 @@
 package de.metalcon.imageServer.protocol.read;
 
+import org.json.simple.parser.JSONParser;
+
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadRequest {
 
-	public static void checkRequest(FormItemList formItemList,
-			ReadResponse readResponse) {
-		String imageIdentifier = checkImageIdentifier(formItemList,
-				readResponse);
-		Boolean originalImageFlag = checkOriginalImageFlag(formItemList,
-				readResponse);
+	private static final JSONParser PARSER = new JSONParser();
+
+	private final String imageIdentifier;
+
+	private final Boolean originalImageFlag;
+
+	private Integer imageWidth;
+
+	private Integer imageHeight;
+
+	public ReadRequest(final String imageIdentifier,
+			final Boolean originalImageFlag) {
+		this.imageIdentifier = imageIdentifier;
+		this.originalImageFlag = originalImageFlag;
 	}
 
-	public static void checkRequestWithScaling(FormItemList formItemList,
-			ReadResponse readResponse) {
-		String imageIdentifier = checkImageIdentifier(formItemList,
+	public ReadRequest(final String imageIdentifier,
+			final Boolean originalImageFlag, final Integer imageWidth,
+			final Integer imageHeight) {
+		this.imageIdentifier = imageIdentifier;
+		this.originalImageFlag = originalImageFlag;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+	}
+
+	public String getImageIdentifier() {
+		return this.imageIdentifier;
+	}
+
+	public Boolean getOriginalImageFlag() {
+		return this.originalImageFlag;
+	}
+
+	public static ReadRequest checkRequest(final FormItemList formItemList,
+			final ReadResponse response) {
+		final String imageIdentifier = checkImageIdentifier(formItemList,
+				response);
+		if (imageIdentifier != null) {
+			final Boolean originalImageFlag = checkOriginalImageFlag(
+					formItemList, response);
+			if (originalImageFlag != null) {
+				return new ReadRequest(imageIdentifier, originalImageFlag);
+			}
+		}
+		return null;
+	}
+
+	public static ReadRequest checkRequestWithScaling(
+			FormItemList formItemList, ReadResponse readResponse) {
+		final String imageIdentifier = checkImageIdentifier(formItemList,
 				readResponse);
-		Boolean originalImageFlag = checkOriginalImageFlag(formItemList,
-				readResponse);
-		Integer imageWidth = checkImageWidth(formItemList, readResponse);
-		Integer imageHeight = checkImageHeight(formItemList, readResponse);
+		if (imageIdentifier != null) {
+			final Boolean originalImageFlag = checkOriginalImageFlag(
+					formItemList, readResponse);
+			if (originalImageFlag != null) {
+				final Integer imageWidth = checkImageWidth(formItemList,
+						readResponse);
+				if (imageWidth != null) {
+					final Integer imageHeight = checkImageHeight(formItemList,
+							readResponse);
+					if (imageWidth != null) {
+						return new ReadRequest(imageIdentifier,
+								originalImageFlag, imageWidth, imageHeight);
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	private static Integer checkImageHeight(FormItemList formItemList,
