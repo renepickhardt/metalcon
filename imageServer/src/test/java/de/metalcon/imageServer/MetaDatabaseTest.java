@@ -32,9 +32,14 @@ public class MetaDatabaseTest {
 	protected static final String VALID_CREATE_IDENTIFIER = "img2";
 
 	/**
-	 * (valid) meta data for a new entry
+	 * valid meta data for a new entry
 	 */
-	protected static final JSONObject META_DATA = new JSONObject();
+	protected static final JSONObject VALID_META_DATA = new JSONObject();
+
+	/**
+	 * valid meta data for meta data updates
+	 */
+	protected static final JSONObject VALID_UPDATE_META_DATA = new JSONObject();
 
 	/**
 	 * JSON parser
@@ -51,12 +56,13 @@ public class MetaDatabaseTest {
 	public static void setUpBeforeClass() throws Exception {
 		DB = new MetaDatabase("localhost", 27017, "testdb");
 		DB.clear();
-		META_DATA.put("pos", "home");
+		VALID_META_DATA.put("pos", "home");
+		VALID_UPDATE_META_DATA.put("pos", "bridge");
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		assertTrue(DB.addDatabaseEntry(VALID_READ_IDENTIFIER, META_DATA));
+		assertTrue(DB.addDatabaseEntry(VALID_READ_IDENTIFIER, VALID_META_DATA));
 	}
 
 	@After
@@ -66,8 +72,10 @@ public class MetaDatabaseTest {
 
 	@Test
 	public void testAddDatabaseEntry() {
-		assertTrue(DB.addDatabaseEntry(VALID_CREATE_IDENTIFIER, META_DATA));
-		assertFalse(DB.addDatabaseEntry(VALID_CREATE_IDENTIFIER, META_DATA));
+		assertTrue(DB
+				.addDatabaseEntry(VALID_CREATE_IDENTIFIER, VALID_META_DATA));
+		assertFalse(DB.addDatabaseEntry(VALID_CREATE_IDENTIFIER,
+				VALID_META_DATA));
 	}
 
 	@Test
@@ -98,7 +106,7 @@ public class MetaDatabaseTest {
 		assertNotNull(metaData);
 
 		final JSONObject metaDataJSON = parseToJSON(metaData);
-		assertTrue(META_DATA.equals(metaDataJSON));
+		assertTrue(VALID_META_DATA.equals(metaDataJSON));
 
 		final String noMetaData = DB.getMetadata(INVALID_READ_IDENTIFIER);
 		assertNull(noMetaData);
@@ -106,8 +114,10 @@ public class MetaDatabaseTest {
 
 	@Test
 	public void testAppendMetaData() {
-		assertTrue(DB.appendMetadata(VALID_READ_IDENTIFIER, "pos", "home1"));
-		assertFalse(DB.appendMetadata(INVALID_READ_IDENTIFIER, "pos", "null"));
+		assertTrue(DB.appendMetadata(VALID_READ_IDENTIFIER,
+				VALID_UPDATE_META_DATA));
+		assertFalse(DB.appendMetadata(INVALID_READ_IDENTIFIER,
+				VALID_UPDATE_META_DATA));
 	}
 
 	@Test
@@ -118,7 +128,7 @@ public class MetaDatabaseTest {
 		assertNotNull(metaData);
 
 		final JSONObject metaDataJSON = parseToJSON(metaData);
-		assertFalse(META_DATA.equals(metaDataJSON));
+		assertTrue(VALID_UPDATE_META_DATA.equals(metaDataJSON));
 	}
 
 	@Test

@@ -8,43 +8,69 @@ import de.metalcon.utils.FormItemList;
 
 public class UpdateRequest {
 
-	public static void checkRequest(FormItemList formItemList,
-			UpdateResponse response) {
-		String imageIdentifier = checkImageIdentifier(formItemList, response);
-		String metaData = checkMetaData(formItemList, response);
+	// TODO: JavaDoc
+
+	private static final JSONParser PARSER = new JSONParser();
+
+	private final String imageIdentifier;
+
+	private final String metaData;
+
+	public UpdateRequest(final String imageIdentifier, final String metaData) {
+		this.imageIdentifier = imageIdentifier;
+		this.metaData = metaData;
 	}
 
-	private static String checkMetaData(FormItemList formItemList,
-			UpdateResponse response) {
-		String metaData = null;
-		try {
-			metaData = formItemList
-					.getField(ProtocolConstants.Parameters.Update.META_DATA);
-		} catch (IllegalArgumentException e) {
-			response.addNoMetadataError();
-			return null;
-		}
-		try {
-			JSONParser jsonparser = new JSONParser();
-			jsonparser.parse(metaData);
-		} catch (ParseException e) {
-			response.addMetadataMalformedError();
-		}
-		return metaData;
+	public String getImageIdentifier() {
+		return this.imageIdentifier;
 	}
 
-	private static String checkImageIdentifier(FormItemList formItemList,
-			UpdateResponse response) {
-		String imageIdentifier = null;
+	public String getMetaData() {
+		return this.metaData;
+	}
+
+	public static UpdateRequest checkRequest(final FormItemList formItemList,
+			final UpdateResponse response) {
+		final String imageIdentifier = checkImageIdentifier(formItemList,
+				response);
+		if (imageIdentifier != null) {
+			final String metaData = checkMetaData(formItemList, response);
+			if (metaData != null) {
+				return new UpdateRequest(imageIdentifier, metaData);
+			}
+		}
+
+		return null;
+	}
+
+	protected static String checkImageIdentifier(
+			final FormItemList formItemList, final UpdateResponse response) {
 		try {
-			imageIdentifier = formItemList
+			return formItemList
 					.getField(ProtocolConstants.Parameters.Update.IMAGE_IDENTIFIER);
-		} catch (IllegalArgumentException e) {
-			response.addNoImageIdentifierError();
-			return null;
+		} catch (final IllegalArgumentException e) {
+			response.imageIdentifierMissing();
 		}
-		return imageIdentifier;
 
+		return null;
+	}
+
+	protected static String checkMetaData(final FormItemList formItemList,
+			final UpdateResponse response) {
+		try {
+			final String metaData = formItemList
+					.getField(ProtocolConstants.Parameters.Update.META_DATA);
+			try {
+				PARSER.parse(metaData);
+				return metaData;
+			} catch (final ParseException e) {
+				response.metaDataMalformed();
+			}
+		} catch (final IllegalArgumentException e) {
+			response.metaDataMissing();
+		}
+
+		return null;
 	}
 
 }

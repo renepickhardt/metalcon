@@ -145,19 +145,15 @@ public interface ImageStorageServerAPI {
 	 * 
 	 * @param imageIdentifier
 	 *            image identifier
-	 * @param key
-	 *            key of the meta data value<br>
-	 *            &emsp;<b>if the meta already has a value for this key the old
-	 *            value will get overridden</b>
-	 * @param value
-	 *            meta data value that shall be appended
+	 * @param metaData
+	 *            meta data that shall be appended/updated
 	 * @param response
 	 *            update response object
-	 * @return true - if the meta data was appended successfully<br>
-	 *         false - if the image identifier was invalid
+	 * @return true - if the meta data was appended/updated successfully<br>
+	 *         false - otherwise
 	 */
-	boolean appendImageMetaData(String imageIdentifier, String key,
-			String value, UpdateResponse response);
+	boolean appendImageMetaData(String imageIdentifier, String metaData,
+			UpdateResponse response);
 
 	/**
 	 * delete an image from the server

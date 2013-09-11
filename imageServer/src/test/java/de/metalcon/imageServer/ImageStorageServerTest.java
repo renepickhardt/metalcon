@@ -31,6 +31,7 @@ import org.junit.Test;
 import de.metalcon.imageServer.protocol.ProtocolConstants;
 import de.metalcon.imageServer.protocol.Response;
 import de.metalcon.imageServer.protocol.create.CreateResponse;
+import de.metalcon.imageServer.protocol.delete.DeleteResponse;
 import de.metalcon.imageServer.protocol.read.ReadResponse;
 import de.metalcon.imageServer.protocol.update.UpdateResponse;
 
@@ -63,9 +64,6 @@ public class ImageStorageServerTest {
 
 	private static final String VALID_IMAGE_URL = "http://mos.totalfilm.com/images/6/6-original-casting-ideas-for-the-a-team.jpg";
 
-	private static final String[] IMAGES_PATHS = { VALID_IMAGE_PATH_JPEG,
-			VALID_IMAGE_PATH_PNG };
-
 	private static final int VALID_CROPPING_LEFT = 100;
 
 	private static final int VALID_CROPPING_TOP = 100;
@@ -82,9 +80,7 @@ public class ImageStorageServerTest {
 
 	private static final int INVALID_READ_HEIGHT_TOO_LARGE = 1000;
 
-	private static final String VALID_META_DATA_KEY = "timestamp";
-
-	private static final String VALID_META_DATA_VALUE = "123456789";
+	private static final String VALID_UPDATE_META_DATA = "{ \"author\": \"Komissar Kugelblitz\" }";
 
 	private ImageStorageServer server;
 
@@ -96,6 +92,8 @@ public class ImageStorageServerTest {
 
 	private UpdateResponse updateResponse;
 
+	private DeleteResponse deleteResponse;
+
 	@Before
 	public void setUp() throws Exception {
 		this.server = new ImageStorageServer("test.iss.config");
@@ -106,6 +104,8 @@ public class ImageStorageServerTest {
 
 		this.createResponse = new CreateResponse();
 		this.readResponse = new ReadResponse();
+		this.updateResponse = new UpdateResponse();
+		this.deleteResponse = new DeleteResponse();
 
 		assertTrue(this.server.createImage(VALID_READ_IDENTIFIER,
 				new FileInputStream(VALID_IMAGE_PATH_JPEG), VALID_META_DATA,
@@ -126,7 +126,7 @@ public class ImageStorageServerTest {
 				this.createResponse));
 		this.jsonResponse = extractJson(this.createResponse);
 		assertEquals(
-				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
+				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
@@ -141,7 +141,7 @@ public class ImageStorageServerTest {
 				this.createResponse));
 		this.jsonResponse = extractJson(this.createResponse);
 		assertEquals(
-				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_ALREADY_EXISTS,
+				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
@@ -156,6 +156,10 @@ public class ImageStorageServerTest {
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, INVALID_META_DATA, false,
 				this.createResponse));
+		this.jsonResponse = extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -340,10 +344,55 @@ public class ImageStorageServerTest {
 
 	@Test
 	public void testAppendMetaData() {
-		assertTrue(this.server
-				.appendImageMetaData(VALID_READ_IDENTIFIER,
-						VALID_META_DATA_KEY, VALID_META_DATA_VALUE,
-						this.updateResponse));
+		assertTrue(this.server.appendImageMetaData(VALID_READ_IDENTIFIER,
+				VALID_UPDATE_META_DATA, this.updateResponse));
+	}
+
+	@Test
+	public void testReadAppendedMetaData() {
+		this.testAppendMetaData();
+
+		final ImageData imageData = this.server.readImageWithMetaData(
+				VALID_READ_IDENTIFIER, this.readResponse);
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+
+		compareJson(VALID_UPDATE_META_DATA, imageData.getMetaData());
+	}
+
+	@Test
+	public void testAppendMetaDataInvalidIdentifier() {
+		assertFalse(this.server.appendImageMetaData(INVALID_READ_IDENTIFIER,
+				VALID_UPDATE_META_DATA, this.updateResponse));
+		this.jsonResponse = extractJson(this.updateResponse);
+		assertEquals(ProtocolConstants.StatusMessage.Update.IMAGE_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testAppendMetaDataInvalidMetaData() {
+		assertFalse(this.server.appendImageMetaData(VALID_READ_IDENTIFIER,
+				INVALID_META_DATA, this.updateResponse));
+	}
+
+	@Test
+	public void testDeleteImage() {
+		assertTrue(this.server.deleteImage(VALID_READ_IDENTIFIER,
+				this.deleteResponse));
+
+		assertFalse(this.server.deleteImage(VALID_READ_IDENTIFIER,
+				this.deleteResponse));
+		this.jsonResponse = extractJson(this.deleteResponse);
+		assertEquals(ProtocolConstants.StatusMessage.Delete.IMAGE_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testReadOriginalImageDeleted() {
+		this.testDeleteImage();
+
+		assertNull(this.server.readImageWithMetaData(VALID_READ_IDENTIFIER,
+				this.readResponse));
 	}
 
 	/**

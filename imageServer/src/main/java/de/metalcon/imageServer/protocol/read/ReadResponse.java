@@ -5,7 +5,10 @@ import de.metalcon.imageServer.protocol.Response;
 
 public class ReadResponse extends Response {
 
+	// TODO: write helpful solution messages for missing parameters!
+	// TODO: JavaDoc
 	// TODO: refactor code using constants (in malformed-error methods)
+	// TODO: refactor to match the other protocol request/response patterns
 
 	public void addNoImageIdentifierError() {
 		this.parameterMissing(
@@ -53,22 +56,14 @@ public class ReadResponse extends Response {
 
 	}
 
-	public void addInternalServerError() {
-		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR,
-				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR_SOLUTION);
-
-	}
-
 	public void addImageNotFoundError() {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND,
-				ProtocolConstants.Solution.Read.NO_IMAGE_FOUND);
+				ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND, "");
 	}
 
 	public void addGeometryBiggerThanOriginalWarning() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
-				ProtocolConstants.Solution.Read.GEMOTRY_BIGGER_THAN_ORIGINAL);
+				"");
 	}
 }

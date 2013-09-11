@@ -140,17 +140,13 @@ public class MetaDatabase {
 	 * 
 	 * @param identifier
 	 *            database entry identifier
-	 * @param key
-	 *            key of the meta data value<br>
-	 *            &emsp;<b>if the meta already has a value for this key the old
-	 *            value will get overridden</b>
-	 * @param value
-	 *            meta data value that shall be appended
-	 * @return true - if the meta data has been appended successfully<br>
+	 * @param metaData
+	 *            meta data that shall be appended/updated
+	 * @return true - if the meta data has been appended/updated successfully<br>
 	 *         false - if there is no entry with such identifier
 	 */
-	public boolean appendMetadata(final String identifier, final String key,
-			final String value) {
+	public boolean appendMetadata(final String identifier,
+			final JSONObject metaData) {
 		final BasicDBObject searchQuery = new BasicDBObject();
 		searchQuery.put(ENTRY_IDENTIFIER, identifier);
 
@@ -158,7 +154,9 @@ public class MetaDatabase {
 		if (entry != null) {
 			final BasicDBObject metaDataEntry = (BasicDBObject) entry
 					.get(META_DATA_META_DATA);
-			metaDataEntry.put(key, value);
+			for (Object key : metaData.keySet()) {
+				metaDataEntry.put((String) key, metaData.get(key));
+			}
 			entry.put(META_DATA_META_DATA, metaDataEntry);
 			this.tableMetaData.update(searchQuery, entry);
 			return true;

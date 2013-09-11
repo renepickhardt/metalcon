@@ -5,17 +5,22 @@ import de.metalcon.imageServer.protocol.Response;
 
 public class DeleteResponse extends Response {
 
-	public void addNoImageIdentifierError() {
+	// TODO: write helpful solution messages for missing parameters!
+	// TODO: JavaDoc
+
+	public void imageIdentifierMissing() {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Delete.IMAGE_IDENTIFIER,
 				"The image identifier is missing. Please deliver one");
 
 	}
 
-	public void addImageNotFoundError() {
+	public void imageNotExisting(final String imageIdentifier) {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Delete.NO_IMAGE_FOUND,
-				ProtocolConstants.Solution.Delete.NO_IMAGE_FOUND);
+				ProtocolConstants.StatusMessage.Delete.IMAGE_NOT_EXISTING,
+				"There is no image having the identifier \""
+						+ imageIdentifier
+						+ "\". Please provide an identifier used by an existing image.");
 	}
 
 }

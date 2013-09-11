@@ -5,22 +5,39 @@ import de.metalcon.utils.FormItemList;
 
 public class DeleteRequest {
 
-	public static void checkRequest(FormItemList formItemList,
-			DeleteResponse response) {
-		String imageIdentifier = checkImageIdentifier(formItemList, response);
+	// TODO: JavaDoc
+
+	private final String imageIdentifier;
+
+	public DeleteRequest(final String imageIdentifier) {
+		this.imageIdentifier = imageIdentifier;
 	}
 
-	private static String checkImageIdentifier(FormItemList formItemList,
-			DeleteResponse response) {
-		String imageIdentifier = null;
-		try {
-			imageIdentifier = formItemList
-					.getField(ProtocolConstants.Parameters.Delete.IMAGE_IDENTIFIER);
-		} catch (IllegalArgumentException e) {
-			response.addNoImageIdentifierError();
-			return null;
+	public String getImageIdentifier() {
+		return this.imageIdentifier;
+	}
+
+	public static DeleteRequest checkRequest(final FormItemList formItemList,
+			final DeleteResponse response) {
+		final String imageIdentifier = checkImageIdentifier(formItemList,
+				response);
+		if (imageIdentifier != null) {
+			return new DeleteRequest(imageIdentifier);
 		}
-		return imageIdentifier;
+
+		return null;
+	}
+
+	private static String checkImageIdentifier(final FormItemList formItemList,
+			final DeleteResponse response) {
+		try {
+			return formItemList
+					.getField(ProtocolConstants.Parameters.Delete.IMAGE_IDENTIFIER);
+		} catch (final IllegalArgumentException e) {
+			response.imageIdentifierMissing();
+		}
+
+		return null;
 
 	}
 }

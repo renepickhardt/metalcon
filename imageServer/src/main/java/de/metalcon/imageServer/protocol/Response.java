@@ -23,6 +23,7 @@ public abstract class Response {
 	 */
 	public Response() {
 		this.json = new JSONObject();
+		this.statusCode = 200;
 	}
 
 	/**
@@ -69,6 +70,18 @@ public abstract class Response {
 	 */
 	public void setStatusCode(final int statusCode) {
 		this.statusCode = statusCode;
+	}
+
+	/**
+	 * an internal server error occurred<br>
+	 * sets the HTTP status code to 500
+	 */
+	public void internalServerError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.INTERNAL_SERVER_ERROR,
+				"Please try again later.");
+		this.setStatusCode(500);
+
 	}
 
 	@Override

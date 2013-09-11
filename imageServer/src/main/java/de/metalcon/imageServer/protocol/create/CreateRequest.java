@@ -9,6 +9,10 @@ import de.metalcon.utils.FormItemList;
 
 public class CreateRequest {
 
+	// TODO: JavaDoc
+
+	private static final JSONParser PARSER = new JSONParser();
+
 	private final String imageIdentifier;
 
 	private final FormFile imageStream;
@@ -26,8 +30,24 @@ public class CreateRequest {
 		this.autoRotateFlag = autoRotateFlag;
 	}
 
-	public static CreateRequest checkRequest(FormItemList formItemList,
-			CreateResponse response) {
+	public String getImageIdentifier() {
+		return this.imageIdentifier;
+	}
+
+	public FormFile getImageStream() {
+		return this.imageStream;
+	}
+
+	public String getMetaData() {
+		return this.metaData;
+	}
+
+	public boolean isAutoRotateFlag() {
+		return this.autoRotateFlag;
+	}
+
+	public static CreateRequest checkRequest(final FormItemList formItemList,
+			final CreateResponse response) {
 
 		final String imageIdentifier = checkImageIdentifier(formItemList,
 				response);
@@ -50,76 +70,63 @@ public class CreateRequest {
 		return null;
 	}
 
-	private static FormFile checkImageStream(FormItemList formItemList,
-			CreateResponse response) {
-
-		FormFile imageStream = null;
+	protected static String checkImageIdentifier(
+			final FormItemList formItemList, final CreateResponse response) {
 		try {
-			imageStream = formItemList
-					.getFile(ProtocolConstants.Parameters.Create.IMAGESTREAM);
-		} catch (IllegalArgumentException e) {
-
-			response.addNoImageStreamError();
-			return imageStream;
-		}
-		return imageStream;
-	}
-
-	private static Boolean checkAutoRotateFlag(FormItemList formItemList,
-			CreateResponse response) {
-
-		String autoRotateFlag = null;
-		try {
-			autoRotateFlag = formItemList
-					.getField(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
-		} catch (IllegalArgumentException e) {
-
-			response.addAutoRotateFlagMissingError(ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MISSING);
-			return null;
-		}
-		try {
-			Integer autoRotateInteger = Integer.parseInt(autoRotateFlag);
-			if (autoRotateInteger == 0) {
-				return false;
-			}
-			return true;
-		} catch (NumberFormatException e) {
-			response.addAutoRotateFlagMalformedError();
-			return null;
-		}
-	}
-
-	private static String checkMetaData(FormItemList formItemList,
-			CreateResponse response) {
-		String metaData = null;
-		try {
-			metaData = formItemList
-					.getField(ProtocolConstants.Parameters.Create.META_DATA);
-		} catch (IllegalArgumentException e) {
-			response.addNoMetadataError();
-			return null;
-		}
-		try {
-			JSONParser jsonparser = new JSONParser();
-			jsonparser.parse(metaData);
-		} catch (ParseException e) {
-			// System.out.println(metaData + "broken");
-			response.addMetadataMalformedError();
-		}
-		return metaData;
-	}
-
-	private static String checkImageIdentifier(FormItemList formItemList,
-			CreateResponse response) {
-		String imageIdentifier = null;
-		try {
-			imageIdentifier = formItemList
+			return formItemList
 					.getField(ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER);
-		} catch (IllegalArgumentException e) {
-			response.addNoIdentifierError();
-			return null;
+		} catch (final IllegalArgumentException e) {
+			response.imageIdentifierMissing();
 		}
-		return imageIdentifier;
+
+		return null;
+	}
+
+	protected static FormFile checkImageStream(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			return formItemList
+					.getFile(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+		} catch (final IllegalArgumentException e) {
+			response.imageStreamMissing();
+		}
+
+		return null;
+	}
+
+	protected static Boolean checkAutoRotateFlag(
+			final FormItemList formItemList, final CreateResponse response) {
+		try {
+			final String autoRotateFlag = formItemList
+					.getField(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
+			try {
+				return (Integer.parseInt(autoRotateFlag) != 0);
+			} catch (final NumberFormatException e) {
+				response.autoRotateFlagMalformed(autoRotateFlag);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.autoRotateFlagMissing();
+		}
+
+		return null;
+	}
+
+	protected static String checkMetaData(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			final String metaData = formItemList
+					.getField(ProtocolConstants.Parameters.Create.META_DATA);
+			try {
+				PARSER.parse(metaData);
+				return metaData;
+			} catch (final ParseException e) {
+				response.metaDataMalformed();
+			}
+		} catch (final IllegalArgumentException e) {
+			response.metaDataMissing();
+		}
+
+		return null;
 	}
 
 }

@@ -321,7 +321,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				metaDataJSON = (JSONObject) PARSER.parse(metaData);
 			} catch (final ParseException e) {
 				// error: meta data format invalid
-				response.addMetadataMalformedError();
+				response.metaDataMalformed();
 				return false;
 			}
 		}
@@ -357,21 +357,21 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					return true;
 				} else {
 					// internal server error: hash collision
-					response.addInternalServerError();
+					response.internalServerError();
 					System.err
 							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
 			} catch (final MagickException e) {
 				// error: image invalid
-				response.addImageInvalidError();
+				response.imageStreamInvalid();
 			} catch (final IOException e) {
 				// internal server error: failed to store image(s)
-				response.addInternalServerError();
+				response.internalServerError();
 				e.printStackTrace();
 			}
 
 		} else {
-			response.addImageIdentifierAlreadyInUseError();
+			response.imageIdentifierInUse(imageIdentifier);
 		}
 
 		return false;
@@ -390,7 +390,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				metaDataJSON = (JSONObject) PARSER.parse(metaData);
 			} catch (final ParseException e) {
 				// error: meta data format invalid
-				response.addMetadataMalformedError();
+				response.metaDataMalformed();
 				return false;
 			}
 		}
@@ -422,24 +422,24 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						return true;
 					}
 
-					response.addInternalServerError();
+					response.internalServerError();
 					System.err
 							.println(ProtocolConstants.LogMessage.CROPPING_FAILURE);
 				} else {
-					response.addInternalServerError();
+					response.internalServerError();
 					System.err
 							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
 			} catch (final MagickException e) {
 				// error: image invalid
-				response.addImageInvalidError();
+				response.imageStreamInvalid();
 			} catch (final IOException e) {
 				// internal server error: failed to store image(s)
-				response.addInternalServerError();
+				response.internalServerError();
 				e.printStackTrace();
 			}
 		} else {
-			response.addImageIdentifierAlreadyInUseError();
+			response.imageIdentifierInUse(imageIdentifier);
 		}
 
 		return false;
@@ -476,25 +476,26 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					return true;
 				} else {
 					// internal server error: hash collision
-					response.addInternalServerError();
+					response.internalServerError();
 					System.err
 							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
 
 			} catch (final MalformedURLException e) {
 				// error: no valid URL
-				response.addURLMalformedError();
+				response.imageUrlMalformed(imageUrl);
 			} catch (final MagickException e) {
+				// TODO: check what happens if an URL throws 404
 				// error: no image file
-				response.addImageInvalidError();
+				response.imageUrlInvalid(imageUrl);
 				tmpImageFile.delete();
 			} catch (final IOException e) {
 				// internal server error: failed to store image(s)
-				response.addInternalServerError();
+				response.internalServerError();
 			}
 		} else {
 			// error: image identifier in use
-			response.addImageIdentifierAlreadyInUseError();
+			response.imageIdentifierInUse(imageIdentifier);
 		}
 
 		return false;
@@ -514,7 +515,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 						this.getOriginalFile(hash)));
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			}
@@ -554,7 +555,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 							return imageStream;
 						}
 
-						response.addInternalServerError();
+						response.internalServerError();
 						System.err
 								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
 					} else {
@@ -567,12 +568,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err
 						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
@@ -616,7 +617,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 							return new ImageData(metaData, imageStream);
 						}
 
-						response.addInternalServerError();
+						response.internalServerError();
 						System.err
 								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
 					} else {
@@ -629,12 +630,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err
 						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
@@ -708,20 +709,20 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 				succeeded = false;
 			} catch (final IOException e) {
 				// internal server error: failed to write to archive stream
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err
 						.println(ProtocolConstants.LogMessage.ARCHIVE_STREAM_WRITING_FAILED);
 				e.printStackTrace();
 				succeeded = false;
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
-				response.addInternalServerError();
+				response.internalServerError();
 				System.err
 						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
@@ -736,7 +737,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			}
 		} catch (final IOException e) {
 			// internal server error: failed to create archive
-			response.addInternalServerError();
+			response.internalServerError();
 			e.printStackTrace();
 		}
 
@@ -745,30 +746,43 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 	@Override
 	public boolean appendImageMetaData(final String imageIdentifier,
-			final String key, final String value, final UpdateResponse response) {
-		if (this.imageMetaDatabase.appendMetadata(imageIdentifier, key, value)) {
+			final String metaData, final UpdateResponse response) {
+		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+			JSONObject metaDataJSON = null;
+			try {
+				metaDataJSON = (JSONObject) PARSER.parse(metaData);
+			} catch (final ParseException e) {
+				// error: meta data format invalid
+				response.metaDataMalformed();
+				return false;
+			}
+
+			this.imageMetaDatabase
+					.appendMetadata(imageIdentifier, metaDataJSON);
 			return true;
 		} else {
-			// TODO error: no image with such identifier
+			// error: no image with such identifier
+			response.imageNotExisting(imageIdentifier);
 		}
 
 		return false;
 	}
 
 	@Override
-	public boolean deleteImage(String imageIdentifier,
+	public boolean deleteImage(final String imageIdentifier,
 			final DeleteResponse response) {
-		final String[] imagePaths = this.imageMetaDatabase
-				.getRegisteredImagePaths(imageIdentifier);
-		if (this.imageMetaDatabase.deleteDatabaseEntry(imageIdentifier)) {
+		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+			final String[] imagePaths = this.imageMetaDatabase
+					.getRegisteredImagePaths(imageIdentifier);
 			final String hash = generateHash(imageIdentifier);
 
-			// delete the original and the basis version
+			// TODO: do we delete original images?
+			// TODO: IF we do we have to register the path if we do not expect
+			// creation and deletion to happen at the same day
+
+			// delete the original version
 			final File originalFile = this.getOriginalFile(hash);
 			originalFile.delete();
-
-			final File basisFile = this.getBasisFile(hash);
-			basisFile.delete();
 
 			// delete all additional image versions registered
 			File imageFile;
@@ -776,8 +790,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				imageFile = new File(imagePath);
 				imageFile.delete();
 			}
+
+			this.imageMetaDatabase.deleteDatabaseEntry(imageIdentifier);
+			return true;
 		} else {
-			response.addImageNotFoundError();
+			// error: no image with such identifier
+			response.imageNotExisting(imageIdentifier);
 		}
 
 		return false;
