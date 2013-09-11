@@ -891,18 +891,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					storeImage(tmpInputStream, originalFile);
 					return originalImage;
 				}
-			} catch (final MagickException e) {
-				// delete invalid (image) file
-				tmpFile.delete();
-
-				// TODO: delete parental directory/ies?
-
-				throw e;
 			} finally {
-				// delete invalid (image) file
+				// delete temporary (image) file
 				tmpFile.delete();
-
-				// TODO: delete parental directory/ies?
 			}
 		}
 
