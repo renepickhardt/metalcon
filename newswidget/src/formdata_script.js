@@ -1,5 +1,5 @@
-$(document).ready(function() {
-	$("#submit_button").click(function(){
+$(window).load(function() {
+	$(".btn.btn-primary.message-submit").click(function(){
 		var message = document.getElementById("message").value;
 		if(message) {
 			var fd = new FormData();
@@ -18,7 +18,7 @@ $(document).ready(function() {
 			}  
 			var type = "status_update";
 			var userid = renderer.user;
-			var displayName = "Post"; 
+			var displayName = user_name; 
 			var localDate = renderer.format(new Date());
 			var rand = "AB" + Math.round(Math.random() * 1000000);
 			message = message.replace(/\n/g, '<br />');

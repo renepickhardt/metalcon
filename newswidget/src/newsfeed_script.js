@@ -1,3 +1,11 @@
+$(function(){ //Here you can define the parameters for the newsfeed
+    $("#message-display").metalconReader({
+        user    : "user5",
+        items   : 1000,
+        ownUpdates : 1
+    });
+});
+
 
 jQuery.fn.metalconReader = function(options){
 	return this.each(function(){
@@ -8,18 +16,21 @@ jQuery.fn.metalconReader = function(options){
 }; //End Plugin
  
 var MetalconReader = function(options){
+	var documentStructure = "<div class=\"form-group message-input\"><label for=\"message\">Message:</label><textarea id=\"message\" class=\"form-control message-input\" rows=\"2\" name=\"message\" type=\"text\" placeholder=\"Enter your Message\"></textarea><div class=\"textbox_buttons-holder\"><input class=\"btn btn-primary btn-sm message-submit\" type=\"submit\" value=\"create status update\" /><button class=\"btn btn-default btn-sm button-clear-link\"> Clear Link</button><button class=\"btn btn-default btn-sm button-clear\"> Clear Text</button><button class=\"btn btn-default btn-sm button-cancel\"> Cancel </button></div></div><div class=\"liveurl\"><div class=\"close\" title=\"Entfernen\"></div><div class=\"inner\"><div class=\"image\"> </div><div class=\"details\"><div class=\"info\"><div class=\"title\"> </div><div class=\"description\"></div><div class=\"url\"> </div></div><div class=\"thumbnail\"><div class=\"pictures\"><div class=\"controls\"><div class=\"prev button inactive\"></div><div class=\"next button inactive\"></div><div class=\"count\"><span class=\"current\">0</span><span> von </span><span class=\"max\">0</span></div></div></div></div><div class=\"video\"></div></div></div></div>";
+	$(documentStructure).prependTo('.wrapper');
     jQuery.extend(this,options || {});
-    this.url = "http://localhost:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items="+this.items+"&own_updates=1";
+    this.url = "http://localhost:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items="+this.items+"&own_updates="+this.ownUpdates;
     //this.url = "http://192.168.178.36:8080/Graphity-Server-0.1/read?user_id="+this.user+"&poster_id="+this.user+"&num_items="+this.items+"&own_updates=1";
 	if(this.user === "") throw "The 'user' property is required";
 	if(this.renderTo === "") throw "The 'renderTo' property is required";
 	this.read();
 }; //End constructor
-
+var user_name;
 MetalconReader.prototype = {
 	renderTo: "",
 	user	: "",
 	items	: 10,
+	ownUpdates: 1,
 	
 	read	: function(){
 		this.el = jQuery(this.renderTo);
@@ -38,18 +49,20 @@ MetalconReader.prototype = {
 	}, //End parse function
 
 	render	: function(element){
+		textboxBehavior();
 		var html = [];
 		var that = this;
 		html.push("<ul class=\"comments-holder\">");
 		if (typeof this.data != 'undefined'){
 			for(var i = 0; i < this.items && i < this.data.length;i++){
 				var temp_date = that.createDate(this.data[i].published);
+				user_name = this.data[i].actor.displayName;
 				html.push("<li id=\""+i+"\" class=\"single-comment-holder\"><div class=\"user-img\"><a href=\""+this.data[i].actor.id+"\"><img src=\"http://www.metalcon.de/images/metal-community.jpg\" class=\"user-img-pic\"></a></div><div class=\"comment-body\"><h3 class=\"username-field\">"+this.data[i].actor.displayName+"</h3><div class=\"comment-date\"><a href=\""+this.data[i].object.id+"\">"+that.format(temp_date)+"</a></div><div class=\"comment-text\">"+this.data[i].object.message+"</div></div></li>");
 			} //End for
 		}//End if
 		html.push("</ul>");
 		this.el.append(html.join(""));
-		$("div.comment-text").not(".link_box").shorten({"showChars": 250, "moreText" : "Mehr", "lessText" : "Weniger"});
+		$("div.comment-text").not(".link_box").shorten({"showChars": 400, "moreText" : "Mehr", "lessText" : "Weniger"});
 	}, //End render function
 	createDate	: function(str){
 		str = str.substring(0,19).replace(/[ZT]/," ").replace(/\-/g,"/");
@@ -78,3 +91,7 @@ MetalconReader.prototype = {
 		}//End else
 	} //End format function	
 }; //End Prototype
+
+
+
+

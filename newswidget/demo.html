@@ -2,78 +2,35 @@
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 	<head>
-	<title>Objects</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Metalcon Newsstream Prototype</title>
 	<link type="text/css" rel="stylesheet" href="theme/bootstrap.css"/> 
 	<link rel="Stylesheet" href="theme/style.css" media="screen" type="text/css"/>
 	<link rel="stylesheet" href="theme/liveurl.css" type="text/css" />  
     <link href='theme/jquery.mentionsInput.css' rel='stylesheet' type='text/css'>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript" src="src/newsfeed_script.js"></script>
-	<script type="text/javascript" src="src/formdata_script.js"></script>
-    <script type="text/javascript" src="src/jquery.shorten.js"></script>
-
-	<script type="text/javascript">  //this script is used to initialize the newsfeed
-		$(function(){
-			$("#message-display").metalconReader({
-				user	: "user5",
-				items	: 100
-			});
-		});
-	</script>
-
 	</head>
-	<body>
-		<div class="wrapper">
-			<div class="form-group message-input">
-				<label for="message">Message:</label>
-				<textarea id="message" class="form-control message-input" rows="2" name="message" type="text" placeholder="Enter your Message"></textarea>
-				<div class="textbox_buttons-holder">
-                    <input id="submit_button" class="btn btn-primary btn-sm message-submit" type="submit" value="create status update" />
-    				<button class="btn btn-default btn-sm button-clear-link"> Clear Link</button>
-    				<button class="btn btn-default btn-sm button-clear"> Clear Text</button>
-                    <button class="btn btn-default btn-sm button-cancel"> Cancel </button>
-                </div>
-			</div>
-            <div class="liveurl">
-                	<div class="close" title="Entfernen"></div>
-                    <div class="inner">
-                        <div class="image"> </div>
-                        <div class="details">
-                            <div class="info">
-                                <div class="title"> </div>
-                                <div class="description"></div> 
-                                <div class="url"> </div>
-                            </div>
-                            <div class="thumbnail">
-                                <div class="pictures">
-                                    <div class="controls">
-                                        <div class="prev button inactive"></div>
-                                        <div class="next button inactive"></div>
-                                        <div class="count">
-                                            <span class="current">0</span><span> von </span><span class="max">0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="video"></div>
-                        </div>
+	
 
-                    </div>
-                </div>
+    <body>
+		<div class="wrapper">
 			<div class="message-display-wrapper" id="message-display">
 				<div class="comments-holder-outside"></div>
 			</div>
 		</div>
 
-	<script src="src/bootstrap.js"></script>
-	<script src="src/jquery.liveurl.js"></script>
-    <script src="src/ba-linkify.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="src/textbox_behavior.js"></script>
+    <script type="text/javascript" src="src/newsfeed_script.js"></script>
+    <script type="text/javascript" src="src/formdata_script.js"></script>
+    <script type="text/javascript" src="src/jquery.shorten.js"></script>
+    <script src="src/bootstrap.js"></script>
+    <script src="src/jquery.liveurl.js"></script>
+    <!--<script src="src/ba-linkify.js"></script>-->
 
-    <script type="text/javascript"> //this script controls linkify, currently not working
-        $(function() {
-            $('li.single-comment-holder').each(function() {
+
+    <!--<script type="text/javascript"> //this script controls linkify, currently not working
+        $(window).load(function() {
+            $('div.comment-text').each(function() {
                 var that = $(this),
                     txt = that.html(),
                     options = {
@@ -85,184 +42,8 @@
                  that.html( txt + ' (orig)<br/>' + linkify( txt, options ) + ' (linkified)' );
             });
         });
-    </script>
+    </script>-->
 
-	<script type="text/javascript"> //this script controls the behavior of the textbox, animation and hiding / showing buttons
-		$(function () {
-			$(".form-control.message-input").focus(function() {
-				$(this).animate({width:"+150%", height:"135px" }, 1000);
-				$(".form-group.message-input").animate({left:'50px'}, 1000);
-				$(".btn.btn-primary.message-submit").css('display', 'inline');
-                $(".btn.btn-default.button-clear-link").css('display', 'inline');
-				$(".btn.btn-default.button-clear").css('display', 'inline');
-				$(".btn.btn-default.button-cancel").css('display', 'inline');
-
-			});
-			
-            $(".btn.btn-primary.message-submit").click(function() {
-				$(".form-control.message-input").animate({width:"100%", height:"100%"}, 1000);
-				$(".form-group.message-input").animate({left:'-=50px'}, 1000);	
-				$(".btn.btn-primary.message-submit").css('display', 'none');
-				$(".btn.btn-default.button-clear").css('display', 'none');
-                $(".btn.btn-default.button-clear-link").css('display', 'none');
-				$(".btn.btn-default.button-cancel").css('display', 'none');
-				$(".form-control.message-input").val('');
-                $(".close").trigger("click");
-
-			});
-
-			$(".btn.btn-default.button-cancel").click(function() {
-				$(".form-control.message-input").animate({width:"100%", height:"100%"}, 1000);
-				$(".form-group.message-input").animate({left:'-=50px'}, 1000);
-				$(".btn.btn-primary.message-submit").css('display', 'none');
-				$(".btn.btn-default.button-clear").css('display', 'none');
-				$(".btn.btn-default.button-cancel").css('display', 'none');
-                $(".btn.btn-default.button-clear-link").css('display', 'none');
-			});
-            
-			$(".btn.btn-default.button-clear").click(function() {
-				$(".form-control.message-input").val('');
-                $(".close").trigger("click");
-                $(".form-control.message-input").focus();
-			});
-
-            $(".btn.btn-default.button-clear-link").click(function() {
-                $(".close").trigger("click");
-                $(".form-control.message-input").focus();
-            });
-		});
-	</script>
-	
-    <script>  //this script controls the url-parsing that shows in a box under the input
-                var curImages = new Array();
-                var temp_url;
-                $('textarea').liveUrl({
-                    loadStart : function(){
-                        $('.liveurl-loader').show();
-                    },
-                    loadEnd : function(){
-                        $('.liveurl-loader').hide();
-                    },
-                    success : function(data) 
-                    {                        
-                        var output = $('.liveurl');
-                        output.find('.title').text(data.title);
-                        $('.title').wrap("<a href=\""+data.url+"\"></a>");
-                        output.find('.description').text(data.description);
-                        output.find('.url').text(data.url);
-                        output.find('.image').empty();
-                        
-                        output.find('.close').one('click', function() 
-                        {
-                            var liveUrl     = $(this).parent();
-                            liveUrl.hide('fast');
-                            liveUrl.find('.video').html('').hide();
-                            liveUrl.find('.image').html('');
-                            liveUrl.find('.description').html('');
-                            liveUrl.find('.controls .prev').addClass('inactive');
-                            liveUrl.find('.controls .next').addClass('inactive');
-                            liveUrl.find('.thumbnail').hide();
-                            liveUrl.find('.image').hide();
-                            $('textarea').trigger('clear'); 
-                            curImages = new Array();
-                        });
-                        
-                        output.show('slow');
-                        
-                        if (data.video != null) {                       
-                            var ratioW        = data.video.width  /350;
-                            data.video.width  = 250;
-                            data.video.height = data.video.height / ratioW;
-        
-                            var video = 
-                            '<object width="' + data.video.width  + '" height="' + data.video.height  + '">' +
-                                '<param name="movie"' +
-                                      'value="' + data.video.file  + '"></param>' +
-                                '<param name="allowScriptAccess" value="always"></param>' +
-                                '<embed src="' + data.video.file  + '"' +
-                                      'type="application/x-shockwave-flash"' +
-                                      'allowscriptaccess="always"' +
-                                      'width="' + data.video.width  + '" height="' + data.video.height  + '"></embed>' +
-                            '</object>';
-                            output.find('.video').html(video).show();
-                            
-                         
-                        }
-                    },
-                    addImage : function(image)
-                    {   
-                        var output  = $('.liveurl');
-                        var jqImage = $(image);
-                        jqImage.attr('alt', 'Preview');
-                        
-                        if ((image.width / image.height)  > 7 
-                        ||  (image.height / image.width)  > 4 ) {
-                            // we dont want extra large images...
-                            return false;
-                        } 
-
-                        curImages.push(jqImage.attr('src'));
-                        output.find('.image').append(jqImage);
-                        
-                        
-                        if (curImages.length == 1) {
-                            // first image...
-                            
-                            output.find('.thumbnail .current').text('1');
-                            output.find('.thumbnail').show();
-                            output.find('.image').show();
-                            jqImage.addClass('active');
-                            
-                        }
-                        
-                        if (curImages.length == 2) {
-                            output.find('.controls .next').removeClass('inactive');
-                        }
-                        
-                        output.find('.thumbnail .max').text(curImages.length);
-                    }
-                });
-              
-              
-                $('.liveurl ').on('click', '.controls .button', function() 
-                {
-                    var self        = $(this);
-                    var liveUrl     = $(this).parents('.liveurl');
-                    var content     = liveUrl.find('.image');
-                    var images      = $('img', content);
-                    var activeImage = $('img.active', content);
-
-                    if (self.hasClass('next')) 
-                         var elem = activeImage.next("img");
-                    else var elem = activeImage.prev("img");
-      
-                    if (elem.length > 0) {
-                        activeImage.removeClass('active');
-                        elem.addClass('active');  
-                        liveUrl.find('.thumbnail .current').text(elem.index() +1);
-                        
-                        if (elem.index() +1 == images.length || elem.index()+1 == 1) {
-                            self.addClass('inactive');
-                        }
-                    }
-
-                    if (self.hasClass('next')) 
-                         var other = elem.prev("img");
-                    else var other = elem.next("img");
-                    
-                    if (other.length > 0) {
-                        if (self.hasClass('next')) 
-                               self.prev().removeClass('inactive');
-                        else   self.next().removeClass('inactive');
-                   } else {
-                        if (self.hasClass('next')) 
-                               self.prev().addClass('inactive');
-                        else   self.next().addClass('inactive');
-                   }
-                   
-                   
-                   
-                });
-          </script>
+   
 	</body>
 </html>		
