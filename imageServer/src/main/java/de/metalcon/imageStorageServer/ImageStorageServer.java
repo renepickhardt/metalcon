@@ -292,6 +292,37 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
+	private static MagickImage autoRotate(final MagickImage image) {
+		// TODO: check if attribute is written correctly
+		try {
+			final int orientation = Integer.parseInt(image
+					.getImageAttribute("exif:Orientation"));
+			if (orientation == 3) {
+				return (image.rotateImage(180));
+			}
+			if (orientation == 5) {
+				return (image.rotateImage(-90));
+			}
+			if (orientation == 6) {
+				return (image.rotateImage(90));
+			}
+		} catch (final MagickException e) {
+			// no EXIF data for orientation set
+		}
+
+		// image is rotated correctly or mirrored
+		return image;
+
+	}
+
+	/**
+	 * delete the content of a directory (clear)
+	 * 
+	 * @param directory
+	 *            directory that shall be cleared
+	 * @param removeRoot
+	 *            if set the directory passed will be removed too
+	 */
 	private static void deleteDirectoryContent(final File directory,
 			final boolean removeRoot) {
 		final File[] content = directory.listFiles();
@@ -334,11 +365,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				if (image != null) {
 					if (autoRotate) {
-						// TODO: implement auto orientation
-						// WARNING: no documentation available!
-						// image.autoOrientImage();
-
-						image = this.autoRotate(image);
+						image = autoRotate(image);
 					}
 
 					// store basis version
@@ -376,33 +403,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		}
 
 		return false;
-	}
-
-	private MagickImage autoRotate(MagickImage image) {
-		// TODO: check if attribute is written correctly
-		try {
-			Integer orientation = Integer.parseInt(image
-					.getImageAttribute("exif:Orientation"));
-			if (orientation == 1) {
-				return image;
-			}
-			if (orientation == 3) {
-				return (image.rotateImage(180));
-			}
-			if (orientation == 5) {
-				return (image.rotateImage(-90));
-			}
-			if (orientation == 6) {
-				return (image.rotateImage(90));
-			}
-		} catch (MagickException e) {
-			System.err
-					.println("autorotate was called with an image that has no exif flag for orientation");
-			return image;
-		}
-		// we do not care about mirror-inverse images, do we?
-		return image;
-
 	}
 
 	@Override
