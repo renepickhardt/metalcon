@@ -292,6 +292,55 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
+	private static MagickImage autoRotate(final MagickImage image)
+			throws MagickException {
+		// TODO: check if attribute is written correctly
+		final String exifOrientation = "exif:Orientation";
+		final String sOrientation = image.getImageAttribute(exifOrientation);
+		int rotationDegree = 0;
+
+		if (sOrientation != null) {
+			final int orientation = Integer.parseInt(sOrientation);
+
+			switch (orientation) {
+
+			case 3:
+				rotationDegree = 180;
+				break;
+
+			case 5:
+				rotationDegree = -90;
+				break;
+
+			case 6:
+				rotationDegree = 90;
+				break;
+
+			default:
+				// image rotated correctly or mirrored
+
+			}
+		} else {
+			// no EXIF data for orientation existing
+		}
+
+		if (rotationDegree != 0) {
+			final MagickImage rotatedImage = image.rotateImage(rotationDegree);
+			rotatedImage.setImageAttribute(exifOrientation, "1");
+			return rotatedImage;
+		}
+
+		return image;
+	}
+
+	/**
+	 * delete the content of a directory (clear)
+	 * 
+	 * @param directory
+	 *            directory that shall be cleared
+	 * @param removeRoot
+	 *            if set the directory passed will be removed too
+	 */
 	private static void deleteDirectoryContent(final File directory,
 			final boolean removeRoot) {
 		final File[] content = directory.listFiles();
@@ -334,11 +383,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				if (image != null) {
 					if (autoRotate) {
-						// TODO: implement auto orientation
-						// WARNING: no documentation available!
-						// image.autoOrientImage();
-
-						image = this.autoRotate(image);
+						image = autoRotate(image);
 					}
 
 					// store basis version
@@ -376,33 +421,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		}
 
 		return false;
-	}
-
-	private MagickImage autoRotate(MagickImage image) {
-		// TODO: check if attribute is written correctly
-		try {
-			Integer orientation = Integer.parseInt(image
-					.getImageAttribute("exif:Orientation"));
-			if (orientation == 1) {
-				return image;
-			}
-			if (orientation == 3) {
-				return (image.rotateImage(180));
-			}
-			if (orientation == 5) {
-				return (image.rotateImage(-90));
-			}
-			if (orientation == 6) {
-				return (image.rotateImage(90));
-			}
-		} catch (MagickException e) {
-			System.err
-					.println("autorotate was called with an image that has no exif flag for orientation");
-			return image;
-		}
-		// we do not care about mirror-inverse images, do we?
-		return image;
-
 	}
 
 	@Override
@@ -802,17 +820,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
 			final String[] imagePaths = this.imageMetaDatabase
 					.getRegisteredImagePaths(imageIdentifier);
-			final String hash = generateHash(imageIdentifier);
 
 			// TODO: do we delete original images?
 			// TODO: IF we do we have to register the path if we do not expect
 			// creation and deletion to happen at the same day
 
-			// delete the original version
-			final File originalFile = this.getOriginalFile(hash);
-			originalFile.delete();
-
-			// delete all additional image versions registered
+			// delete all image versions registered
 			File imageFile;
 			for (String imagePath : imagePaths) {
 				imageFile = new File(imagePath);
