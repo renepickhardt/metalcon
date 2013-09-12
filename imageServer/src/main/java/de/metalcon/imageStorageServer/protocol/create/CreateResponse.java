@@ -30,6 +30,26 @@ public class CreateResponse extends Response {
 				"The image meta data is missing. Please deliver some");
 	}
 
+	public void cropTopCoordinateMissing() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_TOP,
+				"The cropping coordinate top is missing. Please deliver one");
+	}
+
+	public void cropLeftCoordinateMissing() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_LEFT,
+				"The cropping coordinate left is missing. Please deliver one");
+	}
+
+	public void cropWidthMissing() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_WIDTH,
+				"The cropping width is missing. Please deliver one");
+	}
+
+	public void cropHeightMissing() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_HEIGHT,
+				"The cropping height is missing. Please deliver one");
+	}
+
 	public void imageIdentifierInUse(final String imageIdentifier) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
