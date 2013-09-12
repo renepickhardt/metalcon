@@ -56,13 +56,11 @@ public class CreateRequest {
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
-				if (metaData != null) {
-					final Boolean autoRotateFlag = checkAutoRotateFlag(
-							formItemList, response);
-					if (autoRotateFlag != null) {
-						return new CreateRequest(imageIdentifier, imageStream,
-								metaData, autoRotateFlag);
-					}
+				final Boolean autoRotateFlag = checkAutoRotateFlag(
+						formItemList, response);
+				if (autoRotateFlag != null) {
+					return new CreateRequest(imageIdentifier, imageStream,
+							metaData, autoRotateFlag);
 				}
 			}
 		}
