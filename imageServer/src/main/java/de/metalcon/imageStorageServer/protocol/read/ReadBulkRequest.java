@@ -1,5 +1,5 @@
 package de.metalcon.imageStorageServer.protocol.read;
 
-public class ReadBulk {
+public class ReadBulkRequest {
 
 }

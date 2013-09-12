@@ -3,7 +3,7 @@ package de.metalcon.imageStorageServer.protocol.read;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
-public class ReadScaled {
+public class ReadScaledRequest {
 
 	private final String imageIdentifier;
 
@@ -13,7 +13,7 @@ public class ReadScaled {
 
 	private final Integer imageHeight;
 
-	public ReadScaled(final String imageIdentifier,
+	public ReadScaledRequest(final String imageIdentifier,
 			final Boolean originalImageFlag, final Integer imageWidth,
 			final Integer imageHeight) {
 		this.imageIdentifier = imageIdentifier;
@@ -22,7 +22,7 @@ public class ReadScaled {
 		this.imageHeight = imageHeight;
 	}
 
-	public static ReadScaled checkRequest(FormItemList formItemList,
+	public static ReadScaledRequest checkRequest(FormItemList formItemList,
 			ReadResponse readResponse) {
 		final String imageIdentifier = checkImageIdentifier(formItemList,
 				readResponse);
@@ -36,7 +36,7 @@ public class ReadScaled {
 					final Integer imageHeight = checkImageHeight(formItemList,
 							readResponse);
 					if (imageWidth != null) {
-						return new ReadScaled(imageIdentifier,
+						return new ReadScaledRequest(imageIdentifier,
 								originalImageFlag, imageWidth, imageHeight);
 					}
 				}
