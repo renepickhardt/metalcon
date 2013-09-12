@@ -138,17 +138,16 @@ public class ReadRequest {
 		}
 	}
 
-	private static String checkImageIdentifier(FormItemList formItemList,
-			ReadResponse response) {
-		String imageIdentifier = null;
+	private static String checkImageIdentifier(final FormItemList formItemList,
+			final ReadResponse response) {
 		try {
-			imageIdentifier = formItemList
+			return formItemList
 					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			response.addNoImageIdentifierError();
-			return null;
 		}
-		return imageIdentifier;
+
+		return null;
 
 	}
 
