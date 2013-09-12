@@ -68,6 +68,10 @@ public class ProtocolConstants {
 			public static final String IMAGESTREAM = "imageStream";
 			public static final String META_DATA = "metaData";
 			public static final String AUTOROTATE_FLAG = "autoRotateFlag";
+			public static final String CROP_LEFT = "left";
+			public static final String CROP_TOP = "top";
+			public static final String CROP_HEIGHT = "height";
+			public static final String CROP_WIDTH = "width";
 		}
 
 		public class Read {
