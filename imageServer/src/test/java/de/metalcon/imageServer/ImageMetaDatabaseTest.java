@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.metalcon.imageStorageServer.ImageMetaDatabase;
+
 public class ImageMetaDatabaseTest extends MetaDatabaseTest {
 
 	private static final int INVALID_READ_WIDTH = 300;

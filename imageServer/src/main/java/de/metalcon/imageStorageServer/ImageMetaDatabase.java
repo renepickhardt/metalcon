@@ -1,4 +1,4 @@
-package de.metalcon.imageServer;
+package de.metalcon.imageStorageServer;
 
 import java.net.UnknownHostException;
 

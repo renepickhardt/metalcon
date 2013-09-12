@@ -22,10 +22,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
-import de.metalcon.imageServer.protocol.Response;
-import de.metalcon.imageServer.protocol.create.CreateRequest;
-import de.metalcon.imageServer.protocol.create.CreateResponse;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.Response;
+import de.metalcon.imageStorageServer.protocol.create.CreateRequest;
+import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
 import de.metalcon.utils.FormItemList;
 
 public class TestCreateRequest {

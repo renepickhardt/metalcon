@@ -1,4 +1,4 @@
-package de.metalcon.imageServer;
+package de.metalcon.imageStorageServer;
 
 import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
@@ -29,11 +29,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
-import de.metalcon.imageServer.protocol.create.CreateResponse;
-import de.metalcon.imageServer.protocol.delete.DeleteResponse;
-import de.metalcon.imageServer.protocol.read.ReadResponse;
-import de.metalcon.imageServer.protocol.update.UpdateResponse;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
+import de.metalcon.imageStorageServer.protocol.delete.DeleteResponse;
+import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
+import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 
 /**
  * image storage server

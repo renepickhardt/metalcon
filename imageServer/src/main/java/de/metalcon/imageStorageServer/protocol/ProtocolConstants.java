@@ -1,4 +1,4 @@
-package de.metalcon.imageServer.protocol;
+package de.metalcon.imageStorageServer.protocol;
 
 /**
  * constants used in the image server protocol

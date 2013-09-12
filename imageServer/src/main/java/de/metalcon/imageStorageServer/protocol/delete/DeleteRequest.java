@@ -1,6 +1,6 @@
-package de.metalcon.imageServer.protocol.delete;
+package de.metalcon.imageStorageServer.protocol.delete;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class DeleteRequest {

@@ -1,11 +1,11 @@
-package de.metalcon.imageServer;
+package de.metalcon.imageStorageServer;
 
 import java.io.InputStream;
 
-import de.metalcon.imageServer.protocol.create.CreateResponse;
-import de.metalcon.imageServer.protocol.delete.DeleteResponse;
-import de.metalcon.imageServer.protocol.read.ReadResponse;
-import de.metalcon.imageServer.protocol.update.UpdateResponse;
+import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
+import de.metalcon.imageStorageServer.protocol.delete.DeleteResponse;
+import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
+import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 
 /**
  * prototype interface for the image storage server API

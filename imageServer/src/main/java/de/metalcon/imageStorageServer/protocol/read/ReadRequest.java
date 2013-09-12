@@ -1,8 +1,8 @@
-package de.metalcon.imageServer.protocol.read;
+package de.metalcon.imageStorageServer.protocol.read;
 
 import org.json.simple.parser.JSONParser;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadRequest {

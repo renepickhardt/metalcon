@@ -1,4 +1,4 @@
-package de.metalcon.imageServer.caching;
+package de.metalcon.imageStorageServer.caching;
 
 public class LinkedList<T> {
 

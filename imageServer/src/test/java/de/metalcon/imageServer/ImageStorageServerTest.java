@@ -28,12 +28,14 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
-import de.metalcon.imageServer.protocol.Response;
-import de.metalcon.imageServer.protocol.create.CreateResponse;
-import de.metalcon.imageServer.protocol.delete.DeleteResponse;
-import de.metalcon.imageServer.protocol.read.ReadResponse;
-import de.metalcon.imageServer.protocol.update.UpdateResponse;
+import de.metalcon.imageStorageServer.ImageData;
+import de.metalcon.imageStorageServer.ImageStorageServer;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.Response;
+import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
+import de.metalcon.imageStorageServer.protocol.delete.DeleteResponse;
+import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
+import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 
 public class ImageStorageServerTest {
 

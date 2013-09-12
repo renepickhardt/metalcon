@@ -17,10 +17,10 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
-import de.metalcon.imageServer.protocol.Response;
-import de.metalcon.imageServer.protocol.update.UpdateRequest;
-import de.metalcon.imageServer.protocol.update.UpdateResponse;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.Response;
+import de.metalcon.imageStorageServer.protocol.update.UpdateRequest;
+import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 import de.metalcon.utils.FormItemList;
 
 public class testUpdateRequest {

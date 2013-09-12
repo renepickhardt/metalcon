@@ -1,9 +1,9 @@
-package de.metalcon.imageServer.protocol.create;
+package de.metalcon.imageStorageServer.protocol.create;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.metalcon.imageServer.protocol.ProtocolConstants;
+import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
 
