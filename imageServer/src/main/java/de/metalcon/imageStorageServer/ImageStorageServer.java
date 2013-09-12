@@ -330,14 +330,15 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 			try {
 				// store and try to load original image
-				final MagickImage image = this.storeAndLoadImage(hash,
-						imageStream);
+				MagickImage image = this.storeAndLoadImage(hash, imageStream);
 
 				if (image != null) {
 					if (autoRotate) {
 						// TODO: implement auto orientation
 						// WARNING: no documentation available!
 						// image.autoOrientImage();
+
+						image = this.autoRotate(image);
 					}
 
 					// store basis version
@@ -375,6 +376,33 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		}
 
 		return false;
+	}
+
+	private MagickImage autoRotate(MagickImage image) {
+		// TODO: check if attribute is written correctly
+		try {
+			Integer orientation = Integer.parseInt(image
+					.getImageAttribute("exif:Orientation"));
+			if (orientation == 1) {
+				return image;
+			}
+			if (orientation == 3) {
+				return (image.rotateImage(180));
+			}
+			if (orientation == 5) {
+				return (image.rotateImage(-90));
+			}
+			if (orientation == 6) {
+				return (image.rotateImage(90));
+			}
+		} catch (MagickException e) {
+			System.err
+					.println("autorotate was called with an image that has no exif flag for orientation");
+			return image;
+		}
+		// we do not care about mirror-inverse images, do we?
+		return image;
+
 	}
 
 	@Override
