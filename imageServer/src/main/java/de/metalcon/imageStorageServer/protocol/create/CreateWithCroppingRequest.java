@@ -95,8 +95,13 @@ public class CreateWithCroppingRequest {
 	private static Integer checkLeft(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
-			return Integer.parseInt(formItemList
+			int left = Integer.parseInt(formItemList
 					.getField(ProtocolConstants.Parameters.Create.CROP_LEFT));
+			if (left >= 0) {
+				return left;
+			} else {
+				response.cropLeftCoordinateInvalid(left);
+			}
 		} catch (final IllegalArgumentException e) {
 			response.cropLeftCoordinateMissing();
 		}

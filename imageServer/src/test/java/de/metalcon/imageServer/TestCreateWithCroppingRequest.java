@@ -139,16 +139,16 @@ public class TestCreateWithCroppingRequest {
 				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
 
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Create.META_DATA
-				+ this.responseEndMalformed,
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testCroppingLeftNotGiven() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
-				ProtocolTestConstants.INVALID_IMAGE_METADATA, null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA, null,
 				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
@@ -162,15 +162,17 @@ public class TestCreateWithCroppingRequest {
 	@Test
 	public void testCroppingLeftInvalid() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
-				ProtocolTestConstants.INVALID_IMAGE_METADATA, null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.INVALID_CROPPING_LEFT_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
 
 		// FIXME expected response is not reasonable
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Create.CROP_LEFT
-				+ this.responseEndMalformed,
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ ProtocolConstants.Parameters.Create.CROP_LEFT
+						+ this.responseEndMalformed,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 

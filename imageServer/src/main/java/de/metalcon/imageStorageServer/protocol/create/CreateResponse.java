@@ -50,6 +50,13 @@ public class CreateResponse extends Response {
 				"The cropping height is missing. Please deliver one");
 	}
 
+	public void cropLeftCoordinateInvalid(int left) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID,
+				"The left-hand cropping coordinate is" + left
+						+ ". This value should be greater or equals 0");
+	}
+
 	public void imageIdentifierInUse(final String imageIdentifier) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
@@ -82,7 +89,8 @@ public class CreateResponse extends Response {
 
 	public void autoRotateFlagMalformed(final String autoRotateFlag) {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
 				"\""
 						+ autoRotateFlag
 						+ "\" is not a number. Please provide a number such as \"1\" to enable or \"0\" to disable automatic rotation.");
@@ -90,7 +98,8 @@ public class CreateResponse extends Response {
 
 	public void metaDataMalformed() {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
 				"Please pass a JSON object that contains the meta data you want to store or leave the field blank if you do not want to store meta data at all.");
 	}
 

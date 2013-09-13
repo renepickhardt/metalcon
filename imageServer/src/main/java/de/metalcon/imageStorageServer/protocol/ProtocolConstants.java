@@ -34,11 +34,13 @@ public class ProtocolConstants {
 		public class Create {
 
 			public static final String IMAGE_IDENTIFIER_IN_USE = "image identifier passed is already in use";
-			public static final String META_DATA_MALFORMED = "meta data passed is malformed";
+			public static final String META_DATA_MALFORMED = "meta data passed are malformed";
 			public static final String IMAGE_STREAM_INVALID = "image stream passed is invalid";
 			public static final String IMAGE_URL_MALFORMED = "image URL passed is malformed";
 			public static final String IMAGE_URL_INVALID = "image URL passed is invalid";
-			public static final String AUTOROTATE_FLAG_MALFORMED = "auto rotation flag passed is malformed";
+			public static final String AUTOROTATE_FLAG_MALFORMED = "\"auto rotation flag\" passed is malformed";
+			public static final String RESPONSE_BEGIN_CORRUPT_REQUEST = "request corrupt: ";
+			public static final String CROP_LEFT_INVALID = "Left-hand side cropping coordinate is invalid.";
 		}
 
 		// TODO
@@ -64,10 +66,10 @@ public class ProtocolConstants {
 
 		public class Create {
 
-			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
-			public static final String IMAGESTREAM = "imageStream";
-			public static final String META_DATA = "metaData";
-			public static final String AUTOROTATE_FLAG = "autoRotateFlag";
+			public static final String IMAGE_IDENTIFIER = "image identifier";
+			public static final String IMAGESTREAM = "image stream";
+			public static final String META_DATA = "meta data";
+			public static final String AUTOROTATE_FLAG = "auto rotation flag";
 			public static final String CROP_LEFT = "left";
 			public static final String CROP_TOP = "top";
 			public static final String CROP_HEIGHT = "height";

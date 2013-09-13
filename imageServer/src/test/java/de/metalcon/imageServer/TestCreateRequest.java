@@ -42,7 +42,7 @@ public class TestCreateRequest {
 	private final String responseBeginMissing = "request incomplete: parameter \"";
 	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
-	private final String responseEndMalformed = "\" is malformed";
+	private final String responseEndMalformed = "\" passed is malformed";
 
 	@BeforeClass
 	public static void LoadImage() throws FileNotFoundException {
@@ -124,9 +124,9 @@ public class TestCreateRequest {
 				ProtocolTestConstants.INVALID_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
 
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Create.META_DATA
-				+ this.responseEndMalformed,
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
@@ -146,13 +146,15 @@ public class TestCreateRequest {
 	public void testImageAutorotateFlagMalformed() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
-				ProtocolTestConstants.INVALID_BOOLEAN_AUTOROTATE);
+				ProtocolTestConstants.MALFORMED_BOOLEAN_AUTOROTATE);
 		System.out.println(this.createResponse);
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG
-				+ this.responseEndMalformed,
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
+						+ "\""
+						+ ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG
+						+ this.responseEndMalformed,
 
-		this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 	}
 
