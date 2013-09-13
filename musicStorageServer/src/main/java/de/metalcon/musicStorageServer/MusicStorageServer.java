@@ -7,6 +7,8 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.xiph.libvorbis.vorbisenc;
+
 import de.metalcon.musicStorageServer.protocol.create.CreateResponse;
 import de.metalcon.musicStorageServer.protocol.delete.DeleteResponse;
 import de.metalcon.musicStorageServer.protocol.read.ReadResponse;
@@ -18,6 +20,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	 * date formatter
 	 */
 	private static final Format FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+
+	private static final vorbisenc ENCODER = new vorbisenc();
 
 	/**
 	 * year represented by the current formatted year
@@ -127,6 +131,7 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			final InputStream musicItemStream, final String metaData,
 			final CreateResponse response) {
 		// TODO Auto-generated method stub
+
 		return false;
 	}
 
