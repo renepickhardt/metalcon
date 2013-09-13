@@ -55,8 +55,6 @@ public class TestProcessCreateRequest {
 		}
 	}
 
-	// TODO: Check if all possible states are tested
-
 	@Test
 	public void testFormMissingSuggestString() {
 

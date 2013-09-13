@@ -7,6 +7,11 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
 
+/**
+ * 
+ * @author Christian Schowalter
+ * 
+ */
 public class CreateRequest {
 
 	// TODO: JavaDoc
@@ -46,6 +51,13 @@ public class CreateRequest {
 		return this.autoRotateFlag;
 	}
 
+	/**
+	 * Checks if the FormItemList contains all required objects.
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return CreateRequest, if all needed objects are found, else null
+	 */
 	public static CreateRequest checkRequest(final FormItemList formItemList,
 			final CreateResponse response) {
 
@@ -68,6 +80,14 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the image identifier field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return String imageIdentifier if valid, else null
+	 */
 	protected static String checkImageIdentifier(
 			final FormItemList formItemList, final CreateResponse response) {
 		try {
@@ -80,6 +100,14 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the ImageStream field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return FormFile imageStream if valid, else null
+	 */
 	protected static FormFile checkImageStream(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
@@ -92,6 +120,14 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the autorotate flag field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Boolean autoRotate if valid, else null
+	 */
 	protected static Boolean checkAutoRotateFlag(
 			final FormItemList formItemList, final CreateResponse response) {
 		try {
@@ -109,6 +145,14 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the meta data field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return String metaData if valid, else null
+	 */
 	protected static String checkMetaData(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {

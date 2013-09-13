@@ -168,7 +168,6 @@ public class TestCreateWithCroppingRequest {
 				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
 
-		// FIXME expected response is not reasonable
 		assertEquals(ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}

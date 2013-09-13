@@ -7,6 +7,11 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
 
+/**
+ * 
+ * @author Christian Schowalter
+ * 
+ */
 public class CreateWithCroppingRequest {
 	// TODO: JavaDoc
 
@@ -48,6 +53,14 @@ public class CreateWithCroppingRequest {
 		return this.metaData;
 	}
 
+	/**
+	 * Checks if the FormItemList contains all required objects.
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return CreateWithCroppingRequest, if all needed objects are found, else
+	 *         null
+	 */
 	public static CreateWithCroppingRequest checkRequest(
 			final FormItemList formItemList, final CreateResponse response) {
 
@@ -80,8 +93,15 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
-	// TODO should this test also check if the value is >= 0?
-	private static Integer checkTop(final FormItemList formItemList,
+	/**
+	 * Extracts the top coordinate field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer top if valid, else null
+	 */
+	protected static Integer checkTop(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
 			int top = Integer.parseInt(formItemList
@@ -97,7 +117,15 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
-	private static Integer checkLeft(final FormItemList formItemList,
+	/**
+	 * Extracts the left coordinate field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer left if valid, else null
+	 */
+	protected static Integer checkLeft(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
 			int left = Integer.parseInt(formItemList
@@ -113,7 +141,15 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
-	private static Integer checkWidth(final FormItemList formItemList,
+	/**
+	 * Extracts the width field from the FormItemList and checks for protocol
+	 * compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer width if valid, else null
+	 */
+	protected static Integer checkWidth(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
 			int width = Integer.parseInt(formItemList
@@ -129,7 +165,15 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
-	private static Integer checkHeight(final FormItemList formItemList,
+	/**
+	 * Extracts the height field from the FormItemList and checks for protocol
+	 * compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer height if valid, else null
+	 */
+	protected static Integer checkHeight(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
 			int height = Integer.parseInt(formItemList
@@ -145,6 +189,14 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the image identifier field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return String imageIdentifier if valid, else null
+	 */
 	protected static String checkImageIdentifier(
 			final FormItemList formItemList, final CreateResponse response) {
 		try {
@@ -157,6 +209,14 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the ImageStream field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return FormFile imageStream if valid, else null
+	 */
 	protected static FormFile checkImageStream(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
@@ -169,6 +229,14 @@ public class CreateWithCroppingRequest {
 		return null;
 	}
 
+	/**
+	 * Extracts the meta data field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return String metaData if valid, else null
+	 */
 	protected static String checkMetaData(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
