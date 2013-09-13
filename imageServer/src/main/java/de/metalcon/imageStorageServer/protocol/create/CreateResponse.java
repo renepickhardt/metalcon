@@ -3,53 +3,92 @@ package de.metalcon.imageStorageServer.protocol.create;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.Response;
 
+/**
+ * Response class for any type of ISS create request
+ * 
+ * @author Christian Schowalter
+ * 
+ */
 public class CreateResponse extends Response {
 
 	// TODO: write helpful solution messages for missing parameters!
 	// TODO: JavaDoc
 
+	/**
+	 * Adds an error message for missing image identifier parameter to the
+	 * response.
+	 */
 	public void imageIdentifierMissing() {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
 				"The image identifier is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing image stream to the response.
+	 */
 	public void imageStreamMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.IMAGESTREAM,
 				"The image stream is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing auto rotate flag to the response.
+	 */
 	public void autoRotateFlagMissing() {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
 				"The autoRotate flag is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing meta data to the response.
+	 */
 	public void metaDataMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
 				"The image meta data is missing. Please deliver some");
 	}
 
+	/**
+	 * Adds an error message for missing top cropping coordinate parameter to
+	 * the response.
+	 */
 	public void cropTopCoordinateMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_TOP,
 				"The cropping coordinate top is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing left cropping coordinate parameter to
+	 * the response.
+	 */
 	public void cropLeftCoordinateMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_LEFT,
 				"The cropping coordinate left is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing cropping width parameter to the
+	 * response.
+	 */
 	public void cropWidthMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_WIDTH,
 				"The cropping width is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for missing cropping height parameter to the
+	 * response.
+	 */
 	public void cropHeightMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_HEIGHT,
 				"The cropping height is missing. Please deliver one");
 	}
 
+	/**
+	 * Adds an error message for invalid left cropping coordinate parameter to
+	 * the response.
+	 */
 	public void cropLeftCoordinateInvalid(int left) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID,
@@ -57,6 +96,10 @@ public class CreateResponse extends Response {
 						+ ". This value should be greater or equals 0");
 	}
 
+	/**
+	 * Adds an error message for invalid top cropping coordinate parameter to
+	 * the response.
+	 */
 	public void cropTopCoordinateInvalid(int top) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID,
@@ -64,6 +107,10 @@ public class CreateResponse extends Response {
 						+ ". This value should be greater or equals 0");
 	}
 
+	/**
+	 * Adds an error message for invalid cropping width parameter to the
+	 * response.
+	 */
 	public void cropWidthInvalid(int width) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID,
@@ -72,6 +119,10 @@ public class CreateResponse extends Response {
 
 	}
 
+	/**
+	 * Adds an error message for invalid cropping height parameter to the
+	 * response.
+	 */
 	public void cropHeightInvalid(int height) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID,
@@ -80,6 +131,10 @@ public class CreateResponse extends Response {
 
 	}
 
+	/**
+	 * Adds an error message about the requested image identifier already being
+	 * in use to the response.
+	 */
 	public void imageIdentifierInUse(final String imageIdentifier) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
@@ -88,12 +143,19 @@ public class CreateResponse extends Response {
 						+ "\". Please provide another one that is not used yet.");
 	}
 
+	/**
+	 * Adds an error message for an invalid image stream to the response.
+	 */
 	public void imageStreamInvalid() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_STREAM_INVALID,
 				"The image stream passed is no valid image stream. Please provide a stream of an image encoded in one of the formats supported.");
 	}
 
+	/**
+	 * Adds an error message for a malformed URL to the response. This means the
+	 * URL can't be parsed correctly.
+	 */
 	public void imageUrlMalformed(final String imageUrl) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_URL_MALFORMED,
@@ -102,6 +164,10 @@ public class CreateResponse extends Response {
 						+ "\" is not a valid URL. Please provide a valid URL referring to an image.");
 	}
 
+	/**
+	 * Adds an error message for an invalid URL to the response. This refers to
+	 * the URL not leading to an image file.
+	 */
 	public void imageUrlInvalid(final String imageUrl) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_URL_INVALID,
@@ -110,6 +176,10 @@ public class CreateResponse extends Response {
 						+ "\" does not lead to an existing image. Please provide an URL that referrs to an image encoded in one of the formats supported.");
 	}
 
+	/**
+	 * Adds an error message for a malformed auto rotate flag String to the
+	 * response.
+	 */
 	public void autoRotateFlagMalformed(final String autoRotateFlag) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
@@ -119,6 +189,9 @@ public class CreateResponse extends Response {
 						+ "\" is not a number. Please provide a number such as \"1\" to enable or \"0\" to disable automatic rotation.");
 	}
 
+	/**
+	 * Adds an error message for a malformed meta data String to the response.
+	 */
 	public void metaDataMalformed() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
