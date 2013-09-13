@@ -84,8 +84,13 @@ public class CreateWithCroppingRequest {
 	private static Integer checkTop(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
-			return Integer.parseInt(formItemList
+			int top = Integer.parseInt(formItemList
 					.getField(ProtocolConstants.Parameters.Create.CROP_TOP));
+			if (top >= 0) {
+				return top;
+			} else {
+				response.cropTopCoordinateInvalid(top);
+			}
 		} catch (final IllegalArgumentException e) {
 			response.cropTopCoordinateMissing();
 		}
@@ -111,8 +116,13 @@ public class CreateWithCroppingRequest {
 	private static Integer checkWidth(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
-			return Integer.parseInt(formItemList
+			int width = Integer.parseInt(formItemList
 					.getField(ProtocolConstants.Parameters.Create.CROP_WIDTH));
+			if (width >= 0) {
+				return width;
+			} else {
+				response.cropWidthInvalid(width);
+			}
 		} catch (final IllegalArgumentException e) {
 			response.cropWidthMissing();
 		}
@@ -122,8 +132,13 @@ public class CreateWithCroppingRequest {
 	private static Integer checkHeight(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
-			return Integer.parseInt(formItemList
+			int height = Integer.parseInt(formItemList
 					.getField(ProtocolConstants.Parameters.Create.CROP_HEIGHT));
+			if (height >= 0) {
+				return height;
+			} else {
+				response.cropHeightInvalid(height);
+			}
 		} catch (final IllegalArgumentException e) {
 			response.cropHeightMissing();
 		}

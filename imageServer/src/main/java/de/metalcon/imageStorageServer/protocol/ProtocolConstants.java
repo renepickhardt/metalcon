@@ -41,6 +41,10 @@ public class ProtocolConstants {
 			public static final String AUTOROTATE_FLAG_MALFORMED = "\"auto rotation flag\" passed is malformed";
 			public static final String RESPONSE_BEGIN_CORRUPT_REQUEST = "request corrupt: ";
 			public static final String CROP_LEFT_INVALID = "Left-hand side cropping coordinate is invalid.";
+			public static final String CROP_TOP_INVALID = "Top side cropping coordinate is invalid.";
+			public static final String CROP_HEIGHT_INVALID = "Desired image height for cropping has an invalid value";
+			public static final String CROP_WIDTH_INVALID = "Desired image width for cropping has an invalid value";
+
 		}
 
 		// TODO

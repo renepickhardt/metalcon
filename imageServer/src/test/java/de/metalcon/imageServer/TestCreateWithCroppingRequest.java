@@ -169,10 +169,92 @@ public class TestCreateWithCroppingRequest {
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
 
 		// FIXME expected response is not reasonable
+		assertEquals(ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingTopNotGiven() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE, null,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
+
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Create.CROP_TOP
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingTopInvalid() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_TOP_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
+
+		// FIXME expected response is not reasonable
+		assertEquals(ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingWidthNotGiven() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE, null,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
+
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Create.CROP_WIDTH
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingWidthInvalid() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
+
+		// FIXME expected response is not reasonable
+		assertEquals(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingHeightNotGiven() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE, null);
+
+		assertEquals(this.responseBeginMissing
+				+ ProtocolConstants.Parameters.Create.CROP_HEIGHT
+				+ this.responseEndMissing,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testCroppingHeightInvalid() {
+		this.processCreateRequest("validIdentifier", imageFileItem,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_HEIGHT_COORDINATE);
+
+		// FIXME expected response is not reasonable
 		assertEquals(
-				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
-						+ ProtocolConstants.Parameters.Create.CROP_LEFT
-						+ this.responseEndMalformed,
+				ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 

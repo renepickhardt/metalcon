@@ -57,6 +57,29 @@ public class CreateResponse extends Response {
 						+ ". This value should be greater or equals 0");
 	}
 
+	public void cropTopCoordinateInvalid(int top) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID,
+				"The top side cropping coordinate is" + top
+						+ ". This value should be greater or equals 0");
+	}
+
+	public void cropWidthInvalid(int width) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID,
+				"The top side cropping coordinate is" + width
+						+ ". This value should be greater or equals 0");
+
+	}
+
+	public void cropHeightInvalid(int height) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID,
+				"The top side cropping coordinate is" + height
+						+ ". This value should be greater or equals 0");
+
+	}
+
 	public void imageIdentifierInUse(final String imageIdentifier) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
