@@ -11,6 +11,7 @@ import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
+import de.metalcon.sdd.tomcat.Servlet;
 
 public abstract class Entity {
     
@@ -36,15 +37,12 @@ public abstract class Entity {
                                               Server server);
     
     protected static String getParam(Map<String, String[]> params, String key) {
-        String[] vals = params.get(key);
-        if (vals != null) {
-            String val = vals[0];
-            if (val != null)
-                return val;
-        }
-        
-        // TODO: handle this
-        throw new RuntimeException();
+        return getParam(params, key, false);
+    }
+    
+    protected static String getParam(Map<String, String[]> params, String key,
+                                     boolean optional) {
+        return Servlet.getParam(params, key, optional);
     }
     
     protected static Map<String, String> parseJson(String json) {

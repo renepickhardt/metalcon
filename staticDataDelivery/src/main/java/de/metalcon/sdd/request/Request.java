@@ -3,6 +3,7 @@ package de.metalcon.sdd.request;
 import java.util.Map;
 
 import de.metalcon.sdd.server.Server;
+import de.metalcon.sdd.tomcat.Servlet;
 
 public abstract class Request {
     
@@ -19,15 +20,11 @@ public abstract class Request {
     }
     
     protected String getParam(String key) {
-        String[] vals = params.get(key);
-        if (vals != null) {
-            String val = vals[0];
-            if (val != null)
-                return val;
-        }
-        
-        // TODO: handle this
-        throw new RuntimeException();
+        return getParam(key, false);
+    }
+    
+    protected String getParam(String key, boolean optional) {
+        return Servlet.getParam(params, key, optional);
     }
     
     public abstract Map<String, Object> run();
