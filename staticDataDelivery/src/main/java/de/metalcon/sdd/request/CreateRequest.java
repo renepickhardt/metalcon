@@ -65,6 +65,7 @@ public class CreateRequest extends Request {
             System.out.println("--- " + new IdDetail(id, detail).toString());
             System.out.println(entity.getJson(detail));
         }
+        server.commitWriteBatch();
     }
     
     public static void main(String[] args) throws InterruptedException {

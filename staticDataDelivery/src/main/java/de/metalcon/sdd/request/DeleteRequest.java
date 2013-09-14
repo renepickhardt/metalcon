@@ -42,6 +42,7 @@ public class DeleteRequest extends Request {
                 continue;
             server.deleteEntity(new IdDetail(id, detail));
         }
+        server.commitWriteBatch();
     }
     
     public static void main(String[] args) throws InterruptedException {

@@ -13,6 +13,7 @@ import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.request.Request;
 
+
 // LevelDB
 import org.iq80.leveldb.*;
 
@@ -23,11 +24,13 @@ public class Server implements ServletContextListener {
     final private static String dbPath = "/usr/share/sdd";
 
     private DB db;
+    
+    private WriteBatch batch;
 
     private BlockingQueue<Request> queue;
 
     private Worker worker;
-
+    
     public void start() {
         Options options = new Options();
         options.createIfMissing(true);
@@ -38,7 +41,9 @@ public class Server implements ServletContextListener {
             e.printStackTrace();
             throw new RuntimeException();
         }
-
+        
+        batch = db.createWriteBatch();
+        
         queue = new LinkedBlockingQueue<Request>();
         worker = new Worker(queue);
         worker.start();
@@ -49,10 +54,16 @@ public class Server implements ServletContextListener {
         worker.waitForShutdown();
         
         try {
+            batch.close();
+        } catch (IOException e) {
+            // TODO: handle this
+            throw new RuntimeException();
+        }
+        
+        try {
             db.close();
         } catch (IOException e) {
             // TODO: handle this
-            e.printStackTrace();
             throw new RuntimeException();
         }
     }
@@ -74,7 +85,7 @@ public class Server implements ServletContextListener {
             // TODO: handle this
             throw new RuntimeException();
         }
-        db.put(bytes(entity.toString()), bytes(json));
+        batch.put(bytes(entity.toString()), bytes(json));
     }
     
     public void deleteEntity(IdDetail entity) {
@@ -82,7 +93,18 @@ public class Server implements ServletContextListener {
             // TODO: handle this
             throw new RuntimeException();
         }
-        db.delete(bytes(entity.toString()));
+        batch.delete(bytes(entity.toString()));
+    }
+    
+    public void commitWriteBatch() {
+        db.write(batch);
+        try {
+            batch.close();
+        } catch (IOException e) {
+            // TODO: handle this
+            throw new RuntimeException();
+        }
+        batch = db.createWriteBatch();
     }
 
     @Override
