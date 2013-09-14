@@ -75,7 +75,7 @@ public class ImportScript {
 				}
 
 				
-		String path = "/var/lib/datasets/rawdata/wikipedia/de/personlized search/wiki-pr.tsv";
+		String path = "/var/lib/datasets/rawdata/wikipedia/de/personlizedsearch/wiki-pr.tsv";
 		HashMap<Integer, Integer> prValues = new HashMap<Integer, Integer>();
 //				HashMap<String, Integer> prTitles = new HashMap<String, Integer>();
 
@@ -98,7 +98,7 @@ public class ImportScript {
 			e.printStackTrace();
 		}
 		
-		path = "/var/lib/datasets/rawdata/wikipedia/de/personlized search/wiki-titles.tsv";
+		path = "/var/lib/datasets/rawdata/wikipedia/de/personlizedsearch/wiki-titles.tsv";
 		br = null;
 		try {
 			br = new BufferedReader(new FileReader(path));

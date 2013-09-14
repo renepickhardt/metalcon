@@ -38,29 +38,30 @@ public class Search {
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		int priority = 100000;
 
-		try {
-			FileInputStream saveFile = new FileInputStream("saveFile.sav");
-			ObjectInputStream restore = new ObjectInputStream(saveFile);
-
-			Object obj = restore.readObject();
-
-			while (true) {
-				try {
-					CreateRequestContainer suggestTreeEntry = (CreateRequestContainer) restore
-							.readObject();
-					suggestTree.put(suggestTreeEntry.getSuggestString(),
-							suggestTreeEntry.getWeight(),
-							suggestTreeEntry.getKey());
-					imageIndex.put(suggestTreeEntry.getKey(),
-							suggestTreeEntry.getImageBase64());
-				} catch (EOFException e) {
-					break;
-				}
-
-			}
-
-		} catch (IOException | ClassNotFoundException e1) {
-
+//		try {
+//			FileInputStream saveFile = new FileInputStream("saveFile.sav");
+//			ObjectInputStream restore = new ObjectInputStream(saveFile);
+//
+//			Object obj = restore.readObject();
+//
+//			while (true) {
+//				try {
+//					CreateRequestContainer suggestTreeEntry = (CreateRequestContainer) restore
+//							.readObject();
+//					suggestTree.put(suggestTreeEntry.getSuggestString(),
+//							suggestTreeEntry.getWeight(),
+//							suggestTreeEntry.getKey());
+//					imageIndex.put(suggestTreeEntry.getKey(),
+//							suggestTreeEntry.getImageBase64());
+//				} catch (EOFException e) {
+//					break;
+//				}
+//
+//			}
+//
+//		} catch (IOException | ClassNotFoundException e1) {
+//
+//		}
 
 				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
 				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
@@ -109,6 +110,5 @@ public class Search {
 				}*/
 //		}
 
-		}
 	}
 }
