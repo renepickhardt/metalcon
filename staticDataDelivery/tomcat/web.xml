@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee">
+  <display-name>staticDataDelivery</display-name>
+  <listener>
+    <listener-class>de.metalcon.sdd.server.Server</listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>Read</servlet-name>
+    <description>TODO</description>
+    <servlet-class>de.metalcon.sdd.tomcat.Read</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Create</servlet-name>
+    <description>TODO</description>
+    <servlet-class>de.metalcon.sdd.tomcat.Create</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Update</servlet-name>
+    <description>TODO</description>
+    <servlet-class>de.metalcon.sdd.tomcat.Update</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Delete</servlet-name>
+    <description>TODO</description>
+    <servlet-class>de.metalcon.sdd.tomcat.Delete</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Read</servlet-name>
+    <url-pattern>/read</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Create</servlet-name>
+    <url-pattern>/create</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Update</servlet-name>
+    <url-pattern>/update</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Delete</servlet-name>
+    <url-pattern>/delete</url-pattern>
+  </servlet-mapping>
+</web-app>
+

@@ -1,0 +1,116 @@
+package de.metalcon.sdd.entity;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONValue;
+
+import de.metalcon.common.JsonString;
+import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.server.Server;
+
+public class Person extends Entity {
+    
+    private String name;
+    
+    private String firstname;
+    
+    private String lastname;
+    
+    private String url;
+    
+    private String birthday;
+    
+    private City city;
+    
+    @Override
+    public void loadFromJson(String json, Server server) {
+        Map<String, String> entity = parseJson(json);
+        
+        setId(entity.get("id"));
+        firstname = entity.get("firstname");
+        lastname = entity.get("lastname");
+        url = entity.get("url");
+        birthday = entity.get("birthday");
+        city = new City();
+        city.loadFromId(entity.get("city"), server);
+        loadAfter();
+    }
+    
+    public void loadFromCreateParams(Map<String, String[]> params,
+                                     Server server) {
+        setId(getParam(params, "id"));
+        firstname = getParam(params, "firstname");
+        lastname = getParam(params, "lastname");
+        url = getParam(params, "url");
+        birthday = getParam(params, "birthday");
+        city = new City();
+        city.loadFromId(getParam(params, "city"), server);
+        loadAfter();
+    }
+    
+    public void loadAfter() {
+        name = firstname + " " + lastname;
+    }
+    
+    @Override
+    protected void generateJson() {
+        Map<String, Object> j;
+        
+        // FULL
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        j.put("firstname", firstname);
+        j.put("lastname", lastname);
+        j.put("url", url);
+        j.put("birthday", birthday);
+        j.put("city", city.getId());
+        json.put(Detail.FULL, JSONValue.toJSONString(j));
+        
+        // SYMBOL
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        j.put("name", name);
+        j.put("firstname", firstname);
+        j.put("lastname", lastname);
+        j.put("url", url);
+        json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
+        
+        // LINE 
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        j.put("name", name);
+        j.put("firstname", firstname);
+        j.put("lastname", lastname);
+        j.put("url", url);
+        j.put("birthday", birthday);
+        j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
+        json.put(Detail.LINE, JSONValue.toJSONString(j));
+        
+        // PARAGRAPH
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
+        
+        // PROFILE
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        json.put(Detail.PROFILE, JSONValue.toJSONString(j));
+        
+        // TOOLTIP
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
+        
+        // SEARCH_ENTRY
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        json.put(Detail.SEARCH_ENTRY, JSONValue.toJSONString(j));
+        
+        // SEARCH_DETAILED
+        j = new LinkedHashMap<String, Object>();
+        j.put("id", getId());
+        json.put(Detail.SEARCH_DETAILED, JSONValue.toJSONString(j));
+    }
+
+}
