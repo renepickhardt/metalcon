@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.simple.JSONValue;
 
 import de.metalcon.common.JsonString;
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
 
@@ -27,25 +28,25 @@ public class Person extends Entity {
     public void loadFromJson(String json, Server server) {
         Map<String, String> entity = parseJson(json);
         
-        setId(entity.get("id"));
+        setId(new Muid(entity.get("id")));
         firstname = entity.get("firstname");
         lastname = entity.get("lastname");
         url = entity.get("url");
         birthday = entity.get("birthday");
         city = new City();
-        city.loadFromId(entity.get("city"), server);
+        city.loadFromId(new Muid(entity.get("city")), server);
         loadAfter();
     }
     
     public void loadFromCreateParams(Map<String, String[]> params,
                                      Server server) {
-        setId(getParam(params, "id"));
+        setId(new Muid(getParam(params, "id")));
         firstname = getParam(params, "firstname");
         lastname = getParam(params, "lastname");
         url = getParam(params, "url");
         birthday = getParam(params, "birthday");
         city = new City();
-        city.loadFromId(getParam(params, "city"), server);
+        city.loadFromId(new Muid(getParam(params, "city")), server);
         loadAfter();
     }
     
@@ -59,17 +60,17 @@ public class Person extends Entity {
         
         // FULL
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         j.put("firstname", firstname);
         j.put("lastname", lastname);
         j.put("url", url);
         j.put("birthday", birthday);
-        j.put("city", city.getId());
+        j.put("city", city.getId().toString());
         json.put(Detail.FULL, JSONValue.toJSONString(j));
         
         // SYMBOL
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         j.put("name", name);
         j.put("firstname", firstname);
         j.put("lastname", lastname);
@@ -78,7 +79,7 @@ public class Person extends Entity {
         
         // LINE 
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         j.put("name", name);
         j.put("firstname", firstname);
         j.put("lastname", lastname);
@@ -89,27 +90,27 @@ public class Person extends Entity {
         
         // PARAGRAPH
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
         
         // PROFILE
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
         
         // TOOLTIP
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
         
         // SEARCH_ENTRY
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         json.put(Detail.SEARCH_ENTRY, JSONValue.toJSONString(j));
         
         // SEARCH_DETAILED
         j = new LinkedHashMap<String, Object>();
-        j.put("id", getId());
+        j.put("id", getId().toString());
         json.put(Detail.SEARCH_DETAILED, JSONValue.toJSONString(j));
     }
 

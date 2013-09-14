@@ -7,6 +7,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import de.metalcon.common.JsonOrderedFactory;
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
@@ -17,14 +18,14 @@ public abstract class Entity {
     
     protected Map<Detail, String> json;
     
-    private String id;
+    private Muid id;
     
     public Entity() {
         jsonGenerated = false;
         json = new LinkedHashMap<Detail, String>();
     }
     
-    public void loadFromId(String id, Server server) {
+    public void loadFromId(Muid id, Server server) {
         String json = server.readEntity(new IdDetail(id, Detail.FULL));
         loadFromJson(json, server);
     }
@@ -71,11 +72,11 @@ public abstract class Entity {
         return json.get(detail);
     }
     
-    public String getId() {
+    public Muid getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Muid id) {
         this.id = id;
     }
     

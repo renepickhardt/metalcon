@@ -19,6 +19,8 @@ import org.iq80.leveldb.*;
 import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 public class Server implements ServletContextListener {
+    
+    final private static String dbPath = "/usr/share/sdd";
 
     private DB db;
 
@@ -30,7 +32,7 @@ public class Server implements ServletContextListener {
         Options options = new Options();
         options.createIfMissing(true);
         try {
-            db = factory.open(new File("/usr/share/sdd"), options);
+            db = factory.open(new File(dbPath), options);
         } catch (IOException e) {
             // TODO: handle this
             e.printStackTrace();

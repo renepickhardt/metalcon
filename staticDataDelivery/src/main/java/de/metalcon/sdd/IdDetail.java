@@ -1,5 +1,6 @@
 package de.metalcon.sdd;
 
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.error.ReadRequestInvalidDetailError;
 import de.metalcon.sdd.error.ReadRequestInvalidQueryError;
 
@@ -7,10 +8,10 @@ public class IdDetail {
     
     final public static char delimeter = ':';
 
-    private String id;
+    private Muid id;
     private Detail detail;
     
-    public IdDetail(String id, Detail detail) {
+    public IdDetail(Muid id, Detail detail) {
         this.id = id;
         this.detail = detail;
     }
@@ -25,7 +26,7 @@ public class IdDetail {
                 || colonPos == idDetail.length() - 1)
             throw new ReadRequestInvalidQueryError();
         
-        id     = idDetail.substring(0, colonPos);
+        id     = new Muid(idDetail.substring(0, colonPos));
         // TODO: validate id
         detail = Detail.stringToEnum(idDetail.substring(colonPos + 1));
         if (detail == Detail.NONE)
@@ -33,10 +34,10 @@ public class IdDetail {
     }
     
     public String toString() {
-        return id + delimeter + Detail.enumToString(detail);
+        return id.toString() + delimeter + Detail.enumToString(detail);
     }
     
-    public String getId() {
+    public Muid getId() {
         return id;
     }
     

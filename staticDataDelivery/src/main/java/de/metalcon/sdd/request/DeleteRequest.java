@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.simple.JSONValue;
 
 import de.metalcon.common.JsonPrettyPrinter;
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
@@ -34,7 +35,7 @@ public class DeleteRequest extends Request {
     
     @Override
     public void exec() {
-        String id = getParam("id");
+        Muid id = new Muid(getParam("id"));
         
         for (Detail detail : Detail.values()) {
             if (detail == Detail.NONE)

@@ -8,6 +8,7 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.EntityType;
 import de.metalcon.common.JsonPrettyPrinter;
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.entity.City;
@@ -40,7 +41,7 @@ public class CreateRequest extends Request {
     public void exec() {
         Entity entity;
         
-        String id = getParam("id");
+        Muid id = new Muid(getParam("id"));
         
         // switch (getParam(Muid.getMuidType(id))) {
         switch (EntityType.stringToEnum(getParam("type"))) {
