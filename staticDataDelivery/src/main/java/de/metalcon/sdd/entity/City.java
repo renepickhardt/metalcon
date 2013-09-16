@@ -17,8 +17,12 @@ public class City extends Entity {
     
     private String country;
     
+    public City(Server server) {
+        super(server);
+    }
+    
     @Override
-    public void loadFromJson(String json, Server server) {
+    public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
         
         setId(new Muid(entity.get("id")));
@@ -27,18 +31,16 @@ public class City extends Entity {
         country = entity.get("country");
     }
     
-    public void loadFromCreateParams(Map<String, String[]> params,
-                                     Server server) {
+    public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
         name = getParam(params, "name");
         url = getParam(params, "url");
         country = getParam(params, "country");
     }
     
-    public void loadFromUpdateParams(Map<String, String[]> params,
-                                     Server server) {
+    public void loadFromUpdateParams(Map<String, String[]> params) {
         Muid id = new Muid(getParam(params, "id"));
-        loadFromId(id, server);
+        loadFromId(id);
         
         String name = getParam(params, "name", true);
         if (name != null)

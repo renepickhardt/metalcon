@@ -16,29 +16,30 @@ import de.metalcon.sdd.tomcat.Servlet;
 
 public abstract class Entity {
     
+    protected Server server;
+    
     protected boolean jsonGenerated;
     
     protected Map<Detail, String> json;
     
     private Muid id;
     
-    public Entity() {
+    public Entity(Server server) {
+        this.server = server;
         jsonGenerated = false;
         json = new LinkedHashMap<Detail, String>();
     }
     
-    public void loadFromId(Muid id, Server server) {
+    public void loadFromId(Muid id) {
         String json = server.readEntity(new IdDetail(id, Detail.FULL));
-        loadFromJson(json, server);
+        loadFromJson(json);
     }
     
-    public abstract void loadFromJson(String json, Server server);
+    public abstract void loadFromJson(String json);
     
-    public abstract void loadFromCreateParams(Map<String, String[]> params,
-                                              Server server);
+    public abstract void loadFromCreateParams(Map<String, String[]> params);
     
-    public abstract void loadFromUpdateParams(Map<String, String[]> params,
-                                              Server server);
+    public abstract void loadFromUpdateParams(Map<String, String[]> params);
     
     protected static String getParam(Map<String, String[]> params, String key) {
         return getParam(params, key, false);
@@ -82,10 +83,10 @@ public abstract class Entity {
         this.id = id;
     }
     
-    public static Entity newEntityByType(EntityType type) {
+    public static Entity newEntityByType(EntityType type, Server server) {
         switch (type) {
-            case CITY:              return new City();
-            case PERSON:            return new Person();
+            case CITY:              return new City(server);
+            case PERSON:            return new Person(server);
                 
             case NONE:
             default:

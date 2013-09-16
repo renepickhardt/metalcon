@@ -35,9 +35,9 @@ public class CreateRequest extends Request {
     @Override
     public void runQueueAction() {
         Entity entity = Entity.newEntityByType(EntityType
-                .stringToEnum(getParam("type")));
+                .stringToEnum(getParam("type")), server);
 //        Entity entity = Entity.newEntityByType(id.getType());
-        entity.loadFromCreateParams(params, server);
+        entity.loadFromCreateParams(params);
         server.writeEntity(entity);
     }
     

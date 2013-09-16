@@ -24,8 +24,12 @@ public class Person extends Entity {
     
     private City city;
     
+    public Person(Server server) {
+        super(server);
+    }
+    
     @Override
-    public void loadFromJson(String json, Server server) {
+    public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
         
         setId(new Muid(entity.get("id")));
@@ -33,27 +37,25 @@ public class Person extends Entity {
         lastname = entity.get("lastname");
         url = entity.get("url");
         birthday = entity.get("birthday");
-        city = new City();
-        city.loadFromId(new Muid(entity.get("city")), server);
+        city = new City(server);
+        city.loadFromId(new Muid(entity.get("city")));
         loadAfter();
     }
     
-    public void loadFromCreateParams(Map<String, String[]> params,
-                                     Server server) {
+    public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
         firstname = getParam(params, "firstname");
         lastname = getParam(params, "lastname");
         url = getParam(params, "url");
         birthday = getParam(params, "birthday");
-        city = new City();
-        city.loadFromId(new Muid(getParam(params, "city")), server);
+        city = new City(server);
+        city.loadFromId(new Muid(getParam(params, "city")));
         loadAfter();
     }
     
-    public void loadFromUpdateParams(Map<String, String[]> params,
-                                     Server server) {
+    public void loadFromUpdateParams(Map<String, String[]> params) {
         Muid id = new Muid(getParam(params, "id"));
-        loadFromId(id, server);
+        loadFromId(id);
         
         String firstname = getParam(params, "firstname", true);
         if (firstname != null)
@@ -69,8 +71,8 @@ public class Person extends Entity {
             this.birthday = birthday;
         String city = getParam(params, "city", true);
         if (city != null) {
-            this.city = new City();
-            this.city.loadFromId(new Muid(city), server);
+            this.city = new City(server);
+            this.city.loadFromId(new Muid(city));
         }
         loadAfter();
     }
