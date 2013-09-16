@@ -7,8 +7,7 @@ public class ReadRequest {
 
 	private final String imageIdentifier;
 
-	public ReadRequest(final String imageIdentifier,
-			final Boolean originalImageFlag) {
+	public ReadRequest(final String imageIdentifier) {
 		this.imageIdentifier = imageIdentifier;
 	}
 
@@ -21,36 +20,9 @@ public class ReadRequest {
 		final String imageIdentifier = checkImageIdentifier(formItemList,
 				response);
 		if (imageIdentifier != null) {
-			final Boolean originalImageFlag = checkOriginalImageFlag(
-					formItemList, response);
-			if (originalImageFlag != null) {
-				return new ReadRequest(imageIdentifier, originalImageFlag);
-			}
+			return new ReadRequest(imageIdentifier);
 		}
 		return null;
-	}
-
-	private static Boolean checkOriginalImageFlag(FormItemList formItemList,
-			ReadResponse response) {
-		String originalImageFlagString = null;
-		try {
-			originalImageFlagString = formItemList
-					.getField(ProtocolConstants.Parameters.Read.ORIGINAL_FLAG);
-		} catch (IllegalArgumentException e) {
-			response.addNoOriginalFlagError();
-			return null;
-		}
-		try {
-			Integer originalImageFlagInteger = Integer
-					.parseInt(originalImageFlagString);
-			if (originalImageFlagInteger == 0) {
-				return false;
-			}
-			return true;
-		} catch (NumberFormatException e) {
-			response.addOriginalImageFlagMalformedError();
-			return null;
-		}
 	}
 
 	private static String checkImageIdentifier(final FormItemList formItemList,
