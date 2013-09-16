@@ -35,6 +35,22 @@ public class City extends Entity {
         country = getParam(params, "country");
     }
     
+    public void loadFromUpdateParams(Map<String, String[]> params,
+                                     Server server) {
+        Muid id = new Muid(getParam(params, "id"));
+        loadFromId(id, server);
+        
+        String name = getParam(params, "name", true);
+        if (name != null)
+            this.name = name;
+        String url = getParam(params, "url", true);
+        if (url != null)
+            this.url = url;
+        String country = getParam(params, "country", true);
+        if (country != null)
+            this.country = country;
+    }
+    
     @Override
     protected void generateJson() {
         Map<String, Object> j;

@@ -28,7 +28,7 @@ public class Worker implements Runnable {
             Request request = null;
             while (!stopping) {
                 request = queue.take();
-                request.exec();
+                request.runQueueAction();
             }
         } catch (InterruptedException e) {
             // stopped by server

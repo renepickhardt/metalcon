@@ -3,11 +3,7 @@ package de.metalcon.sdd;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.iq80.leveldb.*;
-import org.json.simple.JSONValue;
 
 import static org.fusesource.leveldbjni.JniDBFactory.*;
 

@@ -50,6 +50,31 @@ public class Person extends Entity {
         loadAfter();
     }
     
+    public void loadFromUpdateParams(Map<String, String[]> params,
+                                     Server server) {
+        Muid id = new Muid(getParam(params, "id"));
+        loadFromId(id, server);
+        
+        String firstname = getParam(params, "firstname", true);
+        if (firstname != null)
+            this.firstname = firstname;
+        String lastname = getParam(params, "lastname", true);
+        if (lastname != null)
+            this.lastname = lastname;
+        String url = getParam(params, "url", true);
+        if (url != null)
+            this.url = url;
+        String birthday = getParam(params, "birthday", true);
+        if (birthday != null)
+            this.birthday = birthday;
+        String city = getParam(params, "city", true);
+        if (city != null) {
+            this.city = new City();
+            this.city.loadFromId(new Muid(city), server);
+        }
+        loadAfter();
+    }
+    
     public void loadAfter() {
         name = firstname + " " + lastname;
     }

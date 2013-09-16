@@ -8,12 +8,7 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.EntityType;
 import de.metalcon.common.JsonPrettyPrinter;
-import de.metalcon.common.Muid;
-import de.metalcon.sdd.Detail;
-import de.metalcon.sdd.IdDetail;
-import de.metalcon.sdd.entity.City;
 import de.metalcon.sdd.entity.Entity;
-import de.metalcon.sdd.entity.Person;
 import de.metalcon.sdd.server.Server;
 
 public class CreateRequest extends Request {
@@ -23,7 +18,7 @@ public class CreateRequest extends Request {
     }
     
     @Override
-    public Map<String, Object> run() {
+    public Map<String, Object> runHttpResponse() {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         
         if (server.addRequest(this)) {
@@ -38,34 +33,12 @@ public class CreateRequest extends Request {
     }
     
     @Override
-    public void exec() {
-        Entity entity;
-        
-        Muid id = new Muid(getParam("id"));
-        
-        // switch (getParam(Muid.getMuidType(id))) {
-        switch (EntityType.stringToEnum(getParam("type"))) {
-            case CITY:              entity = new City();            break;
-            case PERSON:            entity = new Person();          break;
-                
-            case NONE:
-            default:
-                // TODO: handle this
-                throw new RuntimeException();
-        }
-        
+    public void runQueueAction() {
+        Entity entity = Entity.newEntityByType(EntityType
+                .stringToEnum(getParam("type")));
+//        Entity entity = Entity.newEntityByType(id.getType());
         entity.loadFromCreateParams(params, server);
-        
-        for (Detail detail : Detail.values()) {
-            if (detail == Detail.NONE)
-                continue;
-            server.writeEntity(new IdDetail(id, detail),
-                               entity.getJson(detail));
-            // TODO: remove sysout
-            System.out.println("--- " + new IdDetail(id, detail).toString());
-            System.out.println(entity.getJson(detail));
-        }
-        server.commitWriteBatch();
+        server.writeEntity(entity);
     }
     
     public static void main(String[] args) throws InterruptedException {
@@ -92,10 +65,10 @@ public class CreateRequest extends Request {
         params.put("type",      new String[]{"city"});
         params.put("name",      new String[]{"Helsinki"});
         params.put("url",       new String[]{"/city/Helsinki"});
-        params.put("country",   new String[]{"Finnland"});
+        params.put("country",   new String[]{"Finland"});
         CreateRequest r = new CreateRequest(s);
         r.setParams(params);
-        String json = JSONValue.toJSONString(r.run());
+        String json = JSONValue.toJSONString(r.runHttpResponse());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
         Thread.sleep(100);

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.metalcon.common.EntityType;
 import de.metalcon.common.JsonOrderedFactory;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
@@ -34,6 +35,9 @@ public abstract class Entity {
     public abstract void loadFromJson(String json, Server server);
     
     public abstract void loadFromCreateParams(Map<String, String[]> params,
+                                              Server server);
+    
+    public abstract void loadFromUpdateParams(Map<String, String[]> params,
                                               Server server);
     
     protected static String getParam(Map<String, String[]> params, String key) {
@@ -78,6 +82,16 @@ public abstract class Entity {
         this.id = id;
     }
     
-
+    public static Entity newEntityByType(EntityType type) {
+        switch (type) {
+            case CITY:              return new City();
+            case PERSON:            return new Person();
+                
+            case NONE:
+            default:
+                // TODO: handle this
+                throw new RuntimeException();
+        }
+    }
     
 }

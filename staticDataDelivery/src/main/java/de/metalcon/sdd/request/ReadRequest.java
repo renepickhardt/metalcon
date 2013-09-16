@@ -27,7 +27,7 @@ public class ReadRequest extends Request {
     }
 
     @Override
-    public Map<String, Object> run() {
+    public Map<String, Object> runHttpResponse() {
         Map<String, Object> result;
 
         try {
@@ -63,7 +63,7 @@ public class ReadRequest extends Request {
     }
     
     @Override
-    public void exec() {
+    public void runQueueAction() {
         // TODO: You shouldn't push a ReadRequest into the Server queue.
         throw new RuntimeException();
     }
@@ -73,8 +73,8 @@ public class ReadRequest extends Request {
         s.start(); 
         
         ReadRequest r = new ReadRequest(s);
-        r.setQuery("2f364c13c0114e16:line,9568b0efb6ca8e26:symbol,2731c67201ae29ae:line,ce0058ac39a33616:line,11233033e2b36cff:symbol");
-        String json = JSONValue.toJSONString(r.run());
+        r.setQuery("2f364c13c0114e16:line,9568b0efb6ca8e26:symbol,2731c67201ae29ae:line,ce0058ac39a33616:line,11233033e2b36cff:line");
+        String json = JSONValue.toJSONString(r.runHttpResponse());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
         Thread.sleep(100);

@@ -9,10 +9,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
+import de.metalcon.sdd.entity.Entity;
 import de.metalcon.sdd.request.Request;
-
 
 // LevelDB
 import org.iq80.leveldb.*;
@@ -25,8 +26,6 @@ public class Server implements ServletContextListener {
 
     private DB db;
     
-    private WriteBatch batch;
-
     private BlockingQueue<Request> queue;
 
     private Worker worker;
@@ -42,8 +41,6 @@ public class Server implements ServletContextListener {
             throw new RuntimeException();
         }
         
-        batch = db.createWriteBatch();
-        
         queue = new LinkedBlockingQueue<Request>();
         worker = new Worker(queue);
         worker.start();
@@ -52,13 +49,6 @@ public class Server implements ServletContextListener {
     public void stop() {
         worker.stop();
         worker.waitForShutdown();
-        
-        try {
-            batch.close();
-        } catch (IOException e) {
-            // TODO: handle this
-            throw new RuntimeException();
-        }
         
         try {
             db.close();
@@ -80,33 +70,51 @@ public class Server implements ServletContextListener {
         return asString(db.get(bytes(entity.toString())));
     }
     
-    public void writeEntity(IdDetail entity, String json) {
-        if (entity.getDetail() == Detail.NONE) {
-            // TODO: handle this
-            throw new RuntimeException();
-        }
-        batch.put(bytes(entity.toString()), bytes(json));
-    }
-    
-    public void deleteEntity(IdDetail entity) {
-        if (entity.getDetail() == Detail.NONE) {
-            // TODO: handle this
-            throw new RuntimeException();
-        }
-        batch.delete(bytes(entity.toString()));
-    }
-    
-    public void commitWriteBatch() {
-        db.write(batch);
+    public void writeEntity(Entity entity) {
+        Muid id = entity.getId();
+        
+        WriteBatch batch = db.createWriteBatch();
         try {
-            batch.close();
-        } catch (IOException e) {
-            // TODO: handle this
-            throw new RuntimeException();
+            for (Detail detail : Detail.values()) {
+                if (detail == Detail.NONE)
+                    continue;
+                
+                batch.put(bytes(new IdDetail(id, detail).toString()),
+                          bytes(entity.getJson(detail)));
+            }
+            
+            db.write(batch);
+        } finally {
+            try {
+                batch.close();
+            } catch (IOException e) {
+                // TODO: handle this
+                throw new RuntimeException();
+            }
         }
-        batch = db.createWriteBatch();
     }
-
+    
+    public void deleteEntity(Muid id) {
+        WriteBatch batch = db.createWriteBatch();
+        try {
+            for (Detail detail : Detail.values()) {
+                if (detail == Detail.NONE)
+                    continue;
+                
+                batch.delete(bytes(new IdDetail(id, detail).toString()));
+            }
+            
+            db.write(batch);
+        } finally {
+            try {
+                batch.close();
+            } catch (IOException e) {
+                // TODO: handle this
+                throw new RuntimeException();
+            }
+        }
+    }
+    
     @Override
     public void contextInitialized(ServletContextEvent arg) {
         ServletContext context = arg.getServletContext();

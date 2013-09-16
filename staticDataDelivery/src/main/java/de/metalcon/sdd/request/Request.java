@@ -27,8 +27,8 @@ public abstract class Request {
         return Servlet.getParam(params, key, optional);
     }
     
-    public abstract Map<String, Object> run();
+    public abstract Map<String, Object> runHttpResponse();
     
-    public abstract void exec();
+    public abstract void runQueueAction();
     
 }

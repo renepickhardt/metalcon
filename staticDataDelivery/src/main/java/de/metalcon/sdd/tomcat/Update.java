@@ -15,7 +15,8 @@ public class Update extends Servlet {
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         UpdateRequest r = new UpdateRequest(server);
-        JsonResponder.writeJsonResponse(response, r.run());
+        r.setParams(request.getParameterMap());
+        JsonResponder.writeJsonResponse(response, r.runHttpResponse());
     }
 
 }
