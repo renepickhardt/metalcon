@@ -12,14 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.apache.commons.io.IOUtils;
-import org.xiph.libogg.ogg_packet;
-import org.xiph.libogg.ogg_page;
-import org.xiph.libogg.ogg_stream_state;
-import org.xiph.libvorbis.vorbis_block;
-import org.xiph.libvorbis.vorbis_comment;
-import org.xiph.libvorbis.vorbis_dsp_state;
-import org.xiph.libvorbis.vorbis_info;
-import org.xiph.libvorbis.vorbisenc;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import de.metalcon.musicStorageServer.protocol.create.CreateResponse;
 import de.metalcon.musicStorageServer.protocol.delete.DeleteResponse;
@@ -33,9 +28,15 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	 */
 	private static final Format FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static final vorbisenc ENCODER = new vorbisenc();
+	/**
+	 * JSON parser
+	 */
+	private static final JSONParser PARSER = new JSONParser();
 
-	private static final vorbis_dsp_state DSP_STATE = new vorbis_dsp_state();
+	/**
+	 * program name used for music conversion
+	 */
+	private static final String CONVERTER_PROGRAM = "avconv";
 
 	/**
 	 * year represented by the current formatted year
@@ -147,6 +148,77 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		return path.toString();
 	}
 
+	private static void storeBasisMusicItem(final File sourceFile,
+			final File destinationFile) throws ConverterExecutionException {
+		// create the parental directories
+		final File musicItemFileDir = destinationFile.getParentFile();
+		if (musicItemFileDir != null) {
+			musicItemFileDir.mkdirs();
+		}
+
+		final String[] arguments = new String[] {
+				"-i " + sourceFile.getAbsolutePath(), "-aq 100",
+				"-acodec libvorbis", destinationFile.getAbsolutePath() };
+		System.out.println(CONVERTER_PROGRAM);
+		for (String argument : arguments) {
+			System.out.println(argument);
+		}
+		System.out.println();
+
+		try {
+			final CommandLineCall ffmpeg = new CommandLineCall(
+					CONVERTER_PROGRAM, arguments);
+			final int exitCode = ffmpeg.waitFor();
+
+			System.out.println("exit code: " + exitCode);
+			final String consoleOutput = ffmpeg.getConsoleOutput();
+			if (consoleOutput != null) {
+				System.out.println(consoleOutput);
+			} else {
+				throw new ConverterExecutionException(
+						"failed to read ffmpeg response");
+			}
+		} catch (final IOException e) {
+			throw new ConverterExecutionException("failed to call ffmpeg");
+		}
+	}
+
+	private static void storeStreamingMusicItem(final File sourceFile,
+			final File destinationFile) {
+		// create the parental directories
+		final File musicItemFileDir = destinationFile.getParentFile();
+		if (musicItemFileDir != null) {
+			musicItemFileDir.mkdirs();
+		}
+
+		// TODO
+	}
+
+	/**
+	 * delete the content of a directory (clear)
+	 * 
+	 * @param directory
+	 *            directory that shall be cleared
+	 * @param removeRoot
+	 *            if set the directory passed will be removed too
+	 */
+	private static void deleteDirectoryContent(final File directory,
+			final boolean removeRoot) {
+		final File[] content = directory.listFiles();
+		if (content != null) {
+			for (File contentItem : content) {
+				if (contentItem.isDirectory()) {
+					deleteDirectoryContent(contentItem, true);
+				} else {
+					contentItem.delete();
+				}
+			}
+		}
+		if (removeRoot) {
+			directory.delete();
+		}
+	}
+
 	/**
 	 * create a new music storage server
 	 * 
@@ -177,6 +249,16 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		this.musicMetaDatabase = musicMetaDatabase;
 	}
 
+	/**
+	 * store a stream to a file
+	 * 
+	 * @param inputStream
+	 *            stream to be stored
+	 * @param destinationFile
+	 *            destination file to write the stream to
+	 * @throws IOException
+	 *             if the writing failed
+	 */
 	private static void storeToFile(final InputStream inputStream,
 			final File destinationFile) throws IOException {
 		final File parentalDirectory = destinationFile.getParentFile();
@@ -189,91 +271,41 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		IOUtils.copy(inputStream, fileOutputStream);
 	}
 
-	private boolean storeEncodedMusicItem(
-			final InputStream musicItemInputStream, final File destinationFile)
-			throws IOException {
-		final File parentalDirectory = destinationFile.getParentFile();
-		if (parentalDirectory != null) {
-			parentalDirectory.mkdirs();
-		}
-
-		final vorbis_info vorbisInfo = new vorbis_info();
-		final vorbisenc vorbisEncoder = new vorbisenc();
-		final vorbis_dsp_state vorbisState = new vorbis_dsp_state();
-
-		if (!vorbisEncoder.vorbis_encode_init(vorbisInfo, 2, 44100,
-				(this.sampleRateMin != -1) ? (this.sampleRateMin * 1000) : -1,
-				this.sampleRateAverage * 1000,
-				(this.sampleRateMax != -1) ? (this.sampleRateMax * 1000) : -1)) {
-			System.err.println("Failed to initialize vorbis encoder!");
-			return false;
-		}
-
-		if (!vorbisState.vorbis_analysis_init(vorbisInfo)) {
-			System.err.println("Failed to initialize vorbis DSP state!");
-			return false;
-		}
-
-		final vorbis_comment vorbisComment = new vorbis_comment();
-		final vorbis_block vorbisBlock = new vorbis_block(DSP_STATE);
-		final ogg_stream_state oggStreamState = new ogg_stream_state();
-
-		// create header
-		final ogg_packet header = new ogg_packet();
-		final ogg_packet header_comm = new ogg_packet();
-		final ogg_packet header_code = new ogg_packet();
-		vorbisState.vorbis_analysis_headerout(vorbisComment, header,
-				header_comm, header_code);
-
-		oggStreamState.ogg_stream_packetin(header);
-		oggStreamState.ogg_stream_packetin(header_comm);
-		oggStreamState.ogg_stream_packetin(header_code);
-
-		final ogg_page oggPage = new ogg_page();
-		final ogg_packet decodingPacket = new ogg_packet();
-
-		final OutputStream fileOutputStream = new FileOutputStream(
-				destinationFile);
-
-		// write header
-		while (oggStreamState.ogg_stream_flush(oggPage)) {
-			fileOutputStream.write(oggPage.header, 0, oggPage.header_len);
-			fileOutputStream.write(oggPage.body, 0, oggPage.body_len);
-		}
-
-		// TODO: encoding
-
-		return true;
-	}
-
+	@Override
 	public boolean createMusicItem(final String musicItemIdentifier,
 			final InputStream musicItemStream, final String metaData,
 			final CreateResponse response) {
 		if (!this.musicMetaDatabase.hasEntryWithIdentifier(musicItemIdentifier)) {
 			final String hash = generateHash(musicItemIdentifier);
-			final File tmpFile = this.getTemporaryFile(hash);
+			JSONObject metaDataJSON = null;
+			if (metaData != null) {
+				try {
+					metaDataJSON = (JSONObject) PARSER.parse(metaData);
+				} catch (final ParseException e) {
+					// TODO error: meta data format invalid
+					return false;
+				}
+			}
 
 			try {
-				if (!tmpFile.exists()) {
-					storeToFile(musicItemStream, tmpFile);
+				final File tmpFile = this.storeConvertedMusicItems(hash,
+						musicItemStream);
+				if (tmpFile != null) {
+					// store original music item
+					storeToFile(new FileInputStream(tmpFile),
+							this.getOriginalFile(hash));
 
-					try {
+					// create music item in database
+					this.musicMetaDatabase.addDatabaseEntry(
+							musicItemIdentifier, metaDataJSON);
 
-						// save the original image to the disk
-						final FileInputStream tmpInputStream = new FileInputStream(
-								tmpFile);
-						final File originalFile = this.getOriginalFile(hash);
-
-						if (!originalFile.exists()) {
-							storeToFile(tmpInputStream, originalFile);
-						}
-					} finally {
-						// delete temporary (music) file
-						tmpFile.delete();
-					}
+					return true;
 				} else {
-					// TODO error: hash collision
+					// TODO: hash collision
 				}
+			} catch (final ConverterExecutionException e) {
+				// TODO internal server error
+				e.printStackTrace();
 			} catch (final IOException e) {
 				// TODO internal server error
 			}
@@ -284,24 +316,28 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		return false;
 	}
 
+	@Override
 	public MusicData readMusicItem(final String musicItemIdentifier,
 			final ReadResponse response) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public String[] readMusicItemMetaData(final String[] musicItemIdentifiers,
 			final ReadResponse response) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public boolean updateMetaData(final String musicItemIdentifier,
 			final String metaData, final UpdateResponse response) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	@Override
 	public boolean deleteMusicItem(final String musicItemIdentifier,
 			final DeleteResponse response) {
 		// TODO Auto-generated method stub
@@ -346,11 +382,78 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	}
 
 	/**
+	 * generate the file handle to the streaming version of a music item
+	 * 
+	 * @param hash
+	 *            music item identifier hash
+	 * @return file handle to the streaming version of the music item passed
+	 */
+	private File getStreamingFile(final String hash) {
+		return new File(this.musicDirectory + getRelativeDirectory(hash, 3)
+				+ File.separator + "streaming", hash + ".ogg");
+	}
+
+	/**
+	 * store converted versions of a music item
+	 * 
+	 * @param hash
+	 *            music item identifier hash
+	 * @param musicItemStream
+	 *            music item input stream
+	 * @return handle to a copy of the original music file<br>
+	 *         <b>null</b> if there was a collision between music files
+	 * @throws IOException
+	 *             failed to store one of the music file versions
+	 * @throws ConvertingFailedException
+	 *             if the converting failed due to internal errors
+	 */
+	private File storeConvertedMusicItems(final String hash,
+			final InputStream musicItemStream) throws IOException,
+			ConverterExecutionException {
+		// store a copy of the original music file
+		final File tmpFile = this.getTemporaryFile(hash);
+
+		if (!tmpFile.exists()) {
+			storeToFile(musicItemStream, tmpFile);
+
+			try {
+				// try to create converted files
+				final File basisFile = this.getBasisFile(hash);
+				if (!basisFile.exists()) {
+					storeBasisMusicItem(tmpFile, basisFile);
+					storeStreamingMusicItem(tmpFile,
+							this.getStreamingFile(hash));
+
+					return tmpFile;
+				}
+			} finally {
+
+			}
+		}
+
+		// delete copy of the (music) file
+		tmpFile.delete();
+
+		// collision between music item files
+		return null;
+	}
+
+	/**
 	 * @return true - if the server is running<br>
 	 *         false - otherwise
 	 */
 	public boolean isRunning() {
 		return this.running;
+	}
+
+	/**
+	 * clear the server<br>
+	 * <b>removes all images and meta data</b>
+	 */
+	public void clear() {
+		deleteDirectoryContent(new File(this.musicDirectory), false);
+		deleteDirectoryContent(new File(this.temporaryDirectory), false);
+		this.musicMetaDatabase.clear();
 	}
 
 }
