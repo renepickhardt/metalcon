@@ -89,6 +89,7 @@ public class ProtocolConstants {
 			public static final String ORIGINAL_FLAG = "originalFlag";
 			public static final String IMAGE_WIDTH = "imageWidth";
 			public static final String IMAGE_HEIGHT = "imageHeight";
+			public static final String IMAGE_IDENTIFIER_LIST = "imageIdentifierList";
 		}
 
 		public class Update {

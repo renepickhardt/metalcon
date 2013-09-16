@@ -63,6 +63,18 @@ public class TestReadBulkRequest {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
+	// test if there are empty strings in the sting array after splitting
+	@Test
+	public void testIdentifierListContainsEmptyParts() {
+		this.processReadRequest(
+				ProtocolTestConstants.MALFORMED_IDENTIFIER_LIST, "100", "100");
+		assertEquals(this.responseBeginCorrupt
+				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST
+				+ this.responseEndMalformed,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+	}
+
 	@Test
 	public void testNoHeightGiven() {
 		this.processReadRequest("testIdentifier", null, "100");

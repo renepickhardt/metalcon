@@ -28,4 +28,5 @@ public class ProtocolTestConstants {
 	public static final String MALFORMED_CROPPING_TOP_COORDINATE = "NotANumber";
 	public static final String MALFORMED_CROPPING_WIDTH_COORDINATE = "NotANumber";
 	public static final String MALFORMED_CROPPING_HEIGHT_COORDINATE = "NotANumber";
+	public static final String MALFORMED_IDENTIFIER_LIST = "test,,test";
 }
