@@ -45,11 +45,65 @@ public class OggVorbisEncodingTest {
 		final AudioInputStream in = AudioSystem
 				.getAudioInputStream(new BufferedInputStream(
 						new FileInputStream(sourceFile), 1024));
+
+		final AudioFileFormat baseFileFormat = AudioSystem
+				.getAudioFileFormat(sourceFile);
+		final AudioFormat baseFormat = in.getFormat();
+		System.out.println("Source file");
+		System.out.println("-----------");
+		System.out.println("audio type: " + baseFileFormat.getType());
+		System.out.println("sample rate: " + (int) baseFormat.getSampleRate()
+				+ " Hz");
+		System.out.println("sample size: " + baseFormat.getSampleSizeInBits()
+				+ " bit");
+		System.out.println("channels: " + baseFormat.getChannels());
+		System.out
+				.println("frame size: " + baseFormat.getFrameSize() + " byte");
+		System.out.println("frame rate: " + baseFormat.getFrameRate()
+				+ " / second");
+
+		final AudioFormat decodeFormat = new AudioFormat(
+				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
+				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
+				baseFormat.getFrameRate(), false);
 		final AudioInputStream pcm = AudioSystem.getAudioInputStream(
-				AudioFormat.Encoding.PCM_SIGNED, in);
-		final AudioInputStream ulaw = AudioSystem.getAudioInputStream(
-				AudioFormat.Encoding.ULAW, pcm);
-		AudioSystem.write(ulaw, AudioFileFormat.Type.WAVE, tmpFile);
+				decodeFormat, in);
+		AudioSystem.write(pcm, AudioFileFormat.Type.WAVE, tmpFile);
+		System.out.println("Decoded audio file");
+		System.out.println("-----------");
+		System.out.println("audio type: " + decodeFormat.getEncoding());
+		System.out.println("sample rate: " + (int) decodeFormat.getSampleRate()
+				+ " Hz");
+		System.out.println("sample size: " + decodeFormat.getSampleSizeInBits()
+				+ " bit");
+		System.out.println("channels: " + decodeFormat.getChannels());
+		System.out.println("frame size: " + decodeFormat.getFrameSize()
+				+ " byte");
+		System.out.println("frame rate: " + decodeFormat.getFrameRate()
+				+ " / second");
+
+		// final AudioFormat rawFormat = new AudioFormat(
+		// AudioFormat.Encoding.ULAW, baseFormat.getSampleRate(), 16,
+		// baseFormat.getChannels(), baseFormat.getChannels() * 2,
+		// baseFormat.getFrameRate(), false);
+		// final AudioInputStream ulaw = AudioSystem.getAudioInputStream(
+		// AudioFormat.Encoding.ULAW, pcm);
+		// AudioSystem.write(ulaw, AudioFileFormat.Type.WAVE, tmpFile);
+
+		final AudioFileFormat tmpFileFormat = AudioSystem
+				.getAudioFileFormat(tmpFile);
+		System.out.println("Decoded audio file");
+		System.out.println("-----------");
+		System.out.println("audio type: " + tmpFileFormat.getType());
+		// System.out.println("sample rate: " + (int) rawFormat.getSampleRate()
+		// + " Hz");
+		// System.out.println("sample size: " + rawFormat.getSampleSizeInBits()
+		// + " bit");
+		// System.out.println("channels: " + rawFormat.getChannels());
+		// System.out.println("frame size: " + rawFormat.getFrameSize() +
+		// " byte");
+		// System.out.println("frame rate: " + rawFormat.getFrameRate()
+		// + " / second");
 
 		final vorbis_info vorbisInfo = new vorbis_info();
 		final vorbisenc vorbisEncoder = new vorbisenc();
@@ -146,7 +200,6 @@ public class OggVorbisEncodingTest {
 			}
 		}
 
-		tmpFile.delete();
+		// tmpFile.delete();
 	}
-
 }
