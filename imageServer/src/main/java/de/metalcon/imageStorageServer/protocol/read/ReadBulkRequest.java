@@ -17,7 +17,7 @@ public class ReadBulkRequest {
 		this.imageHeight = imageHeight;
 	}
 
-	public static ReadScaledRequest checkRequest(FormItemList formItemList,
+	public static ReadBulkRequest checkRequest(FormItemList formItemList,
 			ReadResponse readResponse) {
 		final String imageIdentifierList = checkImageIdentifierList(
 				formItemList, readResponse);
@@ -28,18 +28,25 @@ public class ReadBulkRequest {
 				final Integer imageHeight = checkImageHeight(formItemList,
 						readResponse);
 				if (imageWidth != null) {
-					return new ReadScaledRequest(imageIdentifierList,
-							imageWidth, imageHeight);
+					return new ReadBulkRequest(imageIdentifierList, imageWidth,
+							imageHeight);
 				}
 			}
 		}
 		return null;
 	}
 
-	private static String checkImageIdentifierList(FormItemList formItemList,
-			ReadResponse readResponse) {
-		// TODO Auto-generated method stub
+	private static String checkImageIdentifierList(
+			final FormItemList formItemList, final ReadResponse response) {
+		try {
+			return formItemList
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
+		} catch (final IllegalArgumentException e) {
+			response.addNoImageIdentifierError();
+		}
+
 		return null;
+
 	}
 
 	private static Integer checkImageHeight(FormItemList formItemList,
@@ -54,11 +61,16 @@ public class ReadBulkRequest {
 		}
 		try {
 			Integer imageHeightInteger = Integer.parseInt(imageHeightString);
-			return imageHeightInteger;
+			if (imageHeightInteger > 0) {
+				return imageHeightInteger;
+			} else {
+				response.addImageHeightToSmallError(imageHeightInteger);
+			}
 		} catch (NumberFormatException e) {
 			response.addImageHeightMalformedError();
-			return null;
+
 		}
+		return null;
 	}
 
 	private static Integer checkImageWidth(FormItemList formItemList,
@@ -73,10 +85,15 @@ public class ReadBulkRequest {
 		}
 		try {
 			Integer imageWidthInteger = Integer.parseInt(imageWidthString);
-			return imageWidthInteger;
+			if (imageWidthInteger > 0) {
+				return imageWidthInteger;
+			} else {
+				response.addImageWidthToSmallError(imageWidthInteger);
+			}
 		} catch (NumberFormatException e) {
 			response.addImageWidthMalformedError();
-			return null;
+
 		}
+		return null;
 	}
 }

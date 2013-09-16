@@ -50,6 +50,9 @@ public class ImageStorageServerTest {
 	private static final String[] VALID_READ_IDENTIFIERS = {
 			VALID_READ_IDENTIFIER, VALID_READ_IDENTIFIER2 };
 
+	private static final String[] DUPLICATE_READ_IDENTIFIERS = {
+			VALID_READ_IDENTIFIER, VALID_READ_IDENTIFIER };
+
 	private static final String VALID_CREATE_IDENTIFIER = "img3";
 
 	private static final String INVALID_META_DATA = "{ author: Testy }";
@@ -342,6 +345,42 @@ public class ImageStorageServerTest {
 			numEntries += 1;
 		}
 		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
+	}
+
+	@Test
+	public void testReadImagesWithDuplicate() throws IOException {
+		// let the server create the scaled versions
+		InputStream inputStream = this.server.readImages(
+				DUPLICATE_READ_IDENTIFIERS, VALID_READ_WIDTH, VALID_READ_WIDTH,
+				this.readResponse);
+		assertNotNull(inputStream);
+
+		ZipInputStream archiveStream = new ZipInputStream(inputStream);
+
+		int numEntries = 0;
+		while (archiveStream.getNextEntry() != null) {
+			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
+					VALID_READ_HEIGHT);
+
+			numEntries += 1;
+		}
+		assertEquals(DUPLICATE_READ_IDENTIFIERS.length, numEntries);
+
+		// read the scaled versions created before
+		inputStream = this.server.readImages(DUPLICATE_READ_IDENTIFIERS,
+				VALID_READ_WIDTH, VALID_READ_WIDTH, this.readResponse);
+		assertNotNull(inputStream);
+
+		archiveStream = new ZipInputStream(inputStream);
+
+		numEntries = 0;
+		while (archiveStream.getNextEntry() != null) {
+			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
+					VALID_READ_HEIGHT);
+
+			numEntries += 1;
+		}
+		assertEquals(DUPLICATE_READ_IDENTIFIERS.length, numEntries);
 	}
 
 	@Test
