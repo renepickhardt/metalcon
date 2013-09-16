@@ -74,8 +74,20 @@ public class ReadResponse extends Response {
 
 	}
 
+	public void addImageWidthToSmallError(Integer imageWidthInteger) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO,
+				"The requested width is zero or less. Please specify a value greater than zero instead.");
+	}
+
+	public void addImageHeightToSmallError(Integer imageWidthInteger) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO,
+				"The requested height is zero or less. Please specify a value greater than zero instead.");
+	}
+
 	/**
-	 * Adds an image not founf error message to the response.
+	 * Adds an image not found error message to the response.
 	 */
 	public void addImageNotFoundError() {
 		this.addStatusMessage(
@@ -91,4 +103,5 @@ public class ReadResponse extends Response {
 				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
 				"");
 	}
+
 }

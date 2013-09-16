@@ -63,25 +63,6 @@ public class TestReadRequest {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
-	@Test
-	public void testNoOriginalFlagGiven() {
-		this.processReadRequest("testIdentifier", null);
-		System.out.println(this.readResponse);
-		assertEquals(this.responseBeginMissing
-				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
-				+ this.responseEndMissing,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
-	}
-
-	@Test
-	public void testOriginalFlagMalformed() {
-		this.processReadRequest("testIdentifier", "wrong");
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
-				+ this.responseEndMalformed,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
-	}
-
 	private void processReadRequest(String imageIdentifier, String originalFlag) {
 		FormItemList formItemList = new FormItemList();
 		this.readResponse = new ReadResponse();
@@ -90,12 +71,6 @@ public class TestReadRequest {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
 					imageIdentifier);
-		}
-
-		if (originalFlag != null) {
-			formItemList.addField(
-					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
-					originalFlag);
 		}
 
 		ReadRequest.checkRequest(formItemList, this.readResponse);

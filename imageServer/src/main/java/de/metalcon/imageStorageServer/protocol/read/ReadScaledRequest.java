@@ -49,11 +49,16 @@ public class ReadScaledRequest {
 		}
 		try {
 			Integer imageHeightInteger = Integer.parseInt(imageHeightString);
-			return imageHeightInteger;
+			if (imageHeightInteger > 0) {
+				return imageHeightInteger;
+			} else {
+				response.addImageHeightToSmallError(imageHeightInteger);
+			}
 		} catch (NumberFormatException e) {
 			response.addImageHeightMalformedError();
-			return null;
+
 		}
+		return null;
 	}
 
 	private static Integer checkImageWidth(FormItemList formItemList,
@@ -68,11 +73,16 @@ public class ReadScaledRequest {
 		}
 		try {
 			Integer imageWidthInteger = Integer.parseInt(imageWidthString);
-			return imageWidthInteger;
+			if (imageWidthInteger > 0) {
+				return imageWidthInteger;
+			} else {
+				response.addImageWidthToSmallError(imageWidthInteger);
+			}
 		} catch (NumberFormatException e) {
 			response.addImageWidthMalformedError();
-			return null;
+
 		}
+		return null;
 	}
 
 	private static String checkImageIdentifier(final FormItemList formItemList,

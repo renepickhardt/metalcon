@@ -55,7 +55,7 @@ public class TestReadScaledRequest {
 
 	@Test
 	public void testNoIdentifierGiven() {
-		this.processReadRequest(null, "0", "100", "100");
+		this.processReadRequest(null, "100", "100");
 		System.out.println(this.readResponse);
 		assertEquals(this.responseBeginMissing
 				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER
@@ -64,27 +64,8 @@ public class TestReadScaledRequest {
 	}
 
 	@Test
-	public void testNoOriginalFlagGiven() {
-		this.processReadRequest("testIdentifier", null, "100", "100");
-		System.out.println(this.readResponse);
-		assertEquals(this.responseBeginMissing
-				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
-				+ this.responseEndMissing,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
-	}
-
-	@Test
-	public void testOriginalFlagMalformed() {
-		this.processReadRequest("testIdentifier", "wrong", "100", "100");
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Read.ORIGINAL_FLAG
-				+ this.responseEndMalformed,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
-	}
-
-	@Test
 	public void testNoHeightGiven() {
-		this.processReadRequest("testIdentifier", "0", null, "100");
+		this.processReadRequest("testIdentifier", null, "100");
 		assertEquals(this.responseBeginMissing
 				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
 				+ this.responseEndMissing,
@@ -93,7 +74,7 @@ public class TestReadScaledRequest {
 
 	@Test
 	public void testNoWidthGiven() {
-		this.processReadRequest("testIdentifier", "0", "100", null);
+		this.processReadRequest("testIdentifier", "100", null);
 		assertEquals(this.responseBeginMissing
 				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
 				+ this.responseEndMissing,
@@ -102,7 +83,7 @@ public class TestReadScaledRequest {
 
 	@Test
 	public void testWidthMalformed() {
-		this.processReadRequest("testIdentifier", "0", "100", "wrong");
+		this.processReadRequest("testIdentifier", "100", "wrong");
 		assertEquals(this.responseBeginCorrupt
 				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
 				+ this.responseEndMalformed,
@@ -111,15 +92,31 @@ public class TestReadScaledRequest {
 
 	@Test
 	public void testHeightMalformed() {
-		this.processReadRequest("testIdentifier", "0", "wrong", "100");
+		this.processReadRequest("testIdentifier", "wrong", "100");
 		assertEquals(this.responseBeginCorrupt
 				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
 				+ this.responseEndMalformed,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
-	private void processReadRequest(String imageIdentifier,
-			String originalFlag, String height, String width) {
+	@Test
+	public void testWidthTooSmall() {
+		this.processReadRequest("testIdentifier", "100", "-1");
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	@Test
+	public void testHeightTooSmall() {
+		this.processReadRequest("testIdentifier", "-1", "100");
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	private void processReadRequest(String imageIdentifier, String height,
+			String width) {
 
 		FormItemList formItemList = new FormItemList();
 		this.readResponse = new ReadResponse();
@@ -128,12 +125,6 @@ public class TestReadScaledRequest {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER,
 					imageIdentifier);
-		}
-
-		if (originalFlag != null) {
-			formItemList.addField(
-					ProtocolConstants.Parameters.Read.ORIGINAL_FLAG,
-					originalFlag);
 		}
 
 		if (height != null) {
