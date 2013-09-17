@@ -2,18 +2,10 @@ package de.metalcon.imageServer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import org.json.simple.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
@@ -24,36 +16,19 @@ import de.metalcon.utils.FormItemList;
 
 public class TestReadBulkRequest {
 
-	final private ServletConfig servletConfig = mock(ServletConfig.class);
-	final private ServletContext servletContext = mock(ServletContext.class);
-
 	private ReadResponse readResponse;
+
+	private static final String PARAM_MISSING_BEGIN = "request incomplete: parameter \"";
+	private static final String PARAM_MISSING_END = "\" is missing";
 	private JSONObject jsonResponse;
-	// private static FileItem imageFileItem;
-	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseEndMissing = "\" is missing";
-
-	@Before
-	public void initializeTest() {
-		HttpServlet servlet = mock(HttpServlet.class);
-		when(this.servletConfig.getServletContext()).thenReturn(
-				this.servletContext);
-
-		try {
-			servlet.init(this.servletConfig);
-		} catch (ServletException e) {
-			fail("could not initialize servlet");
-			e.printStackTrace();
-		}
-	}
 
 	@Test
 	public void testNoIdentifierGiven() {
 		this.processReadRequest(null, "100", "100");
 		System.out.println(this.readResponse);
-		assertEquals(this.responseBeginMissing
+		assertEquals(PARAM_MISSING_BEGIN
 				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER
-				+ this.responseEndMissing,
+				+ PARAM_MISSING_END,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
@@ -70,18 +45,18 @@ public class TestReadBulkRequest {
 	@Test
 	public void testNoHeightGiven() {
 		this.processReadRequest("testIdentifier", null, "100");
-		assertEquals(this.responseBeginMissing
+		assertEquals(PARAM_MISSING_BEGIN
 				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
-				+ this.responseEndMissing,
+				+ PARAM_MISSING_END,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testNoWidthGiven() {
 		this.processReadRequest("testIdentifier", "100", null);
-		assertEquals(this.responseBeginMissing
+		assertEquals(PARAM_MISSING_BEGIN
 				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
-				+ this.responseEndMissing,
+				+ PARAM_MISSING_END,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
