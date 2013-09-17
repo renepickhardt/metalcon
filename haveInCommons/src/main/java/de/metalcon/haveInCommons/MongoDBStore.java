@@ -52,22 +52,36 @@ public class MongoDBStore {
 		this.db.createCollection(collectionName, null);
 	}
 
-	public void insert(int from, int to, Set<String> neighbours,
-			DBCollection collection) {
-		BasicDBList dbl = new BasicDBList();
+	public void insert(String key, String value,
+			String collection) {
+		
 
-		for (String s : neighbours) {
-			dbl.add(new BasicDBObject("id", s));
+		//TODO:update documents first
+		BasicDBObject query = new BasicDBObject("key", key);
+		DBCursor cursor = new this.db.getCollection(collection).find(query);
+
+		try{
+			while(cursor.hasNext()){
+				DBObject dbo = cursor.next();
+				updateCommons(key, dbo);
+			}
 		}
 
+
+		BasicDBList dbl = new BasicDBList();
+
 		BasicDBObject dbo = new BasicDBObject("from", from).append("to", to)
-				.append("neighbours", dbl);
-		WriteResult result = collection.insert(dbo);
+				.append("commons", dbl);
+		WriteResult result = db.getCollection(collection).insert(dbo);
 		// TODO: Testing for errors
 	}
 
-	public Set<String> getPreferenceSet(int from, int to, String collection) {
-		BasicDBObject query = new BasicDBObject("from", from).append("to", to);
+	private void updateCommons(String key, DBObject dbo){
+		// TODO: implementation needed
+	}
+
+	public Set<String> getPreferenceSet(String key, String collection) {
+		BasicDBObject query = new BasicDBObject("key", key);
 		DBCursor cursor = this.db.getCollection(collection).find(query);
 
 		Set<String> items = new HashSet<String>((int)(cursor.size()/0.75)+1);
@@ -79,7 +93,7 @@ public class MongoDBStore {
 			while(cursor.hasNext()){
 				
 				item = cursor.next();
-				list = (BasicDBList)item.get("neighbours");
+				list = (BasicDBList)item.get("commons");
 				
 				for(Object itemid : list){
 					items.add((String)itemid);
@@ -89,7 +103,7 @@ public class MongoDBStore {
 			cursor.close();
 		}
 
-		return null;
+		return items;
 	}
 
 	/**
