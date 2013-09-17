@@ -15,6 +15,11 @@ import java.util.Properties;
 public class MSSConfig extends Properties {
 
 	/**
+	 * serialization information
+	 */
+	private static final long serialVersionUID = -3972072216600607421L;
+
+	/**
 	 * root directory for the music storage server
 	 */
 	public String music_directory;
@@ -25,19 +30,14 @@ public class MSSConfig extends Properties {
 	public String temporary_directory;
 
 	/**
-	 * sample rate targeted (in kbit/s)
+	 * quality of the basis files (in percent)
 	 */
-	public int sample_rate_average;
+	public int basis_quality;
 
 	/**
-	 * minimum sample rate (in kbit/s)
+	 * sample rate for stream files (in kbit/s)
 	 */
-	public int sample_rate_min;
-
-	/**
-	 * maximum sample rate (in kbit/s)
-	 */
-	public int sample_rate_max;
+	public int sample_rate_streaming;
 
 	/**
 	 * host address of the server the database runs at
@@ -139,24 +139,17 @@ public class MSSConfig extends Properties {
 	}
 
 	/**
-	 * @return sample rate targeted (in kbit/s)
+	 * @return quality of the basis files (in percent)
 	 */
-	public int getSampleRateAverage() {
-		return this.sample_rate_average;
+	public int getBasisQuality() {
+		return this.basis_quality;
 	}
 
 	/**
-	 * @return minimum sample rate (in kbit/s)
+	 * @return sample rate for stream files (in kbit/s)
 	 */
-	public int getSampleRateMin() {
-		return this.sample_rate_min;
-	}
-
-	/**
-	 * @return maximum sample rate (in kbit/s)
-	 */
-	public int getSampleRateMax() {
-		return this.sample_rate_max;
+	public int getSampleRateStreaming() {
+		return this.sample_rate_streaming;
 	}
 
 	/**

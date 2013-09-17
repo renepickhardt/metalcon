@@ -31,7 +31,7 @@ public class MusicStorageServerTest {
 		assertTrue(this.server.isRunning());
 
 		VALID_READ_STREAM_MP3 = new FileInputStream(new File(
-				"/home/sebschlicht/test.mp3"));
+				"/home/sebschlicht/mr_t_ba.jpg"));
 
 		this.createResponse = new CreateResponse();
 	}

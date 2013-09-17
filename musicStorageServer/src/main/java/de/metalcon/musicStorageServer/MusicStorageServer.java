@@ -16,6 +16,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.metalcon.musicStorageServer.converting.Avconv;
+import de.metalcon.musicStorageServer.converting.AvconvResponse;
+import de.metalcon.musicStorageServer.converting.exceptions.ConverterExecutionException;
+import de.metalcon.musicStorageServer.converting.exceptions.ConvertingFailedException;
 import de.metalcon.musicStorageServer.protocol.create.CreateResponse;
 import de.metalcon.musicStorageServer.protocol.delete.DeleteResponse;
 import de.metalcon.musicStorageServer.protocol.read.ReadResponse;
@@ -69,19 +73,14 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	private final String temporaryDirectory;
 
 	/**
-	 * minimum sample rate (in kbit/s)
+	 * quality of the basis files (in percent)
 	 */
-	private final int sampleRateMin;
+	private final int basisQuality;
 
 	/**
-	 * sample rate targeted (in kbit/s)
+	 * sample rate for stream files (in kbit/s)
 	 */
-	private final int sampleRateAverage;
-
-	/**
-	 * maximum sample rate (in kbit/s)
-	 */
-	private final int sampleRateMax;
+	private final int sampleRateStreaming;
 
 	/**
 	 * database for music item meta data
@@ -149,35 +148,24 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	}
 
 	private static void storeBasisMusicItem(final File sourceFile,
-			final File destinationFile) throws ConverterExecutionException {
+			final File destinationFile, final int quality)
+			throws ConverterExecutionException, ConvertingFailedException {
 		// create the parental directories
 		final File musicItemFileDir = destinationFile.getParentFile();
 		if (musicItemFileDir != null) {
 			musicItemFileDir.mkdirs();
 		}
 
-		final String[] arguments = new String[] {
-				"-i " + sourceFile.getAbsolutePath(), "-aq 100",
-				"-acodec libvorbis", destinationFile.getAbsolutePath() };
-		System.out.println(CONVERTER_PROGRAM);
-		for (String argument : arguments) {
-			System.out.println(argument);
-		}
-		System.out.println();
+		final Avconv converter = new Avconv(sourceFile.getAbsolutePath(),
+				destinationFile.getAbsolutePath());
+		converter.setQuality(quality);
 
 		try {
-			final CommandLineCall ffmpeg = new CommandLineCall(
-					CONVERTER_PROGRAM, arguments);
-			final int exitCode = ffmpeg.waitFor();
-
-			System.out.println("exit code: " + exitCode);
-			final String consoleOutput = ffmpeg.getConsoleOutput();
-			if (consoleOutput != null) {
-				System.out.println(consoleOutput);
-			} else {
-				throw new ConverterExecutionException(
-						"failed to read ffmpeg response");
+			final AvconvResponse response = converter.execute();
+			if (!response.succeeded()) {
+				throw new ConvertingFailedException(response.getErrorMessage());
 			}
+
 		} catch (final IOException e) {
 			throw new ConverterExecutionException("failed to call ffmpeg");
 		}
@@ -230,9 +218,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		MusicMetaDatabase musicMetaDatabase = null;
 		this.musicDirectory = config.getMusicDirectory();
 		this.temporaryDirectory = config.getTemporaryDirectory();
-		this.sampleRateAverage = config.getSampleRateAverage();
-		this.sampleRateMin = config.getSampleRateMin();
-		this.sampleRateMax = config.getSampleRateMax();
+		this.basisQuality = config.getBasisQuality();
+		this.sampleRateStreaming = config.getSampleRateStreaming();
 
 		try {
 			musicMetaDatabase = new MusicMetaDatabase(config.getDatabaseHost(),
@@ -303,6 +290,9 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				} else {
 					// TODO: hash collision
 				}
+			} catch (final ConvertingFailedException e) {
+				// TODO error: invalid music item stream
+				e.printStackTrace();
 			} catch (final ConverterExecutionException e) {
 				// TODO internal server error
 				e.printStackTrace();
@@ -404,12 +394,14 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	 *         <b>null</b> if there was a collision between music files
 	 * @throws IOException
 	 *             failed to store one of the music file versions
-	 * @throws ConvertingFailedException
+	 * @throws ConverterExecutionException
 	 *             if the converting failed due to internal errors
+	 * @throws ConvertingFailedException
+	 *             if the converting process failed
 	 */
 	private File storeConvertedMusicItems(final String hash,
 			final InputStream musicItemStream) throws IOException,
-			ConverterExecutionException {
+			ConverterExecutionException, ConvertingFailedException {
 		// store a copy of the original music file
 		final File tmpFile = this.getTemporaryFile(hash);
 
@@ -420,7 +412,7 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				// try to create converted files
 				final File basisFile = this.getBasisFile(hash);
 				if (!basisFile.exists()) {
-					storeBasisMusicItem(tmpFile, basisFile);
+					storeBasisMusicItem(tmpFile, basisFile, this.basisQuality);
 					storeStreamingMusicItem(tmpFile,
 							this.getStreamingFile(hash));
 
