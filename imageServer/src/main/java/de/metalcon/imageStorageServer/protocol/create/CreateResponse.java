@@ -182,8 +182,7 @@ public class CreateResponse extends Response {
 	 */
 	public void autoRotateFlagMalformed(final String autoRotateFlag) {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
-						+ ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
+				ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
 				"\""
 						+ autoRotateFlag
 						+ "\" is not a number. Please provide a number such as \"1\" to enable or \"0\" to disable automatic rotation.");
@@ -194,8 +193,7 @@ public class CreateResponse extends Response {
 	 */
 	public void metaDataMalformed() {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
-						+ ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
+				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
 				"Please pass a JSON object that contains the meta data you want to store or leave the field blank if you do not want to store meta data at all.");
 	}
 
