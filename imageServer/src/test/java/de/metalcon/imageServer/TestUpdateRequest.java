@@ -11,7 +11,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -23,7 +22,7 @@ import de.metalcon.imageStorageServer.protocol.update.UpdateRequest;
 import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 import de.metalcon.utils.FormItemList;
 
-public class testUpdateRequest {
+public class TestUpdateRequest {
 
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
 	final private ServletContext servletContext = mock(ServletContext.class);
@@ -31,16 +30,11 @@ public class testUpdateRequest {
 	private UpdateResponse updateResponse;
 	private JSONObject jsonResponse;
 	// private static FileItem imageFileItem;
-	private HttpServletRequest request;
 	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
-
-	private final String responseEndMalformed = "\" is malformed";
 
 	@Before
 	public void initializeTest() {
-		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
@@ -79,9 +73,8 @@ public class testUpdateRequest {
 		this.processUpdateRequest("testIdentifier",
 				ProtocolTestConstants.INVALID_IMAGE_METADATA);
 
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Update.META_DATA
-				+ this.responseEndMalformed,
+		assertEquals(
+				ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 

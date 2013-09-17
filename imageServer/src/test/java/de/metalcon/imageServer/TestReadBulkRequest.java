@@ -11,7 +11,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -31,16 +30,11 @@ public class TestReadBulkRequest {
 	private ReadResponse readResponse;
 	private JSONObject jsonResponse;
 	// private static FileItem imageFileItem;
-	private HttpServletRequest request;
 	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
-
-	private final String responseEndMalformed = "\" is malformed";
 
 	@Before
 	public void initializeTest() {
-		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
@@ -68,9 +62,7 @@ public class TestReadBulkRequest {
 	public void testIdentifierListContainsEmptyParts() {
 		this.processReadRequest(
 				ProtocolTestConstants.MALFORMED_IDENTIFIER_LIST, "100", "100");
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST
-				+ this.responseEndMalformed,
+		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 	}
@@ -96,18 +88,16 @@ public class TestReadBulkRequest {
 	@Test
 	public void testWidthMalformed() {
 		this.processReadRequest("testIdentifier", "100", "wrong");
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
-				+ this.responseEndMalformed,
+		// TODO: use status message!
+		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_WIDTH,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testHeightMalformed() {
 		this.processReadRequest("testIdentifier", "wrong", "100");
-		assertEquals(this.responseBeginCorrupt
-				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
-				+ this.responseEndMalformed,
+		// TODO: use status message!
+		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 

@@ -11,7 +11,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -31,7 +30,6 @@ public class TestDeleteRequest {
 	private DeleteResponse deleteResponse;
 	private JSONObject jsonResponse;
 	// private static FileItem imageFileItem;
-	private HttpServletRequest request;
 	private final String responseBeginMissing = "request incomplete: parameter \"";
 	// private final String responseBeginCorrupt =
 	// "request corrupt: parameter \"";
@@ -41,7 +39,6 @@ public class TestDeleteRequest {
 
 	@Before
 	public void initializeTest() {
-		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);

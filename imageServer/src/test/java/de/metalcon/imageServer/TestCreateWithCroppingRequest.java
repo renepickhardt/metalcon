@@ -13,7 +13,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
@@ -36,13 +35,10 @@ public class TestCreateWithCroppingRequest {
 	private CreateResponse createResponse;
 	private JSONObject jsonResponse;
 	private static FileItem imageFileItem;
-	private HttpServletRequest request;
 
 	// maybe make global constants out of this variables?
 	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseBeginCorrupt = "request corrupt: parameter \"";
 	private final String responseEndMissing = "\" is missing";
-	private final String responseEndMalformed = "\" is malformed";
 
 	@BeforeClass
 	public static void LoadImage() throws FileNotFoundException {
@@ -59,7 +55,6 @@ public class TestCreateWithCroppingRequest {
 
 	@Before
 	public void initializeTest() {
-		this.request = mock(HttpServletRequest.class);
 		HttpServlet servlet = mock(HttpServlet.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
@@ -140,8 +135,7 @@ public class TestCreateWithCroppingRequest {
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE);
 
 		assertEquals(
-				ProtocolConstants.StatusMessage.Create.RESPONSE_BEGIN_CORRUPT_REQUEST
-						+ ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
+				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
