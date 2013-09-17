@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.metalcon.musicStorageServer.converting.Avconv;
+import de.metalcon.musicStorageServer.converting.AvconvCommand;
 import de.metalcon.musicStorageServer.converting.AvconvResponse;
 import de.metalcon.musicStorageServer.converting.exceptions.ConverterExecutionException;
 import de.metalcon.musicStorageServer.converting.exceptions.ConvertingFailedException;
@@ -36,11 +36,6 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	 * JSON parser
 	 */
 	private static final JSONParser PARSER = new JSONParser();
-
-	/**
-	 * program name used for music conversion
-	 */
-	private static final String CONVERTER_PROGRAM = "avconv";
 
 	/**
 	 * year represented by the current formatted year
@@ -156,8 +151,9 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			musicItemFileDir.mkdirs();
 		}
 
-		final Avconv converter = new Avconv(sourceFile.getAbsolutePath(),
-				destinationFile.getAbsolutePath());
+		// create a new converter command
+		final AvconvCommand converter = new AvconvCommand(
+				sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath());
 		converter.setQuality(quality);
 
 		try {
@@ -172,14 +168,28 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	}
 
 	private static void storeStreamingMusicItem(final File sourceFile,
-			final File destinationFile) {
+			final File destinationFile, final int bitrate)
+			throws ConverterExecutionException, ConvertingFailedException {
 		// create the parental directories
 		final File musicItemFileDir = destinationFile.getParentFile();
 		if (musicItemFileDir != null) {
 			musicItemFileDir.mkdirs();
 		}
 
-		// TODO
+		// create a new converter command
+		final AvconvCommand converter = new AvconvCommand(
+				sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath());
+		converter.setBitrate(bitrate);
+
+		try {
+			final AvconvResponse response = converter.execute();
+			if (!response.succeeded()) {
+				throw new ConvertingFailedException(response.getErrorMessage());
+			}
+
+		} catch (final IOException e) {
+			throw new ConverterExecutionException("failed to call ffmpeg");
+		}
 	}
 
 	/**
@@ -414,7 +424,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				if (!basisFile.exists()) {
 					storeBasisMusicItem(tmpFile, basisFile, this.basisQuality);
 					storeStreamingMusicItem(tmpFile,
-							this.getStreamingFile(hash));
+							this.getStreamingFile(hash),
+							this.sampleRateStreaming);
 
 					return tmpFile;
 				}
