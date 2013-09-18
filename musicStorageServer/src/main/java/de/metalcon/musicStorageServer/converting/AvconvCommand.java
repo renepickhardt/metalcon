@@ -1,6 +1,10 @@
 package de.metalcon.musicStorageServer.converting;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * command line wrapper for converting via avconv
@@ -16,6 +20,19 @@ public class AvconvCommand {
 	private static final String PROGRAM_NAME = "avconv";
 
 	/**
+	 * meta data keys according to vorbis comment
+	 */
+	private static final String[] VORBIS_COMMENT_KEYS = { "title", "version",
+			"album", "tracknumber", "artist", "performer", "copyright",
+			"license", "organisation", "description", "genre", "date",
+			"location", "contact", "isrc",
+
+			/**
+			 * NOT part of vorbis comment but of tag readers
+			 */
+			"comment" };
+
+	/**
 	 * path to the source file
 	 */
 	private final String sourceFile;
@@ -24,6 +41,11 @@ public class AvconvCommand {
 	 * path to the destination file
 	 */
 	private final String destinationFile;
+
+	/**
+	 * meta data to be written to the destination file
+	 */
+	private final Map<String, String> metaData;
 
 	/**
 	 * output quality relative to the source file
@@ -47,10 +69,14 @@ public class AvconvCommand {
 	 *            path to the source file
 	 * @param destinationFile
 	 *            path to the destination file
+	 * @param metaData
+	 *            meta data to be written to the destination file
 	 */
-	public AvconvCommand(final String sourceFile, final String destinationFile) {
+	public AvconvCommand(final String sourceFile, final String destinationFile,
+			final Map<String, String> metaData) {
 		this.sourceFile = sourceFile;
 		this.destinationFile = destinationFile;
+		this.metaData = metaData;
 	}
 
 	/**
@@ -111,6 +137,13 @@ public class AvconvCommand {
 	}
 
 	/**
+	 * @return meta data to be written to the destination file
+	 */
+	public Map<String, String> getMetaData() {
+		return this.metaData;
+	}
+
+	/**
 	 * execute this converter command
 	 * 
 	 * @return command execution response
@@ -118,9 +151,31 @@ public class AvconvCommand {
 	 *             if IO errors occurred within console communication
 	 */
 	public AvconvResponse execute() throws IOException {
-		final String cmdCall = generateCommandLineCall(this);
-		final Process process = Runtime.getRuntime().exec(cmdCall);
+		final ProcessBuilder processBuilder = new ProcessBuilder(
+				generateCommandLineCall(this));
+		final Process process = processBuilder.start();
 		return AvconvResponse.readFromConsoleOutput(process.getErrorStream());
+	}
+
+	/**
+	 * extract the vorbis comment meta data from a map
+	 * 
+	 * @param metaData
+	 *            map containing meta data of any format
+	 * @return map containing meta data according to vorbis comment only
+	 */
+	private static Map<String, String> extractVorbisComment(
+			final Map<String, String> metaData) {
+		final Map<String, String> vorbisComment = new HashMap<String, String>();
+
+		for (String key : VORBIS_COMMENT_KEYS) {
+			final String value = metaData.get(key);
+			if (value != null) {
+				vorbisComment.put(key, value);
+			}
+		}
+
+		return vorbisComment;
 	}
 
 	/**
@@ -130,14 +185,28 @@ public class AvconvCommand {
 	 *            converter command to be represented
 	 * @return command line call representing the converter command passed
 	 */
-	private static String generateCommandLineCall(
+	private static List<String> generateCommandLineCall(
 			final AvconvCommand converterCommand) {
+		// extract meta data
+		final Map<String, String> metaData = extractVorbisComment(converterCommand
+				.getMetaData());
+
+		final List<String> cmdCall = new ArrayList<String>(
+				2 + metaData.size() + 4);
+
 		// program name
-		final StringBuilder line = new StringBuilder(PROGRAM_NAME);
+		cmdCall.add(PROGRAM_NAME);
 
 		// source file
-		line.append(" -i ");
-		line.append(converterCommand.getSourceFile());
+		cmdCall.add("-i");
+		cmdCall.add(converterCommand.getSourceFile());
+
+		// meta data
+		for (String key : metaData.keySet()) {
+			final String value = metaData.get(key);
+			cmdCall.add("-metadata");
+			cmdCall.add(key + "=" + value);
+		}
 
 		// output rate
 		final OutputRateType outputRateType = converterCommand
@@ -145,24 +214,23 @@ public class AvconvCommand {
 		if (outputRateType == null) {
 			throw new IllegalArgumentException("no output rate type set!");
 		} else if (outputRateType == OutputRateType.QUALITY) {
-			line.append(" -aq ");
-			line.append(converterCommand.getQuality());
+			cmdCall.add("-aq");
+			cmdCall.add(String.valueOf(converterCommand.getQuality()));
 		} else {
-			line.append(" -ab ");
-			line.append(converterCommand.getBitrate());
+			cmdCall.add("-ab");
+			cmdCall.add(String.valueOf(converterCommand.getBitrate()));
 		}
 
 		// audio encoder
-		line.append(" -acodec libvorbis");
+		cmdCall.add("-acodec");
+		cmdCall.add("libvorbis");
 
 		// no video encoding
-		line.append(" -vn");
+		cmdCall.add("-vn");
 
 		// destination file
-		line.append(" ");
-		line.append(converterCommand.getDestinationFile());
+		cmdCall.add(converterCommand.getDestinationFile());
 
-		return line.toString();
+		return cmdCall;
 	}
-
 }

@@ -38,12 +38,15 @@ public interface MusicStorageServerAPI {
 	 * 
 	 * @param musicItemIdentifier
 	 *            identifier of the music item
+	 * @param version
+	 *            music item version requested to read
 	 * @param response
 	 *            read response object
 	 * @return music data encapsulating the music item stream and its meta data<br>
 	 *         <b>null</b> if the identifier passed is invalid
 	 */
-	MusicData readMusicItem(String musicItemIdentifier, ReadResponse response);
+	MusicData readMusicItem(String musicItemIdentifier,
+			MusicItemVersion version, ReadResponse response);
 
 	/**
 	 * read the meta data for any number of music items
