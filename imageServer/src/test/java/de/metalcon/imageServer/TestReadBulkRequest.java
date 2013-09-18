@@ -19,8 +19,10 @@ public class TestReadBulkRequest {
 	private ReadResponse readResponse;
 	private JSONObject jsonResponse;
 	// private static FileItem imageFileItem;
-	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseEndMissing = "\" is missing";
+	private final static String responseBeginMissing = "request incomplete: parameter \"";
+	private final static String responseEndMissing = "\" is missing";
+	private final static String responseBeginMalformed = "request corrupt: parameter \"";
+	private final static String responseEndMalformed = "\" is malformed";
 
 	@Test
 	public void testNoIdentifierGiven() {
@@ -64,7 +66,9 @@ public class TestReadBulkRequest {
 	public void testWidthMalformed() {
 		this.processReadRequest("testIdentifier", "100", "wrong");
 		// TODO: use status message!
-		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_WIDTH,
+		assertEquals(this.responseBeginMalformed
+				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
+				+ this.responseEndMalformed,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
@@ -72,7 +76,9 @@ public class TestReadBulkRequest {
 	public void testHeightMalformed() {
 		this.processReadRequest("testIdentifier", "wrong", "100");
 		// TODO: use status message!
-		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT,
+		assertEquals(this.responseBeginMalformed
+				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
+				+ this.responseEndMalformed,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
