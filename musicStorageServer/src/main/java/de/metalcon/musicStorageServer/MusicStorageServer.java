@@ -364,21 +364,34 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			// TODO error: no music item with such identifier
 		}
 
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String[] readMusicItemMetaData(final String[] musicItemIdentifiers,
 			final ReadResponse response) {
-		// TODO Auto-generated method stub
-		return null;
+		final String[] metaDataArray = new String[musicItemIdentifiers.length];
+
+		for (int i = 0; i < musicItemIdentifiers.length; i++) {
+			final String metaData = this.musicMetaDatabase
+					.getMetadata(musicItemIdentifiers[i]);
+			if (metaData != null) {
+				metaDataArray[i] = metaData;
+			} else {
+				// TODO error: no music item with such identifier
+
+				return null;
+			}
+		}
+
+		return metaDataArray;
 	}
 
 	@Override
 	public boolean updateMetaData(final String musicItemIdentifier,
 			final String metaData, final UpdateResponse response) {
 		// TODO Auto-generated method stub
+
 		return false;
 	}
 

@@ -191,8 +191,7 @@ public class AvconvCommand {
 		final Map<String, String> metaData = extractVorbisComment(converterCommand
 				.getMetaData());
 
-		final List<String> cmdCall = new ArrayList<String>(
-				2 + metaData.size() + 4);
+		final List<String> cmdCall = new ArrayList<String>();
 
 		// program name
 		cmdCall.add(PROGRAM_NAME);
