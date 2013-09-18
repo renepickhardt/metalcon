@@ -4,13 +4,13 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadBulkRequest {
-	private final String imageIdentifierList;
+	private final String[] imageIdentifierList;
 
 	private final Integer imageWidth;
 
 	private final Integer imageHeight;
 
-	public ReadBulkRequest(final String imageIdentifierList,
+	public ReadBulkRequest(final String[] imageIdentifierList,
 			final Integer imageWidth, final Integer imageHeight) {
 		this.imageIdentifierList = imageIdentifierList;
 		this.imageWidth = imageWidth;
@@ -19,7 +19,7 @@ public class ReadBulkRequest {
 
 	public static ReadBulkRequest checkRequest(FormItemList formItemList,
 			ReadResponse readResponse) {
-		final String imageIdentifierList = checkImageIdentifierList(
+		final String[] imageIdentifierList = checkImageIdentifierList(
 				formItemList, readResponse);
 		if (imageIdentifierList != null) {
 			final Integer imageWidth = checkImageWidth(formItemList,
@@ -36,11 +36,20 @@ public class ReadBulkRequest {
 		return null;
 	}
 
-	private static String checkImageIdentifierList(
+	private static String[] checkImageIdentifierList(
 			final FormItemList formItemList, final ReadResponse response) {
 		try {
-			return formItemList
+			String IDString = formItemList
 					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
+			String[] IDList = IDString.split(",");
+			for (String element : IDList) {
+				if (element.isEmpty()) {
+					response.addImageIdentifierListContainsEmptyFieldsError();
+					return null;
+				}
+			}
+
+			return IDList;
 		} catch (final IllegalArgumentException e) {
 			response.addNoImageIdentifierError();
 		}

@@ -104,4 +104,10 @@ public class ReadResponse extends Response {
 				"");
 	}
 
+	public void addImageIdentifierListContainsEmptyFieldsError() {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.LIST_CONTAINS_EMPTY_IDENTIFIER,
+				"");
+	}
+
 }

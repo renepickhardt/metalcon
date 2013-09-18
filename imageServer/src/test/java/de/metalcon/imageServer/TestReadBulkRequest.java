@@ -39,7 +39,9 @@ public class TestReadBulkRequest {
 	public void testIdentifierListContainsEmptyParts() {
 		this.processReadRequest(
 				ProtocolTestConstants.MALFORMED_IDENTIFIER_LIST, "100", "100");
-		assertEquals(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST,
+		assertEquals(this.responseBeginMalformed
+				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST
+				+ "contains an empty identifier",
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 	}
@@ -65,7 +67,6 @@ public class TestReadBulkRequest {
 	@Test
 	public void testWidthMalformed() {
 		this.processReadRequest("testIdentifier", "100", "wrong");
-		// TODO: use status message!
 		assertEquals(this.responseBeginMalformed
 				+ ProtocolConstants.Parameters.Read.IMAGE_WIDTH
 				+ this.responseEndMalformed,
@@ -75,7 +76,6 @@ public class TestReadBulkRequest {
 	@Test
 	public void testHeightMalformed() {
 		this.processReadRequest("testIdentifier", "wrong", "100");
-		// TODO: use status message!
 		assertEquals(this.responseBeginMalformed
 				+ ProtocolConstants.Parameters.Read.IMAGE_HEIGHT
 				+ this.responseEndMalformed,
