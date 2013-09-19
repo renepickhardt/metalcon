@@ -9,10 +9,10 @@ import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
 
-public class City extends Entity {
+public class Event extends Entity {
 
 
-    public City(Server server) {
+    public Event(Server server) {
         super(server);
     }
 

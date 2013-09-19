@@ -22,9 +22,4 @@ public class Muid {
         return id;
     }
     
-    public EntityType getType() {
-        // TODO
-        return EntityType.PERSON;
-    }
-    
 }

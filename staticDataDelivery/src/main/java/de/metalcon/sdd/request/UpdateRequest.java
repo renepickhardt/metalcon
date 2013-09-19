@@ -6,10 +6,11 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import de.metalcon.common.EntityType;
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.sdd.entity.Entity;
 import de.metalcon.sdd.server.Server;
+
+import static de.metalcon.sdd.entity.EntityByType.newEntityByType;
 
 public class UpdateRequest extends Request {
     
@@ -34,8 +35,7 @@ public class UpdateRequest extends Request {
     
     @Override
     public void runQueueAction() {
-        Entity entity = Entity.newEntityByType(EntityType
-                .stringToEnum(getParam("type")), server);
+        Entity entity = newEntityByType(getParam("type"), server);
 //        Entity entity = Entity.newEntityByType(id.getType());
         entity.loadFromUpdateParams(params);;
         server.writeEntity(entity);

@@ -1,12 +1,12 @@
 package de.metalcon.sdd.entity;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.metalcon.common.EntityType;
 import de.metalcon.common.JsonOrderedFactory;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
@@ -83,16 +83,11 @@ public abstract class Entity {
         this.id = id;
     }
     
-    public static Entity newEntityByType(EntityType type, Server server) {
-        switch (type) {
-            case CITY:              return new City(server);
-            case PERSON:            return new Person(server);
-                
-            case NONE:
-            default:
-                // TODO: handle this
-                throw new RuntimeException();
-        }
+    protected static String joinIds(List<Muid> ids) {
+        String result = "";
+        for (Muid id : ids)
+            result += "," + id.toString();
+        return result.substring(1);
     }
     
 }

@@ -5,14 +5,26 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
+import de.metalcon.common.JsonString;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
 
-public class City extends Entity {
+public class Musician extends Entity {
 
+    String name;
 
-    public City(Server server) {
+    String url;
+
+    String active;
+
+    String founder;
+
+    String spans;
+
+    Band band;
+
+    public Musician(Server server) {
         super(server);
     }
 
@@ -22,12 +34,48 @@ public class City extends Entity {
 
         setId(new Muid(entity.get("id")));
 
+        String oid;
+        name = entity.get("name");
+
+        url = entity.get("url");
+
+        active = entity.get("active");
+
+        founder = entity.get("founder");
+
+        spans = entity.get("spans");
+
+        oid = entity.get("band");
+        if (oid == null)
+            band = null;
+        else {
+            band = new Band(server);
+            band.loadFromId(new Muid(oid));
+        }
     }
 
     @Override
     public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
 
+        String oid;
+        name = getParam(params, "name");
+
+        url = getParam(params, "url");
+
+        active = getParam(params, "active");
+
+        founder = getParam(params, "founder");
+
+        spans = getParam(params, "spans");
+
+        oid = getParam(params, "band", true);
+        if (oid == null)
+            band = null;
+        else {
+            band = new Band(server);
+            band.loadFromId(new Muid(oid));
+        }
     }
 
     @Override
@@ -44,16 +92,33 @@ public class City extends Entity {
         // FULL
         j = new LinkedHashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("name", name);
+        j.put("url", url);
+        j.put("active", active);
+        j.put("founder", founder);
+        j.put("spans", spans);
+        if (band == null)
+            j.put("band", null);
+        else
+            j.put("band", band.getId().toString());
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
         j = new LinkedHashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("url", url);
+        j.put("name", name);
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
         j = new LinkedHashMap<String, Object>();
         j.put("id", getId().toString());
+        if (band == null)
+            j.put("band", null);
+        else
+            j.put("band", new JsonString(band.getJson(Detail.SYMBOL)));
+        j.put("url", url);
+        j.put("name", name);
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH

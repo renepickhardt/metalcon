@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<sdd-meta>
+  <!-- DETAILS -->
+  <details>
+    <detail name="symbol"/>
+    <detail name="line"/>
+    <detail name="paragraph"/>
+    <detail name="profile"/>
+    <detail name="tooltip"/>
+    <detail name="search_entry"/>
+    <detail name="search_detailed"/>
+  </details>
+
+  <!-- ENTITIES -->
+  <entities>
+    <entity name="Band">
+      <attr name="name" type="String"/>
+      <attr name="url" type="String"/>
+      <attr name="foundation" type="String"/>
+      <attr name="city" type="City"/>
+      <attr name="genres" type="Genre[]"/>
+      <attr name="musicians" type="Musician[]"/>
+      <attr name="events" type="Event[]"/>
+      <attr name="tours" type="Tour[]"/>
+      <attr name="records" type="Record[]"/>
+      <output detail="symbol">
+        <oattr name="name"/>
+        <oattr name="url"/>
+      </output>
+      <output detail="line">
+        <oattr name="name"/>
+        <oattr name="url"/>
+        <oattr name="foundation"/>
+        <oattr name="city" detail="symbol"/>
+      </output>
+      <output detail="paragraph">
+        <oattr name="name"/>
+        <oattr name="url"/>
+        <oattr name="foundation"/>
+        <oattr name="city" detail="line"/>
+        <oattr name="genres" detail="symbol"/>
+        <oattr name="records" detail="line"/>
+      </output>
+      <output detail="profile">
+        <oattr name="name"/>
+        <oattr name="url"/>
+        <oattr name="foundation"/>
+        <oattr name="city" detail="line"/>
+        <oattr name="genres" detail="line"/>
+        <oattr name="musicians" detail="paragraph"/>
+        <oattr name="events" detail="line"/>
+        <oattr name="tours" detail="line"/>
+        <oattr name="records" detail="line"/>
+      </output>
+      <output detail="tooltip">
+        <oattr name="name"/>
+        <oattr name="url"/>
+        <oattr name="foundation"/>
+        <oattr name="city" detail="symbol"/>
+        <oattr name="genres" detail="symbol"/>
+        <oattr name="records" detail="symbol"/>
+      </output>
+      <output detail="search_entry"/>
+      <output detail="search_detailed"/>
+    </entity>
+    <entity name="City">
+    </entity>
+    <entity name="Disc">
+    </entity>
+    <entity name="Event">
+    </entity>
+    <entity name="Genre">
+    </entity>
+    <entity name="Instrument">
+    </entity>
+    <entity name="Musician">
+      <attr name="name" type="String"/>
+      <attr name="url" type="String"/>
+      <attr name="active" type="String"/>
+      <attr name="founder" type="String"/>
+      <attr name="spans" type="String"/>
+      <attr name="band" type="Band"/>
+      <output detail="symbol">
+        <oattr name="name"/>
+        <oattr name="url"/>
+      </output>
+      <output detail="line">
+        <oattr name="name"/>
+        <oattr name="url"/>
+        <oattr name="band" detail="symbol"/>
+      </output>
+    </entity>
+    <entity name="Person">
+    </entity>
+    <entity name="Record">
+    </entity>
+    <entity name="Tour">
+    </entity>
+    <entity name="Track">
+    </entity>
+    <entity name="Venue">
+    </entity>
+  </entities>
+</sdd-meta>

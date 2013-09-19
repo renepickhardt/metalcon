@@ -1,0 +1,39 @@
+delimiters "$","$"
+
+// lits - Object[]
+//     .name - String
+//     .constname - String
+detail(lits) ::= <<
+package de.metalcon.sdd;
+
+import de.metalcon.sdd.Detail;
+
+public enum Detail {
+
+    $lits:{lit|$lit.constname$,}; separator="\n"$
+    NONE;
+    
+    public static Detail stringToEnum(String detail) {
+        switch (detail) {
+            $lits:{lit|case "$lit.name$":
+    return $lit.constname$;}; separator="\n"$
+            
+            case "none":
+            default:
+                return NONE;
+        }
+    }
+    
+    public static String enumToString(Detail detail) {
+        switch (detail) {
+            $lits:{lit|case $lit.constname$:
+    return "$lit.name$";}; separator="\n"$
+            
+            case NONE:
+            default:
+                return "none";
+        }
+    }
+    
+}
+>>

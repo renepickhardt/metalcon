@@ -1,0 +1,23 @@
+delimiters "$","$"
+
+// Entities - String[]
+entityByType(entities) ::= <<
+package de.metalcon.sdd.entity;
+
+import de.metalcon.sdd.server.Server;
+
+public class EntityByType {
+    
+    public static Entity newEntityByType(String type, Server server) {
+        switch (type) {
+            $entities:{entity|case "$entity$":
+    return new $entity$(server);}; separator="\n"$
+            
+            default:
+                // TODO: handle this
+                throw new RuntimeException();
+        }
+    }
+    
+}
+>>

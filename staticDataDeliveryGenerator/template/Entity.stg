@@ -1,0 +1,213 @@
+delimiters "$","$"
+
+// name - String
+// attrs - Object[]
+//     .name - String
+//     .type - String
+//     .primitive - Boolean
+//     .array - Boolean
+// jsons - String[]
+// has - Object 
+//     .array - Boolean
+//     .class - Boolean
+entity(name,attrs,jsons,has) ::= <<
+package de.metalcon.sdd.entity;
+
+import java.util.LinkedHashMap;
+$if(has.array)$import java.util.LinkedList;
+import java.util.List;$endif$
+import java.util.Map;
+
+import org.json.simple.JSONValue;
+
+$if(has.array || has.class)$import de.metalcon.common.JsonString;$endif$
+import de.metalcon.common.Muid;
+import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.server.Server;
+
+public class $name$ extends Entity {
+
+    $attrs:{attr|$javaType(attr.type,attr.array)$ $attr.name$;}; separator="\n\n"$
+    
+    public $name$(Server server) {
+        super(server);
+    }
+    
+    @Override
+    public void loadFromJson(String json) {
+        Map<String, String> entity = parseJson(json);
+        
+        setId(new Muid(entity.get("id")));
+        
+        $if(has.class)$String oid;
+        $endif$
+        $attrs:{attr|$load(attr,"entity.get(\"","\")","\")")$}; separator="\n\n"$
+    }
+    
+    @Override
+    public void loadFromCreateParams(Map<String, String[]> params) {
+        setId(new Muid(getParam(params, "id")));
+        
+        $if(has.class)$String oid;
+        $endif$
+        $attrs:{attr|$load(attr,"getParam(params, \"","\")","\", true)")$}; separator="\n\n"$
+    }
+    
+    @Override
+    public void loadFromUpdateParams(Map<String, String[]> params) {
+        Muid id = new Muid(getParam(params, "id"));
+        loadFromId(id);
+        
+        //<LOAD_FROM_UPDATE_PARAMS>
+    }
+    
+    @Override
+    protected void generateJson() {
+        Map<String, Object> j;
+        $if(has.array)$List<Muid> ids;
+        List<JsonString> os;
+        $endif$
+        $jsons; separator="\n\n"$
+    }
+    
+}
+>>
+
+// type - String
+// array - Boolean
+javaType(type,array) ::= <%
+$if(array)$
+    List<$type$>
+$else$
+    $type$
+$endif$
+%>
+
+// -----------------------------------------------------------------------------
+// --- load --------------------------------------------------------------------
+
+// attr - Object
+//     .name - String
+//     .type - String
+//     .primitive - Boolean
+//     .array - Boolean
+// loadFuncPre - String
+// loadFuncPost - String
+// loadFuncOptPost - String
+
+load(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <%
+$if(attr.primitive)$
+    $loadPrimitive(attr,loadFuncPre,loadFuncPost)$
+$elseif(attr.array)$
+    $loadArray(attr,loadFuncPre,loadFuncPost)$
+$else$
+    $loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
+$endif$
+%>
+
+loadPrimitive(attr,loadFuncPre,loadFuncPost) ::= <<
+$attr.name$ = $loadFuncPre$$attr.name$$loadFuncPost$;
+>>
+
+loadArray(attr,loadFuncPre,loadFuncPost) ::= <<
+$attr.name$ = new LinkedList<$attr.type$>();
+for (String id : $loadFuncPre$$attr.name$$loadFuncPost$.split(",")) {
+    $attr.type$ o = new $attr.type$(server);
+    o.loadFromId(new Muid(id));
+    $attr.name$.add(o);
+}
+>>
+
+loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
+oid = $loadFuncPre$$attr.name$$loadFuncOptPost$;
+if (oid == null)
+    $attr.name$ = null;
+else {
+    $attr.name$ = new $attr.type$(server);
+    $attr.name$.loadFromId(new Muid(oid));
+}
+>>
+
+// -----------------------------------------------------------------------------
+// --- generate ----------------------------------------------------------------
+
+// detail - String
+// oattrs - Object[]
+//     .name - Stirng
+//     .type - String
+//     .primitive - Boolean
+//     .array - Boolean
+//     .detail - String
+// full - Boolean
+
+generate(detail,oattrs,full) ::= <<
+// $detail$
+j = new LinkedHashMap<String, Object>();
+j.put("id", getId().toString());
+$if(full)$$generateFull(oattrs)$$else$$generateOther(oattrs)$$endif$
+json.put(Detail.$detail$, JSONValue.toJSONString(j));
+>>
+
+// --- generateFull ------------------------------------------------------------
+
+generateFull(oattrs) ::= <%
+$oattrs:{oattr|
+    $if(oattr.primitive)$
+        $generateFullPrimitive(oattr)$
+    $elseif(oattr.array)$
+        $generateFullArray(oattr)$
+    $else$
+        $generateFullClass(oattr)$
+    $endif$
+}; separator="\n"$
+%>
+
+generateFullPrimitive(oattr) ::= <<
+j.put("$oattr.name$", $oattr.name$);
+>>
+
+generateFullArray(oattr) ::= <<
+ids = new LinkedList<Muid>();
+for ($oattr.type$ o : $oattr.name$)
+    ids.add(o.getId());
+j.put("$oattr.name$", joinIds(ids));
+>>
+
+generateFullClass(oattr) ::= <<
+if ($oattr.name$ == null)
+    j.put("$oattr.name$", null);
+else
+    j.put("$oattr.name$", $oattr.name$.getId().toString());
+>>
+
+// --- generateOther -----------------------------------------------------------
+
+generateOther(oattrs) ::= <%
+$oattrs:{oattr|
+    $if(oattr.primitive)$
+        $generateOtherPrimitive(oattr)$
+    $elseif(oattr.array)$
+        $generateOtherArray(oattr)$
+    $else$
+        $generateOtherClass(oattr)$
+    $endif$
+}; separator="\n"$
+%>
+
+generateOtherPrimitive(oattr) ::= <<
+j.put("$oattr.name$", $oattr.name$);
+>>
+
+generateOtherArray(oattr) ::= <<
+os = new LinkedList<JsonString>();
+for ($oattr.type$ o : $oattr.name$)
+    os.add(new JsonString(o.getJson(Detail.$oattr.detail$)));
+j.put("$oattr.name$", os);
+>>
+
+generateOtherClass(oattr) ::= <<
+if ($oattr.name$ == null)
+    j.put("$oattr.name$", null);
+else
+    j.put("$oattr.name$", new JsonString($oattr.name$.getJson(Detail.$oattr.detail$)));
+>>
