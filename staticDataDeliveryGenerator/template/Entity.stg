@@ -41,6 +41,8 @@ public class $name$ extends Entity {
         
         $if(has.class)$String oid;
         $endif$
+        $if(has.array)$String os;
+        $endif$
         $attrs:{attr|$load(attr,"entity.get(\"","\")","\")")$}; separator="\n\n"$
     }
     
@@ -49,6 +51,8 @@ public class $name$ extends Entity {
         setId(new Muid(getParam(params, "id")));
         
         $if(has.class)$String oid;
+        $endif$
+        $if(has.array)$String os;
         $endif$
         $attrs:{attr|$load(attr,"getParam(params, \"","\")","\", true)")$}; separator="\n\n"$
     }
@@ -97,25 +101,27 @@ $endif$
 
 load(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <%
 $if(attr.primitive)$
-    $loadPrimitive(attr,loadFuncPre,loadFuncPost)$
+    $loadPrimitive(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
 $elseif(attr.array)$
-    $loadArray(attr,loadFuncPre,loadFuncPost)$
+    $loadArray(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
 $else$
     $loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
 $endif$
 %>
 
-loadPrimitive(attr,loadFuncPre,loadFuncPost) ::= <<
+loadPrimitive(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
 $attr.name$ = $loadFuncPre$$attr.name$$loadFuncPost$;
 >>
 
-loadArray(attr,loadFuncPre,loadFuncPost) ::= <<
+loadArray(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
 $attr.name$ = new LinkedList<$attr.type$>();
-for (String id : $loadFuncPre$$attr.name$$loadFuncPost$.split(",")) {
-    $attr.type$ o = new $attr.type$(server);
-    o.loadFromId(new Muid(id));
-    $attr.name$.add(o);
-}
+os = $loadFuncPre$$attr.name$$loadFuncOptPost$;
+if (os != null)
+    for (String id : os.split(",")) {
+        $attr.type$ o = new $attr.type$(server);
+        o.loadFromId(new Muid(id));
+        $attr.name$.add(o);
+    }
 >>
 
 loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<

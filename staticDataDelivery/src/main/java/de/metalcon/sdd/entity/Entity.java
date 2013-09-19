@@ -84,9 +84,15 @@ public abstract class Entity {
     
     protected static String joinIds(List<Muid> ids) {
         String result = "";
-        for (Muid id : ids)
-            result += "," + id.toString();
-        return result.substring(1);
+        Boolean first = true;
+        for (Muid id : ids) {
+            if (first) {
+                first = false;
+                result += id.toString();
+            } else
+                result += "," + id.toString();
+        }
+        return result;
     }
     
 }

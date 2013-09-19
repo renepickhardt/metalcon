@@ -106,19 +106,19 @@ public class Musician extends Entity {
         // SYMBOL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
         j.put("url", url);
+        j.put("name", name);
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
         if (band == null)
             j.put("band", null);
         else
             j.put("band", new JsonString(band.getJson(Detail.SYMBOL)));
         j.put("url", url);
+        j.put("name", name);
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH

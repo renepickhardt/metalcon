@@ -73,7 +73,7 @@ public class ReadRequest extends Request {
         s.start(); 
         
         ReadRequest r = new ReadRequest(s);
-        r.setQuery("2f364c13c0114e16:line");
+        r.setQuery("11233033e2b36cff:line,2f364c13c0114e16:line,ce0058ac39a33616:profile");
         String json = JSONValue.toJSONString(r.runHttpResponse());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);

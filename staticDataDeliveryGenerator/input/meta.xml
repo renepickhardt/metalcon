@@ -47,7 +47,7 @@
         <oattr name="foundation"/>
         <oattr name="city" detail="line"/>
         <oattr name="genres" detail="line"/>
-        <oattr name="musicians" detail="paragraph"/>
+        <oattr name="musicians" detail="line"/>
         <oattr name="events" detail="line"/>
         <oattr name="tours" detail="line"/>
         <oattr name="records" detail="line"/>

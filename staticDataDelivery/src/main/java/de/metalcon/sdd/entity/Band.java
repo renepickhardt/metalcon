@@ -42,6 +42,7 @@ public class Band extends Entity {
         setId(new Muid(entity.get("id")));
 
         String oid;
+        String os;
         name = entity.get("name");
 
         url = entity.get("url");
@@ -57,39 +58,49 @@ public class Band extends Entity {
         }
 
         genres = new LinkedList<Genre>();
-        for (String id : entity.get("genres").split(",")) {
-            Genre o = new Genre(server);
-            o.loadFromId(new Muid(id));
-            genres.add(o);
-        }
+        os = entity.get("genres");
+        if (os != null)
+            for (String id : os.split(",")) {
+                Genre o = new Genre(server);
+                o.loadFromId(new Muid(id));
+                genres.add(o);
+            }
 
         musicians = new LinkedList<Musician>();
-        for (String id : entity.get("musicians").split(",")) {
-            Musician o = new Musician(server);
-            o.loadFromId(new Muid(id));
-            musicians.add(o);
-        }
+        os = entity.get("musicians");
+        if (os != null)
+            for (String id : os.split(",")) {
+                Musician o = new Musician(server);
+                o.loadFromId(new Muid(id));
+                musicians.add(o);
+            }
 
         events = new LinkedList<Event>();
-        for (String id : entity.get("events").split(",")) {
-            Event o = new Event(server);
-            o.loadFromId(new Muid(id));
-            events.add(o);
-        }
+        os = entity.get("events");
+        if (os != null)
+            for (String id : os.split(",")) {
+                Event o = new Event(server);
+                o.loadFromId(new Muid(id));
+                events.add(o);
+            }
 
         tours = new LinkedList<Tour>();
-        for (String id : entity.get("tours").split(",")) {
-            Tour o = new Tour(server);
-            o.loadFromId(new Muid(id));
-            tours.add(o);
-        }
+        os = entity.get("tours");
+        if (os != null)
+            for (String id : os.split(",")) {
+                Tour o = new Tour(server);
+                o.loadFromId(new Muid(id));
+                tours.add(o);
+            }
 
         records = new LinkedList<Record>();
-        for (String id : entity.get("records").split(",")) {
-            Record o = new Record(server);
-            o.loadFromId(new Muid(id));
-            records.add(o);
-        }
+        os = entity.get("records");
+        if (os != null)
+            for (String id : os.split(",")) {
+                Record o = new Record(server);
+                o.loadFromId(new Muid(id));
+                records.add(o);
+            }
     }
 
     @Override
@@ -97,6 +108,7 @@ public class Band extends Entity {
         setId(new Muid(getParam(params, "id")));
 
         String oid;
+        String os;
         name = getParam(params, "name");
 
         url = getParam(params, "url");
@@ -112,39 +124,49 @@ public class Band extends Entity {
         }
 
         genres = new LinkedList<Genre>();
-        for (String id : getParam(params, "genres").split(",")) {
-            Genre o = new Genre(server);
-            o.loadFromId(new Muid(id));
-            genres.add(o);
-        }
+        os = getParam(params, "genres", true);
+        if (os != null)
+            for (String id : os.split(",")) {
+                Genre o = new Genre(server);
+                o.loadFromId(new Muid(id));
+                genres.add(o);
+            }
 
         musicians = new LinkedList<Musician>();
-        for (String id : getParam(params, "musicians").split(",")) {
-            Musician o = new Musician(server);
-            o.loadFromId(new Muid(id));
-            musicians.add(o);
-        }
+        os = getParam(params, "musicians", true);
+        if (os != null)
+            for (String id : os.split(",")) {
+                Musician o = new Musician(server);
+                o.loadFromId(new Muid(id));
+                musicians.add(o);
+            }
 
         events = new LinkedList<Event>();
-        for (String id : getParam(params, "events").split(",")) {
-            Event o = new Event(server);
-            o.loadFromId(new Muid(id));
-            events.add(o);
-        }
+        os = getParam(params, "events", true);
+        if (os != null)
+            for (String id : os.split(",")) {
+                Event o = new Event(server);
+                o.loadFromId(new Muid(id));
+                events.add(o);
+            }
 
         tours = new LinkedList<Tour>();
-        for (String id : getParam(params, "tours").split(",")) {
-            Tour o = new Tour(server);
-            o.loadFromId(new Muid(id));
-            tours.add(o);
-        }
+        os = getParam(params, "tours", true);
+        if (os != null)
+            for (String id : os.split(",")) {
+                Tour o = new Tour(server);
+                o.loadFromId(new Muid(id));
+                tours.add(o);
+            }
 
         records = new LinkedList<Record>();
-        for (String id : getParam(params, "records").split(",")) {
-            Record o = new Record(server);
-            o.loadFromId(new Muid(id));
-            records.add(o);
-        }
+        os = getParam(params, "records", true);
+        if (os != null)
+            for (String id : os.split(",")) {
+                Record o = new Record(server);
+                o.loadFromId(new Muid(id));
+                records.add(o);
+            }
     }
 
     @Override
@@ -202,38 +224,57 @@ public class Band extends Entity {
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("foundation", foundation);
+        j.put("url", url);
+        j.put("name", name);
         if (city == null)
             j.put("city", null);
         else
             j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
-        j.put("foundation", foundation);
-        j.put("url", url);
-        j.put("name", name);
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.LINE)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
         j.put("foundation", foundation);
         os = new LinkedList<JsonString>();
         for (Genre o : genres)
             os.add(new JsonString(o.getJson(Detail.SYMBOL)));
         j.put("genres", os);
         j.put("url", url);
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("records", os);
         j.put("name", name);
+        if (city == null)
+            j.put("city", null);
+        else
+            j.put("city", new JsonString(city.getJson(Detail.LINE)));
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
 
         // PROFILE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        os = new LinkedList<JsonString>();
+        for (Musician o : musicians)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("musicians", os);
+        j.put("foundation", foundation);
+        os = new LinkedList<JsonString>();
+        for (Genre o : genres)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("genres", os);
+        j.put("url", url);
+        os = new LinkedList<JsonString>();
+        for (Tour o : tours)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("tours", os);
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("records", os);
+        j.put("name", name);
         os = new LinkedList<JsonString>();
         for (Event o : events)
             os.add(new JsonString(o.getJson(Detail.LINE)));
@@ -242,45 +283,26 @@ public class Band extends Entity {
             j.put("city", null);
         else
             j.put("city", new JsonString(city.getJson(Detail.LINE)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
-        j.put("foundation", foundation);
-        os = new LinkedList<JsonString>();
-        for (Musician o : musicians)
-            os.add(new JsonString(o.getJson(Detail.PARAGRAPH)));
-        j.put("musicians", os);
-        os = new LinkedList<JsonString>();
-        for (Genre o : genres)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("genres", os);
-        j.put("url", url);
-        j.put("name", name);
-        os = new LinkedList<JsonString>();
-        for (Tour o : tours)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("tours", os);
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
 
         // TOOLTIP
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
-        j.put("records", os);
         j.put("foundation", foundation);
         os = new LinkedList<JsonString>();
         for (Genre o : genres)
             os.add(new JsonString(o.getJson(Detail.SYMBOL)));
         j.put("genres", os);
         j.put("url", url);
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
+        j.put("records", os);
         j.put("name", name);
+        if (city == null)
+            j.put("city", null);
+        else
+            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
 
         // SEARCH_ENTRY
