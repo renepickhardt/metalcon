@@ -254,7 +254,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				try {
 					metaDataJSON = (JSONObject) PARSER.parse(metaData);
 				} catch (final ParseException e) {
-					// TODO error: meta data format invalid
+					// error: meta data format invalid
+					response.metaDataMalformed();
 					return false;
 				}
 			}
@@ -277,13 +278,15 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 					// TODO: hash collision
 				}
 			} catch (final ConvertingFailedException e) {
-				// TODO error: invalid music item stream
-				System.err.println(e);
+				// error: invalid music item stream
+				response.musicItemStreamInvalid();
 			} catch (final ConverterExecutionException e) {
-				// TODO internal server error
-				System.err.println(e);
+				// internal server error
+				response.internalServerError();
+				e.printStackTrace();
 			} catch (final IOException e) {
-				// TODO internal server error
+				// internal server error
+				response.internalServerError();
 				e.printStackTrace();
 			} finally {
 				// delete temporary (audio) file
@@ -292,7 +295,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				}
 			}
 		} else {
-			// TODO error: music item identifier in use
+			// error: music item identifier in use
+			response.musicItemIdentifierInUse(musicItemIdentifier);
 		}
 
 		return false;
@@ -321,10 +325,12 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				return new MusicData(new FileInputStream(musicItemFile),
 						metaData);
 			} catch (final FileNotFoundException e) {
-				// TODO: internal server error
+				// internal server error: file not found
+				response.internalServerError();
 			}
 		} else {
-			// TODO error: no music item with such identifier
+			// error: no music item with such identifier
+			response.musicItemNotExisting(musicItemIdentifier);
 		}
 
 		return null;
@@ -341,7 +347,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			if (metaData != null) {
 				metaDataArray[i] = metaData;
 			} else {
-				// TODO error: no music item with such identifier
+				// error: no music item with such identifier
+				response.musicItemNotExisting(musicItemIdentifiers[i]);
 				return null;
 			}
 		}
@@ -358,7 +365,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				try {
 					metaDataJSON = (JSONObject) PARSER.parse(metaData);
 				} catch (final ParseException e) {
-					// TODO error: meta data format invalid
+					// error: meta data format invalid
+					response.metaDataMalformed();
 					return false;
 				}
 			}
@@ -367,7 +375,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 					metaDataJSON);
 			return true;
 		} else {
-			// TODO error: no music item with such identifier
+			// error: no music item with such identifier
+			response.musicItemNotExisting(musicItemIdentifier);
 		}
 
 		return false;
@@ -392,7 +401,8 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			this.musicMetaDatabase.deleteDatabaseEntry(musicItemIdentifier);
 			return true;
 		} else {
-			// TODO error: no music item with such identifier
+			// error: no music item with such identifier
+			response.musicItemNotExisting(musicItemIdentifier);
 		}
 
 		return false;

@@ -131,7 +131,7 @@ public class MusicStorageServerTest {
 				FileUtils.copyFile(DESTINATION_FILE_STREAMING,
 						BACKUP_FILE_STREAMING);
 			} catch (final FileNotFoundException e) {
-				fail("audio file for test is not avialable!");
+				fail("audio file for test is not avialable!\n" + e.getMessage());
 			}
 		}
 	}
