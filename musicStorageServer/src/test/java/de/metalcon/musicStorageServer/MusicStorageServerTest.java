@@ -28,6 +28,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.metalcon.musicStorageServer.protocol.ProtocolConstants;
+import de.metalcon.musicStorageServer.protocol.Response;
 import de.metalcon.musicStorageServer.protocol.create.CreateResponse;
 import de.metalcon.musicStorageServer.protocol.delete.DeleteResponse;
 import de.metalcon.musicStorageServer.protocol.read.ReadResponse;
@@ -65,6 +67,8 @@ public class MusicStorageServerTest {
 	private static String INVALID_CREATE_META_DATA = "{ artist: Testy }";
 
 	private MusicStorageServer server;
+
+	private JSONObject jsonResponse;
 
 	private CreateResponse createResponse;
 	private ReadResponse readResponse;
@@ -187,6 +191,11 @@ public class MusicStorageServerTest {
 		assertFalse(this.server.createMusicItem(VALID_READ_IDENTIFIER,
 				VALID_READ_STREAM_MP3, VALID_CREATE_META_DATA,
 				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.MUSIC_ITEM_IDENTIFIER_IN_USE,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -194,6 +203,11 @@ public class MusicStorageServerTest {
 		assertFalse(this.server.createMusicItem(VALID_CREATE_IDENTIFIER,
 				VALID_READ_STREAM_MP3, INVALID_CREATE_META_DATA,
 				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -202,6 +216,10 @@ public class MusicStorageServerTest {
 				INVALID_READ_STREAM_JPEG, VALID_CREATE_META_DATA,
 				this.createResponse));
 
+		this.extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.MUSIC_ITEM_STREAM_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -209,6 +227,11 @@ public class MusicStorageServerTest {
 		assertFalse(this.server.createMusicItem(VALID_CREATE_IDENTIFIER,
 				INVALID_READ_STREAM_TXT, VALID_CREATE_META_DATA,
 				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.MUSIC_ITEM_STREAM_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -216,6 +239,11 @@ public class MusicStorageServerTest {
 		assertFalse(this.server.createMusicItem(VALID_CREATE_IDENTIFIER,
 				INVALID_READ_STREAM_EMPTY, VALID_CREATE_META_DATA,
 				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Create.MUSIC_ITEM_STREAM_INVALID,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -262,6 +290,11 @@ public class MusicStorageServerTest {
 	public void testReadInvalidIdentifier() {
 		assertNull(this.server.readMusicItem(VALID_CREATE_IDENTIFIER,
 				MusicItemVersion.ORIGINAL, this.readResponse));
+
+		this.extractJson(this.readResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.MUSIC_ITEM_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -287,11 +320,16 @@ public class MusicStorageServerTest {
 	}
 
 	@Test
-	public void testReadMetaDataInvalid() {
+	public void testReadMetaDataInvalidIdentifier() {
 		final String[] identifiers = new String[] { VALID_READ_IDENTIFIER,
 				VALID_CREATE_IDENTIFIER };
 		assertNull(this.server.readMusicItemMetaData(identifiers,
 				this.readResponse));
+
+		this.extractJson(this.readResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.MUSIC_ITEM_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -304,12 +342,22 @@ public class MusicStorageServerTest {
 	public void testUpdateMetaDataInvalidIdentifier() {
 		assertFalse(this.server.updateMetaData(VALID_CREATE_IDENTIFIER,
 				VALID_CREATE_META_DATA, this.updateResponse));
+
+		this.extractJson(this.updateResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Update.MUSIC_ITEM_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
 	public void testUpdateMetaDataInvalidMetaData() {
 		assertFalse(this.server.updateMetaData(VALID_READ_IDENTIFIER,
 				INVALID_CREATE_META_DATA, this.updateResponse));
+
+		this.extractJson(this.updateResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	@Test
@@ -322,6 +370,11 @@ public class MusicStorageServerTest {
 	public void testDeleteInvalidIdentifier() {
 		assertFalse(this.server.deleteMusicItem(VALID_CREATE_IDENTIFIER,
 				this.deleteResponse));
+
+		this.extractJson(this.deleteResponse);
+		assertEquals(
+				ProtocolConstants.StatusMessage.Delete.MUSIC_ITEM_NOT_EXISTING,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
 	/**
@@ -408,6 +461,23 @@ public class MusicStorageServerTest {
 		}
 
 		return null;
+	}
+
+	/**
+	 * extract the JSON object from the response, failing the test if this is
+	 * not possible
+	 * 
+	 * @param response
+	 *            MSSP response
+	 */
+	protected void extractJson(final Response response) {
+		try {
+			final Field field = Response.class.getDeclaredField("json");
+			field.setAccessible(true);
+			this.jsonResponse = (JSONObject) field.get(response);
+		} catch (final Exception e) {
+			fail("failed to extract the JSON object from class Response");
+		}
 	}
 
 }
