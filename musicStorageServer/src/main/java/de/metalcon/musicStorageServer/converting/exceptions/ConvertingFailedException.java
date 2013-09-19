@@ -19,7 +19,7 @@ public class ConvertingFailedException extends Exception {
 
 	@Override
 	public String toString() {
-		return "converting process failed: " + this.getMessage();
+		return "converting process failed: " + this.getMessage() + "!";
 	}
 
 }

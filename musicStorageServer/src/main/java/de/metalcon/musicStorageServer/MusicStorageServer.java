@@ -165,57 +165,27 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		IOUtils.copy(inputStream, fileOutputStream);
 	}
 
-	private static void storeBasisMusicItem(final File sourceFile,
-			final File destinationFile, final int quality,
-			final JSONObject metaData) throws ConverterExecutionException,
-			ConvertingFailedException {
-		// create the parental directories
-		final File musicItemFileDir = destinationFile.getParentFile();
-		if (musicItemFileDir != null) {
-			musicItemFileDir.mkdirs();
-		}
-
-		// create a new converter command
-		final AvconvCommand converter = new AvconvCommand(
-				sourceFile.getAbsolutePath(),
-				destinationFile.getAbsolutePath(), metaData);
-		converter.setQuality(quality);
-
+	/**
+	 * execute a converter command
+	 * 
+	 * @param converterCommand
+	 *            converter command to be executed
+	 * @throws ConverterExecutionException
+	 *             if the converting failed due to internal errors
+	 * @throws ConvertingFailedException
+	 *             if the converting process failed
+	 */
+	private static void executeConverterCommand(
+			final AvconvCommand converterCommand)
+			throws ConverterExecutionException, ConvertingFailedException {
 		try {
-			final AvconvResponse response = converter.execute();
+			final AvconvResponse response = converterCommand.execute();
 			if (!response.succeeded()) {
 				throw new ConvertingFailedException(response.getErrorMessage());
 			}
 
 		} catch (final IOException e) {
-			throw new ConverterExecutionException("failed to call ffmpeg");
-		}
-	}
-
-	private static void storeStreamingMusicItem(final File sourceFile,
-			final File destinationFile, final int bitrate,
-			final JSONObject metaData) throws ConverterExecutionException,
-			ConvertingFailedException {
-		// create the parental directories
-		final File musicItemFileDir = destinationFile.getParentFile();
-		if (musicItemFileDir != null) {
-			musicItemFileDir.mkdirs();
-		}
-
-		// create a new converter command
-		final AvconvCommand converter = new AvconvCommand(
-				sourceFile.getAbsolutePath(),
-				destinationFile.getAbsolutePath(), metaData);
-		converter.setBitrate(bitrate);
-
-		try {
-			final AvconvResponse response = converter.execute();
-			if (!response.succeeded()) {
-				throw new ConvertingFailedException(response.getErrorMessage());
-			}
-
-		} catch (final IOException e) {
-			throw new ConverterExecutionException("failed to call ffmpeg");
+			throw new ConverterExecutionException("failed to call avconv!");
 		}
 	}
 
@@ -340,19 +310,12 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			try {
 				File musicItemFile;
 
-				switch (version) {
-
-				case ORIGINAL:
+				if (version == MusicItemVersion.ORIGINAL) {
 					musicItemFile = this.getOriginalFile(hash);
-					break;
-
-				case BASIS:
+				} else if (version == MusicItemVersion.BASIS) {
 					musicItemFile = this.getBasisFile(hash);
-					break;
-
-				default:
+				} else {
 					musicItemFile = this.getStreamingFile(hash);
-
 				}
 
 				return new MusicData(new FileInputStream(musicItemFile),
@@ -379,7 +342,6 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 				metaDataArray[i] = metaData;
 			} else {
 				// TODO error: no music item with such identifier
-
 				return null;
 			}
 		}
@@ -390,7 +352,23 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	@Override
 	public boolean updateMetaData(final String musicItemIdentifier,
 			final String metaData, final UpdateResponse response) {
-		// TODO Auto-generated method stub
+		if (this.musicMetaDatabase.hasEntryWithIdentifier(musicItemIdentifier)) {
+			JSONObject metaDataJSON = null;
+			if (metaData != null) {
+				try {
+					metaDataJSON = (JSONObject) PARSER.parse(metaData);
+				} catch (final ParseException e) {
+					// TODO error: meta data format invalid
+					return false;
+				}
+			}
+
+			this.musicMetaDatabase.appendMetadata(musicItemIdentifier,
+					metaDataJSON);
+			return true;
+		} else {
+			// TODO error: no music item with such identifier
+		}
 
 		return false;
 	}
@@ -398,7 +376,25 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 	@Override
 	public boolean deleteMusicItem(final String musicItemIdentifier,
 			final DeleteResponse response) {
-		// TODO Auto-generated method stub
+		if (this.musicMetaDatabase.hasEntryWithIdentifier(musicItemIdentifier)) {
+			final String hash = generateHash(musicItemIdentifier);
+
+			// TODO: do we delete original images?
+			// TODO: IF we do we have to register the path if we do not expect
+			// creation and deletion to happen at the same day
+
+			// delete basis version
+			this.getBasisFile(hash).delete();
+
+			// delete streaming version
+			this.getStreamingFile(hash).delete();
+
+			this.musicMetaDatabase.deleteDatabaseEntry(musicItemIdentifier);
+			return true;
+		} else {
+			// TODO error: no music item with such identifier
+		}
+
 		return false;
 	}
 
@@ -479,20 +475,17 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 		if (!tmpFile.exists()) {
 			storeToFile(musicItemStream, tmpFile);
 
-			try {
-				// try to create converted files
-				final File basisFile = this.getBasisFile(hash);
-				if (!basisFile.exists()) {
-					storeBasisMusicItem(tmpFile, basisFile, this.basisQuality,
-							metaData);
-					storeStreamingMusicItem(tmpFile,
-							this.getStreamingFile(hash),
-							this.sampleRateStreaming, metaData);
+			// try to create converted files
+			final File basisFile = this.getBasisFile(hash);
+			if (!basisFile.exists()) {
+				// store the basis version
+				this.storeBasisMusicItem(tmpFile, basisFile, metaData);
 
-					return tmpFile;
-				}
-			} finally {
+				// store the streaming version
+				this.storeStreamingMusicItem(tmpFile,
+						this.getStreamingFile(hash), metaData);
 
+				return tmpFile;
 			}
 		}
 
@@ -501,6 +494,72 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 
 		// collision between music item files
 		return null;
+	}
+
+	/**
+	 * store the basis version of a music item having a certain quality
+	 * 
+	 * @param sourceFile
+	 *            music file to be converted
+	 * @param destinationFile
+	 *            target file for the converted version
+	 * @param metaData
+	 *            meta data to be written to the destination file
+	 * @throws ConverterExecutionException
+	 *             if the converting failed due to internal errors
+	 * @throws ConvertingFailedException
+	 *             if the converting process failed
+	 */
+	private void storeBasisMusicItem(final File sourceFile,
+			final File destinationFile, final JSONObject metaData)
+			throws ConverterExecutionException, ConvertingFailedException {
+		// create the parental directories
+		final File musicItemFileDir = destinationFile.getParentFile();
+		if (musicItemFileDir != null) {
+			musicItemFileDir.mkdirs();
+		}
+
+		// create a new converter command
+		@SuppressWarnings("unchecked")
+		final AvconvCommand converterCommand = new AvconvCommand(
+				sourceFile.getAbsolutePath(),
+				destinationFile.getAbsolutePath(), metaData);
+		converterCommand.setQuality(this.basisQuality);
+
+		executeConverterCommand(converterCommand);
+	}
+
+	/**
+	 * store the streaming version of a music item having a certain bit rate
+	 * 
+	 * @param sourceFile
+	 *            music file to be converted
+	 * @param destinationFile
+	 *            target file for the converted version
+	 * @param metaData
+	 *            meta data to be written to the destination file
+	 * @throws ConverterExecutionException
+	 *             if the converting failed due to internal errors
+	 * @throws ConvertingFailedException
+	 *             if the converting process failed
+	 */
+	private void storeStreamingMusicItem(final File sourceFile,
+			final File destinationFile, final JSONObject metaData)
+			throws ConverterExecutionException, ConvertingFailedException {
+		// create the parental directories
+		final File musicItemFileDir = destinationFile.getParentFile();
+		if (musicItemFileDir != null) {
+			musicItemFileDir.mkdirs();
+		}
+
+		// create a new converter command
+		@SuppressWarnings("unchecked")
+		final AvconvCommand converterCommand = new AvconvCommand(
+				sourceFile.getAbsolutePath(),
+				destinationFile.getAbsolutePath(), metaData);
+		converterCommand.setBitrate(this.sampleRateStreaming);
+
+		executeConverterCommand(converterCommand);
 	}
 
 	/**
