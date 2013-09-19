@@ -21,6 +21,7 @@ import de.metalcon.musicStorageServer.converting.AvconvCommand;
 import de.metalcon.musicStorageServer.converting.AvconvResponse;
 import de.metalcon.musicStorageServer.converting.exceptions.ConverterExecutionException;
 import de.metalcon.musicStorageServer.converting.exceptions.ConvertingFailedException;
+import de.metalcon.musicStorageServer.protocol.ProtocolConstants;
 import de.metalcon.musicStorageServer.protocol.create.CreateResponse;
 import de.metalcon.musicStorageServer.protocol.delete.DeleteResponse;
 import de.metalcon.musicStorageServer.protocol.read.ReadResponse;
@@ -275,17 +276,20 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 
 					return true;
 				} else {
-					// TODO: hash collision
+					// internal server error: hash collision
+					response.internalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
 			} catch (final ConvertingFailedException e) {
 				// error: invalid music item stream
 				response.musicItemStreamInvalid();
 			} catch (final ConverterExecutionException e) {
-				// internal server error
+				// internal server error: failed to start the audio converter
 				response.internalServerError();
 				e.printStackTrace();
 			} catch (final IOException e) {
-				// internal server error
+				// internal server error: failed to store music files
 				response.internalServerError();
 				e.printStackTrace();
 			} finally {
@@ -327,6 +331,7 @@ public class MusicStorageServer implements MusicStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.internalServerError();
+				e.printStackTrace();
 			}
 		} else {
 			// error: no music item with such identifier

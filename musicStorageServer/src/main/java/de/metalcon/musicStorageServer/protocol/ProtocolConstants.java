@@ -13,6 +13,30 @@ public class ProtocolConstants {
 	public static final String SOLUTION = "solution";
 
 	/**
+	 * parameters for requests
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public class Parameter {
+
+		/**
+		 * parameters used in the create requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Create {
+
+			public static final String MUSIC_ITEM_IDENTIFIER = "musicItemIdentifier";
+			public static final String MUSIC_ITEM = "musicItem";
+			public static final String META_DATA = "metaData";
+
+		}
+
+	}
+
+	/**
 	 * status messages for responses
 	 * 
 	 * @author sebschlicht
@@ -70,6 +94,18 @@ public class ProtocolConstants {
 			public static final String MUSIC_ITEM_NOT_EXISTING = "music item not existing";
 
 		}
+
+	}
+
+	/**
+	 * server log messages
+	 * 
+	 * @author sebschlicht
+	 * 
+	 */
+	public class LogMessage {
+
+		public static final String HASH_COLLISION = "hash collision occurred!";
 
 	}
 
