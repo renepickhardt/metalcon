@@ -10,6 +10,9 @@ import org.json.simple.parser.ParseException;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
+import de.metalcon.sdd.error.EntityJsonClassCastSddError;
+import de.metalcon.sdd.error.EntityJsonParseSddError;
+import de.metalcon.sdd.error.EntityNoJsonForDetailSddError;
 import de.metalcon.sdd.server.Server;
 import de.metalcon.sdd.tomcat.Servlet;
 
@@ -27,6 +30,7 @@ public abstract class Entity {
         this.server = server;
         jsonGenerated = false;
         json = new HashMap<Detail, String>();
+        id = null;
     }
     
     public void loadFromId(Muid id) {
@@ -57,11 +61,9 @@ public abstract class Entity {
                                          parser.parse(json);
             return entity;
         } catch (ParseException e) {
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new EntityJsonParseSddError(e, json);
         } catch (ClassCastException e) {
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new EntityJsonClassCastSddError(json);
         }
     }
 
@@ -71,7 +73,10 @@ public abstract class Entity {
         if (!jsonGenerated)
             generateJson();
         
-        return json.get(detail);
+        String result = json.get(detail);
+        if (result == null)
+            throw new EntityNoJsonForDetailSddError(detail);
+        return result;
     }
     
     public Muid getId() {

@@ -8,8 +8,9 @@ import org.json.simple.JSONValue;
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.common.JsonString;
 import de.metalcon.sdd.IdDetail;
-import de.metalcon.sdd.error.ReadRequestInvalidQueryError;
-import de.metalcon.sdd.error.SddError;
+import de.metalcon.sdd.error.ReadRequestInvalidIdDetailSddError;
+import de.metalcon.sdd.error.ReadRequestNoQuerySddError;
+import de.metalcon.sdd.error.ReadRequestQueueActionSddError;
 import de.metalcon.sdd.server.Server;
 
 public class ReadRequest extends Request {
@@ -27,45 +28,30 @@ public class ReadRequest extends Request {
     }
 
     @Override
-    public Map<String, Object> runHttpResponse() {
-        Map<String, Object> result;
-
-        try {
-            result = runTry();
-        } catch (SddError e) {
-            result = new HashMap<String, Object>();
-            result.put("error", e.toJson());
-        }
-
-        return result;
-    }
-
-    public Map<String, Object> runTry() {
+    protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
 
         if (query == null)
-            throw new ReadRequestInvalidQueryError();
+            throw new ReadRequestNoQuerySddError();
         for (String idDetail : query.split(String.valueOf(queryDelimeter)))
-            result.put(idDetail, new JsonString(getIdDetail(idDetail)));
+            result.put(idDetail, new JsonString(getJson(idDetail)));
 
         return result;
     }
 
-    public String getIdDetail(String idDetail) {
+    public String getJson(String idDetail) {
         IdDetail entity = new IdDetail(idDetail);
         
         String json = server.readEntity(entity);
-        if (json == null) {
-            // TODO key didn't exists
-        }
+        if (json == null)
+            throw new ReadRequestInvalidIdDetailSddError(idDetail);
         
         return json;
     }
     
     @Override
     public void runQueueAction() {
-        // TODO: You shouldn't push a ReadRequest into the Server queue.
-        throw new RuntimeException();
+        throw new ReadRequestQueueActionSddError();
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -74,7 +60,7 @@ public class ReadRequest extends Request {
         
         ReadRequest r = new ReadRequest(s);
         r.setQuery("11233033e2b36cff:line,2f364c13c0114e16:line,ce0058ac39a33616:profile");
-        String json = JSONValue.toJSONString(r.runHttpResponse());
+        String json = JSONValue.toJSONString(r.runHttp());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
         Thread.sleep(100);

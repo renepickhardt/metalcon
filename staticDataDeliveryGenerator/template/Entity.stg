@@ -33,7 +33,7 @@ import de.metalcon.sdd.server.Server;
 
 public class $name$ extends Entity {
 
-    $attrs:{attr|$javaType(attr.type,attr.array)$ $attr.name$;}; separator="\n\n"$
+    $attrs:{attr|private $javaType(attr.type,attr.array)$ $attr.name$;}; separator="\n\n"$
     
     public $name$(Server server) {
         super(server);

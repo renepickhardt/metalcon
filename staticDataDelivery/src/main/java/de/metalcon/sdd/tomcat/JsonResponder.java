@@ -26,9 +26,15 @@ public class JsonResponder {
         if (prettyPrint)
             json = JsonPrettyPrinter.prettyPrintJson(json);
         
-        PrintWriter w = response.getWriter();
-        w.println(json);
-        w.flush();
-        w.close();
+        PrintWriter w = null;
+        try {
+            w = response.getWriter();
+            w.println(json);
+            w.flush();
+            w.close();
+        } finally {
+            if (w != null)
+                w.close();
+        }
     }
 }

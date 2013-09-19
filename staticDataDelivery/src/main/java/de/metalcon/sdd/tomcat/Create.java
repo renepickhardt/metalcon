@@ -16,7 +16,7 @@ public class Create extends Servlet {
             HttpServletResponse response) throws IOException {
         CreateRequest r = new CreateRequest(server);
         r.setParams(request.getParameterMap());
-        JsonResponder.writeJsonResponse(response, r.runHttpResponse());
+        JsonResponder.writeJsonResponse(response, r.runHttp());
     }
 
 }

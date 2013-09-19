@@ -16,7 +16,7 @@ public class Read extends Servlet {
             HttpServletResponse response) throws IOException {
         ReadRequest r = new ReadRequest(server);
         r.setQuery(request.getQueryString());
-        JsonResponder.writeJsonResponse(response, r.runHttpResponse());
+        JsonResponder.writeJsonResponse(response, r.runHttp());
     }
 
 }

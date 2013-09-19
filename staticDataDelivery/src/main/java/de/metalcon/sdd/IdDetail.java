@@ -1,8 +1,8 @@
 package de.metalcon.sdd;
 
 import de.metalcon.common.Muid;
-import de.metalcon.sdd.error.ReadRequestInvalidDetailError;
-import de.metalcon.sdd.error.ReadRequestInvalidQueryError;
+import de.metalcon.sdd.error.IdDetailInvalidDetailSddError;
+import de.metalcon.sdd.error.IdDetailInvalidStringSddError;
 
 public class IdDetail {
     
@@ -24,13 +24,15 @@ public class IdDetail {
         int colonPos = idDetail.indexOf(delimeter);
         if (colonPos == -1 || colonPos == 0
                 || colonPos == idDetail.length() - 1)
-            throw new ReadRequestInvalidQueryError();
+            throw new IdDetailInvalidStringSddError(idDetail);
         
-        id     = new Muid(idDetail.substring(0, colonPos));
-        // TODO: validate id
-        detail = Detail.stringToEnum(idDetail.substring(colonPos + 1));
+        String idStr     = idDetail.substring(0, colonPos);
+        String detailStr = idDetail.substring(colonPos + 1);
+        
+        id     = new Muid(idStr);
+        detail = Detail.stringToEnum(detailStr);
         if (detail == Detail.NONE)
-            throw new ReadRequestInvalidDetailError();
+            throw new IdDetailInvalidDetailSddError(detailStr);
     }
     
     public String toString() {

@@ -6,6 +6,7 @@ package de.metalcon.sdd.entity;
  * "staticDataDeliverGenerator/template/".
  */
 
+import de.metalcon.sdd.error.EntityInvalidEntityTypeSddError;
 import de.metalcon.sdd.server.Server;
 
 public class EntityByType {
@@ -38,8 +39,7 @@ public class EntityByType {
                 return new Venue(server);
 
             default:
-                // TODO: handle this
-                throw new RuntimeException();
+                throw new EntityInvalidEntityTypeSddError(type);
         }
     }
 

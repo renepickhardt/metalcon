@@ -16,7 +16,7 @@ public class Delete extends Servlet {
             HttpServletResponse response) throws IOException {
         DeleteRequest r = new DeleteRequest(server);
         r.setParams(request.getParameterMap());
-        JsonResponder.writeJsonResponse(response, r.runHttpResponse());
+        JsonResponder.writeJsonResponse(response, r.runHttp());
     }
 
 }

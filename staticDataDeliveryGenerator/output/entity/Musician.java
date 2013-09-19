@@ -18,17 +18,17 @@ import de.metalcon.sdd.server.Server;
 
 public class Musician extends Entity {
 
-    String name;
+    private String name;
 
-    String url;
+    private String url;
 
-    String active;
+    private String active;
 
-    String founder;
+    private String founder;
 
-    String spans;
+    private String spans;
 
-    Band band;
+    private Band band;
 
     public Musician(Server server) {
         super(server);

@@ -16,7 +16,7 @@ public class DeleteRequest extends Request {
     }
     
     @Override
-    public Map<String, Object> runHttpResponse() {
+    protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
         
         if (server.addRequest(this)) {
@@ -44,7 +44,7 @@ public class DeleteRequest extends Request {
         params.put("id", new String[]{"2f364c13c0114e16"});
         DeleteRequest r = new DeleteRequest(s);
         r.setParams(params);
-        String json = JSONValue.toJSONString(r.runHttpResponse());
+        String json = JSONValue.toJSONString(r.runHttp());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
         Thread.sleep(100);

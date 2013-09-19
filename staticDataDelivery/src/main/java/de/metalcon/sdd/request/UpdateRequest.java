@@ -18,7 +18,7 @@ public class UpdateRequest extends Request {
     }
 
     @Override
-    public Map<String, Object> runHttpResponse() {
+    protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
         
         if (server.addRequest(this)) {
@@ -50,7 +50,7 @@ public class UpdateRequest extends Request {
         params.put("country",   new String[]{"Finnland"});
         UpdateRequest r = new UpdateRequest(s);
         r.setParams(params);
-        String json = JSONValue.toJSONString(r.runHttpResponse());
+        String json = JSONValue.toJSONString(r.runHttp());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
         Thread.sleep(100);

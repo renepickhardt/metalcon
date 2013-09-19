@@ -19,23 +19,23 @@ import de.metalcon.sdd.server.Server;
 
 public class Band extends Entity {
 
-    String name;
+    private String name;
 
-    String url;
+    private String url;
 
-    String foundation;
+    private String foundation;
 
-    City city;
+    private City city;
 
-    List<Genre> genres;
+    private List<Genre> genres;
 
-    List<Musician> musicians;
+    private List<Musician> musicians;
 
-    List<Event> events;
+    private List<Event> events;
 
-    List<Tour> tours;
+    private List<Tour> tours;
 
-    List<Record> records;
+    private List<Record> records;
 
     public Band(Server server) {
         super(server);

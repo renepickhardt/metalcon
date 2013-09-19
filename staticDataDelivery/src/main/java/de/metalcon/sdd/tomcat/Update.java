@@ -16,7 +16,7 @@ public class Update extends Servlet {
             HttpServletResponse response) throws IOException {
         UpdateRequest r = new UpdateRequest(server);
         r.setParams(request.getParameterMap());
-        JsonResponder.writeJsonResponse(response, r.runHttpResponse());
+        JsonResponder.writeJsonResponse(response, r.runHttp());
     }
 
 }
