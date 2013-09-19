@@ -1,6 +1,6 @@
 package de.metalcon.sdd.request;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
@@ -33,7 +33,7 @@ public class ReadRequest extends Request {
         try {
             result = runTry();
         } catch (SddError e) {
-            result = new LinkedHashMap<String, Object>();
+            result = new HashMap<String, Object>();
             result.put("error", e.toJson());
         }
 
@@ -41,7 +41,7 @@ public class ReadRequest extends Request {
     }
 
     public Map<String, Object> runTry() {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
 
         if (query == null)
             throw new ReadRequestInvalidQueryError();
@@ -73,7 +73,7 @@ public class ReadRequest extends Request {
         s.start(); 
         
         ReadRequest r = new ReadRequest(s);
-        r.setQuery("2f364c13c0114e16:full");
+        r.setQuery("2f364c13c0114e16:line");
         String json = JSONValue.toJSONString(r.runHttpResponse());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);

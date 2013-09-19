@@ -1,6 +1,6 @@
 package de.metalcon.sdd.entity;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;import java.util.Map;
 
@@ -161,7 +161,7 @@ public class Band extends Entity {
         List<Muid> ids;
                 List<JsonString> os;
         // FULL
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         j.put("name", name);
         j.put("url", url);
@@ -193,66 +193,47 @@ public class Band extends Entity {
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         j.put("url", url);
         j.put("name", name);
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("foundation", foundation);
-        j.put("url", url);
-        j.put("name", name);
         if (city == null)
             j.put("city", null);
         else
             j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
+        j.put("foundation", foundation);
+        j.put("url", url);
+        j.put("name", name);
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        if (city == null)
+            j.put("city", null);
+        else
+            j.put("city", new JsonString(city.getJson(Detail.LINE)));
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("records", os);
         j.put("foundation", foundation);
         os = new LinkedList<JsonString>();
         for (Genre o : genres)
             os.add(new JsonString(o.getJson(Detail.SYMBOL)));
         j.put("genres", os);
         j.put("url", url);
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
         j.put("name", name);
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.LINE)));
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
 
         // PROFILE
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        os = new LinkedList<JsonString>();
-        for (Musician o : musicians)
-            os.add(new JsonString(o.getJson(Detail.PARAGRAPH)));
-        j.put("musicians", os);
-        j.put("foundation", foundation);
-        os = new LinkedList<JsonString>();
-        for (Genre o : genres)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("genres", os);
-        j.put("url", url);
-        os = new LinkedList<JsonString>();
-        for (Tour o : tours)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("tours", os);
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
-        j.put("name", name);
         os = new LinkedList<JsonString>();
         for (Event o : events)
             os.add(new JsonString(o.getJson(Detail.LINE)));
@@ -261,35 +242,54 @@ public class Band extends Entity {
             j.put("city", null);
         else
             j.put("city", new JsonString(city.getJson(Detail.LINE)));
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("records", os);
+        j.put("foundation", foundation);
+        os = new LinkedList<JsonString>();
+        for (Musician o : musicians)
+            os.add(new JsonString(o.getJson(Detail.PARAGRAPH)));
+        j.put("musicians", os);
+        os = new LinkedList<JsonString>();
+        for (Genre o : genres)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("genres", os);
+        j.put("url", url);
+        j.put("name", name);
+        os = new LinkedList<JsonString>();
+        for (Tour o : tours)
+            os.add(new JsonString(o.getJson(Detail.LINE)));
+        j.put("tours", os);
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
 
         // TOOLTIP
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        if (city == null)
+            j.put("city", null);
+        else
+            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
+        os = new LinkedList<JsonString>();
+        for (Record o : records)
+            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
+        j.put("records", os);
         j.put("foundation", foundation);
         os = new LinkedList<JsonString>();
         for (Genre o : genres)
             os.add(new JsonString(o.getJson(Detail.SYMBOL)));
         j.put("genres", os);
         j.put("url", url);
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
-        j.put("records", os);
         j.put("name", name);
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
 
         // SEARCH_ENTRY
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.SEARCH_ENTRY, JSONValue.toJSONString(j));
 
         // SEARCH_DETAILED
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.SEARCH_DETAILED, JSONValue.toJSONString(j));
     }

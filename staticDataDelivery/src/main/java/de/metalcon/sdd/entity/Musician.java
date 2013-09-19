@@ -1,6 +1,6 @@
 package de.metalcon.sdd.entity;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
@@ -90,7 +90,7 @@ public class Musician extends Entity {
     protected void generateJson() {
         Map<String, Object> j;
         // FULL
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         j.put("name", name);
         j.put("url", url);
@@ -104,45 +104,45 @@ public class Musician extends Entity {
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("url", url);
         j.put("name", name);
+        j.put("url", url);
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("name", name);
         if (band == null)
             j.put("band", null);
         else
             j.put("band", new JsonString(band.getJson(Detail.SYMBOL)));
         j.put("url", url);
-        j.put("name", name);
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
 
         // PROFILE
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
 
         // TOOLTIP
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
 
         // SEARCH_ENTRY
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.SEARCH_ENTRY, JSONValue.toJSONString(j));
 
         // SEARCH_DETAILED
-        j = new LinkedHashMap<String, Object>();
+        j = new HashMap<String, Object>();
         j.put("id", getId().toString());
         json.put(Detail.SEARCH_DETAILED, JSONValue.toJSONString(j));
     }

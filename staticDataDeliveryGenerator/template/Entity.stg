@@ -13,7 +13,7 @@ delimiters "$","$"
 entity(name,attrs,jsons,has) ::= <<
 package de.metalcon.sdd.entity;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 $if(has.array)$import java.util.LinkedList;
 import java.util.List;$endif$
 import java.util.Map;
@@ -142,7 +142,7 @@ else {
 
 generate(detail,oattrs,full) ::= <<
 // $detail$
-j = new LinkedHashMap<String, Object>();
+j = new HashMap<String, Object>();
 j.put("id", getId().toString());
 $if(full)$$generateFull(oattrs)$$else$$generateOther(oattrs)$$endif$
 json.put(Detail.$detail$, JSONValue.toJSONString(j));

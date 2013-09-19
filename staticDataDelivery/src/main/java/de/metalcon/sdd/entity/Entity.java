@@ -1,13 +1,12 @@
 package de.metalcon.sdd.entity;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.metalcon.common.JsonOrderedFactory;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
@@ -27,7 +26,7 @@ public abstract class Entity {
     public Entity(Server server) {
         this.server = server;
         jsonGenerated = false;
-        json = new LinkedHashMap<Detail, String>();
+        json = new HashMap<Detail, String>();
     }
     
     public void loadFromId(Muid id) {
@@ -55,7 +54,7 @@ public abstract class Entity {
             JSONParser parser = new JSONParser();
             @SuppressWarnings("unchecked")
             Map<String, String> entity = (Map<String, String>)
-                    parser.parse(json, new JsonOrderedFactory());
+                                         parser.parse(json);
             return entity;
         } catch (ParseException e) {
             // TODO: handle this

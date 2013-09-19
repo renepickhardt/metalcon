@@ -1,6 +1,6 @@
 package de.metalcon.sdd.error;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SddError extends RuntimeException {
@@ -12,7 +12,7 @@ public abstract class SddError extends RuntimeException {
     public abstract String getSuggestion();
     
     public Map<String, String> toJson() {
-        Map<String, String> json = new LinkedHashMap<String, String>();
+        Map<String, String> json = new HashMap<String, String>();
         json.put("type",    "error");
         json.put("id",      getClass().getName());
         json.put("desc",    getDescription());

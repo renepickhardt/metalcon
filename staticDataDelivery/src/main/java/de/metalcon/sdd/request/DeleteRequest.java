@@ -1,7 +1,6 @@
 package de.metalcon.sdd.request;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.json.simple.JSONValue;
@@ -18,7 +17,7 @@ public class DeleteRequest extends Request {
     
     @Override
     public Map<String, Object> runHttpResponse() {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
         
         if (server.addRequest(this)) {
             // TODO: good response
