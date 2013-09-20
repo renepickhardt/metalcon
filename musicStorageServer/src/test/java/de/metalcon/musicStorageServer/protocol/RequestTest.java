@@ -1,5 +1,6 @@
 package de.metalcon.musicStorageServer.protocol;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
@@ -13,6 +14,16 @@ import org.json.simple.JSONObject;
  * 
  */
 public class RequestTest {
+
+	/**
+	 * MSSP prefix for missing parameters
+	 */
+	private static final String MISSING_PARAM_BEFORE = "request incomplete: parameter \"";
+
+	/**
+	 * MSSP postfix for missing parameters
+	 */
+	private static final String MISSING_PARAM_AFTER = "\" is missing";
 
 	/**
 	 * JSON response from server
@@ -34,6 +45,31 @@ public class RequestTest {
 		} catch (final Exception e) {
 			fail("failed to extract the JSON object from class Response");
 		}
+	}
+
+	/**
+	 * check if the JSON response contains a certain status message<br>
+	 * <b>fails</b> the test if the status message is not contained
+	 * 
+	 * @param statusMessage
+	 *            status message the response should contain
+	 */
+	protected void checkForStatusMessage(final String statusMessage) {
+		assertEquals(statusMessage,
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+	}
+
+	/**
+	 * check if the JSON response contains a certain missing parameter status
+	 * message<br>
+	 * <b>fails</b> the test if the status message is not contained
+	 * 
+	 * @param parameter
+	 *            parameter the missing parameter status message is expected for
+	 */
+	protected void checkForMissingParameter(final String parameter) {
+		this.checkForStatusMessage(MISSING_PARAM_BEFORE + parameter
+				+ MISSING_PARAM_AFTER);
 	}
 
 }
