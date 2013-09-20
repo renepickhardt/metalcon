@@ -19,15 +19,13 @@ import de.metalcon.sdd.error.ServerLevelDbCloseSddError;
 import de.metalcon.sdd.error.ServerLevelDbInitializationSddError;
 import de.metalcon.sdd.request.Request;
 
-
 // LevelDB
 import org.iq80.leveldb.*;
-
 import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 public class Server implements ServletContextListener {
-    
-    final private static String dbPath = "/usr/share/sdd";
+
+    final private static String dbPath = "/usr/share/sdd/leveldb";
 
     private DB db;
     
@@ -64,6 +62,9 @@ public class Server implements ServletContextListener {
         return queue.offer(request);
     }
 
+    /**
+     * @return Returns null if entity does not exist in database.
+     */
     public String readEntity(IdDetail idDetail) {
         if (idDetail.getDetail() == Detail.NONE)
             throw new ServerDetailNoneSddError(idDetail);

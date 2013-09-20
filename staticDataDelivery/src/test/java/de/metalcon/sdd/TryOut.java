@@ -3,7 +3,11 @@ package de.metalcon.sdd;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+
 import org.iq80.leveldb.*;
+
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 
 import static org.fusesource.leveldbjni.JniDBFactory.*;
 
@@ -77,11 +81,17 @@ public class TryOut {
             db.close();
         }
     }
+    
+    public static void t3() {
+        Graph graph = new Neo4jGraph("/usr/share/sdd/neo4j");
+        graph.shutdown();
+    }
 
     public static void main(String[] args) throws IOException,
             UnknownHostException {
 //        t1();
 //        t2();
+        t3();
     }
     
 }

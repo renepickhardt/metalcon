@@ -13,6 +13,8 @@ import de.metalcon.common.JsonString;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
+import de.metalcon.sdd.error.EntityConstructionSddError;
+import de.metalcon.sdd.error.EntityInvalidIDSddError;
 import de.metalcon.sdd.error.EntityJsonClassCastSddError;
 import de.metalcon.sdd.error.EntityJsonParseSddError;
 import de.metalcon.sdd.error.EntityNoJsonForDetailSddError;
@@ -44,6 +46,8 @@ public abstract class Entity {
     
     public void loadFromId(Muid id) {
         String json = server.readEntity(new IdDetail(id, Detail.FULL));
+        if (json == null)
+            throw new EntityInvalidIDSddError(id);
         loadFromJson(json);
     }
     
@@ -106,8 +110,7 @@ public abstract class Entity {
             entity.loadFromId(new Muid(id));
         } catch (IllegalAccessException | InstantiationException
                 | InvocationTargetException | NoSuchMethodException e) {
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new EntityConstructionSddError(clazz.toString());
         }
         return entity;
     }

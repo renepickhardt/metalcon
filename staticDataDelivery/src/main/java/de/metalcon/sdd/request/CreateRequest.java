@@ -81,12 +81,12 @@ public class CreateRequest extends Request {
 //        params.put("active",    new String[]{"true"});
 //        params.put("founder",   new String[]{"true"});
 //        params.put("spans",     new String[]{"1992-now"});
-        params.put("id",        new String[]{"ce0058ac39a33616"});
-        params.put("type",      new String[]{"Band"});
-        params.put("name",      new String[]{"Ensiferum"});
-        params.put("url",       new String[]{"/music/Ensiferum"});
-        params.put("foundation",new String[]{"1995"});
-        params.put("musicians", new String[]{"2f364c13c0114e16,11233033e2b36cff"});
+//        params.put("id",        new String[]{"ce0058ac39a33616"});
+//        params.put("type",      new String[]{"Band"});
+//        params.put("name",      new String[]{"Ensiferum"});
+//        params.put("url",       new String[]{"/music/Ensiferum"});
+//        params.put("foundation",new String[]{"1995"});
+//        params.put("musicians", new String[]{"2f364c13c0114e16,11233033e2b36cff"});
         CreateRequest r = new CreateRequest(s);
         r.setParams(params);
         String json = JSONValue.toJSONString(r.runHttp());
