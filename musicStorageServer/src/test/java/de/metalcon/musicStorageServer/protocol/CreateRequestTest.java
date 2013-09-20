@@ -1,7 +1,9 @@
 package de.metalcon.musicStorageServer.protocol;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -9,6 +11,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
@@ -102,6 +107,18 @@ public class CreateRequestTest extends RequestTest {
 	}
 
 	@Test
+	public void testCreateMusicItem() throws IOException {
+		this.fillRequest(VALID_CREATE_IDENTIFIER, VALID_MUSIC_ITEM_MP3,
+				VALID_CREATE_META_DATA);
+		assertNotNull(this.createRequest);
+		assertEquals(VALID_CREATE_IDENTIFIER,
+				this.createRequest.getMusicItemIdentifier());
+		assertTrue(compareInputStreams(VALID_MUSIC_ITEM_MP3.getInputStream(),
+				this.createRequest.getImageStream()));
+		assertEquals(VALID_CREATE_META_DATA, this.createRequest.getMetaData());
+	}
+
+	@Test
 	public void testMusicItemIdentifierMissing() {
 		this.fillRequest(null, VALID_MUSIC_ITEM_MP3, VALID_CREATE_META_DATA);
 		this.checkForMissingParameter(ProtocolConstants.Parameter.Create.MUSIC_ITEM_IDENTIFIER);
@@ -158,6 +175,58 @@ public class CreateRequestTest extends RequestTest {
 		}
 
 		return musicItem;
+	}
+
+	/**
+	 * compare two input streams
+	 * 
+	 * @param stream1
+	 *            first input stream
+	 * @param stream2
+	 *            second input stream
+	 * @return true - if the two streams does contain the same content<br>
+	 *         false - otherwise
+	 * @throws IOException
+	 *             if IO errors occurred
+	 */
+	private static boolean compareInputStreams(final InputStream stream1,
+			final InputStream stream2) throws IOException {
+		final ReadableByteChannel channel1 = Channels.newChannel(stream1);
+		final ReadableByteChannel channel2 = Channels.newChannel(stream2);
+		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(4096);
+		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(4096);
+
+		try {
+			while (true) {
+
+				int n1 = channel1.read(buffer1);
+				int n2 = channel2.read(buffer2);
+
+				if ((n1 == -1) || (n2 == -1)) {
+					return n1 == n2;
+				}
+
+				buffer1.flip();
+				buffer2.flip();
+
+				for (int i = 0; i < Math.min(n1, n2); i++) {
+					if (buffer1.get() != buffer2.get()) {
+						return false;
+					}
+				}
+
+				buffer1.compact();
+				buffer2.compact();
+			}
+
+		} finally {
+			if (stream1 != null) {
+				stream1.close();
+			}
+			if (stream2 != null) {
+				stream2.close();
+			}
+		}
 	}
 
 }

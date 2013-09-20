@@ -378,7 +378,7 @@ public class MusicStorageServerTest {
 	}
 
 	/**
-	 * compare to input streams
+	 * compare two input streams
 	 * 
 	 * @param stream1
 	 *            first input stream

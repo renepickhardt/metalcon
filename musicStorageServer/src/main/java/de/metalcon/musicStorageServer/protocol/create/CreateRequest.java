@@ -76,17 +76,28 @@ public class CreateRequest {
 		return this.metaData;
 	}
 
+	/**
+	 * check a create request for validity concerning MSSP
+	 * 
+	 * @param request
+	 *            form item list extracted from the request
+	 * @param response
+	 *            create response object to add status messages to
+	 * @return create request object<br>
+	 *         <b>null</b> if the request is invalid
+	 */
 	public static CreateRequest checkRequest(final FormItemList request,
 			final CreateResponse response) {
 		final String musicItemIdentifier = checkMusicItemIdentifier(request,
 				response);
 		if (musicItemIdentifier != null) {
-			final InputStream imageStream = checkImageStream(request, response);
-			if (imageStream != null) {
+			final InputStream musicItemStream = checkMusicItem(request,
+					response);
+			if (musicItemStream != null) {
 				final String metaData = checkMetaData(request, response);
 				if (metaData != null) {
-					return new CreateRequest(musicItemIdentifier, imageStream,
-							metaData);
+					return new CreateRequest(musicItemIdentifier,
+							musicItemStream, metaData);
 				}
 			}
 		}
@@ -94,6 +105,16 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * check if the request contains a music item identifier
+	 * 
+	 * @param formItemList
+	 *            form item list extracted
+	 * @param response
+	 *            create response object
+	 * @return music item identifier<br>
+	 *         <b>null</b> if the music item identifier is missing
+	 */
 	protected static String checkMusicItemIdentifier(
 			final FormItemList formItemList, final CreateResponse response) {
 		try {
@@ -106,7 +127,17 @@ public class CreateRequest {
 		return null;
 	}
 
-	protected static InputStream checkImageStream(
+	/**
+	 * check if the request contains a music item
+	 * 
+	 * @param formItemList
+	 *            form item list extracted
+	 * @param response
+	 *            create response object
+	 * @return input stream of the music item<br>
+	 *         <b>null</b> if the music item is missing
+	 */
+	protected static InputStream checkMusicItem(
 			final FormItemList formItemList, final CreateResponse response) {
 		try {
 			final FormFile musicItem = formItemList
@@ -123,6 +154,16 @@ public class CreateRequest {
 		return null;
 	}
 
+	/**
+	 * check if the request contains valid meta data
+	 * 
+	 * @param formItemList
+	 *            form item list extracted
+	 * @param response
+	 *            create response object
+	 * @return valid meta data<br>
+	 *         <b>null</b> if the meta data is missing or malformed
+	 */
 	protected static String checkMetaData(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {

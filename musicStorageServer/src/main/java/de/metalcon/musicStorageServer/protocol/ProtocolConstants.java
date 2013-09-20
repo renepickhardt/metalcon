@@ -34,6 +34,19 @@ public class ProtocolConstants {
 
 		}
 
+		/**
+		 * parameters used in the update requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Update {
+
+			public static final String MUSIC_ITEM_IDENTIFIER = "musicItemIdentifier";
+			public static final String META_DATA = "metaData";
+
+		}
+
 	}
 
 	/**
