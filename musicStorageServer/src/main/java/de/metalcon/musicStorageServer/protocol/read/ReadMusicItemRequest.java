@@ -86,7 +86,7 @@ public class ReadMusicItemRequest {
 	 * @return music item identifier<br>
 	 *         <b>null</b> if the music item identifier is missing
 	 */
-	private static String checkMusicItemIdentifier(
+	protected static String checkMusicItemIdentifier(
 			final FormItemList formItemList, final ReadResponse response) {
 		try {
 			return formItemList

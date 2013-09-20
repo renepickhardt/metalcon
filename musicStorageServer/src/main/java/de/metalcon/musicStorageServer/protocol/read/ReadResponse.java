@@ -56,4 +56,13 @@ public class ReadResponse extends Response {
 						+ MUSIC_ITEM_VERSIONS_ALLOWED + ".");
 	}
 
+	/**
+	 * add status message: music item identifiers missing
+	 */
+	public void musicItemIdentifiersMissing() {
+		this.parameterMissing(
+				ProtocolConstants.Parameter.Read.MUSIC_ITEM_IDENTIFIERS,
+				"Please provide a comma separated list of identifiers you want to retrieve meta data for.");
+	}
+
 }

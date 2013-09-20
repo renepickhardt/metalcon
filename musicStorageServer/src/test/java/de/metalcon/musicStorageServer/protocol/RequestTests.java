@@ -6,7 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ CreateRequestTest.class, ReadMusicItemRequestTest.class,
-		DeleteRequestTest.class, UpdateRequestTest.class })
+		ReadMetaDataRequestTest.class, DeleteRequestTest.class,
+		UpdateRequestTest.class })
 public class RequestTests {
 
 }
