@@ -179,7 +179,7 @@ public class MusicStorageServerTest {
 		this.deleteResponse = new DeleteResponse();
 	}
 
-	// @Test
+	@Test
 	public void testCreateMusicItemMp3Valid() {
 		assertTrue(this.server.createMusicItem(VALID_CREATE_IDENTIFIER,
 				VALID_READ_STREAM_MP3, VALID_CREATE_META_DATA,
