@@ -35,8 +35,6 @@ public class CreateRequestTest extends RequestTest {
 
 	private static File TEST_FILE_DIRECTORY, DISK_FILE_REPOSITORY;
 
-	private static final String VALID_CREATE_IDENTIFIER = "mi1";
-
 	private static FileItem VALID_MUSIC_ITEM_MP3;
 
 	private static String VALID_CREATE_META_DATA;
@@ -107,11 +105,11 @@ public class CreateRequestTest extends RequestTest {
 	}
 
 	@Test
-	public void testCreateMusicItem() throws IOException {
-		this.fillRequest(VALID_CREATE_IDENTIFIER, VALID_MUSIC_ITEM_MP3,
+	public void testCreateRequest() throws IOException {
+		this.fillRequest(VALID_IDENTIFIER, VALID_MUSIC_ITEM_MP3,
 				VALID_CREATE_META_DATA);
 		assertNotNull(this.createRequest);
-		assertEquals(VALID_CREATE_IDENTIFIER,
+		assertEquals(VALID_IDENTIFIER,
 				this.createRequest.getMusicItemIdentifier());
 		assertTrue(compareInputStreams(VALID_MUSIC_ITEM_MP3.getInputStream(),
 				this.createRequest.getImageStream()));
@@ -121,27 +119,27 @@ public class CreateRequestTest extends RequestTest {
 	@Test
 	public void testMusicItemIdentifierMissing() {
 		this.fillRequest(null, VALID_MUSIC_ITEM_MP3, VALID_CREATE_META_DATA);
-		this.checkForMissingParameter(ProtocolConstants.Parameter.Create.MUSIC_ITEM_IDENTIFIER);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameter.Create.MUSIC_ITEM_IDENTIFIER);
 		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testMusicItemMissing() {
-		this.fillRequest(VALID_CREATE_IDENTIFIER, null, VALID_CREATE_META_DATA);
-		this.checkForMissingParameter(ProtocolConstants.Parameter.Create.MUSIC_ITEM);
+		this.fillRequest(VALID_IDENTIFIER, null, VALID_CREATE_META_DATA);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameter.Create.MUSIC_ITEM);
 		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testMetaDataMissing() {
-		this.fillRequest(VALID_CREATE_IDENTIFIER, VALID_MUSIC_ITEM_MP3, null);
-		this.checkForMissingParameter(ProtocolConstants.Parameter.Create.META_DATA);
+		this.fillRequest(VALID_IDENTIFIER, VALID_MUSIC_ITEM_MP3, null);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameter.Create.META_DATA);
 		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testMetaDataMalformed() {
-		this.fillRequest(VALID_CREATE_IDENTIFIER, VALID_MUSIC_ITEM_MP3,
+		this.fillRequest(VALID_IDENTIFIER, VALID_MUSIC_ITEM_MP3,
 				INVALID_META_DATA);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED);
 		assertNull(this.createRequest);

@@ -26,6 +26,11 @@ public class RequestTest {
 	private static final String MISSING_PARAM_AFTER = "\" is missing";
 
 	/**
+	 * valid identifier for a music item
+	 */
+	protected static final String VALID_IDENTIFIER = "mi1";
+
+	/**
 	 * JSON response from server
 	 */
 	protected JSONObject jsonResponse;
@@ -67,7 +72,7 @@ public class RequestTest {
 	 * @param parameter
 	 *            parameter the missing parameter status message is expected for
 	 */
-	protected void checkForMissingParameter(final String parameter) {
+	protected void checkForMissingParameterMessage(final String parameter) {
 		this.checkForStatusMessage(MISSING_PARAM_BEFORE + parameter
 				+ MISSING_PARAM_AFTER);
 	}

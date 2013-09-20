@@ -6,6 +6,15 @@ import de.metalcon.musicStorageServer.protocol.Response;
 public class DeleteResponse extends Response {
 
 	/**
+	 * add status message: music item identifier missing
+	 */
+	public void musicItemIdentifierMissing() {
+		this.parameterMissing(
+				ProtocolConstants.Parameter.Delete.MUSIC_ITEM_IDENTIFIER,
+				"Please provide a music item identifier that is used by an existing music item.");
+	}
+
+	/**
 	 * add status message: music item not existing
 	 * 
 	 * @param musicItemIdentifier

@@ -35,6 +35,24 @@ public class ProtocolConstants {
 		}
 
 		/**
+		 * parameters used in the read requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Read {
+
+			public static final String MUSIC_ITEM_IDENTIFIER = "musicItemIdentifier";
+			public static final String MUSIC_ITEM_VERSION = "musicItemVersion";
+
+			/**
+			 * read meta data of any number of music items
+			 */
+			public static final String MUSIC_ITEM_IDENTIFIERS = "musicItemIdentifiers";
+
+		}
+
+		/**
 		 * parameters used in the update requests
 		 * 
 		 * @author sebschlicht
@@ -44,6 +62,18 @@ public class ProtocolConstants {
 
 			public static final String MUSIC_ITEM_IDENTIFIER = "musicItemIdentifier";
 			public static final String META_DATA = "metaData";
+
+		}
+
+		/**
+		 * parameters used in the delete requests
+		 * 
+		 * @author sebschlicht
+		 * 
+		 */
+		public class Delete {
+
+			public static final String MUSIC_ITEM_IDENTIFIER = "musicItemIdentifier";
 
 		}
 
@@ -80,6 +110,7 @@ public class ProtocolConstants {
 		public class Read {
 
 			public static final String MUSIC_ITEM_NOT_EXISTING = "music item not existing";
+			public static final String MUSIC_ITEM_VERSION_INVALID = "music item version invalid";
 
 		}
 

@@ -1,5 +1,7 @@
 package de.metalcon.musicStorageServer.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.json.simple.JSONObject;
@@ -55,9 +57,32 @@ public class UpdateRequestTest extends RequestTest {
 	}
 
 	@Test
+	public void testUpdateRequest() {
+		this.fillRequest(VALID_IDENTIFIER, VALID_UPDATE_META_DATA);
+		assertNotNull(this.updateRequest);
+		assertEquals(VALID_IDENTIFIER,
+				this.updateRequest.getMusicItemIdentifier());
+		assertEquals(VALID_UPDATE_META_DATA, this.updateRequest.getMetaData());
+	}
+
+	@Test
 	public void testMusicItemIdentifierMissing() {
 		this.fillRequest(null, VALID_UPDATE_META_DATA);
-		this.checkForMissingParameter(ProtocolConstants.Parameter.Update.MUSIC_ITEM_IDENTIFIER);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameter.Update.MUSIC_ITEM_IDENTIFIER);
+		assertNull(this.updateRequest);
+	}
+
+	@Test
+	public void testMetaDataMissing() {
+		this.fillRequest(VALID_IDENTIFIER, null);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameter.Update.META_DATA);
+		assertNull(this.updateRequest);
+	}
+
+	@Test
+	public void testMetaDataMalformed() {
+		this.fillRequest(VALID_IDENTIFIER, INVALID_META_DATA);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED);
 		assertNull(this.updateRequest);
 	}
 
