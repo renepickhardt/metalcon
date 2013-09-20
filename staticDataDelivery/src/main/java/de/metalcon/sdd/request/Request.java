@@ -22,11 +22,7 @@ public abstract class Request {
     }
     
     protected String getParam(String key) {
-        return getParam(key, false);
-    }
-    
-    protected String getParam(String key, boolean optional) {
-        return Servlet.getParam(params, key, optional);
+        return Servlet.getParam(params, key);
     }
     
     public Map<String, Object> runHttp() {

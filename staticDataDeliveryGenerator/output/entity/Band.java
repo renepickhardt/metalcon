@@ -14,6 +14,7 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
 
 public class Band extends Entity {
@@ -64,20 +65,32 @@ public class Band extends Entity {
         name = loadPrimitive(String.class, getParam(params, "name"));
         url = loadPrimitive(String.class, getParam(params, "url"));
         foundation = loadPrimitive(String.class, getParam(params, "foundation"));
-        city = loadEntity(City.class, getParam(params, "city", true));
-        genres = loadEntityArray(Genre.class, getParam(params, "genres", true));
-        musicians = loadEntityArray(Musician.class, getParam(params, "musicians", true));
-        events = loadEntityArray(Event.class, getParam(params, "events", true));
-        tours = loadEntityArray(Tour.class, getParam(params, "tours", true));
-        records = loadEntityArray(Record.class, getParam(params, "records", true));
+        city = loadEntity(City.class, getParam(params, "city"));
+        genres = loadEntityArray(Genre.class, getParam(params, "genres"));
+        musicians = loadEntityArray(Musician.class, getParam(params, "musicians"));
+        events = loadEntityArray(Event.class, getParam(params, "events"));
+        tours = loadEntityArray(Tour.class, getParam(params, "tours"));
+        records = loadEntityArray(Record.class, getParam(params, "records"));
     }
 
     @Override
     public void loadFromUpdateParams(Map<String, String[]> params) {
         Muid id = new Muid(getParam(params, "id"));
-        loadFromId(id);
+        IdDetail idDetail = new IdDetail(id, Detail.FULL);
+        String json = server.readEntity(idDetail);
+        Map<String, String> entity = parseJson(json);
 
-        //<LOAD_FROM_UPDATE_PARAMS>
+        setId(new Muid(entity.get("id")));
+
+        name = loadPrimitive(String.class, getParam(params, "name"), entity.get("name"));
+        url = loadPrimitive(String.class, getParam(params, "url"), entity.get("url"));
+        foundation = loadPrimitive(String.class, getParam(params, "foundation"), entity.get("foundation"));
+        city = loadEntity(City.class, getParam(params, "city"), entity.get("city"));
+        genres = loadEntityArray(Genre.class, getParam(params, "genres"), entity.get("genres"));
+        musicians = loadEntityArray(Musician.class, getParam(params, "musicians"), entity.get("musicians"));
+        events = loadEntityArray(Event.class, getParam(params, "events"), entity.get("events"));
+        tours = loadEntityArray(Tour.class, getParam(params, "tours"), entity.get("tours"));
+        records = loadEntityArray(Record.class, getParam(params, "records"), entity.get("records"));
     }
 
     @Override

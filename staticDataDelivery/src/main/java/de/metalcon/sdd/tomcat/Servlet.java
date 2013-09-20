@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
-import de.metalcon.sdd.error.ServletNonExistingParamSddError;
 import de.metalcon.sdd.server.Server;
 
 public class Servlet extends HttpServlet {
@@ -24,8 +23,7 @@ public class Servlet extends HttpServlet {
         server = (Server) context.getAttribute("server");
     }
     
-    public static String getParam(Map<String, String[]> params, String key,
-            boolean optional) {
+    public static String getParam(Map<String, String[]> params, String key) {
         String[] vals = params.get(key);
         if (vals != null) {
             String val = vals[0];
@@ -33,10 +31,7 @@ public class Servlet extends HttpServlet {
                 return val;
         }
         
-        if (optional)
-            return null;
-        else
-            throw new ServletNonExistingParamSddError(key);
+        return null;
     }
 
 }

@@ -25,6 +25,7 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
 
 public class $name$ extends Entity {
@@ -41,22 +42,26 @@ public class $name$ extends Entity {
         
         setId(new Muid(entity.get("id")));
         
-        $attrs:{attr|$load(attr,"entity.get(\"","\")","\")")$}; separator="\n"$
+        $attrs:{attr|$loadJson(attr)$}; separator="\n"$
     }
     
     @Override
     public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
         
-        $attrs:{attr|$load(attr,"getParam(params, \"","\")","\", true)")$}; separator="\n"$
+        $attrs:{attr|$loadCreate(attr)$}; separator="\n"$
     }
     
     @Override
     public void loadFromUpdateParams(Map<String, String[]> params) {
         Muid id = new Muid(getParam(params, "id"));
-        loadFromId(id);
+        IdDetail idDetail = new IdDetail(id, Detail.FULL);
+        String json = server.readEntity(idDetail);
+        Map<String, String> entity = parseJson(json);
         
-        //<LOAD_FROM_UPDATE_PARAMS>
+        setId(new Muid(entity.get("id")));
+        
+        $attrs:{attr|$loadUpdate(attr)$}; separator="\n"$
     }
     
     @Override
@@ -87,18 +92,39 @@ $endif$
 //     .type - String
 //     .primitive - Boolean
 //     .array - Boolean
-// loadFuncPre - String
-// loadFuncPost - String
-// loadFuncOptPost - String
-load(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <%
+
+loadJson(attr) ::= <%
 $if(attr.primitive)$
-    $attr.name$ = loadPrimitive($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncPost$);
+    $attr.name$ = loadPrimitive($attr.type$.class, $entityGet(attr.name)$);
 $elseif(attr.array)$
-    $attr.name$ = loadEntityArray($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncOptPost$);
+    $attr.name$ = loadEntityArray($attr.type$.class, $entityGet(attr.name)$);
 $else$
-    $attr.name$ = loadEntity($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncOptPost$);
+    $attr.name$ = loadEntity($attr.type$.class, $entityGet(attr.name)$);
 $endif$
 %>
+
+loadCreate(attr) ::= <%
+$if(attr.primitive)$
+    $attr.name$ = loadPrimitive($attr.type$.class, $getParam(attr.name)$);
+$elseif(attr.array)$
+    $attr.name$ = loadEntityArray($attr.type$.class, $getParam(attr.name)$);
+$else$
+    $attr.name$ = loadEntity($attr.type$.class, $getParam(attr.name)$);
+$endif$
+%>
+
+loadUpdate(attr) ::= <%
+$if(attr.primitive)$
+    $attr.name$ = loadPrimitive($attr.type$.class, $getParam(attr.name)$, $entityGet(attr.name)$);
+$elseif(attr.array)$
+    $attr.name$ = loadEntityArray($attr.type$.class, $getParam(attr.name)$, $entityGet(attr.name)$);
+$else$
+    $attr.name$ = loadEntity($attr.type$.class, $getParam(attr.name)$, $entityGet(attr.name)$);
+$endif$
+%>
+
+entityGet(name) ::= "entity.get(\"$name$\")"
+getParam(name)  ::= "getParam(params, \"$name$\")"
 
 // -----------------------------------------------------------------------------
 // --- generate ----------------------------------------------------------------

@@ -7,11 +7,16 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.sdd.entity.Entity;
+import de.metalcon.sdd.error.RequestMissingParamIdSddError;
+import de.metalcon.sdd.error.RequestMissingParamTypeSddError;
 import de.metalcon.sdd.server.Server;
-
 import static de.metalcon.sdd.entity.EntityByType.newEntityByType;
 
 public class CreateRequest extends Request {
+    
+    String paramId;
+    
+    String paramType;
     
     public CreateRequest(Server server) {
         super(server);
@@ -20,6 +25,13 @@ public class CreateRequest extends Request {
     @Override
     protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
+        
+        paramId = getParam("id");
+        if (paramId == null)
+            throw new RequestMissingParamIdSddError();
+        paramType = getParam("type");
+        if (paramType == null)
+            throw new RequestMissingParamTypeSddError();
         
         if (server.addRequest(this)) {
             // TODO: good response
@@ -34,8 +46,8 @@ public class CreateRequest extends Request {
     
     @Override
     public void runQueueAction() {
-        Entity entity = newEntityByType(getParam("type"), server);
-//        Entity entity = Entity.newEntityByType(id.getType());
+        Entity entity = newEntityByType(paramType, server);
+//        Entity entity = Entity.newEntityByType(id.getType(), server);
         entity.loadFromCreateParams(params);
         server.writeEntity(entity);
     }
@@ -81,12 +93,12 @@ public class CreateRequest extends Request {
 //        params.put("active",    new String[]{"true"});
 //        params.put("founder",   new String[]{"true"});
 //        params.put("spans",     new String[]{"1992-now"});
-//        params.put("id",        new String[]{"ce0058ac39a33616"});
-//        params.put("type",      new String[]{"Band"});
-//        params.put("name",      new String[]{"Ensiferum"});
-//        params.put("url",       new String[]{"/music/Ensiferum"});
-//        params.put("foundation",new String[]{"1995"});
-//        params.put("musicians", new String[]{"2f364c13c0114e16,11233033e2b36cff"});
+        params.put("id",        new String[]{"ce0058ac39a33616"});
+        params.put("type",      new String[]{"Band"});
+        params.put("name",      new String[]{"Ensiferum"});
+        params.put("url",       new String[]{"/music/Ensiferum"});
+        params.put("foundation",new String[]{"1995"});
+        params.put("musicians", new String[]{"2f364c13c0114e16,11233033e2b36cff"});
         CreateRequest r = new CreateRequest(s);
         r.setParams(params);
         String json = JSONValue.toJSONString(r.runHttp());

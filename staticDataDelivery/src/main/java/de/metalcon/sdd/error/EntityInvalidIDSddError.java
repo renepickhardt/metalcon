@@ -20,7 +20,7 @@ public class EntityInvalidIDSddError extends SddError {
     @Override
     public String getSuggestion() {
         return "Entity request ID was: \"" + id.toString() + "\".\n" +
-               "No entity exists for that ID. Create it first before reference it.";
+               "No entity exists for that ID. Create it first before referencing it.";
     }
 
 }

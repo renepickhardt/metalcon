@@ -72,12 +72,7 @@ public abstract class Entity {
     protected abstract void generateJson();
     
     protected static String getParam(Map<String, String[]> params, String key) {
-        return getParam(params, key, false);
-    }
-    
-    protected static String getParam(Map<String, String[]> params, String key,
-                                     boolean optional) {
-        return Servlet.getParam(params, key, optional);
+        return Servlet.getParam(params, key);
     }
     
     protected static Map<String, String> parseJson(String json) {
@@ -97,11 +92,38 @@ public abstract class Entity {
     // --- load ----------------------------------------------------------------
     
     protected <T> T loadPrimitive(Class<T> clazz, String value) {
-        return clazz.cast(value);
+        return loadPrimitive(clazz, value, null);
     }
     
     protected <T extends Entity> T loadEntity(Class<T> clazz, String id) {
-        if (id == null)
+        return loadEntity(clazz, id, null);
+    }
+    
+    protected <T extends Entity> List<T> loadEntityArray(Class<T> clazz,
+                                                         String ids) {
+        return loadEntityArray(clazz, ids, null);
+    }
+    
+    protected <T> T loadPrimitive(Class<T> clazz,
+                                  String value, String oldValue) {
+        if (value == null) {
+            if (oldValue == null)
+                return null;
+            value = oldValue;
+        }
+                    
+        return clazz.cast(value);
+    }
+    
+    protected <T extends Entity> T loadEntity(Class<T> clazz,
+                                              String id, String oldId) {
+        if (id == null) {
+            if (oldId == null)
+                return null;
+            id = oldId;
+        }
+        
+        if (id.isEmpty())
             return null;
         
         T entity = null;
@@ -116,17 +138,29 @@ public abstract class Entity {
     }
     
     protected <T extends Entity> List<T> loadEntityArray(Class<T> clazz,
-                                                         String ids) {
-        List<T> array = new LinkedList<T>();
-        if (ids != null)
-            for (String id : ids.split(","))
-                array.add(loadEntity(clazz, id));
-        return array;
+                                                         String ids,
+                                                         String oldIds) {
+        if (ids == null) {
+            if (oldIds == null)
+                return new LinkedList<T>();
+            ids = oldIds;
+        }
+        
+        List<T> entities = new LinkedList<T>();
+        for (String id : ids.split(",")) {
+            T entity = loadEntity(clazz, id);
+            if (entity != null)
+                entities.add(entity);
+        }
+        return entities;
     }
     
     // --- generate ------------------------------------------------------------
     
     protected <T> String generatePrimitive(T value) {
+        if (value == null)
+            return null;
+        
         return value.toString();
     }
     
@@ -139,9 +173,12 @@ public abstract class Entity {
     }
     
     protected <T extends Entity> List<JsonString> generateEntityArray(
-            List<T> array, Detail detail) {
+            List<T> entities, Detail detail) {
+        if (entities.isEmpty())
+            return null;
+        
         List<JsonString> jsons = new LinkedList<JsonString>();
-        for (T entity : array)
+        for (T entity : entities)
             jsons.add(generateEntity(entity, detail));
         return jsons;
     }
@@ -155,6 +192,9 @@ public abstract class Entity {
     
     protected <T extends Entity> String generateEntityArrayIds(
             List<T> entities) {
+        if (entities.isEmpty())
+            return null;
+        
         List<String> ids = new LinkedList<String>();
         for (T entity : entities)
             ids.add(generateEntityId(entity));

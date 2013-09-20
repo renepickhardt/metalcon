@@ -7,11 +7,16 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.sdd.entity.Entity;
+import de.metalcon.sdd.error.RequestMissingParamIdSddError;
+import de.metalcon.sdd.error.RequestMissingParamTypeSddError;
 import de.metalcon.sdd.server.Server;
-
 import static de.metalcon.sdd.entity.EntityByType.newEntityByType;
 
 public class UpdateRequest extends Request {
+    
+    String paramId;
+    
+    String paramType;
     
     public UpdateRequest(Server server) {
         super(server);
@@ -20,6 +25,13 @@ public class UpdateRequest extends Request {
     @Override
     protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
+        
+        paramId = getParam("id");
+        if (paramId == null)
+            throw new RequestMissingParamIdSddError();
+        paramType = getParam("type");
+        if (paramType == null)
+            throw new RequestMissingParamTypeSddError();
         
         if (server.addRequest(this)) {
             // TODO: good response
@@ -34,8 +46,8 @@ public class UpdateRequest extends Request {
     
     @Override
     public void runQueueAction() {
-        Entity entity = newEntityByType(getParam("type"), server);
-//        Entity entity = Entity.newEntityByType(id.getType());
+        Entity entity = newEntityByType(paramType, server);
+//        Entity entity = Entity.newEntityByType(id.getType(), server);
         entity.loadFromUpdateParams(params);;
         server.writeEntity(entity);
     }
@@ -45,9 +57,9 @@ public class UpdateRequest extends Request {
         s.start();
         
         Map<String, String[]> params = new HashMap<String, String[]>();
-        params.put("id",        new String[]{"11233033e2b36cff"});
-        params.put("type",      new String[]{"city"});
-        params.put("country",   new String[]{"Finnland"});
+        params.put("id",        new String[]{"ce0058ac39a33616"});
+        params.put("type",      new String[]{"Band"});
+        params.put("musicians", new String[]{""});
         UpdateRequest r = new UpdateRequest(s);
         r.setParams(params);
         String json = JSONValue.toJSONString(r.runHttp());

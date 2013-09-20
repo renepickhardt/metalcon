@@ -13,6 +13,7 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.server.Server;
 
 public class Tour extends Entity {
@@ -38,9 +39,12 @@ public class Tour extends Entity {
     @Override
     public void loadFromUpdateParams(Map<String, String[]> params) {
         Muid id = new Muid(getParam(params, "id"));
-        loadFromId(id);
+        IdDetail idDetail = new IdDetail(id, Detail.FULL);
+        String json = server.readEntity(idDetail);
+        Map<String, String> entity = parseJson(json);
 
-        //<LOAD_FROM_UPDATE_PARAMS>
+        setId(new Muid(entity.get("id")));
+
     }
 
     @Override

@@ -7,9 +7,12 @@ import org.json.simple.JSONValue;
 
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.common.Muid;
+import de.metalcon.sdd.error.RequestMissingParamIdSddError;
 import de.metalcon.sdd.server.Server;
 
 public class DeleteRequest extends Request {
+    
+    String paramId;
     
     public DeleteRequest(Server server) {
         super(server);
@@ -18,6 +21,10 @@ public class DeleteRequest extends Request {
     @Override
     protected Map<String, Object> runHttpAction() {
         Map<String, Object> result = new HashMap<String, Object>();
+        
+        paramId = getParam("id");
+        if (paramId == null)
+            throw new RequestMissingParamIdSddError();
         
         if (server.addRequest(this)) {
             // TODO: good response
@@ -32,8 +39,7 @@ public class DeleteRequest extends Request {
     
     @Override
     public void runQueueAction() {
-        Muid id = new Muid(getParam("id"));
-        server.deleteEntity(id);
+        server.deleteEntity(new Muid(paramId));
     }
     
     public static void main(String[] args) throws InterruptedException {
