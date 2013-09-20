@@ -7,10 +7,8 @@ delimiters "$","$"
 //     .primitive - Boolean
 //     .array - Boolean
 // jsons - String[]
-// has - Object 
-//     .array - Boolean
-//     .class - Boolean
-entity(name,attrs,jsons,has) ::= <<
+// hasArray - Boolean
+entity(name,attrs,jsons,hasArray) ::= <<
 package de.metalcon.sdd.entity;
 
 /**
@@ -20,21 +18,19 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
-$if(has.array)$import java.util.LinkedList;
-import java.util.List;$endif$
+$if(hasArray)$import java.util.List;$endif$
 import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-$if(has.array || has.class)$import de.metalcon.common.JsonString;$endif$
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
 
 public class $name$ extends Entity {
 
-    $attrs:{attr|private $javaType(attr.type,attr.array)$ $attr.name$;}; separator="\n\n"$
-    
+    $attrs:{attr|private $javaType(attr.type,attr.array)$ $attr.name$;
+    };separator="\n"$
     public $name$(Server server) {
         super(server);
     }
@@ -45,22 +41,14 @@ public class $name$ extends Entity {
         
         setId(new Muid(entity.get("id")));
         
-        $if(has.class)$String oid;
-        $endif$
-        $if(has.array)$String os;
-        $endif$
-        $attrs:{attr|$load(attr,"entity.get(\"","\")","\")")$}; separator="\n\n"$
+        $attrs:{attr|$load(attr,"entity.get(\"","\")","\")")$}; separator="\n"$
     }
     
     @Override
     public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
         
-        $if(has.class)$String oid;
-        $endif$
-        $if(has.array)$String os;
-        $endif$
-        $attrs:{attr|$load(attr,"getParam(params, \"","\")","\", true)")$}; separator="\n\n"$
+        $attrs:{attr|$load(attr,"getParam(params, \"","\")","\", true)")$}; separator="\n"$
     }
     
     @Override
@@ -74,9 +62,7 @@ public class $name$ extends Entity {
     @Override
     protected void generateJson() {
         Map<String, Object> j;
-        $if(has.array)$List<Muid> ids;
-        List<JsonString> os;
-        $endif$
+        
         $jsons; separator="\n\n"$
     }
     
@@ -104,41 +90,15 @@ $endif$
 // loadFuncPre - String
 // loadFuncPost - String
 // loadFuncOptPost - String
-
 load(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <%
 $if(attr.primitive)$
-    $loadPrimitive(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
+    $attr.name$ = loadPrimitive($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncPost$);
 $elseif(attr.array)$
-    $loadArray(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
+    $attr.name$ = loadEntityArray($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncOptPost$);
 $else$
-    $loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost)$
+    $attr.name$ = loadEntity($attr.type$.class, $loadFuncPre$$attr.name$$loadFuncOptPost$);
 $endif$
 %>
-
-loadPrimitive(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
-$attr.name$ = $loadFuncPre$$attr.name$$loadFuncPost$;
->>
-
-loadArray(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
-$attr.name$ = new LinkedList<$attr.type$>();
-os = $loadFuncPre$$attr.name$$loadFuncOptPost$;
-if (os != null)
-    for (String id : os.split(",")) {
-        $attr.type$ o = new $attr.type$(server);
-        o.loadFromId(new Muid(id));
-        $attr.name$.add(o);
-    }
->>
-
-loadClass(attr,loadFuncPre,loadFuncPost,loadFuncOptPost) ::= <<
-oid = $loadFuncPre$$attr.name$$loadFuncOptPost$;
-if (oid == null)
-    $attr.name$ = null;
-else {
-    $attr.name$ = new $attr.type$(server);
-    $attr.name$.loadFromId(new Muid(oid));
-}
->>
 
 // -----------------------------------------------------------------------------
 // --- generate ----------------------------------------------------------------
@@ -160,66 +120,30 @@ $if(full)$$generateFull(oattrs)$$else$$generateOther(oattrs)$$endif$
 json.put(Detail.$detail$, JSONValue.toJSONString(j));
 >>
 
-// --- generateFull ------------------------------------------------------------
-
 generateFull(oattrs) ::= <%
 $oattrs:{oattr|
+    j.put("$oattr.name$", 
     $if(oattr.primitive)$
-        $generateFullPrimitive(oattr)$
+        generatePrimitive($oattr.name$)
     $elseif(oattr.array)$
-        $generateFullArray(oattr)$
+        generateEntityArrayIds($oattr.name$)
     $else$
-        $generateFullClass(oattr)$
+        generateEntityId($oattr.name$)
     $endif$
+    );
 }; separator="\n"$
 %>
-
-generateFullPrimitive(oattr) ::= <<
-j.put("$oattr.name$", $oattr.name$);
->>
-
-generateFullArray(oattr) ::= <<
-ids = new LinkedList<Muid>();
-for ($oattr.type$ o : $oattr.name$)
-    ids.add(o.getId());
-j.put("$oattr.name$", joinIds(ids));
->>
-
-generateFullClass(oattr) ::= <<
-if ($oattr.name$ == null)
-    j.put("$oattr.name$", null);
-else
-    j.put("$oattr.name$", $oattr.name$.getId().toString());
->>
-
-// --- generateOther -----------------------------------------------------------
 
 generateOther(oattrs) ::= <%
 $oattrs:{oattr|
+    j.put("$oattr.name$", 
     $if(oattr.primitive)$
-        $generateOtherPrimitive(oattr)$
+        generatePrimitive($oattr.name$)
     $elseif(oattr.array)$
-        $generateOtherArray(oattr)$
+        generateEntityArray($oattr.name$, Detail.$oattr.detail$)
     $else$
-        $generateOtherClass(oattr)$
+        generateEntity($oattr.name$, Detail.$oattr.detail$)
     $endif$
+    );
 }; separator="\n"$
 %>
-
-generateOtherPrimitive(oattr) ::= <<
-j.put("$oattr.name$", $oattr.name$);
->>
-
-generateOtherArray(oattr) ::= <<
-os = new LinkedList<JsonString>();
-for ($oattr.type$ o : $oattr.name$)
-    os.add(new JsonString(o.getJson(Detail.$oattr.detail$)));
-j.put("$oattr.name$", os);
->>
-
-generateOtherClass(oattr) ::= <<
-if ($oattr.name$ == null)
-    j.put("$oattr.name$", null);
-else
-    j.put("$oattr.name$", new JsonString($oattr.name$.getJson(Detail.$oattr.detail$)));
->>

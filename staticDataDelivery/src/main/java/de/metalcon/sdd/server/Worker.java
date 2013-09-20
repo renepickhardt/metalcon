@@ -39,6 +39,7 @@ public class Worker implements Runnable {
             }
         } catch (InterruptedException e) {
             // stopped by server
+            // TODO: somehow store the queue until the server start up again.
         }
         
         running = false;

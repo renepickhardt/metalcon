@@ -214,19 +214,16 @@ public class Generator {
         stEntity.add("name", entity.getName());
         
         Boolean hasArray = false;
-        Boolean hasClass = false;
         
         for (EntityAttribute attr : entity.getAttributes()) {
-            
             hasArray = hasArray || attr.hasArray();
-            hasClass = hasArray || (!attr.hasPrimitiveType() && !attr.hasArray());
             
             stEntity.addAggr("attrs.{name,type,primitive,array}",
                              attr.getName(), attr.getType(),
                              attr.hasPrimitiveType(), attr.hasArray());
         }
         
-        stEntity.addAggr("has.{array,class}", hasArray, hasClass);
+        stEntity.add("hasArray", hasArray);
         
         ST stGenerate;
         for (Detail detail : details) {

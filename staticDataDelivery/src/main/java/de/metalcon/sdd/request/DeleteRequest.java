@@ -41,7 +41,7 @@ public class DeleteRequest extends Request {
         s.start();
         
         Map<String, String[]> params = new HashMap<String, String[]>();
-        params.put("id", new String[]{"2f364c13c0114e16"});
+        params.put("id", new String[]{"ce0058ac39a33616"});
         DeleteRequest r = new DeleteRequest(s);
         r.setParams(params);
         String json = JSONValue.toJSONString(r.runHttp());

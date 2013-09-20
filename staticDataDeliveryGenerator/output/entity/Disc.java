@@ -17,7 +17,6 @@ import de.metalcon.sdd.server.Server;
 
 public class Disc extends Entity {
 
-
     public Disc(Server server) {
         super(server);
     }
@@ -47,6 +46,7 @@ public class Disc extends Entity {
     @Override
     protected void generateJson() {
         Map<String, Object> j;
+
         // FULL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());

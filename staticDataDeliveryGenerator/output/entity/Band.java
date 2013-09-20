@@ -7,12 +7,11 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;import java.util.Map;
+import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import de.metalcon.common.JsonString;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
@@ -47,132 +46,30 @@ public class Band extends Entity {
 
         setId(new Muid(entity.get("id")));
 
-        String oid;
-        String os;
-        name = entity.get("name");
-
-        url = entity.get("url");
-
-        foundation = entity.get("foundation");
-
-        oid = entity.get("city");
-        if (oid == null)
-            city = null;
-        else {
-            city = new City(server);
-            city.loadFromId(new Muid(oid));
-        }
-
-        genres = new LinkedList<Genre>();
-        os = entity.get("genres");
-        if (os != null)
-            for (String id : os.split(",")) {
-                Genre o = new Genre(server);
-                o.loadFromId(new Muid(id));
-                genres.add(o);
-            }
-
-        musicians = new LinkedList<Musician>();
-        os = entity.get("musicians");
-        if (os != null)
-            for (String id : os.split(",")) {
-                Musician o = new Musician(server);
-                o.loadFromId(new Muid(id));
-                musicians.add(o);
-            }
-
-        events = new LinkedList<Event>();
-        os = entity.get("events");
-        if (os != null)
-            for (String id : os.split(",")) {
-                Event o = new Event(server);
-                o.loadFromId(new Muid(id));
-                events.add(o);
-            }
-
-        tours = new LinkedList<Tour>();
-        os = entity.get("tours");
-        if (os != null)
-            for (String id : os.split(",")) {
-                Tour o = new Tour(server);
-                o.loadFromId(new Muid(id));
-                tours.add(o);
-            }
-
-        records = new LinkedList<Record>();
-        os = entity.get("records");
-        if (os != null)
-            for (String id : os.split(",")) {
-                Record o = new Record(server);
-                o.loadFromId(new Muid(id));
-                records.add(o);
-            }
+        name = loadPrimitive(String.class, entity.get("name"));
+        url = loadPrimitive(String.class, entity.get("url"));
+        foundation = loadPrimitive(String.class, entity.get("foundation"));
+        city = loadEntity(City.class, entity.get("city"));
+        genres = loadEntityArray(Genre.class, entity.get("genres"));
+        musicians = loadEntityArray(Musician.class, entity.get("musicians"));
+        events = loadEntityArray(Event.class, entity.get("events"));
+        tours = loadEntityArray(Tour.class, entity.get("tours"));
+        records = loadEntityArray(Record.class, entity.get("records"));
     }
 
     @Override
     public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
 
-        String oid;
-        String os;
-        name = getParam(params, "name");
-
-        url = getParam(params, "url");
-
-        foundation = getParam(params, "foundation");
-
-        oid = getParam(params, "city", true);
-        if (oid == null)
-            city = null;
-        else {
-            city = new City(server);
-            city.loadFromId(new Muid(oid));
-        }
-
-        genres = new LinkedList<Genre>();
-        os = getParam(params, "genres", true);
-        if (os != null)
-            for (String id : os.split(",")) {
-                Genre o = new Genre(server);
-                o.loadFromId(new Muid(id));
-                genres.add(o);
-            }
-
-        musicians = new LinkedList<Musician>();
-        os = getParam(params, "musicians", true);
-        if (os != null)
-            for (String id : os.split(",")) {
-                Musician o = new Musician(server);
-                o.loadFromId(new Muid(id));
-                musicians.add(o);
-            }
-
-        events = new LinkedList<Event>();
-        os = getParam(params, "events", true);
-        if (os != null)
-            for (String id : os.split(",")) {
-                Event o = new Event(server);
-                o.loadFromId(new Muid(id));
-                events.add(o);
-            }
-
-        tours = new LinkedList<Tour>();
-        os = getParam(params, "tours", true);
-        if (os != null)
-            for (String id : os.split(",")) {
-                Tour o = new Tour(server);
-                o.loadFromId(new Muid(id));
-                tours.add(o);
-            }
-
-        records = new LinkedList<Record>();
-        os = getParam(params, "records", true);
-        if (os != null)
-            for (String id : os.split(",")) {
-                Record o = new Record(server);
-                o.loadFromId(new Muid(id));
-                records.add(o);
-            }
+        name = loadPrimitive(String.class, getParam(params, "name"));
+        url = loadPrimitive(String.class, getParam(params, "url"));
+        foundation = loadPrimitive(String.class, getParam(params, "foundation"));
+        city = loadEntity(City.class, getParam(params, "city", true));
+        genres = loadEntityArray(Genre.class, getParam(params, "genres", true));
+        musicians = loadEntityArray(Musician.class, getParam(params, "musicians", true));
+        events = loadEntityArray(Event.class, getParam(params, "events", true));
+        tours = loadEntityArray(Tour.class, getParam(params, "tours", true));
+        records = loadEntityArray(Record.class, getParam(params, "records", true));
     }
 
     @Override
@@ -186,129 +83,71 @@ public class Band extends Entity {
     @Override
     protected void generateJson() {
         Map<String, Object> j;
-        List<Muid> ids;
-                List<JsonString> os;
+
         // FULL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
-        j.put("url", url);
-        j.put("foundation", foundation);
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", city.getId().toString());
-        ids = new LinkedList<Muid>();
-        for (Genre o : genres)
-            ids.add(o.getId());
-        j.put("genres", joinIds(ids));
-        ids = new LinkedList<Muid>();
-        for (Musician o : musicians)
-            ids.add(o.getId());
-        j.put("musicians", joinIds(ids));
-        ids = new LinkedList<Muid>();
-        for (Event o : events)
-            ids.add(o.getId());
-        j.put("events", joinIds(ids));
-        ids = new LinkedList<Muid>();
-        for (Tour o : tours)
-            ids.add(o.getId());
-        j.put("tours", joinIds(ids));
-        ids = new LinkedList<Muid>();
-        for (Record o : records)
-            ids.add(o.getId());
-        j.put("records", joinIds(ids));
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("city", generateEntityId(city));
+        j.put("genres", generateEntityArrayIds(genres));
+        j.put("musicians", generateEntityArrayIds(musicians));
+        j.put("events", generateEntityArrayIds(events));
+        j.put("tours", generateEntityArrayIds(tours));
+        j.put("records", generateEntityArrayIds(records));
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("url", url);
-        j.put("name", name);
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
-        j.put("foundation", foundation);
-        j.put("url", url);
-        j.put("name", name);
+        j.put("city", generateEntity(city, Detail.SYMBOL));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.LINE)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
-        j.put("foundation", foundation);
-        os = new LinkedList<JsonString>();
-        for (Genre o : genres)
-            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
-        j.put("genres", os);
-        j.put("url", url);
-        j.put("name", name);
+        j.put("city", generateEntity(city, Detail.LINE));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("records", generateEntityArray(records, Detail.LINE));
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
+        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
 
         // PROFILE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        os = new LinkedList<JsonString>();
-        for (Event o : events)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("events", os);
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.LINE)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("records", os);
-        j.put("foundation", foundation);
-        os = new LinkedList<JsonString>();
-        for (Musician o : musicians)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("musicians", os);
-        os = new LinkedList<JsonString>();
-        for (Genre o : genres)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("genres", os);
-        j.put("url", url);
-        j.put("name", name);
-        os = new LinkedList<JsonString>();
-        for (Tour o : tours)
-            os.add(new JsonString(o.getJson(Detail.LINE)));
-        j.put("tours", os);
+        j.put("tours", generateEntityArray(tours, Detail.LINE));
+        j.put("city", generateEntity(city, Detail.LINE));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("events", generateEntityArray(events, Detail.LINE));
+        j.put("records", generateEntityArray(records, Detail.LINE));
+        j.put("musicians", generateEntityArray(musicians, Detail.LINE));
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
+        j.put("genres", generateEntityArray(genres, Detail.LINE));
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
 
         // TOOLTIP
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        if (city == null)
-            j.put("city", null);
-        else
-            j.put("city", new JsonString(city.getJson(Detail.SYMBOL)));
-        os = new LinkedList<JsonString>();
-        for (Record o : records)
-            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
-        j.put("records", os);
-        j.put("foundation", foundation);
-        os = new LinkedList<JsonString>();
-        for (Genre o : genres)
-            os.add(new JsonString(o.getJson(Detail.SYMBOL)));
-        j.put("genres", os);
-        j.put("url", url);
-        j.put("name", name);
+        j.put("city", generateEntity(city, Detail.SYMBOL));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("records", generateEntityArray(records, Detail.SYMBOL));
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
+        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
 
         // SEARCH_ENTRY

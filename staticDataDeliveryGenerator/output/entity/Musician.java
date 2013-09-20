@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.json.simple.JSONValue;
 
-import de.metalcon.common.JsonString;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.server.Server;
@@ -40,48 +39,24 @@ public class Musician extends Entity {
 
         setId(new Muid(entity.get("id")));
 
-        String oid;
-        name = entity.get("name");
-
-        url = entity.get("url");
-
-        active = entity.get("active");
-
-        founder = entity.get("founder");
-
-        spans = entity.get("spans");
-
-        oid = entity.get("band");
-        if (oid == null)
-            band = null;
-        else {
-            band = new Band(server);
-            band.loadFromId(new Muid(oid));
-        }
+        name = loadPrimitive(String.class, entity.get("name"));
+        url = loadPrimitive(String.class, entity.get("url"));
+        active = loadPrimitive(String.class, entity.get("active"));
+        founder = loadPrimitive(String.class, entity.get("founder"));
+        spans = loadPrimitive(String.class, entity.get("spans"));
+        band = loadEntity(Band.class, entity.get("band"));
     }
 
     @Override
     public void loadFromCreateParams(Map<String, String[]> params) {
         setId(new Muid(getParam(params, "id")));
 
-        String oid;
-        name = getParam(params, "name");
-
-        url = getParam(params, "url");
-
-        active = getParam(params, "active");
-
-        founder = getParam(params, "founder");
-
-        spans = getParam(params, "spans");
-
-        oid = getParam(params, "band", true);
-        if (oid == null)
-            band = null;
-        else {
-            band = new Band(server);
-            band.loadFromId(new Muid(oid));
-        }
+        name = loadPrimitive(String.class, getParam(params, "name"));
+        url = loadPrimitive(String.class, getParam(params, "url"));
+        active = loadPrimitive(String.class, getParam(params, "active"));
+        founder = loadPrimitive(String.class, getParam(params, "founder"));
+        spans = loadPrimitive(String.class, getParam(params, "spans"));
+        band = loadEntity(Band.class, getParam(params, "band", true));
     }
 
     @Override
@@ -95,36 +70,31 @@ public class Musician extends Entity {
     @Override
     protected void generateJson() {
         Map<String, Object> j;
+
         // FULL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
-        j.put("url", url);
-        j.put("active", active);
-        j.put("founder", founder);
-        j.put("spans", spans);
-        if (band == null)
-            j.put("band", null);
-        else
-            j.put("band", band.getId().toString());
+        j.put("name", generatePrimitive(name));
+        j.put("url", generatePrimitive(url));
+        j.put("active", generatePrimitive(active));
+        j.put("founder", generatePrimitive(founder));
+        j.put("spans", generatePrimitive(spans));
+        j.put("band", generateEntityId(band));
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
-        j.put("url", url);
+        j.put("url", generatePrimitive(url));
+        j.put("name", generatePrimitive(name));
         json.put(Detail.SYMBOL, JSONValue.toJSONString(j));
 
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("name", name);
-        if (band == null)
-            j.put("band", null);
-        else
-            j.put("band", new JsonString(band.getJson(Detail.SYMBOL)));
-        j.put("url", url);
+        j.put("url", generatePrimitive(url));
+        j.put("band", generateEntity(band, Detail.SYMBOL));
+        j.put("name", generatePrimitive(name));
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH

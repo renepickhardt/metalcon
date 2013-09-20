@@ -1,12 +1,15 @@
 package de.metalcon.sdd.entity;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.metalcon.common.JsonString;
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
@@ -33,16 +36,36 @@ public abstract class Entity {
         id = null;
     }
     
-    public void loadFromId(Muid id) {
-        String json = server.readEntity(new IdDetail(id, Detail.FULL));
-        loadFromJson(json);
-    }
-    
     public abstract void loadFromJson(String json);
     
     public abstract void loadFromCreateParams(Map<String, String[]> params);
     
     public abstract void loadFromUpdateParams(Map<String, String[]> params);
+    
+    public void loadFromId(Muid id) {
+        String json = server.readEntity(new IdDetail(id, Detail.FULL));
+        loadFromJson(json);
+    }
+    
+    public String getJson(Detail detail) {
+        if (!jsonGenerated)
+            generateJson();
+        
+        String result = json.get(detail);
+        if (result == null)
+            throw new EntityNoJsonForDetailSddError(detail);
+        return result;
+    }
+    
+    public Muid getId() {
+        return id;
+    }
+
+    public void setId(Muid id) {
+        this.id = id;
+    }
+    
+    protected abstract void generateJson();
     
     protected static String getParam(Map<String, String[]> params, String key) {
         return getParam(params, key, false);
@@ -66,36 +89,81 @@ public abstract class Entity {
             throw new EntityJsonClassCastSddError(json);
         }
     }
-
-    protected abstract void generateJson();
     
-    public String getJson(Detail detail) {
-        if (!jsonGenerated)
-            generateJson();
+    // --- load ----------------------------------------------------------------
+    
+    protected <T> T loadPrimitive(Class<T> clazz, String value) {
+        return clazz.cast(value);
+    }
+    
+    protected <T extends Entity> T loadEntity(Class<T> clazz, String id) {
+        if (id == null)
+            return null;
         
-        String result = json.get(detail);
-        if (result == null)
-            throw new EntityNoJsonForDetailSddError(detail);
-        return result;
+        T entity = null;
+        try {
+            entity = clazz.getConstructor(Server.class).newInstance(server);
+            entity.loadFromId(new Muid(id));
+        } catch (IllegalAccessException | InstantiationException
+                | InvocationTargetException | NoSuchMethodException e) {
+            // TODO: handle this
+            throw new RuntimeException();
+        }
+        return entity;
     }
     
-    public Muid getId() {
-        return id;
-    }
-
-    public void setId(Muid id) {
-        this.id = id;
+    protected <T extends Entity> List<T> loadEntityArray(Class<T> clazz,
+                                                         String ids) {
+        List<T> array = new LinkedList<T>();
+        if (ids != null)
+            for (String id : ids.split(","))
+                array.add(loadEntity(clazz, id));
+        return array;
     }
     
-    protected static String joinIds(List<Muid> ids) {
+    // --- generate ------------------------------------------------------------
+    
+    protected <T> String generatePrimitive(T value) {
+        return value.toString();
+    }
+    
+    protected <T extends Entity> JsonString generateEntity(T entity,
+                                                           Detail detail) {
+        if (entity == null)
+            return null;
+        
+        return new JsonString(entity.getJson(detail));
+    }
+    
+    protected <T extends Entity> List<JsonString> generateEntityArray(
+            List<T> array, Detail detail) {
+        List<JsonString> jsons = new LinkedList<JsonString>();
+        for (T entity : array)
+            jsons.add(generateEntity(entity, detail));
+        return jsons;
+    }
+    
+    protected <T extends Entity> String generateEntityId(T entity) {
+        if (entity == null)
+            return null;
+        
+        return entity.getId().toString();
+    }
+    
+    protected <T extends Entity> String generateEntityArrayIds(
+            List<T> entities) {
+        List<String> ids = new LinkedList<String>();
+        for (T entity : entities)
+            ids.add(generateEntityId(entity));
+        
         String result = "";
         Boolean first = true;
-        for (Muid id : ids) {
+        for (String id : ids) {
             if (first) {
                 first = false;
-                result += id.toString();
+                result += id;
             } else
-                result += "," + id.toString();
+                result += "," + id;
         }
         return result;
     }

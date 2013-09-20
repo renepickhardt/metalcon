@@ -8,7 +8,6 @@ import org.json.simple.JSONValue;
 import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.common.JsonString;
 import de.metalcon.sdd.IdDetail;
-import de.metalcon.sdd.error.ReadRequestInvalidIdDetailSddError;
 import de.metalcon.sdd.error.ReadRequestNoQuerySddError;
 import de.metalcon.sdd.error.ReadRequestQueueActionSddError;
 import de.metalcon.sdd.server.Server;
@@ -33,22 +32,14 @@ public class ReadRequest extends Request {
 
         if (query == null)
             throw new ReadRequestNoQuerySddError();
-        for (String idDetail : query.split(String.valueOf(queryDelimeter)))
-            result.put(idDetail, new JsonString(getJson(idDetail)));
+        for (String idDetail : query.split(String.valueOf(queryDelimeter))) {
+            IdDetail entity = new IdDetail(idDetail);
+            result.put(idDetail, new JsonString(server.readEntity(entity)));
+        }
 
         return result;
     }
 
-    public String getJson(String idDetail) {
-        IdDetail entity = new IdDetail(idDetail);
-        
-        String json = server.readEntity(entity);
-        if (json == null)
-            throw new ReadRequestInvalidIdDetailSddError(idDetail);
-        
-        return json;
-    }
-    
     @Override
     public void runQueueAction() {
         throw new ReadRequestQueueActionSddError();
