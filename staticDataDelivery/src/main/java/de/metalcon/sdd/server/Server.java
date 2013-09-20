@@ -13,7 +13,12 @@ import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.entity.Entity;
+import de.metalcon.sdd.error.ServerDetailNoneSddError;
+import de.metalcon.sdd.error.ServerLevelDbBatchCloseSddError;
+import de.metalcon.sdd.error.ServerLevelDbCloseSddError;
+import de.metalcon.sdd.error.ServerLevelDbInitializationSddError;
 import de.metalcon.sdd.request.Request;
+
 
 // LevelDB
 import org.iq80.leveldb.*;
@@ -36,9 +41,7 @@ public class Server implements ServletContextListener {
         try {
             db = factory.open(new File(dbPath), options);
         } catch (IOException e) {
-            // TODO: handle this
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new ServerLevelDbInitializationSddError();
         }
         
         queue = new LinkedBlockingQueue<Request>();
@@ -53,8 +56,7 @@ public class Server implements ServletContextListener {
         try {
             db.close();
         } catch (IOException e) {
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new ServerLevelDbCloseSddError();
         }
     }
     
@@ -62,12 +64,11 @@ public class Server implements ServletContextListener {
         return queue.offer(request);
     }
 
-    public String readEntity(IdDetail entity) {
-        if (entity.getDetail() == Detail.NONE) {
-            // TODO: handle this 
-            throw new RuntimeException();
-        }
-        return asString(db.get(bytes(entity.toString())));
+    public String readEntity(IdDetail idDetail) {
+        if (idDetail.getDetail() == Detail.NONE)
+            throw new ServerDetailNoneSddError(idDetail);
+        
+        return asString(db.get(bytes(idDetail.toString())));
     }
     
     public void writeEntity(Entity entity) {
@@ -88,8 +89,7 @@ public class Server implements ServletContextListener {
             try {
                 batch.close();
             } catch (IOException e) {
-                // TODO: handle this
-                throw new RuntimeException();
+                throw new ServerLevelDbBatchCloseSddError();
             }
         }
     }
@@ -109,8 +109,7 @@ public class Server implements ServletContextListener {
             try {
                 batch.close();
             } catch (IOException e) {
-                // TODO: handle this
-                throw new RuntimeException();
+                throw new ServerLevelDbBatchCloseSddError();
             }
         }
     }

@@ -33,6 +33,7 @@ public abstract class Request {
         try {
             return runHttpAction();
         } catch(SddError e) {
+            e.print();
             Map<String, Object> result = new HashMap<String, Object>();
             result.put("error", e.toJson());
             return result;

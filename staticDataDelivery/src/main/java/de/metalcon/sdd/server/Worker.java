@@ -2,6 +2,7 @@ package de.metalcon.sdd.server;
 
 import java.util.concurrent.BlockingQueue;
 
+import de.metalcon.sdd.error.SddError;
 import de.metalcon.sdd.request.Request;
 
 public class Worker implements Runnable {
@@ -27,8 +28,14 @@ public class Worker implements Runnable {
         try {
             Request request = null;
             while (!stopping) {
-                request = queue.take();
-                request.runQueueAction();
+                try {
+                    request = queue.take();
+                    request.runQueueAction();
+                } catch(SddError e) {
+                    // A single error in a request does not terminate the server.
+                    // TODO: somehow log the error.
+                    e.print();
+                }
             }
         } catch (InterruptedException e) {
             // stopped by server
@@ -56,8 +63,7 @@ public class Worker implements Runnable {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
-                    // TODO: handle this
-                    throw new RuntimeException();
+                    // stopped by server
                 }
     }
 

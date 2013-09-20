@@ -24,15 +24,19 @@ public abstract class SddError extends RuntimeException {
         printStackTrace(new PrintWriter(trace));
         json.put("trace", trace.toString());
         
-        System.out.println(getClass().getName());
-        System.out.println();
-        System.out.println(getDescription());
-        System.out.println();
-        System.out.println(getSuggestion());
-        System.out.println();
-        System.out.println(trace.toString());
-        System.out.println("-------------------------------------------------");
         return json;
+    }
+    
+    public void print() {
+        System.err.println(getClass().getName());
+        System.err.println();
+        System.err.println(getDescription());
+        System.err.println();
+        System.err.println(getSuggestion());
+        System.err.println();
+        StringWriter trace = new StringWriter();
+        printStackTrace(new PrintWriter(trace));
+        System.err.println(trace.toString());
     }
 
 }
