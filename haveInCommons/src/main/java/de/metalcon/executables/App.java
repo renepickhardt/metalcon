@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.Set;
 
 import de.metalcon.haveInCommons.PersistentReadOptimized;
-import de.metalcon.haveInCommons.RetrievalOptimized;
+import de.metalcon.haveInCommons.MongoRead;
 
 /**
  * Hello world!

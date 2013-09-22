@@ -119,9 +119,9 @@ public class MongoRead {
 			return false;
 	}
 
-	public Set<String> getCommons(String key, String collection) {
+	public Set<String> getCommons(String key) {
 		BasicDBObject query = new BasicDBObject("key", key);
-		DBCursor cursor = this.db.getCollection(collection).find(query);
+		DBCursor cursor = this.collection.find(query);
 
 		Set<String> items = new HashSet<String>((int)(cursor.size()/0.75)+1);
 

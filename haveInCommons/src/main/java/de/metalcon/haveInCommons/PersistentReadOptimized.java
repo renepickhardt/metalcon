@@ -3,6 +3,7 @@
  */
 package de.metalcon.haveInCommons;
 
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.index.lucene.QueryContext;
+import de.metalcon.haveInCommons.MongoRead;
 
 /**
  * @author Rene Pickhardt
@@ -23,12 +25,20 @@ import org.neo4j.index.lucene.QueryContext;
  */
 public class PersistentReadOptimized implements HaveInCommons {
 	private GraphDatabaseService graphDB;
+	private MongoRead mongo = null;
 
 	/**
+	 * @throws UnknownHostException 
 	 * 
 	 */
 	public PersistentReadOptimized(String arg) {
 		graphDB = new GraphDatabaseFactory().newEmbeddedDatabase(arg);
+		try {
+			mongo = new MongoRead("127.0.0.1;27022;metalcon;commonEntities");
+		} catch (UnknownHostException e) {
+			System.out.println("Initialization of MongoDB client failed! Is MongoDB deamon running?");
+			e.printStackTrace();
+		}
 	}
 
 	private void updateCommons(Node from, Node to) {
@@ -56,8 +66,9 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * @param id
 	 */
 	private void addCommonNode(Node n, String from, String to) {
-		Index<Node> ix = graphDB.index().forNodes("commons");
-		ix.add(n, "key", from + ":" + to);
+		//Index<Node> ix = graphDB.index().forNodes("commons");
+		//ix.add(n, "key", from + ":" + to);
+		mongo.insert(from + ":" + to, (String)n.getProperty("id"));
 	}
 
 	/*
@@ -71,22 +82,24 @@ public class PersistentReadOptimized implements HaveInCommons {
 //		Index<Node> ix = graphDB.index().forNodes("commons");
 //		//IndexHits<Node> hits = ix.query("key", new QueryContext("*"));
 //		IndexHits<Node> hits = ix.get("key", uuid1 + "\\:" + uuid2);
-		Index<Node> ix = graphDB.index().forNodes("nodes");
-		Node from = ix.get("id", uuid1).getSingle();
-		Node to = ix.get("id", uuid2).getSingle();
-		if (to == null || from == null)return null;
-		Set<String> s = new HashSet<String>();
-		Set<String> res = new HashSet<String>();
-		for (Relationship r : from.getRelationships()){
-			Node tmp = r.getOtherNode(from);
-			s.add((String)tmp.getProperty("id"));
-		}
-		for (Relationship r : to.getRelationships()){
-			Node tmp = r.getOtherNode(to);
-			String key = (String)tmp.getProperty("id"); 
-			if (s.contains(key))res.add(key);
-		}
-		return res;
+		
+//		Index<Node> ix = graphDB.index().forNodes("nodes");
+//		Node from = ix.get("id", uuid1).getSingle();
+//		Node to = ix.get("id", uuid2).getSingle();
+//		if (to == null || from == null)return null;
+//		Set<String> s = new HashSet<String>();
+//		Set<String> res = new HashSet<String>();
+//		for (Relationship r : from.getRelationships()){
+//			Node tmp = r.getOtherNode(from);
+//			s.add((String)tmp.getProperty("id"));
+//		}
+//		for (Relationship r : to.getRelationships()){
+//			Node tmp = r.getOtherNode(to);
+//			String key = (String)tmp.getProperty("id"); 
+//			if (s.contains(key))res.add(key);
+//		}
+		String key = uuid1 +":" + uuid2;
+		return mongo.getCommons(key);
 	}
 
 	/*
@@ -141,7 +154,7 @@ public class PersistentReadOptimized implements HaveInCommons {
 					DynamicRelationshipType.withName("follows"));
 			relIndex.add(r, "id", from + ":" + to);
 		}
-//		updateCommons(f, t);
+		updateCommons(f, t);
 	}
 
 	/*
