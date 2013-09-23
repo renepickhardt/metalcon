@@ -96,6 +96,11 @@ public class ProtocolConstants {
 			public static final String CROP_HEIGHT_INVALID = "cropping height invalid";
 			public static final String CROP_WIDTH_INVALID = "cropping width invalid";
 
+			public static final String CROP_LEFT_MALFORMED = "left-hand side cropping coordinate malformed";
+			public static final String CROP_TOP_MALFORMED = "top side cropping coordinate malformed";
+			public static final String CROP_HEIGHT_MALFORMED = "cropping height malformed";
+			public static final String CROP_WIDTH_MALFORMED = "cropping width malformed";
+
 		}
 
 		// TODO

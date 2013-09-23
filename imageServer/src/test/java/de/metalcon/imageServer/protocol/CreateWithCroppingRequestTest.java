@@ -131,60 +131,102 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 		assertNull(this.createWithCroppingRequest);
 	}
 
-	// @Test
-	// testCroppingHeightInvalid(){
-	//
-	// }
-	//
-	// @Test
-	// testCroppingHeightMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testCroppingLeftInvalid() {
-	//
-	// }
-	//
-	// @Test
-	// testCroppingLeftMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testTopInvalid() {
-	//
-	// }
-	//
-	// @Test
-	// testTopMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testWidthInvalid() {
-	//
-	// }
-	//
-	// @Test
-	// testWidthMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testImageIdentifierMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testImageMetadataMissing() {
-	//
-	// }
-	//
-	// @Test
-	// testImageMetadataMalformed() {
-	//
-	// }
+	@Test
+	public void testCroppingHeightInvalid() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingWidthInvalid() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.INVALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingLeftInvalid() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingTopInvalid() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingHeightMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.MALFORMED_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_MALFORMED);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingWidthMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.MALFORMED_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_MALFORMED);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingLeftInvaliMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_LEFT_MALFORMED);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingTopMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_TOP_MALFORMED);
+		assertNull(this.createWithCroppingRequest);
+	}
+
 	private void fillRequest(final String imageIdentifier,
 			final FileItem imageItem, final String metaData,
 			final String height, final String width, final String top,
