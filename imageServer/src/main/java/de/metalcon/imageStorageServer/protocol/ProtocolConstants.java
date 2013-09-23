@@ -18,6 +18,7 @@ public class ProtocolConstants {
 	/**
 	 * parameters for requests
 	 */
+	// TODO: this should be called "Parameter"
 	public class Parameters {
 
 		/**
