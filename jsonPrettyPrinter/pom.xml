@@ -12,7 +12,7 @@
   <packaging>jar</packaging>
 
   <name>JsonPrettyPrinter</name>
-  <description>Helper to format JSON-Strings into a "pretty-printed" more human-readable format.</description>
+  <description>Helper to format JSON-Strings into a "pretty-printed" human-readable format.</description>
   <url>https://github.com/renepickhardt/metalcon.git</url>
 
   <licenses>
