@@ -37,8 +37,8 @@ public class TestCreateWithCroppingRequest {
 	private static FileItem imageFileItem;
 
 	// maybe make global constants out of this variables?
-	private final String responseBeginMissing = "request incomplete: parameter \"";
-	private final String responseEndMissing = "\" is missing";
+	private final static String responseBeginMissing = "request incomplete: parameter \"";
+	private final static String responseEndMissing = "\" is missing";
 
 	@BeforeClass
 	public static void LoadImage() throws FileNotFoundException {
