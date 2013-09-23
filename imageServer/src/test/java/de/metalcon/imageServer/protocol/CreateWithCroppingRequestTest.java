@@ -27,13 +27,13 @@ import org.junit.Test;
 import de.metalcon.imageServer.ProtocolTestConstants;
 import de.metalcon.imageStorageServer.ISSConfig;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
-import de.metalcon.imageStorageServer.protocol.create.CreateRequest;
 import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
+import de.metalcon.imageStorageServer.protocol.create.CreateWithCroppingRequest;
 import de.metalcon.utils.FormItemList;
 
-public class CreateRequestTest extends RequestTest {
+public class CreateWithCroppingRequestTest extends RequestTest {
 
-	private CreateRequest createRequest;
+	private CreateWithCroppingRequest createWithCroppingRequest;
 	private static final String CONFIG_PATH = "test.iss.config";
 
 	private static File TEST_FILE_DIRECTORY, DISK_FILE_REPOSITORY;
@@ -82,11 +82,13 @@ public class CreateRequestTest extends RequestTest {
 		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
 				VALID_CREATE_META_DATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		assertNotNull(this.createRequest);
-		assertEquals(VALID_IDENTIFIER, this.createRequest.getImageIdentifier());
+		assertNotNull(this.createWithCroppingRequest);
+		assertEquals(VALID_IDENTIFIER,
+				this.createWithCroppingRequest.getImageIdentifier());
 		assertTrue(compareInputStreams(VALID_IMAGE_ITEM_JPEG.getInputStream(),
-				this.createRequest.getImageStream()));
-		assertEquals(VALID_CREATE_META_DATA, this.createRequest.getMetaData());
+				this.createWithCroppingRequest.getImageStream()));
+		assertEquals(VALID_CREATE_META_DATA,
+				this.createWithCroppingRequest.getMetaData());
 	}
 
 	@Test
@@ -95,7 +97,7 @@ public class CreateRequestTest extends RequestTest {
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER);
-		assertNull(this.createRequest);
+		assertNull(this.createWithCroppingRequest);
 	}
 
 	@Test
@@ -104,7 +106,7 @@ public class CreateRequestTest extends RequestTest {
 				VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
-		assertNull(this.createRequest);
+		assertNull(this.createWithCroppingRequest);
 
 	}
 
@@ -114,7 +116,7 @@ public class CreateRequestTest extends RequestTest {
 				VALID_IMAGE_ITEM_JPEG, null,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
-		assertNull(this.createRequest);
+		assertNull(this.createWithCroppingRequest);
 	}
 
 	@Test
@@ -124,12 +126,67 @@ public class CreateRequestTest extends RequestTest {
 				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
-		assertNull(this.createRequest);
+		assertNull(this.createWithCroppingRequest);
 	}
 
+	// @Test
+	// testCroppingHeightInvalid(){
+	//
+	// }
+	//
+	// @Test
+	// testCroppingHeightMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testCroppingLeftInvalid() {
+	//
+	// }
+	//
+	// @Test
+	// testCroppingLeftMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testTopInvalid() {
+	//
+	// }
+	//
+	// @Test
+	// testTopMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testWidthInvalid() {
+	//
+	// }
+	//
+	// @Test
+	// testWidthMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testImageIdentifierMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testImageMetadataMissing() {
+	//
+	// }
+	//
+	// @Test
+	// testImageMetadataMalformed() {
+	//
+	// }
 	private void fillRequest(final String imageIdentifier,
 			final FileItem imageItem, final String metaData,
-			final String autoRotateFlag) {
+			final String height, final String width, final String top,
+			final String left) {
 		// create and fill form item list
 		final FormItemList formItemList = new FormItemList();
 
@@ -146,16 +203,30 @@ public class CreateRequestTest extends RequestTest {
 			formItemList.addField(
 					ProtocolConstants.Parameters.Create.META_DATA, metaData);
 		}
-		if (autoRotateFlag != null) {
+		if (width != null) {
 			formItemList.addField(
-					ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
-					autoRotateFlag);
+					ProtocolConstants.Parameters.Create.CROP_WIDTH, width);
+		}
+
+		if (height != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Create.CROP_HEIGHT, height);
+		}
+
+		if (top != null) {
+			formItemList.addField(ProtocolConstants.Parameters.Create.CROP_TOP,
+					top);
+		}
+
+		if (left != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Create.CROP_LEFT, left);
 		}
 
 		// check request and extract the response
 		final CreateResponse createResponse = new CreateResponse();
-		this.createRequest = CreateRequest.checkRequest(formItemList,
-				createResponse);
+		this.createWithCroppingRequest = CreateWithCroppingRequest
+				.checkRequest(formItemList, createResponse);
 		this.extractJson(createResponse);
 	}
 

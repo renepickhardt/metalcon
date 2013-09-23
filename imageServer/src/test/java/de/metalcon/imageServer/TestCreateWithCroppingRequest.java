@@ -128,7 +128,7 @@ public class TestCreateWithCroppingRequest {
 	@Test
 	public void testImageMetadataNotJson() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
-				ProtocolTestConstants.INVALID_IMAGE_METADATA,
+				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,

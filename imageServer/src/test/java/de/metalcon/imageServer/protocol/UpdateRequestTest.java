@@ -54,7 +54,7 @@ public class UpdateRequestTest extends RequestTest {
 	@Test
 	public void testMetadataMalformed() {
 		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.INVALID_IMAGE_METADATA);
+				ProtocolTestConstants.MALFORMED_IMAGE_METADATA);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED);
 		assertNull(this.updateRequest);
 	}

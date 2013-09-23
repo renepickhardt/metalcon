@@ -71,7 +71,7 @@ public class TestUpdateRequest {
 	@Test
 	public void testMetadataNotJson() {
 		this.processUpdateRequest("testIdentifier",
-				ProtocolTestConstants.INVALID_IMAGE_METADATA);
+				ProtocolTestConstants.MALFORMED_IMAGE_METADATA);
 
 		assertEquals(
 				ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED,

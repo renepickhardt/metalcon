@@ -116,7 +116,7 @@ public class TestCreateRequest {
 	@Test
 	public void testImageMetadataNotJson() {
 		this.processCreateRequest("validIdentifier", imageFileItem,
-				ProtocolTestConstants.INVALID_IMAGE_METADATA,
+				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
 
 		assertEquals(
