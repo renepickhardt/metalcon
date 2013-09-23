@@ -10,7 +10,7 @@ public class CreateFromUrlTest extends RequestTest {
 	}
 
 	// TODO implement test
-	public void testurlMissing() {
+	public void testUrlMissing() {
 		fail("not yet implemented!");
 	}
 }
