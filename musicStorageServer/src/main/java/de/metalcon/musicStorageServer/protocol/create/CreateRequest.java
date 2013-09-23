@@ -148,7 +148,7 @@ public class CreateRequest {
 		} catch (final IllegalArgumentException e) {
 			response.musicItemMissing();
 		} catch (final IOException e) {
-			// TODO
+			response.internalServerError();
 		}
 
 		return null;

@@ -95,7 +95,7 @@ public class ProtocolConstants {
 		 */
 		public class Create {
 
-			public static final String MUSIC_ITEM_IDENTIFIER_IN_USE = "music item identifier already in use";
+			public static final String MUSIC_ITEM_IDENTIFIER_IN_USE = "music item identifier in use";
 			public static final String MUSIC_ITEM_STREAM_INVALID = "music item stream invalid";
 			public static final String META_DATA_MALFORMED = "meta data malformed";
 
