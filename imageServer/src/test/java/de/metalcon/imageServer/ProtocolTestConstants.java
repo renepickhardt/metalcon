@@ -23,4 +23,5 @@ public class ProtocolTestConstants {
 	public static final String MALFORMED_IDENTIFIER_LIST = "test,,test";
 	public static final String VALID_SCALING_HEIGHT = "100";
 	public static final String VALID_SCALING_WIDTH = "100";
+	public static final String MALFORMED_SCALING_HEIGHT = "NotANumber";
 }

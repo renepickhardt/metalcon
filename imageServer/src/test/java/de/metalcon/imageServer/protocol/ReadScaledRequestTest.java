@@ -10,7 +10,7 @@ import de.metalcon.imageStorageServer.protocol.read.ReadRequest;
 import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
 import de.metalcon.utils.FormItemList;
 
-public class ReadScaledRequest extends RequestTest {
+public class ReadScaledRequestTest extends RequestTest {
 
 	private ReadRequest readRequest;
 
@@ -48,4 +48,29 @@ public class ReadScaledRequest extends RequestTest {
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
 		assertNull(this.readRequest);
 	}
+
+	@Test
+	public void testHeightMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
+				ProtocolTestConstants.VALID_SCALING_WIDTH);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
+		assertNull(this.readRequest);
+	}
+
+	@Test
+	public void testWidthMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT, null);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
+		assertNull(this.readRequest);
+	}
+
+	@Test
+	public void testHeightMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				ProtocolTestConstants.MALFORMED_SCALING_HEIGHT,
+				ProtocolTestConstants.VALID_SCALING_WIDTH);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED);
+	}
+
 }
