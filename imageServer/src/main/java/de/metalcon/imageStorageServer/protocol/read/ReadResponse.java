@@ -106,7 +106,7 @@ public class ReadResponse extends Response {
 
 	public void addImageIdentifierListContainsEmptyFieldsError() {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Read.LIST_CONTAINS_EMPTY_IDENTIFIER,
+				ProtocolConstants.StatusMessage.Read.IDENTIFIER_LIST_CONTAINS_EMPTY_PARTS,
 				"");
 	}
 
