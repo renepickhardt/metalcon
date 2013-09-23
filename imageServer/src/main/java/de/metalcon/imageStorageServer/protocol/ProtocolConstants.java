@@ -106,6 +106,7 @@ public class ProtocolConstants {
 			public static final String GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO = "Requested image height zero or less";
 			public static final String IDENTIFIER_LIST_CONTAINS_EMPTY_PARTS = "Identifier list contains empty parts";
 			public static final String SCALING_HEIGHT_MALFORMED = "height is not a valid number";
+			public static final String SCALING_WIDTH_MALFORMED = "width is not a valid number";
 		}
 
 		/**
