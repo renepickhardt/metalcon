@@ -37,7 +37,8 @@ public class DeleteRequestTest extends RequestTest {
 		assertEquals(VALID_IDENTIFIER, this.deleteRequest.getImageIdentifier());
 	}
 
-	public void testMusicItemIdentifierMissing() {
+	@Test
+	public void testImageIdentifierMissing() {
 		this.fillRequest(null);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Delete.IMAGE_IDENTIFIER);
 		assertNull(this.deleteRequest);

@@ -2,6 +2,7 @@ package de.metalcon.imageServer;
 
 public class ProtocolTestConstants {
 
+	public final static String VALID_IMAGE_IDENTIFIER = "ii1";
 	public final static String VALID_IMAGE_METADATA = "{\"key\":\"value\"}";
 	public final static String INVALID_IMAGE_METADATA = "thisisnotjson";
 	public final static String VALID_BOOLEAN_AUTOROTATE_TRUE = "1";
