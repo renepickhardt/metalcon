@@ -17,7 +17,6 @@ import de.metalcon.utils.FormItemList;
 public class TestReadBulkRequest {
 
 	private ReadResponse readResponse;
-<<<<<<< HEAD
 
 	private static final String PARAM_MISSING_BEGIN = "request incomplete: parameter \"";
 	private static final String PARAM_MISSING_END = "\" is missing";
@@ -37,9 +36,8 @@ public class TestReadBulkRequest {
 	public void testIdentifierListContainsEmptyParts() {
 		this.processReadRequest(
 				ProtocolTestConstants.MALFORMED_IDENTIFIER_LIST, "100", "100");
-		assertEquals(this.responseBeginMalformed
-				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST
-				+ "contains an empty identifier",
+		assertEquals(
+				ProtocolConstants.StatusMessage.Read.IDENTIFIER_LIST_MALFORMED,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 
 	}
