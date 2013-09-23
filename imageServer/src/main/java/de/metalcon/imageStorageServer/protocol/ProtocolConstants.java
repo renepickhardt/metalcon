@@ -103,7 +103,7 @@ public class ProtocolConstants {
 			public static final String GEOMETRY_BIGGER_THAN_ORIGINAL = "Requested geometry bigger than original size";
 			public static final String GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO = "Requested image width zero or less";
 			public static final String GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO = "Requested image height zero or less";
-
+			public static final String IDENTIFIER_LIST_CONTAINS_EMPTY_PARTS = "Identifier list contains empty parts";
 		}
 
 		/**
