@@ -135,12 +135,6 @@ public class ImageMetaDataExporter {
 		return exifData;
 	}
 
-	public static JSONObject mergeExifData(final JSONObject higher,
-			final JSONObject lower) {
-		// TODO
-		return null;
-	}
-
 	/**
 	 * export the value of an single EXIF attribute
 	 * 

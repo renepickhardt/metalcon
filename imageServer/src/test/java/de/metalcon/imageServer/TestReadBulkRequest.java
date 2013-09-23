@@ -25,7 +25,6 @@ public class TestReadBulkRequest {
 	@Test
 	public void testNoIdentifierGiven() {
 		this.processReadRequest(null, "100", "100");
-		System.out.println(this.readResponse);
 		assertEquals(PARAM_MISSING_BEGIN
 				+ ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER
 				+ PARAM_MISSING_END,

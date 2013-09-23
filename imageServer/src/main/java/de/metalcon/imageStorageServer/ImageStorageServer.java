@@ -292,9 +292,18 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
+	/**
+	 * rotate an image according to its EXIF orientation value
+	 * 
+	 * @param image
+	 *            image to be rotated
+	 * @return rotated image (or unrotated image with no/unknown orientation
+	 *         value)
+	 * @throws MagickException
+	 *             if the rotation fails
+	 */
 	private static MagickImage autoRotate(final MagickImage image)
 			throws MagickException {
-		// TODO: check if attribute is written correctly
 		final String exifOrientation = "exif:Orientation";
 		final String sOrientation = image.getImageAttribute(exifOrientation);
 		int rotationDegree = 0;
@@ -531,7 +540,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// error: no valid URL
 				response.imageUrlMalformed(imageUrl);
 			} catch (final MagickException e) {
-				// TODO: check what happens if an URL throws 404
+				// TODO: check what happens if an URL throws 404/is invalid
 				// error: no image file
 				response.imageUrlInvalid(imageUrl);
 				tmpImageFile.delete();
@@ -562,7 +571,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.internalServerError();
-				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			}
 		} else {
@@ -615,13 +623,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.internalServerError();
-				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
 				response.internalServerError();
-				System.err
-						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 			}
 		} else {
@@ -677,13 +682,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.internalServerError();
-				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
 				response.internalServerError();
-				System.err
-						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 			}
 		} else {
@@ -756,7 +758,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final FileNotFoundException e) {
 				// internal server error: file not found
 				response.internalServerError();
-				System.err.println(ProtocolConstants.LogMessage.FILE_NOT_FOUND);
 				e.printStackTrace();
 				succeeded = false;
 			} catch (final IOException e) {
@@ -769,8 +770,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			} catch (final MagickException e) {
 				// internal server error: failed to load/scale/store image
 				response.internalServerError();
-				System.err
-						.println(ProtocolConstants.LogMessage.READ_PROCESS_FAILED);
 				e.printStackTrace();
 				succeeded = false;
 			}
