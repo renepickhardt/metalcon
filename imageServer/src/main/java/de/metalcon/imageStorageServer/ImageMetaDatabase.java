@@ -6,7 +6,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 
-import de.utils.MetaDatabase;
+import de.metalcon.utils.metadatabase.MetaDatabase;
 
 /**
  * database for image meta data
