@@ -1,5 +1,8 @@
 package de.metalcon.imageStorageServer.protocol.create;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -19,7 +22,7 @@ public class CreateWithCroppingRequest {
 
 	private final String imageIdentifier;
 
-	private final FormFile imageStream;
+	private final InputStream imageStream;
 
 	private final String metaData;
 
@@ -30,8 +33,8 @@ public class CreateWithCroppingRequest {
 	private final int height;
 
 	public CreateWithCroppingRequest(final String imageIdentifier,
-			final FormFile imageStream, final String metaData, final int top,
-			final int left, final int width, final int height) {
+			final InputStream imageStream, final String metaData,
+			final int top, final int left, final int width, final int height) {
 		this.imageIdentifier = imageIdentifier;
 		this.imageStream = imageStream;
 		this.metaData = metaData;
@@ -45,7 +48,7 @@ public class CreateWithCroppingRequest {
 		return this.imageIdentifier;
 	}
 
-	public FormFile getImageStream() {
+	public InputStream getImageStream() {
 		return this.imageStream;
 	}
 
@@ -67,7 +70,7 @@ public class CreateWithCroppingRequest {
 		final String imageIdentifier = checkImageIdentifier(formItemList,
 				response);
 		if (imageIdentifier != null) {
-			final FormFile imageStream = checkImageStream(formItemList,
+			final InputStream imageStream = checkImageStream(formItemList,
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
@@ -217,13 +220,19 @@ public class CreateWithCroppingRequest {
 	 * @param response
 	 * @return FormFile imageStream if valid, else null
 	 */
-	protected static FormFile checkImageStream(final FormItemList formItemList,
-			final CreateResponse response) {
+	protected static InputStream checkImageStream(
+			final FormItemList formItemList, final CreateResponse response) {
 		try {
-			return formItemList
-					.getFile(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+			final FormFile imageItem = formItemList
+					.getFile(ProtocolConstants.Parameters.Create.IMAGE_ITEM);
+			if (imageItem != null) {
+				return imageItem.getFormItem().getInputStream();
+			}
+
 		} catch (final IllegalArgumentException e) {
 			response.imageStreamMissing();
+		} catch (final IOException e) {
+			response.internalServerError();
 		}
 
 		return null;

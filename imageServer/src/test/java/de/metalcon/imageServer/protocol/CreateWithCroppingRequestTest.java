@@ -79,9 +79,12 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 
 	@Test
 	public void testCreateRequest() throws IOException {
-		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
-				VALID_CREATE_META_DATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
 		assertNotNull(this.createWithCroppingRequest);
 		assertEquals(VALID_IDENTIFIER,
 				this.createWithCroppingRequest.getImageIdentifier());
@@ -95,26 +98,22 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 	public void testImageIdentifierMissing() {
 		this.fillRequest(null, VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER);
 		assertNull(this.createWithCroppingRequest);
-	}
-
-	@Test
-	public void testAutorotateFlagMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				VALID_IMAGE_ITEM_JPEG,
-				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
-		assertNull(this.createWithCroppingRequest);
-
 	}
 
 	@Test
 	public void testImageMetadataMissing() {
 		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
 				VALID_IMAGE_ITEM_JPEG, null,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
 		assertNull(this.createWithCroppingRequest);
 	}
@@ -124,7 +123,10 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
 				VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
 		assertNull(this.createWithCroppingRequest);
 	}
