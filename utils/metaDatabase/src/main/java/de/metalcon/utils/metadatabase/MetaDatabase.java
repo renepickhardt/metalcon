@@ -1,4 +1,4 @@
-package de.utils;
+package de.metalcon.utils.metadatabase;
 
 import java.net.UnknownHostException;
 

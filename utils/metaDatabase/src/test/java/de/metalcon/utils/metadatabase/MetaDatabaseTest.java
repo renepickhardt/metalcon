@@ -1,4 +1,4 @@
-package de.utils;
+package de.metalcon.utils.metadatabase;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -13,6 +13,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import de.metalcon.utils.metadatabase.MetaDatabase;
 
 public class MetaDatabaseTest {
 
