@@ -35,6 +35,7 @@ public class ProtocolConstants {
 			public static final String CROP_HEIGHT = "height";
 			public static final String CROP_WIDTH = "width";
 			public static final String IMAGE_ITEM = "imageItem";
+			public static final String URL = "imageUrl";
 
 		}
 
