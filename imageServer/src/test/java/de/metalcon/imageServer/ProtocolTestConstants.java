@@ -2,12 +2,12 @@ package de.metalcon.imageServer;
 
 public class ProtocolTestConstants {
 
-	public final static String VALID_IMAGE_IDENTIFIER = "ii1";
-	public final static String VALID_IMAGE_METADATA = "{\"key\":\"value\"}";
-	public final static String MALFORMED_IMAGE_METADATA = "thisisnotjson";
-	public final static String VALID_BOOLEAN_AUTOROTATE_TRUE = "1";
-	public final static String VALID_BOOLEAN_AUTOROTATE_FALSE = "0";
-	public final static String MALFORMED_BOOLEAN_AUTOROTATE = "wrong";
+	public static final String VALID_IMAGE_IDENTIFIER = "ii1";
+	public static final String VALID_IMAGE_METADATA = "{\"key\":\"value\"}";
+	public static final String MALFORMED_IMAGE_METADATA = "thisisnotjson";
+	public static final String VALID_BOOLEAN_AUTOROTATE_TRUE = "1";
+	public static final String VALID_BOOLEAN_AUTOROTATE_FALSE = "0";
+	public static final String MALFORMED_BOOLEAN_AUTOROTATE = "wrong";
 	public static final String VALID_CROPPING_LEFT_COORDINATE = "10";
 	public static final String VALID_CROPPING_TOP_COORDINATE = "10";
 	public static final String VALID_CROPPING_WIDTH_COORDINATE = "50";
