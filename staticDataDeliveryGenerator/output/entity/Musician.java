@@ -7,7 +7,9 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -78,6 +80,13 @@ public class Musician extends Entity {
     }
 
     @Override
+    public Set<Muid> getDependingOn() {
+        Set<Muid> ids = new HashSet<Muid>();
+        colAddIfNotNull(ids, getEntityId(band));
+        return ids;
+    }
+
+    @Override
     protected void generateJson() {
         Map<String, Object> j;
 
@@ -89,7 +98,7 @@ public class Musician extends Entity {
         j.put("active", generatePrimitive(active));
         j.put("founder", generatePrimitive(founder));
         j.put("spans", generatePrimitive(spans));
-        j.put("band", generateEntityId(band));
+        j.put("band", idToString(getEntityId(band)));
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL

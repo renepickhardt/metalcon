@@ -7,7 +7,9 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -45,6 +47,12 @@ public class City extends Entity {
 
         setId(new Muid(entity.get("id")));
 
+    }
+
+    @Override
+    public Set<Muid> getDependingOn() {
+        Set<Muid> ids = new HashSet<Muid>();
+        return ids;
     }
 
     @Override

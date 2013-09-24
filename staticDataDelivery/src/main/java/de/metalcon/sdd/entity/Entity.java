@@ -1,10 +1,12 @@
 package de.metalcon.sdd.entity;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -65,11 +67,13 @@ public abstract class Entity {
         return id;
     }
 
-    public void setId(Muid id) {
-        this.id = id;
-    }
+    public abstract Set<Muid> getDependingOn();
     
     protected abstract void generateJson();
+    
+    protected void setId(Muid id) {
+        this.id = id;
+    }
     
     protected static String getParam(Map<String, String[]> params, String key) {
         return Servlet.getParam(params, key);
@@ -87,6 +91,58 @@ public abstract class Entity {
         } catch (ClassCastException e) {
             throw new EntityJsonClassCastSddError(json);
         }
+    }
+    
+    protected static <T> void colAddIfNotNull(Collection<T> col, T value) {
+        if (value != null)
+            col.add(value);
+    }
+    
+    protected static <T> void colAddIfNotNull(Collection<T> col1,
+            Collection<T> col2) {
+        if (col2 != null)
+            for (T value : col2)
+                colAddIfNotNull(col1, value);
+    }
+    
+    protected static String idToString(Muid id) {
+        if (id == null)
+            return null;
+        return id.toString();
+    }
+    
+    protected static String idsToString(Collection<Muid> ids) {
+        if (ids == null)
+            return null;
+        
+        String result = "";
+        boolean first = true;
+        for (Muid id : ids) {
+            if (first) {
+                first = false;
+                result += id.toString();
+            } else
+                result += "," + id.toString();
+        }
+        return result;
+    }
+    
+    protected static <T extends Entity> Muid getEntityId(T entity) {
+        if (entity == null)
+            return null;
+        
+        return entity.getId();
+    }
+    
+    protected static <T extends Entity> List<Muid> getEntityArrayIds(
+            List<T> entities) {
+        if (entities.isEmpty())
+            return null;
+        
+        List<Muid> ids = new LinkedList<Muid>();
+        for (T entity : entities)
+            ids.add(getEntityId(entity));
+        return ids;
     }
     
     // --- load ----------------------------------------------------------------
@@ -181,34 +237,6 @@ public abstract class Entity {
         for (T entity : entities)
             jsons.add(generateEntity(entity, detail));
         return jsons;
-    }
-    
-    protected <T extends Entity> String generateEntityId(T entity) {
-        if (entity == null)
-            return null;
-        
-        return entity.getId().toString();
-    }
-    
-    protected <T extends Entity> String generateEntityArrayIds(
-            List<T> entities) {
-        if (entities.isEmpty())
-            return null;
-        
-        List<String> ids = new LinkedList<String>();
-        for (T entity : entities)
-            ids.add(generateEntityId(entity));
-        
-        String result = "";
-        Boolean first = true;
-        for (String id : ids) {
-            if (first) {
-                first = false;
-                result += id;
-            } else
-                result += "," + id;
-        }
-        return result;
     }
     
 }

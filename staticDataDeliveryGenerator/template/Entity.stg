@@ -18,8 +18,10 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
+import java.util.HashSet;
 $if(hasArray)$import java.util.List;$endif$
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -62,6 +64,13 @@ public class $name$ extends Entity {
         setId(new Muid(entity.get("id")));
         
         $attrs:{attr|$loadUpdate(attr)$}; separator="\n"$
+    }
+    
+    @Override
+    public Set<Muid> getDependingOn() {
+        Set<Muid> ids = new HashSet<Muid>();
+        $attrs:{attr|$dependingOn(attr)$}; separator="\n"$
+        return ids;
     }
     
     @Override
@@ -127,6 +136,17 @@ entityGet(name) ::= "entity.get(\"$name$\")"
 getParam(name)  ::= "getParam(params, \"$name$\")"
 
 // -----------------------------------------------------------------------------
+// --- dependingOn -------------------------------------------------------------
+
+dependingOn(attr) ::= <%
+$if(attr.array)$
+    colAddIfNotNull(ids, getEntityArrayIds($attr.name$));
+$elseif(!attr.primitive)$
+    colAddIfNotNull(ids, getEntityId($attr.name$));
+$endif$
+%>
+
+// -----------------------------------------------------------------------------
 // --- generate ----------------------------------------------------------------
 
 // detail - String
@@ -152,9 +172,9 @@ $oattrs:{oattr|
     $if(oattr.primitive)$
         generatePrimitive($oattr.name$)
     $elseif(oattr.array)$
-        generateEntityArrayIds($oattr.name$)
+        idsToString(getEntityArrayIds($oattr.name$))
     $else$
-        generateEntityId($oattr.name$)
+        idToString(getEntityId($oattr.name$))
     $endif$
     );
 }; separator="\n"$

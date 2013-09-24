@@ -1,15 +1,16 @@
 package de.metalcon.sdd;
 
+import static org.fusesource.leveldbjni.JniDBFactory.factory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.iq80.leveldb.*;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
 
-import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
-
-import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 //import com.mongodb.BasicDBObject;
 //import com.mongodb.DB;
@@ -83,10 +84,20 @@ public class TryOut {
     }
     
     public static void t3() {
-        Graph graph = new Neo4jGraph("/usr/share/sdd/neo4j");
-        graph.shutdown();
+        Neo4jGraph neo4j = new Neo4jGraph("/usr/share/sdd/neo4j");
+        neo4j.createKeyIndex("muid", Vertex.class);
+        
+//        Vertex w = neo4j.addVertex(null);
+//        w.setProperty("muid", "2f364c13c0114e16");
+//        neo4j.commit();
+        
+        for (Vertex v : neo4j.getVertices("muid", "2f364c13c0114e16")) {
+            System.out.println(v);
+        }
+        
+        neo4j.shutdown();
     }
-
+    
     public static void main(String[] args) throws IOException,
             UnknownHostException {
 //        t1();

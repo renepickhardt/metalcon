@@ -22,4 +22,20 @@ public class Muid {
         return id;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        else if (this == other)
+            return true;
+        else if (other instanceof Muid)
+            return id == ((Muid) other).id;
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+    
 }

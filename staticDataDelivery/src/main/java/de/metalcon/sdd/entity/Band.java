@@ -7,8 +7,10 @@ package de.metalcon.sdd.entity;
  */
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -94,6 +96,18 @@ public class Band extends Entity {
     }
 
     @Override
+    public Set<Muid> getDependingOn() {
+        Set<Muid> ids = new HashSet<Muid>();
+        colAddIfNotNull(ids, getEntityId(city));
+        colAddIfNotNull(ids, getEntityArrayIds(genres));
+        colAddIfNotNull(ids, getEntityArrayIds(musicians));
+        colAddIfNotNull(ids, getEntityArrayIds(events));
+        colAddIfNotNull(ids, getEntityArrayIds(tours));
+        colAddIfNotNull(ids, getEntityArrayIds(records));
+        return ids;
+    }
+
+    @Override
     protected void generateJson() {
         Map<String, Object> j;
 
@@ -103,12 +117,12 @@ public class Band extends Entity {
         j.put("name", generatePrimitive(name));
         j.put("url", generatePrimitive(url));
         j.put("foundation", generatePrimitive(foundation));
-        j.put("city", generateEntityId(city));
-        j.put("genres", generateEntityArrayIds(genres));
-        j.put("musicians", generateEntityArrayIds(musicians));
-        j.put("events", generateEntityArrayIds(events));
-        j.put("tours", generateEntityArrayIds(tours));
-        j.put("records", generateEntityArrayIds(records));
+        j.put("city", idToString(getEntityId(city)));
+        j.put("genres", idsToString(getEntityArrayIds(genres)));
+        j.put("musicians", idsToString(getEntityArrayIds(musicians)));
+        j.put("events", idsToString(getEntityArrayIds(events)));
+        j.put("tours", idsToString(getEntityArrayIds(tours)));
+        j.put("records", idsToString(getEntityArrayIds(records)));
         json.put(Detail.FULL, JSONValue.toJSONString(j));
 
         // SYMBOL
