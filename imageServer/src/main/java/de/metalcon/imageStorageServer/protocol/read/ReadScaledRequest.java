@@ -5,10 +5,13 @@ import de.metalcon.utils.FormItemList;
 
 public class ReadScaledRequest {
 
+	@SuppressWarnings("unused")
 	private final String imageIdentifier;
 
+	@SuppressWarnings("unused")
 	private final Integer imageWidth;
 
+	@SuppressWarnings("unused")
 	private final Integer imageHeight;
 
 	public ReadScaledRequest(final String imageIdentifier,
@@ -28,7 +31,7 @@ public class ReadScaledRequest {
 			if (imageWidth != null) {
 				final Integer imageHeight = checkImageHeight(formItemList,
 						readResponse);
-				if (imageWidth != null) {
+				if (imageHeight != null) {
 					return new ReadScaledRequest(imageIdentifier, imageWidth,
 							imageHeight);
 				}

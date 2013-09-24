@@ -4,10 +4,13 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadBulkRequest {
+	@SuppressWarnings("unused")
 	private final String[] imageIdentifierList;
 
+	@SuppressWarnings("unused")
 	private final Integer imageWidth;
 
+	@SuppressWarnings("unused")
 	private final Integer imageHeight;
 
 	public ReadBulkRequest(final String[] imageIdentifierList,
@@ -27,7 +30,7 @@ public class ReadBulkRequest {
 			if (imageWidth != null) {
 				final Integer imageHeight = checkImageHeight(formItemList,
 						readResponse);
-				if (imageWidth != null) {
+				if (imageHeight != null) {
 					return new ReadBulkRequest(imageIdentifierList, imageWidth,
 							imageHeight);
 				}
@@ -40,7 +43,7 @@ public class ReadBulkRequest {
 			final FormItemList formItemList, final ReadResponse response) {
 		try {
 			String IDString = formItemList
-					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST);
 			String[] IDList = IDString.split(",");
 			for (String element : IDList) {
 				if (element.isEmpty()) {

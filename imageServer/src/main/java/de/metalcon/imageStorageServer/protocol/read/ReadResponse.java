@@ -58,8 +58,8 @@ public class ReadResponse extends Response {
 	 */
 	public void addImageWidthMalformedError() {
 		this.addStatusMessage(
-				"request corrupt: parameter \"imageWidth\" is malformed",
-				"The imageWidth flag String is malformed");
+				ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_MALFORMED,
+				"The imageWidth String is malformed");
 
 	}
 
@@ -69,8 +69,8 @@ public class ReadResponse extends Response {
 	 */
 	public void addImageHeightMalformedError() {
 		this.addStatusMessage(
-				"request corrupt: parameter \"imageHeight\" is malformed",
-				"The imageHeight flag String is malformed");
+				ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED,
+				"The imageHeight String is malformed");
 
 	}
 
