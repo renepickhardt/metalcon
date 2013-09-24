@@ -71,11 +71,13 @@ public class CreateRequest {
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
-				final Boolean autoRotateFlag = checkAutoRotateFlag(
-						formItemList, response);
-				if (autoRotateFlag != null) {
-					return new CreateRequest(imageIdentifier, imageStream,
-							metaData, autoRotateFlag);
+				if (metaData != null) {
+					final Boolean autoRotateFlag = checkAutoRotateFlag(
+							formItemList, response);
+					if (autoRotateFlag != null) {
+						return new CreateRequest(imageIdentifier, imageStream,
+								metaData, autoRotateFlag);
+					}
 				}
 			}
 		}
@@ -170,6 +172,9 @@ public class CreateRequest {
 			try {
 				PARSER.parse(metaData);
 				return metaData;
+
+				// FIXME: ParseException is also thrown when (metadata == null),
+				// so metaDataMissing() is never added to response
 			} catch (final ParseException e) {
 				response.metaDataMalformed();
 			}
