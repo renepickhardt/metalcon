@@ -1,6 +1,9 @@
 package de.metalcon.imageServer.protocol;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -8,6 +11,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
@@ -16,10 +22,14 @@ import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
+import de.metalcon.imageServer.ProtocolTestConstants;
 import de.metalcon.imageStorageServer.ISSConfig;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.create.CreateRequest;
+import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
+import de.metalcon.utils.FormItemList;
 
 public class CreateRequestTest extends RequestTest {
 
@@ -67,8 +77,99 @@ public class CreateRequestTest extends RequestTest {
 		DISK_FILE_REPOSITORY.delete();
 	}
 
+	@Test
+	public void testCreateRequest() throws IOException {
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
+				VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		assertNotNull(this.createRequest);
+		assertEquals(VALID_IDENTIFIER, this.createRequest.getImageIdentifier());
+		assertTrue(compareInputStreams(VALID_IMAGE_ITEM_JPEG.getInputStream(),
+				this.createRequest.getImageStream()));
+		assertEquals(VALID_CREATE_META_DATA, this.createRequest.getMetaData());
+	}
+
+	@Test
+	public void testImageIdentifierMissing() {
+		this.fillRequest(null, VALID_IMAGE_ITEM_JPEG,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER);
+		assertNull(this.createRequest);
+	}
+
+	@Test
+	public void testImagestreamMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+		assertNull(this.createRequest);
+	}
+
+	@Test
+	public void testAutorotateFlagMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG,
+				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
+		assertNull(this.createRequest);
+
+	}
+
+	@Test
+	public void testImageMetadataMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, null,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
+		assertNull(this.createRequest);
+	}
+
+	@Test
+	public void testImageMetadataMalformed() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG,
+				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
+		assertNull(this.createRequest);
+	}
+
+	private void fillRequest(final String imageIdentifier,
+			final FileItem imageItem, final String metaData,
+			final String autoRotateFlag) {
+		// create and fill form item list
+		final FormItemList formItemList = new FormItemList();
+
+		if (imageIdentifier != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
+					imageIdentifier);
+		}
+		if (imageItem != null) {
+			formItemList.addFile(
+					ProtocolConstants.Parameters.Create.IMAGE_ITEM, imageItem);
+		}
+		if (metaData != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Create.META_DATA, metaData);
+		}
+		if (autoRotateFlag != null) {
+			formItemList.addField(
+					ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
+					autoRotateFlag);
+		}
+
+		// check request and extract the response
+		final CreateResponse createResponse = new CreateResponse();
+		this.createRequest = CreateRequest.checkRequest(formItemList,
+				createResponse);
+		this.extractJson(createResponse);
+	}
+
 	/**
-	 * create a music item
+	 * create an image item
 	 * 
 	 * @param contentType
 	 *            content type of the music file
@@ -95,5 +196,57 @@ public class CreateRequestTest extends RequestTest {
 		}
 
 		return imageItem;
+	}
+
+	/**
+	 * compare two input streams
+	 * 
+	 * @param stream1
+	 *            first input stream
+	 * @param stream2
+	 *            second input stream
+	 * @return true - if the two streams does contain the same content<br>
+	 *         false - otherwise
+	 * @throws IOException
+	 *             if IO errors occurred
+	 */
+	private static boolean compareInputStreams(final InputStream stream1,
+			final InputStream stream2) throws IOException {
+		final ReadableByteChannel channel1 = Channels.newChannel(stream1);
+		final ReadableByteChannel channel2 = Channels.newChannel(stream2);
+		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(4096);
+		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(4096);
+
+		try {
+			while (true) {
+
+				int n1 = channel1.read(buffer1);
+				int n2 = channel2.read(buffer2);
+
+				if ((n1 == -1) || (n2 == -1)) {
+					return n1 == n2;
+				}
+
+				buffer1.flip();
+				buffer2.flip();
+
+				for (int i = 0; i < Math.min(n1, n2); i++) {
+					if (buffer1.get() != buffer2.get()) {
+						return false;
+					}
+				}
+
+				buffer1.compact();
+				buffer2.compact();
+			}
+
+		} finally {
+			if (stream1 != null) {
+				stream1.close();
+			}
+			if (stream2 != null) {
+				stream2.close();
+			}
+		}
 	}
 }
