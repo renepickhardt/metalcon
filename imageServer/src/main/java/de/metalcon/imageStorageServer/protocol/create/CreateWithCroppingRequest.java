@@ -78,18 +78,21 @@ public class CreateWithCroppingRequest {
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
-				final Integer top = checkTop(formItemList, response);
-				if (top != null) {
-					final Integer left = checkLeft(formItemList, response);
-					if (left != null) {
-						final Integer width = checkWidth(formItemList, response);
-						if (width != null) {
-							final Integer height = checkHeight(formItemList,
+				if (metaData != null) {
+					final Integer top = checkTop(formItemList, response);
+					if (top != null) {
+						final Integer left = checkLeft(formItemList, response);
+						if (left != null) {
+							final Integer width = checkWidth(formItemList,
 									response);
-							if (height != null) {
-								return new CreateWithCroppingRequest(
-										imageIdentifier, imageStream, metaData,
-										top, left, width, height);
+							if (width != null) {
+								final Integer height = checkHeight(
+										formItemList, response);
+								if (height != null) {
+									return new CreateWithCroppingRequest(
+											imageIdentifier, imageStream,
+											metaData, top, left, width, height);
+								}
 							}
 						}
 					}
@@ -166,6 +169,8 @@ public class CreateWithCroppingRequest {
 			} else {
 				response.cropWidthInvalid(width);
 			}
+		} catch (final NumberFormatException e) {
+			// TODO
 		} catch (final IllegalArgumentException e) {
 			response.cropWidthMissing();
 		}

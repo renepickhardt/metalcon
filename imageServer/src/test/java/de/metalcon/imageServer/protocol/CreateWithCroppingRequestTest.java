@@ -139,19 +139,7 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
-		assertNull(this.createWithCroppingRequest);
-	}
-
-	@Test
-	public void testCroppingHeightInvalid() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
-				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
-				ProtocolTestConstants.INVALID_CROPPING_HEIGHT_COORDINATE,
-				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
-				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
-		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED);
 		assertNull(this.createWithCroppingRequest);
 	}
 
@@ -164,6 +152,18 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
 				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
+	public void testCroppingHeightInvalid() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				VALID_IMAGE_ITEM_JPEG, VALID_CREATE_META_DATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.INVALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID);
 		assertNull(this.createWithCroppingRequest);
 	}
 
@@ -241,8 +241,8 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 
 	private void fillRequest(final String imageIdentifier,
 			final FileItem imageItem, final String metaData,
-			final String height, final String width, final String top,
-			final String left) {
+			final String width, final String height, final String left,
+			final String top) {
 		// create and fill form item list
 		final FormItemList formItemList = new FormItemList();
 

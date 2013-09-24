@@ -132,7 +132,7 @@ public class CreateRequestTest extends RequestTest {
 				VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
 				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED);
 		assertNull(this.createRequest);
 	}
 
