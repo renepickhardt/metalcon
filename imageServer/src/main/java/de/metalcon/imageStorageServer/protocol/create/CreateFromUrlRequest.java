@@ -34,7 +34,7 @@ public class CreateFromUrlRequest {
 			URL imageUrl = new URL(imageUrlString);
 			return imageUrl;
 		} catch (IllegalArgumentException e1) {
-			response.imageIdentifierMissing();
+			response.imageUrlMissing();
 		} catch (MalformedURLException e2) {
 			response.imageUrlMalformed(imageUrlString);
 		}
