@@ -27,7 +27,7 @@ public class ReadBulkRequest {
 			if (imageWidth != null) {
 				final Integer imageHeight = checkImageHeight(formItemList,
 						readResponse);
-				if (imageWidth != null) {
+				if (imageHeight != null) {
 					return new ReadBulkRequest(imageIdentifierList, imageWidth,
 							imageHeight);
 				}
@@ -40,7 +40,7 @@ public class ReadBulkRequest {
 			final FormItemList formItemList, final ReadResponse response) {
 		try {
 			String IDString = formItemList
-					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER_LIST);
 			String[] IDList = IDString.split(",");
 			for (String element : IDList) {
 				if (element.isEmpty()) {
