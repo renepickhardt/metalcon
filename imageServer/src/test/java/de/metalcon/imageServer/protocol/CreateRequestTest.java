@@ -99,6 +99,15 @@ public class CreateRequestTest extends RequestTest {
 	}
 
 	@Test
+	public void testImagestreamMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+		assertNull(this.createRequest);
+	}
+
+	@Test
 	public void testAutorotateFlagMissing() {
 		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
 				VALID_IMAGE_ITEM_JPEG,

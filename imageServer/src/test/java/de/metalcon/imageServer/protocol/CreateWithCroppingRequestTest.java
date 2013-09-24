@@ -107,6 +107,18 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 	}
 
 	@Test
+	public void testImagestreamMissing() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
+				ProtocolTestConstants.VALID_IMAGE_METADATA,
+				ProtocolTestConstants.VALID_CROPPING_WIDTH_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_HEIGHT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_LEFT_COORDINATE,
+				ProtocolTestConstants.VALID_CROPPING_TOP_COORDINATE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+		assertNull(this.createWithCroppingRequest);
+	}
+
+	@Test
 	public void testImageMetadataMissing() {
 		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
 				VALID_IMAGE_ITEM_JPEG, null,
