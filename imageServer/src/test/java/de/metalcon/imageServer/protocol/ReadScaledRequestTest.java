@@ -72,6 +72,7 @@ public class ReadScaledRequestTest extends RequestTest {
 				ProtocolTestConstants.MALFORMED_SCALING_HEIGHT,
 				ProtocolTestConstants.VALID_SCALING_WIDTH);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED);
+		assertNull(this.readScaledRequest);
 	}
 
 	@Test
@@ -80,5 +81,25 @@ public class ReadScaledRequestTest extends RequestTest {
 				ProtocolTestConstants.VALID_SCALING_HEIGHT,
 				ProtocolTestConstants.MALFORMED_SCALING_WIDTH);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_MALFORMED);
+		assertNull(this.readScaledRequest);
 	}
+
+	@Test
+	public void testHeightTooSmall() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				ProtocolTestConstants.INVALID_SCALING_HEIGHT,
+				ProtocolTestConstants.VALID_SCALING_WIDTH);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO);
+		assertNull(this.readScaledRequest);
+	}
+
+	@Test
+	public void testWidthTooSmall() {
+		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT,
+				ProtocolTestConstants.INVALID_SCALING_WIDTH);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO);
+		assertNull(this.readScaledRequest);
+	}
+
 }
