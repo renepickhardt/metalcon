@@ -85,6 +85,12 @@ public class CreateResponse extends Response {
 				"The cropping height is missing. Please deliver one");
 	}
 
+	public void imageUrlMissing() {
+		this.parameterMissing(ProtocolConstants.Parameters.Create.URL,
+				"The image URL is missing. Please deliver one");
+
+	}
+
 	/**
 	 * Adds an error message for invalid left cropping coordinate parameter to
 	 * the response.

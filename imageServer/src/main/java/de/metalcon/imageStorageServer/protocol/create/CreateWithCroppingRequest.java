@@ -26,10 +26,14 @@ public class CreateWithCroppingRequest {
 
 	private final String metaData;
 
+	@SuppressWarnings("unused")
 	private final int top;
+	@SuppressWarnings("unused")
 	private final int left;
 
+	@SuppressWarnings("unused")
 	private final int width;
+	@SuppressWarnings("unused")
 	private final int height;
 
 	public CreateWithCroppingRequest(final String imageIdentifier,

@@ -4,10 +4,13 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadBulkRequest {
+	@SuppressWarnings("unused")
 	private final String[] imageIdentifierList;
 
+	@SuppressWarnings("unused")
 	private final Integer imageWidth;
 
+	@SuppressWarnings("unused")
 	private final Integer imageHeight;
 
 	public ReadBulkRequest(final String[] imageIdentifierList,

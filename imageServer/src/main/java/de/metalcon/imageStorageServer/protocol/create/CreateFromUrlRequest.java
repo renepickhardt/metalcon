@@ -8,6 +8,7 @@ import de.metalcon.utils.FormItemList;
 
 public class CreateFromUrlRequest {
 
+	@SuppressWarnings("unused")
 	private final URL imageUrl;
 
 	public CreateFromUrlRequest(final URL imageUrl) {
@@ -31,8 +32,9 @@ public class CreateFromUrlRequest {
 			imageUrlString = formItemList
 					.getField(ProtocolConstants.Parameters.Create.URL);
 			URL imageUrl = new URL(imageUrlString);
+			return imageUrl;
 		} catch (IllegalArgumentException e1) {
-			response.imageIdentifierMissing();
+			response.imageUrlMissing();
 		} catch (MalformedURLException e2) {
 			response.imageUrlMalformed(imageUrlString);
 		}
