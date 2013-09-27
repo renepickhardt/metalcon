@@ -54,6 +54,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	private static final JSONParser PARSER = new JSONParser();
 
 	/**
+	 * minimum hash length
+	 */
+	private static final int MIN_HASH_LENGTH = 6;
+
+	/**
 	 * year represented by the current formatted year
 	 */
 	private static int YEAR;
@@ -146,7 +151,19 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @return hash for the key passed
 	 */
 	private static String generateHash(final String key) {
-		return String.valueOf(key.hashCode());
+		final String hash = String.valueOf(key.hashCode());
+
+		if (hash.length() < MIN_HASH_LENGTH) {
+			final StringBuilder builder = new StringBuilder();
+			for (int i = hash.length(); i < MIN_HASH_LENGTH; i++) {
+				builder.append("0");
+			}
+			builder.append(hash);
+
+			return builder.toString();
+		}
+
+		return hash;
 	}
 
 	/**
@@ -193,7 +210,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			IOException {
 		final OutputStream imageOutputStream = new FileOutputStream(
 				destinationFile);
-		IOUtils.copy(imageInputStream, imageOutputStream);
+		try {
+			IOUtils.copy(imageInputStream, imageOutputStream);
+		} finally {
+			imageOutputStream.close();
+		}
 	}
 
 	/**
@@ -915,16 +936,17 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		// store the original image
 		final File tmpFile = this.getTemporaryFile(hash);
 
+		FileInputStream tmpInputStream = null;
 		if (!tmpFile.exists()) {
 			storeImage(imageStream, tmpFile);
+			imageStream.close();
 
 			try {
 				final MagickImage originalImage = new MagickImage(
 						new ImageInfo(tmpFile.getAbsolutePath()));
 
 				// save the original image to the disk
-				final FileInputStream tmpInputStream = new FileInputStream(
-						tmpFile);
+				tmpInputStream = new FileInputStream(tmpFile);
 				final File originalFile = this.getOriginalFile(hash);
 
 				if (!originalFile.exists()) {
@@ -932,6 +954,11 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					return originalImage;
 				}
 			} finally {
+				// close temporary input stream
+				if (tmpInputStream != null) {
+					tmpInputStream.close();
+				}
+
 				// delete temporary (image) file
 				tmpFile.delete();
 			}
