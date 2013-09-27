@@ -4,20 +4,28 @@ import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.utils.FormItemList;
 
 public class ReadBulkRequest {
-	@SuppressWarnings("unused")
 	private final String[] imageIdentifierList;
 
-	@SuppressWarnings("unused")
-	private final Integer imageWidth;
-
-	@SuppressWarnings("unused")
-	private final Integer imageHeight;
+	private final int imageWidth;
+	private final int imageHeight;
 
 	public ReadBulkRequest(final String[] imageIdentifierList,
-			final Integer imageWidth, final Integer imageHeight) {
+			final int imageWidth, final int imageHeight) {
 		this.imageIdentifierList = imageIdentifierList;
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
+	}
+
+	public String[] getImageIdentifierList() {
+		return this.imageIdentifierList;
+	}
+
+	public int getImageWidth() {
+		return this.imageWidth;
+	}
+
+	public int getImageHeight() {
+		return this.imageHeight;
 	}
 
 	public static ReadBulkRequest checkRequest(FormItemList formItemList,
@@ -61,51 +69,51 @@ public class ReadBulkRequest {
 
 	}
 
-	private static Integer checkImageHeight(FormItemList formItemList,
+	private static Integer checkImageWidth(FormItemList formItemList,
 			ReadResponse response) {
-		String imageHeightString = null;
 		try {
-			imageHeightString = formItemList
-					.getField(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
-		} catch (IllegalArgumentException e) {
-			response.addNoImageHeightError();
-			return null;
-		}
-		try {
-			Integer imageHeightInteger = Integer.parseInt(imageHeightString);
-			if (imageHeightInteger > 0) {
-				return imageHeightInteger;
-			} else {
-				response.addImageHeightToSmallError(imageHeightInteger);
-			}
-		} catch (NumberFormatException e) {
-			response.addImageHeightMalformedError();
+			final String sWidth = formItemList
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
 
+			try {
+				final int width = Integer.parseInt(sWidth);
+				if (width > 0) {
+					return width;
+				}
+
+				response.addImageWidthInvalidError(width);
+
+			} catch (final NumberFormatException e) {
+				response.addImageWidthMalformedError(sWidth);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.addNoImageWidthError();
 		}
+
 		return null;
 	}
 
-	private static Integer checkImageWidth(FormItemList formItemList,
+	private static Integer checkImageHeight(FormItemList formItemList,
 			ReadResponse response) {
-		String imageWidthString = null;
 		try {
-			imageWidthString = formItemList
-					.getField(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
-		} catch (IllegalArgumentException e) {
-			response.addNoImageWidthError();
-			return null;
-		}
-		try {
-			Integer imageWidthInteger = Integer.parseInt(imageWidthString);
-			if (imageWidthInteger > 0) {
-				return imageWidthInteger;
-			} else {
-				response.addImageWidthToSmallError(imageWidthInteger);
-			}
-		} catch (NumberFormatException e) {
-			response.addImageWidthMalformedError();
+			final String sHeight = formItemList
+					.getField(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
 
+			try {
+				final int height = Integer.parseInt(sHeight);
+				if (height > 0) {
+					return height;
+				}
+
+				response.addImageHeightInvalidError(height);
+
+			} catch (final NumberFormatException e) {
+				response.addImageHeightMalformedError(sHeight);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.addNoImageHeightError();
 		}
+
 		return null;
 	}
 }

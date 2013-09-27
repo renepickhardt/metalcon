@@ -26,24 +26,23 @@ public class CreateWithCroppingRequest {
 
 	private final String metaData;
 
-	@SuppressWarnings("unused")
-	private final int top;
-	@SuppressWarnings("unused")
-	private final int left;
+	private final int coordinateTop;
+	private final int coordinateLeft;
 
-	@SuppressWarnings("unused")
 	private final int width;
-	@SuppressWarnings("unused")
 	private final int height;
 
 	public CreateWithCroppingRequest(final String imageIdentifier,
 			final InputStream imageStream, final String metaData,
-			final int top, final int left, final int width, final int height) {
+			final int coordinateLeft, final int coordinateTop, final int width,
+			final int height) {
 		this.imageIdentifier = imageIdentifier;
 		this.imageStream = imageStream;
 		this.metaData = metaData;
-		this.left = left;
-		this.top = top;
+
+		this.coordinateLeft = coordinateLeft;
+		this.coordinateTop = coordinateTop;
+
 		this.width = width;
 		this.height = height;
 	}
@@ -58,6 +57,22 @@ public class CreateWithCroppingRequest {
 
 	public String getMetaData() {
 		return this.metaData;
+	}
+
+	public int getCoordinateLeft() {
+		return this.coordinateLeft;
+	}
+
+	public int getCoordinateTop() {
+		return this.coordinateTop;
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getHeight() {
+		return this.height;
 	}
 
 	/**
@@ -91,7 +106,7 @@ public class CreateWithCroppingRequest {
 								if (height != null) {
 									return new CreateWithCroppingRequest(
 											imageIdentifier, imageStream,
-											metaData, top, left, width, height);
+											metaData, left, top, width, height);
 								}
 							}
 						}
@@ -100,104 +115,6 @@ public class CreateWithCroppingRequest {
 			}
 		}
 
-		return null;
-	}
-
-	/**
-	 * Extracts the top coordinate field from the FormItemList and checks for
-	 * protocol compliance
-	 * 
-	 * @param formItemList
-	 * @param response
-	 * @return Integer top if valid, else null
-	 */
-	protected static Integer checkTop(final FormItemList formItemList,
-			final CreateResponse response) {
-		try {
-			int top = Integer.parseInt(formItemList
-					.getField(ProtocolConstants.Parameters.Create.CROP_TOP));
-			if (top >= 0) {
-				return top;
-			} else {
-				response.cropTopCoordinateInvalid(top);
-			}
-		} catch (final IllegalArgumentException e) {
-			response.cropTopCoordinateMissing();
-		}
-		return null;
-	}
-
-	/**
-	 * Extracts the left coordinate field from the FormItemList and checks for
-	 * protocol compliance
-	 * 
-	 * @param formItemList
-	 * @param response
-	 * @return Integer left if valid, else null
-	 */
-	protected static Integer checkLeft(final FormItemList formItemList,
-			final CreateResponse response) {
-		try {
-			int left = Integer.parseInt(formItemList
-					.getField(ProtocolConstants.Parameters.Create.CROP_LEFT));
-			if (left >= 0) {
-				return left;
-			} else {
-				response.cropLeftCoordinateInvalid(left);
-			}
-		} catch (final IllegalArgumentException e) {
-			response.cropLeftCoordinateMissing();
-		}
-		return null;
-	}
-
-	/**
-	 * Extracts the width field from the FormItemList and checks for protocol
-	 * compliance
-	 * 
-	 * @param formItemList
-	 * @param response
-	 * @return Integer width if valid, else null
-	 */
-	protected static Integer checkWidth(final FormItemList formItemList,
-			final CreateResponse response) {
-		try {
-			int width = Integer.parseInt(formItemList
-					.getField(ProtocolConstants.Parameters.Create.CROP_WIDTH));
-			if (width >= 0) {
-				return width;
-			} else {
-				response.cropWidthInvalid(width);
-			}
-		} catch (final NumberFormatException e) {
-			// TODO
-		} catch (final IllegalArgumentException e) {
-			response.cropWidthMissing();
-		}
-		return null;
-	}
-
-	/**
-	 * Extracts the height field from the FormItemList and checks for protocol
-	 * compliance
-	 * 
-	 * @param formItemList
-	 * @param response
-	 * @return Integer height if valid, else null
-	 */
-	protected static Integer checkHeight(final FormItemList formItemList,
-			final CreateResponse response) {
-		try {
-			int height = Integer.parseInt(formItemList
-					.getField(ProtocolConstants.Parameters.Create.CROP_HEIGHT));
-			if (height >= 0) {
-				return height;
-			} else {
-				response.cropHeightInvalid(height);
-			}
-		} catch (final IllegalArgumentException e) {
-			response.cropHeightMissing();
-		}
 		return null;
 	}
 
@@ -272,4 +189,133 @@ public class CreateWithCroppingRequest {
 
 		return null;
 	}
+
+	/**
+	 * Extracts the top coordinate field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer top if valid, else null
+	 */
+	protected static Integer checkTop(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			final String sTop = formItemList
+					.getField(ProtocolConstants.Parameters.Create.CROP_TOP);
+
+			try {
+				final int top = Integer.parseInt(sTop);
+				if (top >= 0) {
+					return top;
+				}
+
+				response.cropTopCoordinateInvalid(top);
+
+			} catch (final NumberFormatException e) {
+				response.cropTopCoordinateMalformed(sTop);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.cropTopCoordinateMissing();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Extracts the left coordinate field from the FormItemList and checks for
+	 * protocol compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer left if valid, else null
+	 */
+	protected static Integer checkLeft(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			final String sLeft = formItemList
+					.getField(ProtocolConstants.Parameters.Create.CROP_LEFT);
+
+			try {
+				final int left = Integer.parseInt(sLeft);
+				if (left >= 0) {
+					return left;
+				}
+
+				response.cropLeftCoordinateInvalid(left);
+
+			} catch (final NumberFormatException e) {
+				response.cropLeftCoordinateMalformed(sLeft);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.cropLeftCoordinateMissing();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Extracts the width field from the FormItemList and checks for protocol
+	 * compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer width if valid, else null
+	 */
+	protected static Integer checkWidth(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			final String sWidth = formItemList
+					.getField(ProtocolConstants.Parameters.Create.CROP_WIDTH);
+
+			try {
+				final int width = Integer.parseInt(sWidth);
+				if (width > 0) {
+					return width;
+				}
+
+				response.cropWidthInvalid(width);
+
+			} catch (final NumberFormatException e) {
+				response.cropWidthMalformed(sWidth);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.cropWidthMissing();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Extracts the height field from the FormItemList and checks for protocol
+	 * compliance
+	 * 
+	 * @param formItemList
+	 * @param response
+	 * @return Integer height if valid, else null
+	 */
+	protected static Integer checkHeight(final FormItemList formItemList,
+			final CreateResponse response) {
+		try {
+			final String sHeight = formItemList
+					.getField(ProtocolConstants.Parameters.Create.CROP_HEIGHT);
+
+			try {
+				final int height = Integer.parseInt(sHeight);
+				if (height > 0) {
+					return height;
+				}
+
+				response.cropHeightInvalid(height);
+
+			} catch (final NumberFormatException e) {
+				response.cropHeightMalformed(sHeight);
+			}
+		} catch (final IllegalArgumentException e) {
+			response.cropHeightMissing();
+		}
+
+		return null;
+	}
+
 }

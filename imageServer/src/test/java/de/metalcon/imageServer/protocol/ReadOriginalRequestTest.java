@@ -1,5 +1,7 @@
 package de.metalcon.imageServer.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
@@ -25,7 +27,13 @@ public class ReadOriginalRequestTest extends RequestTest {
 		final ReadResponse readResponse = new ReadResponse();
 		this.readRequest = ReadRequest.checkRequest(formItemList, readResponse);
 		this.extractJson(readResponse);
+	}
 
+	@Test
+	public void testReadOriginalRequest() {
+		this.fillRequest(VALID_IDENTIFIER);
+		assertNotNull(this.readRequest);
+		assertEquals(VALID_IDENTIFIER, this.readRequest.getImageIdentifier());
 	}
 
 	@Test

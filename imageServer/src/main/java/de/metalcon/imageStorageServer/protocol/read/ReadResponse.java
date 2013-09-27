@@ -43,6 +43,22 @@ public class ReadResponse extends Response {
 	}
 
 	/**
+	 * Adds an error message for a malformed image scaling width parameter
+	 * string to the response.
+	 */
+	public void addImageWidthMalformedError(final String width) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_MALFORMED,
+				"The imageWidth String is malformed");
+	}
+
+	public void addImageWidthInvalidError(final int width) {
+		this.addStatusMessage(
+				ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_INVALID,
+				"The requested width is zero or less. Please specify a value greater than zero instead.");
+	}
+
+	/**
 	 * Adds an error message for a missing image scaling height parameter to the
 	 * response.
 	 */
@@ -53,36 +69,18 @@ public class ReadResponse extends Response {
 	}
 
 	/**
-	 * Adds an error message for a malformed image scaling width parameter
-	 * string to the response.
-	 */
-	public void addImageWidthMalformedError() {
-		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_MALFORMED,
-				"The imageWidth String is malformed");
-
-	}
-
-	/**
 	 * Adds an error message for a malformed image scaling height parameter
 	 * string to the response.
 	 */
-	public void addImageHeightMalformedError() {
+	public void addImageHeightMalformedError(final String height) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED,
 				"The imageHeight String is malformed");
-
 	}
 
-	public void addImageWidthToSmallError(Integer imageWidthInteger) {
+	public void addImageHeightInvalidError(final int height) {
 		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO,
-				"The requested width is zero or less. Please specify a value greater than zero instead.");
-	}
-
-	public void addImageHeightToSmallError(Integer imageWidthInteger) {
-		this.addStatusMessage(
-				ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO,
+				ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_INVALID,
 				"The requested height is zero or less. Please specify a value greater than zero instead.");
 	}
 

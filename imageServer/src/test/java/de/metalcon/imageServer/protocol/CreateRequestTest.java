@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.metalcon.imageServer.ProtocolTestConstants;
 import de.metalcon.imageStorageServer.ISSConfig;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.create.CreateRequest;
@@ -33,7 +32,12 @@ import de.metalcon.utils.FormItemList;
 
 public class CreateRequestTest extends RequestTest {
 
-	private CreateRequest createRequest;
+	private static final String VALID_AUTOROTATE_FLAG_TRUE = "1";
+
+	private static final String VALID_AUTOROTATE_FLAG_FALSE = "0";
+
+	private static final String MALFORMED_AUTOROTATE_FLAG = "wrong";
+
 	private static final String CONFIG_PATH = "test.iss.config";
 
 	private static File TEST_FILE_DIRECTORY, DISK_FILE_REPOSITORY;
@@ -41,6 +45,8 @@ public class CreateRequestTest extends RequestTest {
 	private static FileItem VALID_IMAGE_ITEM_JPEG;
 
 	private static String VALID_CREATE_META_DATA;
+
+	private CreateRequest createRequest;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -80,58 +86,74 @@ public class CreateRequestTest extends RequestTest {
 	@Test
 	public void testCreateRequest() throws IOException {
 		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
-				VALID_CREATE_META_DATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				VALID_CREATE_META_DATA, VALID_AUTOROTATE_FLAG_FALSE);
 		assertNotNull(this.createRequest);
 		assertEquals(VALID_IDENTIFIER, this.createRequest.getImageIdentifier());
 		assertTrue(compareInputStreams(VALID_IMAGE_ITEM_JPEG.getInputStream(),
 				this.createRequest.getImageStream()));
 		assertEquals(VALID_CREATE_META_DATA, this.createRequest.getMetaData());
+		assertEquals(false, this.createRequest.isAutoRotateFlag());
+	}
+
+	@Test
+	public void testCreateRequestAutoRotate() throws IOException {
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
+				VALID_CREATE_META_DATA, VALID_AUTOROTATE_FLAG_TRUE);
+		assertNotNull(this.createRequest);
+		assertEquals(VALID_IDENTIFIER, this.createRequest.getImageIdentifier());
+		assertTrue(compareInputStreams(VALID_IMAGE_ITEM_JPEG.getInputStream(),
+				this.createRequest.getImageStream()));
+		assertEquals(VALID_CREATE_META_DATA, this.createRequest.getMetaData());
+		assertEquals(true, this.createRequest.isAutoRotateFlag());
 	}
 
 	@Test
 	public void testImageIdentifierMissing() {
 		this.fillRequest(null, VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				VALID_AUTOROTATE_FLAG_TRUE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER);
 		assertNull(this.createRequest);
 	}
 
 	@Test
-	public void testImagestreamMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
+	public void testImageStreamMissing() {
+		this.fillRequest(VALID_IDENTIFIER, null,
 				ProtocolTestConstants.VALID_IMAGE_METADATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGESTREAM);
+				VALID_AUTOROTATE_FLAG_TRUE);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.IMAGE_STREAM);
 		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testAutorotateFlagMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				VALID_IMAGE_ITEM_JPEG,
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
 		assertNull(this.createRequest);
+	}
 
+	@Test
+	public void testAutorotateFlagMalformed() {
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
+				VALID_CREATE_META_DATA, MALFORMED_AUTOROTATE_FLAG);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED);
+		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testImageMetadataMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				VALID_IMAGE_ITEM_JPEG, null,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG, null,
+				VALID_AUTOROTATE_FLAG_TRUE);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
 		assertNull(this.createRequest);
 	}
 
 	@Test
 	public void testImageMetadataMalformed() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				VALID_IMAGE_ITEM_JPEG,
+		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
 				ProtocolTestConstants.MALFORMED_IMAGE_METADATA,
-				ProtocolTestConstants.VALID_BOOLEAN_AUTOROTATE_TRUE);
+				VALID_AUTOROTATE_FLAG_TRUE);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED);
 		assertNull(this.createRequest);
 	}

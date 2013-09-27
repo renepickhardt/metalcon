@@ -27,7 +27,7 @@ public class ProtocolConstants {
 		public class Create {
 
 			public static final String IMAGE_IDENTIFIER = "imageIdentifier";
-			public static final String IMAGESTREAM = "imageStream";
+			public static final String IMAGE_STREAM = "imageStream";
 			public static final String META_DATA = "metaData";
 			public static final String AUTOROTATE_FLAG = "autoRotationFlag";
 			public static final String CROP_LEFT = "left";
@@ -104,16 +104,19 @@ public class ProtocolConstants {
 
 		}
 
-		// TODO
+		/**
+		 * status messages for read responses
+		 */
 		public class Read {
 
 			public static final String NO_IMAGE_FOUND = "No image found";
 			public static final String GEOMETRY_BIGGER_THAN_ORIGINAL = "Requested geometry bigger than original size";
-			public static final String GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO = "Requested image width zero or less";
-			public static final String GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO = "Requested image height zero or less";
 			public static final String IDENTIFIER_LIST_CONTAINS_EMPTY_PARTS = "Identifier list contains empty parts";
-			public static final String SCALING_HEIGHT_MALFORMED = "height is not a valid number";
-			public static final String SCALING_WIDTH_MALFORMED = "width is not a valid number";
+			public static final String SCALING_WIDTH_MALFORMED = "scaling width malformed";
+			public static final String SCALING_HEIGHT_MALFORMED = "scaling height malformed";
+			public static final String SCALING_WIDTH_INVALID = "scaling width invalid";
+			public static final String SCALING_HEIGHT_INVALID = "scaling height invalid";
+
 		}
 
 		/**

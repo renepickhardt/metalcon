@@ -1,10 +1,11 @@
 package de.metalcon.imageServer.protocol;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import de.metalcon.imageServer.ProtocolTestConstants;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
 import de.metalcon.imageStorageServer.protocol.read.ReadScaledRequest;
@@ -14,8 +15,8 @@ public class ReadScaledRequestTest extends RequestTest {
 
 	private ReadScaledRequest readScaledRequest;
 
-	private void fillRequest(final String imageIdentifier, final String Height,
-			final String Width) {
+	private void fillRequest(final String imageIdentifier, final String width,
+			final String height) {
 		FormItemList formItemList = new FormItemList();
 
 		if (imageIdentifier != null) {
@@ -24,81 +25,94 @@ public class ReadScaledRequestTest extends RequestTest {
 					imageIdentifier);
 		}
 
-		if (Height != null) {
+		if (width != null) {
 			formItemList.addField(
-					ProtocolConstants.Parameters.Read.IMAGE_HEIGHT, Height);
+					ProtocolConstants.Parameters.Read.IMAGE_WIDTH, width);
+
 		}
 
-		if (Width != null) {
+		if (height != null) {
 			formItemList.addField(
-					ProtocolConstants.Parameters.Read.IMAGE_WIDTH, Width);
-
+					ProtocolConstants.Parameters.Read.IMAGE_HEIGHT, height);
 		}
 
 		final ReadResponse readResponse = new ReadResponse();
 		this.readScaledRequest = ReadScaledRequest.checkRequest(formItemList,
 				readResponse);
 		this.extractJson(readResponse);
+	}
 
+	@Test
+	public void testReadScaledRequest() {
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_WIDTH,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT);
+		assertNotNull(this.readScaledRequest);
+		assertEquals(VALID_IDENTIFIER,
+				this.readScaledRequest.getImageIdentifier());
+		assertEquals(ProtocolTestConstants.VALID_SCALING_WIDTH,
+				String.valueOf(this.readScaledRequest.getImageWidth()));
+		assertEquals(ProtocolTestConstants.VALID_SCALING_HEIGHT,
+				String.valueOf(this.readScaledRequest.getImageHeight()));
 	}
 
 	@Test
 	public void testImageIdentifierMissing() {
-		this.fillRequest(null, ProtocolTestConstants.VALID_SCALING_HEIGHT,
-				ProtocolTestConstants.VALID_SCALING_WIDTH);
+		this.fillRequest(null, ProtocolTestConstants.VALID_SCALING_WIDTH,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_IDENTIFIER);
 		assertNull(this.readScaledRequest);
 	}
 
 	@Test
-	public void testHeightMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER, null,
-				ProtocolTestConstants.VALID_SCALING_WIDTH);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
-		assertNull(this.readScaledRequest);
-	}
-
-	@Test
 	public void testWidthMissing() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.VALID_SCALING_HEIGHT, null);
+		this.fillRequest(VALID_IDENTIFIER, null,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT);
 		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_WIDTH);
 		assertNull(this.readScaledRequest);
 	}
 
 	@Test
-	public void testHeightMalformed() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.MALFORMED_SCALING_HEIGHT,
-				ProtocolTestConstants.VALID_SCALING_WIDTH);
-		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED);
-		assertNull(this.readScaledRequest);
-	}
-
-	@Test
 	public void testWidthMalformed() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.VALID_SCALING_HEIGHT,
-				ProtocolTestConstants.MALFORMED_SCALING_WIDTH);
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.MALFORMED_SCALING_VALUE,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT);
 		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_MALFORMED);
 		assertNull(this.readScaledRequest);
 	}
 
 	@Test
-	public void testHeightTooSmall() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.INVALID_SCALING_HEIGHT,
-				ProtocolTestConstants.VALID_SCALING_WIDTH);
-		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_HEIGHT_LESS_OR_EQUAL_ZERO);
+	public void testWidthInvalid() {
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.INVALID_SCALING_WIDTH,
+				ProtocolTestConstants.VALID_SCALING_HEIGHT);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_WIDTH_INVALID);
 		assertNull(this.readScaledRequest);
 	}
 
 	@Test
-	public void testWidthTooSmall() {
-		this.fillRequest(ProtocolTestConstants.VALID_IMAGE_IDENTIFIER,
-				ProtocolTestConstants.VALID_SCALING_HEIGHT,
-				ProtocolTestConstants.INVALID_SCALING_WIDTH);
-		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.GEOMETRY_REQUESTED_WIDTH_LESS_OR_EQUAL_ZERO);
+	public void testHeightMissing() {
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_WIDTH, null);
+		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Read.IMAGE_HEIGHT);
+		assertNull(this.readScaledRequest);
+	}
+
+	@Test
+	public void testHeightMalformed() {
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_WIDTH,
+				ProtocolTestConstants.MALFORMED_SCALING_VALUE);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_MALFORMED);
+		assertNull(this.readScaledRequest);
+	}
+
+	@Test
+	public void testHeightInvalid() {
+		this.fillRequest(VALID_IDENTIFIER,
+				ProtocolTestConstants.VALID_SCALING_WIDTH,
+				ProtocolTestConstants.INVALID_SCALING_HEIGHT);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.SCALING_HEIGHT_INVALID);
 		assertNull(this.readScaledRequest);
 	}
 
