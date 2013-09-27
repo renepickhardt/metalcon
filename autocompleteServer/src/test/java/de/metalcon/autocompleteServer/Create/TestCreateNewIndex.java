@@ -24,6 +24,7 @@ import de.metalcon.utils.FormItemList;
 public class TestCreateNewIndex {
 
 	private JSONObject jsonResponse;
+	@SuppressWarnings("unused")
 	private HttpServletRequest request;
 
 	final private ServletConfig servletConfig = mock(ServletConfig.class);
