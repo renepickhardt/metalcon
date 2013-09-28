@@ -15,8 +15,6 @@ import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
  * client after a retrieve request has been sent. This can be the actual content
  * as well as meta information (like error messages and warnings)
  * 
- * TODO: This class needs to be implemented. All functions are just empty
- * functions.
  * 
  * @author Rene Pickhardt
  * 

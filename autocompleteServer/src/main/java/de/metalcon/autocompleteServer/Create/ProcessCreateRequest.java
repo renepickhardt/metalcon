@@ -126,9 +126,7 @@ public class ProcessCreateRequest {
 		FormFile image = null;
 		String imageB64 = null;
 		FileItem imageFileItem;
-
 		try {
-			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
 			imageFileItem = image.getFormItem();
 
@@ -147,11 +145,14 @@ public class ProcessCreateRequest {
 
 		} catch (IllegalArgumentException e) {
 			statusOk = false;
-			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		} catch (IOException e) {
 			statusOk = false;
 
+			return null;
+		} catch (NullPointerException e) {
+			statusOk = false;
+			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 

@@ -24,7 +24,8 @@ public class NewIndex {
 	 * @param indexName
 	 * @author Christian Schowalter
 	 */
-	public static void newSuggestTree(ServletContext context, String indexName) {
+	public static void newSuggestTree(ServletContext context, String indexName,
+			NewIndexResponse response) {
 
 		// TODO: add warning if already existing indexName was given.
 		SuggestTree checkIndex = ContextListener.getIndex(indexName, context);
@@ -39,6 +40,7 @@ public class NewIndex {
 			ContextListener.setImageIndex(imageIndex, context);
 		} else {
 			checkIndex = null;
+			response.addIndexAlreadyExistsError(indexName);
 		}
 	}
 }
