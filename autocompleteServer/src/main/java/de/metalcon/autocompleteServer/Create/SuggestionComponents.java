@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import de.metalcon.autocompleteServer.AppendingObjectOutputStream;
+
 /**
  * 
  * Contains the data extracted from the HTTP-request, which will be inserted
@@ -66,13 +68,29 @@ public class SuggestionComponents implements Serializable {
 
 	public void saveToDisc(File createFile) {
 		try {
-			FileOutputStream saveFile = new FileOutputStream(createFile, true);
 
-			// TODO check if AppendableObjectOutputStream has to be used instead
-			ObjectOutputStream save = new ObjectOutputStream(saveFile);
-			save.writeObject(this);
-			save.close();
+			// Writing more than one object to a file breaks its header, when
+			// using the usual ObjectOutputStream
+			// TODO: double check if this solution works
+			// advice found here:
+			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
+			if (!(createFile.exists())) {
+				FileOutputStream saveFile = new FileOutputStream(createFile,
+						true);
 
+				ObjectOutputStream save = new ObjectOutputStream(saveFile);
+				save.writeObject(this);
+				save.close();
+
+			} else {
+
+				FileOutputStream saveFile = new FileOutputStream(createFile,
+						true);
+				AppendingObjectOutputStream save = new AppendingObjectOutputStream(
+						saveFile);
+				save.writeObject(this);
+				save.close();
+			}
 		}
 		// maybe there is a way to store failed save-processes, to try them
 		// again, when the issue is solved?^
