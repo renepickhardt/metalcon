@@ -91,10 +91,7 @@ public class SuggestionComponents implements Serializable {
 				save.writeObject(this);
 				save.close();
 			}
-		}
-		// maybe there is a way to store failed save-processes, to try them
-		// again, when the issue is solved?^
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
