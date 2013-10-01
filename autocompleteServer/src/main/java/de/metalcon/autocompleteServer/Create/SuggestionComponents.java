@@ -72,6 +72,8 @@ public class SuggestionComponents implements Serializable {
 			// Writing more than one object to a file breaks its header, when
 			// using the usual ObjectOutputStream
 			// TODO: double check if this solution works
+			// FIXME: doesn't seem to work
+			//
 			// advice found here:
 			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
 			if (!(createFile.exists())) {
@@ -95,10 +97,7 @@ public class SuggestionComponents implements Serializable {
 				saveFile.close();
 
 			}
-		}
-		// maybe there is a way to store failed save-processes, to try them
-		// again, when the issue is solved?^
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
