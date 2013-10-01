@@ -12,6 +12,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
+import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
@@ -87,7 +88,12 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.getComponents().setSuggestString(
 				suggestionString);
 
-		String indexName = checkIndexName(items, response);
+		String indexName = checkIndexName(context, items, response);
+		if (indexName == null) {
+			suggestTreeCreateRequestContainer = null;
+			return response;
+		}
+
 		suggestTreeCreateRequestContainer.getComponents().setIndexName(
 				indexName);
 
@@ -201,17 +207,26 @@ public class ProcessCreateRequest {
 		}
 	}
 
-	private static String checkIndexName(FormItemList items,
-			ProcessCreateResponse response) {
-		String index = null;
+	private static String checkIndexName(ServletContext context,
+			FormItemList items, ProcessCreateResponse response) {
+		String indexName = null;
 		try {
-			index = items.getField(ProtocolConstants.INDEX_PARAMETER);
+			indexName = items.getField(ProtocolConstants.INDEX_PARAMETER);
+			System.out.println("indexnamemethod"
+					+ ContextListener.getIndex(indexName, context));
 		} catch (IllegalArgumentException e) {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
-			index = ProtocolConstants.DEFAULT_INDEX_NAME;
+			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
 			statusOk = false;
 		}
-		return index;
+
+		// check if the index we're going to write to exists
+		if (ContextListener.getIndex(indexName, context) == null) {
+			response.addIndexDoesNotExistError(indexName);
+			statusOk = false;
+			return null;
+		}
+		return indexName;
 	}
 
 	private static String checkSuggestionKey(FormItemList items,

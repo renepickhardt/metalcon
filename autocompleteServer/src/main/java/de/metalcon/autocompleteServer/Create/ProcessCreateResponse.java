@@ -107,6 +107,19 @@ public class ProcessCreateResponse {
 	}
 
 	/**
+	 * Adds an IndexDoesNotExist-Error to the container object. Expects the
+	 * String to be not NULL and correctly formatted.
+	 * 
+	 * @param indexName
+	 */
+	@SuppressWarnings("unchecked")
+	public void addIndexDoesNotExistError(String indexName) {
+		this.jsonResponse
+				.put(CreateStatusCodes.STATUS_INDEX_DOES_NOT_EXIST, indexName);
+
+	}
+
+	/**
 	 * Adds a WeightNotANumber-Error to the container object. Expects the String
 	 * to be not NULL and correctly formatted.
 	 * 

@@ -42,5 +42,6 @@ public class CreateStatusCodes {
 	public static final String STATUS_NO_KEY = "Warning:KeyNotGiven";
 	public static final String STATUS_KEY_TOO_LONG = "Warning:KeyTooLong";
 	public static final String STATUS_INDEX_DUPLICATE = "Error:IndexDuplicate";
+	public static final String STATUS_INDEX_DOES_NOT_EXIST = "Error:IndexDoesNotExist";
 
 }
