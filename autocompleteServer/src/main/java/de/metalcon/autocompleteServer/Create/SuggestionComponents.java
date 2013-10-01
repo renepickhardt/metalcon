@@ -76,11 +76,12 @@ public class SuggestionComponents implements Serializable {
 			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
 			if (!(createFile.exists())) {
 				FileOutputStream saveFile = new FileOutputStream(createFile,
-						true);
+						false);
 
 				ObjectOutputStream save = new ObjectOutputStream(saveFile);
 				save.writeObject(this);
 				save.close();
+				saveFile.close();
 
 			} else {
 
@@ -88,8 +89,11 @@ public class SuggestionComponents implements Serializable {
 						true);
 				AppendingObjectOutputStream save = new AppendingObjectOutputStream(
 						saveFile);
+				// ObjectOutputStream save = new ObjectOutputStream(saveFile);
 				save.writeObject(this);
 				save.close();
+				saveFile.close();
+
 			}
 		}
 		// maybe there is a way to store failed save-processes, to try them
