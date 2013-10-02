@@ -12,15 +12,19 @@ public class IdDetail {
     private Detail detail;
     
     public IdDetail(Muid id, Detail detail) {
+        if (id == null || detail == null)
+            // TODO: handle this
+            throw new RuntimeException();
+        
         this.id = id;
         this.detail = detail;
     }
     
     public IdDetail(String idDetail) {
-        fromString(idDetail);
-    }
-    
-    public void fromString(String idDetail) {
+        if (idDetail == null)
+            // TODO: handle this
+            throw new RuntimeException();
+        
         int colonPos = idDetail.indexOf(delimeter);
         if (colonPos == -1 || colonPos == 0
                 || colonPos == idDetail.length() - 1)
@@ -45,6 +49,27 @@ public class IdDetail {
     
     public Detail getDetail() {
         return detail;
+    }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (other == null || getClass() != other.getClass())
+            return false;
+        IdDetail o = (IdDetail) other;
+        return id.equals(o.id) && detail.equals(o.detail);
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 23895;
+        int mult = 461;
+        
+        hash = hash*mult + id.hashCode();
+        hash = hash*mult + detail.hashCode();
+        
+        return hash;
     }
     
 }
