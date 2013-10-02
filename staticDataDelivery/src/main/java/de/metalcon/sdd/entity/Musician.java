@@ -37,6 +37,11 @@ public class Musician extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Musician";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 
@@ -111,8 +116,8 @@ public class Musician extends Entity {
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("url", generatePrimitive(url));
         j.put("band", generateEntity(band, Detail.SYMBOL));
+        j.put("url", generatePrimitive(url));
         j.put("name", generatePrimitive(name));
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 

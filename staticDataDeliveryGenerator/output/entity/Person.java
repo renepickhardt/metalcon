@@ -25,6 +25,11 @@ public class Person extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Person";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 

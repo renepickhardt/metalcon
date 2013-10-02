@@ -40,6 +40,8 @@ public abstract class Entity {
         id = null;
     }
     
+    public abstract String getType();
+    
     public abstract void loadFromJson(String json);
     
     public abstract void loadFromCreateParams(Map<String, String[]> params);

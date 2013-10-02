@@ -49,11 +49,17 @@ public class ReadRequest extends Request {
         Server s = new Server();
         s.start(); 
         
+        long t = System.currentTimeMillis();
+        
         ReadRequest r = new ReadRequest(s);
-        r.setQuery("11233033e2b36cff:line,2f364c13c0114e16:line,ce0058ac39a33616:profile");
+        r.setQuery("5432:line");
         String json = JSONValue.toJSONString(r.runHttp());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
+        
+        long tt = System.currentTimeMillis();
+        System.out.println(tt - t);
+        
         Thread.sleep(100);
         
         s.stop();

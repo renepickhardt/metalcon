@@ -25,6 +25,11 @@ public class Genre extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Genre";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 

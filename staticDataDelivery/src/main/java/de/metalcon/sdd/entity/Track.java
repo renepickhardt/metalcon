@@ -25,6 +25,11 @@ public class Track extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Track";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 

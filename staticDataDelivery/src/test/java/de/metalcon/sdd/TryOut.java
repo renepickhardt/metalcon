@@ -5,12 +5,17 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
+import de.metalcon.common.Muid;
 
 //import com.mongodb.BasicDBObject;
 //import com.mongodb.DB;
@@ -84,25 +89,77 @@ public class TryOut {
     }
     
     public static void t3() {
-        Neo4jGraph neo4j = new Neo4jGraph("/usr/share/sdd/neo4j");
-        neo4j.createKeyIndex("muid", Vertex.class);
+//        Neo4jGraph neo4j = new Neo4jGraph("/usr/share/sdd/neo4j");
+//        neo4j.createKeyIndex("muid", Vertex.class);
         
 //        Vertex w = neo4j.addVertex(null);
 //        w.setProperty("muid", "2f364c13c0114e16");
 //        neo4j.commit();
         
-        for (Vertex v : neo4j.getVertices("muid", "2f364c13c0114e16")) {
-            System.out.println(v);
+//        for (Vertex v : neo4j.getVertices("muid", "2f364c13c0114e16")) {
+//            System.out.println(v);
+//        }
+//        
+//        neo4j.shutdown();
+    }
+    
+    public static void t4() {
+        GraphDatabaseService neo4j = new GraphDatabaseFactory()
+                .newEmbeddedDatabase("/usr/share/sdd/neo4j");
+        neo4j.shutdown();
+    }
+    
+    @SuppressWarnings("deprecation")
+    public static void t5() {
+        Map<Muid, Node> muidIndex = new HashMap<Muid, Node>(10*1000*1000);
+        
+        GraphDatabaseService graphDb = new GraphDatabaseFactory()
+                .newEmbeddedDatabase("/usr/share/sdd/neo4j");
+        
+//        Index<Node> index = neo4j.index().forNodes("muidIndex");
+        
+        long t = System.currentTimeMillis();
+        
+        Transaction tx = graphDb.beginTx();
+        try {
+            int i = 0;
+            for (Node m : graphDb.getAllNodes()) {
+//                m.delete();
+//            }
+            
+            
+//            for (int i = 0; i != 10 * 1000 * 1000; ++i) {
+//                Node n = neo4j.createNode();
+//                n.setProperty("muid", i);
+                muidIndex.put(new Muid(""+i), m);
+                
+                if (i % 10000 == 0) {
+                    System.out.print(i + ":");
+                    System.out.println(Runtime.getRuntime().totalMemory());
+                    
+//                    tx.success();
+//                    tx.finish();
+//                    tx = neo4j.beginTx();
+                }
+                ++i;
+            }
+            
+            tx.finish();
+        } finally {
         }
         
-        neo4j.shutdown();
+        System.out.println(System.currentTimeMillis() - t);
+        
+        graphDb.shutdown();
     }
     
     public static void main(String[] args) throws IOException,
             UnknownHostException {
 //        t1();
 //        t2();
-        t3();
+//        t3();
+//        t4();
+        t5();
     }
     
 }

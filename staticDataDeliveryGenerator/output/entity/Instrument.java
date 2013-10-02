@@ -25,6 +25,11 @@ public class Instrument extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Instrument";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 

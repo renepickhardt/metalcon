@@ -44,6 +44,11 @@ public class Band extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Band";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 
@@ -135,46 +140,46 @@ public class Band extends Entity {
         // LINE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("name", generatePrimitive(name));
         j.put("city", generateEntity(city, Detail.SYMBOL));
         j.put("foundation", generatePrimitive(foundation));
-        j.put("name", generatePrimitive(name));
         j.put("url", generatePrimitive(url));
         json.put(Detail.LINE, JSONValue.toJSONString(j));
 
         // PARAGRAPH
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
+        j.put("name", generatePrimitive(name));
         j.put("city", generateEntity(city, Detail.LINE));
         j.put("foundation", generatePrimitive(foundation));
-        j.put("records", generateEntityArray(records, Detail.LINE));
-        j.put("name", generatePrimitive(name));
         j.put("url", generatePrimitive(url));
-        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
+        j.put("records", generateEntityArray(records, Detail.LINE));
         json.put(Detail.PARAGRAPH, JSONValue.toJSONString(j));
 
         // PROFILE
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
-        j.put("tours", generateEntityArray(tours, Detail.LINE));
-        j.put("city", generateEntity(city, Detail.LINE));
-        j.put("foundation", generatePrimitive(foundation));
-        j.put("events", generateEntityArray(events, Detail.LINE));
-        j.put("records", generateEntityArray(records, Detail.LINE));
-        j.put("musicians", generateEntityArray(musicians, Detail.LINE));
-        j.put("name", generatePrimitive(name));
-        j.put("url", generatePrimitive(url));
         j.put("genres", generateEntityArray(genres, Detail.LINE));
+        j.put("name", generatePrimitive(name));
+        j.put("musicians", generateEntityArray(musicians, Detail.LINE));
+        j.put("city", generateEntity(city, Detail.LINE));
+        j.put("tours", generateEntityArray(tours, Detail.LINE));
+        j.put("events", generateEntityArray(events, Detail.LINE));
+        j.put("foundation", generatePrimitive(foundation));
+        j.put("url", generatePrimitive(url));
+        j.put("records", generateEntityArray(records, Detail.LINE));
         json.put(Detail.PROFILE, JSONValue.toJSONString(j));
 
         // TOOLTIP
         j = new HashMap<String, Object>();
         j.put("id", getId().toString());
+        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
+        j.put("name", generatePrimitive(name));
         j.put("city", generateEntity(city, Detail.SYMBOL));
         j.put("foundation", generatePrimitive(foundation));
-        j.put("records", generateEntityArray(records, Detail.SYMBOL));
-        j.put("name", generatePrimitive(name));
         j.put("url", generatePrimitive(url));
-        j.put("genres", generateEntityArray(genres, Detail.SYMBOL));
+        j.put("records", generateEntityArray(records, Detail.SYMBOL));
         json.put(Detail.TOOLTIP, JSONValue.toJSONString(j));
 
         // SEARCH_ENTRY

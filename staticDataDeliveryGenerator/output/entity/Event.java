@@ -25,6 +25,11 @@ public class Event extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Event";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 

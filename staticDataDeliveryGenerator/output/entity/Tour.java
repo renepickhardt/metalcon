@@ -25,6 +25,11 @@ public class Tour extends Entity {
     }
 
     @Override
+    public String getType() {
+        return "Tour";
+    }
+
+    @Override
     public void loadFromJson(String json) {
         Map<String, String> entity = parseJson(json);
 
