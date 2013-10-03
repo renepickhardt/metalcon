@@ -16,14 +16,14 @@ public interface HaveInCommons {
 	 * @param uuid2
 	 * @return
 	 */
-	public Set<String> getCommonNodes(String uuid1, String uuid2);
+	public long[] getCommonNodes(long uuid1, long uuid2);
 	
 	/**
 	 * puts a new Edge to the data store.
 	 * @param from
 	 * @param to
 	 */
-	public void putEdge(String from, String to);
+	public void putEdge(long from, long to);
 
 	/**
 	 * deletes an Edge from the graph
@@ -31,10 +31,6 @@ public interface HaveInCommons {
 	 * @param to
 	 * @return true if the edge was in the graph
 	 */
-	public boolean delegeEdge(String from, String to);
-	
-	/**
-	 * Indicates that the data push has finished
-	 */
-	public void putFinished();
+	public boolean delegeEdge(long from, long to);
+
 }
