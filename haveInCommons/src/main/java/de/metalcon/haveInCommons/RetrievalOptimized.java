@@ -132,7 +132,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	 */
 	public void putEdge(String from, String to) {
 		if (storeEdge(from, to)) {
-			updateCommons(from, to);
+			//updateCommons(from, to);
 		}
 	}
 
