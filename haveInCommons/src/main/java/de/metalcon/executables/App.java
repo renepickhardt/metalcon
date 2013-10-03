@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
-import de.metalcon.haveInCommons.NormailzedRetrieval;
+import de.metalcon.haveInCommons.PersistentReadOptimized;
 
 /**
  * Hello world!
@@ -128,8 +128,12 @@ public class App {
 		// run(r);
 
 		System.out.println("RetrievalOptimizedLevelDB:");
-		r = new NormailzedRetrieval();
+		r = new PersistentReadOptimized();
 		run(r);
+
+		// System.out.println("RetrievalOptimizedLevelDB:");
+		// r = new NormailzedRetrieval();
+		// run(r);
 
 		int count = 0;
 		long start = System.nanoTime();

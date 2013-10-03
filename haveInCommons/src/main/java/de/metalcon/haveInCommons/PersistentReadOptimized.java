@@ -3,7 +3,9 @@
  */
 package de.metalcon.haveInCommons;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.neo4j.graphdb.Direction;
@@ -12,10 +14,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.index.lucene.QueryContext;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /**
  * @author Rene Pickhardt
@@ -27,8 +27,8 @@ public class PersistentReadOptimized implements HaveInCommons {
 	/**
 	 * 
 	 */
-	public PersistentReadOptimized(String arg) {
-		graphDB = new GraphDatabaseFactory().newEmbeddedDatabase(arg);
+	public PersistentReadOptimized() {
+		graphDB = new EmbeddedGraphDatabase("/tmp/Neo4j");
 	}
 
 	private void updateCommons(Node from, Node to) {
@@ -67,26 +67,29 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * de.metalcon.haveInCommons.HaveInCommons#getCommonNodes(java.lang.String,
 	 * java.lang.String)
 	 */
-	public Set<String> getCommonNodes(String uuid1, String uuid2) {
-//		Index<Node> ix = graphDB.index().forNodes("commons");
-//		//IndexHits<Node> hits = ix.query("key", new QueryContext("*"));
-//		IndexHits<Node> hits = ix.get("key", uuid1 + "\\:" + uuid2);
+	@Override
+	public long[] getCommonNodes(long uuid1, long uuid2) {
+		// Index<Node> ix = graphDB.index().forNodes("commons");
+		// //IndexHits<Node> hits = ix.query("key", new QueryContext("*"));
+		// IndexHits<Node> hits = ix.get("key", uuid1 + "\\:" + uuid2);
 		Index<Node> ix = graphDB.index().forNodes("nodes");
 		Node from = ix.get("id", uuid1).getSingle();
 		Node to = ix.get("id", uuid2).getSingle();
-		if (to == null || from == null)return null;
+		if (to == null || from == null)
+			return null;
 		Set<String> s = new HashSet<String>();
-		Set<String> res = new HashSet<String>();
-		for (Relationship r : from.getRelationships()){
+		ArrayList<Long> res = new ArrayList<Long>();
+		for (Relationship r : from.getRelationships()) {
 			Node tmp = r.getOtherNode(from);
-			s.add((String)tmp.getProperty("id"));
+			s.add((String) tmp.getProperty("id"));
 		}
-		for (Relationship r : to.getRelationships()){
+		for (Relationship r : to.getRelationships()) {
 			Node tmp = r.getOtherNode(to);
-			String key = (String)tmp.getProperty("id"); 
-			if (s.contains(key))res.add(key);
+			long key = (long) tmp.getProperty("id");
+			if (s.contains(key))
+				res.add(key);
 		}
-		return res;
+		return toPrimitive(res);
 	}
 
 	/*
@@ -95,7 +98,8 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#putEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void putEdge(String from, String to) {
+	@Override
+	public void putEdge(long from, long to) {
 		Transaction tx = graphDB.beginTx();
 		try {
 			storeEdge(from, to);
@@ -115,7 +119,7 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * @param to
 	 * @return
 	 */
-	private void storeEdge(String from, String to) {
+	private void storeEdge(long from, long to) {
 		Node f = null;
 		Node t = null;
 		Index<Node> nodeIndex = graphDB.index().forNodes("nodes");
@@ -136,12 +140,12 @@ public class PersistentReadOptimized implements HaveInCommons {
 				.forRelationships("edges");
 		Relationship r = null;
 		r = relIndex.get("id", from + ":" + to).getSingle();
-		if (r==null){
+		if (r == null) {
 			r = f.createRelationshipTo(t,
 					DynamicRelationshipType.withName("follows"));
 			relIndex.add(r, "id", from + ":" + to);
 		}
-//		updateCommons(f, t);
+		// updateCommons(f, t);
 	}
 
 	/*
@@ -150,9 +154,22 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#delegeEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public boolean delegeEdge(String from, String to) {
+	@Override
+	public boolean deleteEdge(long from, long to) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/*
+	 * Converts a List<Long> to an array of primitive longs
+	 */
+	protected long[] toPrimitive(List<Long> list) {
+		long[] ints = new long[list.size()];
+		int i = 0;
+		for (Long n : list) {
+			ints[i++] = n;
+		}
+		return ints;
 	}
 
 }

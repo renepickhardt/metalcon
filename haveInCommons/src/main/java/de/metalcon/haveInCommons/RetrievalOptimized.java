@@ -164,6 +164,9 @@ public class RetrievalOptimized implements HaveInCommons {
 		return result;
 	}
 
+	/*
+	 * Converts a List<Long> to an array of primitive longs
+	 */
 	protected long[] toPrimitive(List<Long> list) {
 		long[] ints = new long[list.size()];
 		int i = 0;
