@@ -7,28 +7,27 @@ import java.io.IOException;
 import java.util.Set;
 
 import de.metalcon.haveInCommons.HaveInCommons;
+import de.metalcon.haveInCommons.HaveInCommonsInt;
 import de.metalcon.haveInCommons.LuceneRead;
-import de.metalcon.haveInCommons.RetrievalOptimized;
 import de.metalcon.haveInCommons.RetrievalOptimizedLevelDB;
-import de.metalcon.haveInCommons.RetrievalOptimizedSSDB;
 
 /**
  * Hello world!
  * 
  */
 public class App {
-	private static void run(HaveInCommons r) {
-
-		// PersistentReadOptimized r = new
-		// PersistentReadOptimized("plaingraph");
-		// r.putEdge("1", "2");
-		// r.putEdge("2", "3");
-		// r.putEdge("1", "4");
-		// r.putEdge("4", "3");
-
+	private static void run(Object o) {
+		HaveInCommons r = null;
+		HaveInCommonsInt ri = null;
+		if (o instanceof HaveInCommons) {
+			r=(HaveInCommons)o;
+		} else {
+			ri = (HaveInCommonsInt)o;
+		}
 		long start = System.currentTimeMillis();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("../data/ub.csv"));
+			BufferedReader br = new BufferedReader(new FileReader(
+					"../data/ub.csv"));
 			String line = "";
 			int cnt = 0;
 			while ((line = br.readLine()) != null) {
@@ -40,7 +39,7 @@ public class App {
 				cnt++;
 				if (cnt % 500 == 0) {
 					System.out.println(cnt + " edges added");
-					//testInCommons(r,"1", "2");
+					// testInCommons(r,"1", "2");
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -52,13 +51,15 @@ public class App {
 		}
 
 		long end = System.currentTimeMillis();
-		System.out.println("done indexing needed: " + (end - start) + " milliseconds");
+		System.out.println("done indexing needed: " + (end - start)
+				+ " milliseconds");
 
 		if (r instanceof LuceneRead) {
 			start = System.currentTimeMillis();
 			r.putFinished();
 			end = System.currentTimeMillis();
-			System.out.println("Indexing Lucene needed: " + (end - start) + " milliseconds");
+			System.out.println("Indexing Lucene needed: " + (end - start)
+					+ " milliseconds");
 		}
 
 		testInCommons(r, "1", "2");
@@ -91,36 +92,37 @@ public class App {
 		// }
 	}
 
-	public static void testInCommons(HaveInCommons r, String from, String to){
+	public static void testInCommons(HaveInCommons r, String from, String to) {
 		long start = System.nanoTime();
 		Set<String> commons = r.getCommonNodes(from, to);
 		long end = System.nanoTime();
-//		System.out.println("getCommonNodes needed: " + (end - start) / 1000 + " microseconds");
-//
-//		if (commons != null && commons.size() > 0) {
-//			System.out.println(commons.size());
-//			//for (String s : commons) {
-//			//	System.out.println(s);
-////			}
-//		} else {
-//			System.out.println("Metallica and Ensiferum have nothing in common!");
-//		}
-		
+		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
+		// " microseconds");
+		//
+		// if (commons != null && commons.size() > 0) {
+		// System.out.println(commons.size());
+		// //for (String s : commons) {
+		// // System.out.println(s);
+		// // }
+		// } else {
+		// System.out.println("Metallica and Ensiferum have nothing in common!");
+		// }
+
 	}
-	
+
 	public static void main(String[] args) {
 		HaveInCommons r;
-//		System.out.println("Lucene:");
-//		r = new LuceneRead();
-//		run(r);
-//
-//		System.out.println("RetrievalOptimized:");
-//		r = new RetrievalOptimized();
-//		run(r);
-//
-//		System.out.println("RetrievalOptimizedSSDB:");
-//		r = new RetrievalOptimizedSSDB();
-//		run(r);
+		// System.out.println("Lucene:");
+		// r = new LuceneRead();
+		// run(r);
+		//
+		// System.out.println("RetrievalOptimized:");
+		// r = new RetrievalOptimized();
+		// run(r);
+		//
+		// System.out.println("RetrievalOptimizedSSDB:");
+		// r = new RetrievalOptimizedSSDB();
+		// run(r);
 
 		System.out.println("RetrievalOptimizedLevelDB:");
 		r = new RetrievalOptimizedLevelDB();
@@ -128,24 +130,26 @@ public class App {
 
 		int count = 0;
 		long start = System.nanoTime();
-		for (int i = 1; i< 1000;i++){
-			for (int j = 1 ; j< 1000; j++){
-				if (i==j)continue;
+		for (int i = 1; i < 1000; i++) {
+			for (int j = 1; j < 1000; j++) {
+				if (i == j)
+					continue;
 				try {
-					testInCommons(r, i+"", j+"");
-				} catch (Exception e){
+					testInCommons(r, i + "", j + "");
+				} catch (Exception e) {
 					continue;
 				}
 				count++;
-				if (count % 1000 ==0){
-					System.out.println("\t\t"+count);
+				if (count % 1000 == 0) {
+					System.out.println("\t\t" + count);
 				}
 
 			}
 		}
 		long end = System.nanoTime();
-		System.out.println((end - start) /(1000*1000)+ " milliseconds");
-		System.out.println((end - start) / (1000*count) + " microsec per operation");
+		System.out.println((end - start) / (1000 * 1000) + " milliseconds");
+		System.out.println((end - start) / (1000 * count)
+				+ " microsec per operation");
 
 	}
 }
