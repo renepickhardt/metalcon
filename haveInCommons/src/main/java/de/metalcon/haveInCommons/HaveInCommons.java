@@ -32,4 +32,9 @@ public interface HaveInCommons {
 	 * @return true if the edge was in the graph
 	 */
 	public boolean delegeEdge(String from, String to);
+	
+	/**
+	 * Indicates that the data push has finished
+	 */
+	public void putFinished();
 }
