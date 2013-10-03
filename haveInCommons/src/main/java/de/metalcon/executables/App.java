@@ -8,6 +8,7 @@ import java.util.Set;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
+import de.metalcon.haveInCommons.NormailzedRetrieval;
 import de.metalcon.haveInCommons.RetrievalOptimized;
 import de.metalcon.haveInCommons.RetrievalOptimizedLevelDB;
 import de.metalcon.haveInCommons.RetrievalOptimizedSSDB;
@@ -18,16 +19,9 @@ import de.metalcon.haveInCommons.RetrievalOptimizedSSDB;
  */
 public class App {
 	private static void run(HaveInCommons r) {
-
-		// PersistentReadOptimized r = new
-		// PersistentReadOptimized("plaingraph");
-		// r.putEdge("1", "2");
-		// r.putEdge("2", "3");
-		// r.putEdge("1", "4");
-		// r.putEdge("4", "3");
-
 		long start = System.currentTimeMillis();
 		try {
+//			BufferedReader br = new BufferedReader(new FileReader("/var/lib/datasets/rawdata/wikipedia/de/personlizedsearch/wiki-links.tsv"));
 			BufferedReader br = new BufferedReader(new FileReader("../data/ub.csv"));
 			String line = "";
 			long cnt = 0;
@@ -35,8 +29,8 @@ public class App {
 				String[] values = line.split("\t");
 				if (values.length != 2)
 					continue;
-				r.putEdge(values[0], values[1]);
-				r.putEdge(values[1], values[0]);
+				r.putEdge(Long.parseLong(values[0]), Long.parseLong(values[1]));
+				r.putEdge(Long.parseLong(values[1]), Long.parseLong(values[0]));
 				cnt++;
 				if (cnt % 500 == 0) {
 					long tmp = System.currentTimeMillis();
@@ -58,12 +52,12 @@ public class App {
 
 		if (r instanceof LuceneRead) {
 			start = System.currentTimeMillis();
-			r.putFinished();
+//			r.putFinished();
 			end = System.currentTimeMillis();
 			System.out.println("Indexing Lucene needed: " + (end - start) + " milliseconds");
 		}
 
-		testInCommons(r, "1", "2");
+//		testInCommons(r, "1", "2");
 
 		// try {
 		// BufferedReader bufferRead = new BufferedReader(new
@@ -93,9 +87,9 @@ public class App {
 		// }
 	}
 
-	public static void testInCommons(HaveInCommons r, String from, String to){
+	public static void testInCommons(HaveInCommons r, long from, long to){
 		long start = System.nanoTime();
-		Set<String> commons = r.getCommonNodes(from, to);
+		long[] commons = r.getCommonNodes(from, to);
 		long end = System.nanoTime();
 //		System.out.println("getCommonNodes needed: " + (end - start) / 1000 + " microseconds");
 //
@@ -124,17 +118,21 @@ public class App {
 //		r = new RetrievalOptimizedSSDB();
 //		run(r);
 
-		System.out.println("RetrievalOptimizedLevelDB:");
-		r = new RetrievalOptimizedLevelDB();
-		run(r);
+//		System.out.println("RetrievalOptimizedLevelDB:");
+//		r = new RetrievalOptimizedLevelDB();
+//		run(r);
 
+		System.out.println("RetrievalOptimizedLevelDB:");
+		r = new NormailzedRetrieval();
+		run(r);
+		
 		int count = 0;
 		long start = System.nanoTime();
 		for (int i = 1; i< 1000;i++){
 			for (int j = 1 ; j< 1000; j++){
 				if (i==j)continue;
 				try {
-					testInCommons(r, i+"", j+"");
+					testInCommons(r, i, j);
 				} catch (Exception e){
 					continue;
 				}

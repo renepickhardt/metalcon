@@ -27,6 +27,7 @@ public class NormailzedRetrieval implements HaveInCommons {
 	public NormailzedRetrieval() {
 		graph = new DirectedSparseGraph();
         vertexIndex = new HashMap<Long,Vertex>();
+        reverseVertexIndex = new HashMap<Vertex, Long>();
 	}
 
 	/**
