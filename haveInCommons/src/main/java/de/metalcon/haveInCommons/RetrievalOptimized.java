@@ -58,7 +58,7 @@ public class RetrievalOptimized implements HaveInCommons {
 			try {
 				graph.addEdge(edge);
 			} catch (Exception e) {
-				System.out.println("could not add edge");
+				//System.out.println("could not add edge");
 				return false;
 			}
 		}
@@ -132,7 +132,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	 */
 	public void putEdge(String from, String to) {
 		if (storeEdge(from, to)) {
-			//updateCommons(from, to);
+//			updateCommons(from, to);
 		}
 	}
 

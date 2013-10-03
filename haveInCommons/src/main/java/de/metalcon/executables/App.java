@@ -29,7 +29,7 @@ public class App {
 			BufferedReader br = new BufferedReader(new FileReader(
 					"../data/ub.csv"));
 			String line = "";
-			int cnt = 0;
+			long cnt = 0;
 			while ((line = br.readLine()) != null) {
 				String[] values = line.split("\t");
 				if (values.length != 2)
@@ -38,7 +38,9 @@ public class App {
 				r.putEdge(values[1], values[0]);
 				cnt++;
 				if (cnt % 500 == 0) {
-					System.out.println(cnt + " edges added");
+					long tmp = System.currentTimeMillis();
+					System.out.println(cnt + " edges added \t time since start " + (tmp - start) );
+					System.err.println(cnt * 2 * 1000 / (tmp - start) + " edges / sec");
 					// testInCommons(r,"1", "2");
 				}
 			}
