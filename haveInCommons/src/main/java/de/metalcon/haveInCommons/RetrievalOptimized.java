@@ -3,9 +3,9 @@
  */
 package de.metalcon.haveInCommons;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -13,23 +13,23 @@ import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+import edu.uci.ics.jung.utils.UserData;
 
 /**
- * @author Rene Pickhardt
  * @author Jonas Kunze
  */
 public class RetrievalOptimized implements HaveInCommons {
 	protected Graph graph;
-	protected HashMap<String, Vertex> vertices;
-	protected HashMap<String, Set<String>> commonSet;
+	protected HashMap<Long, Vertex> vertices;
+	protected HashMap<byte[], ArrayList<Long>> commonSet;
 
 	/**
 	 * constructor
 	 */
 	public RetrievalOptimized() {
 		graph = new DirectedSparseGraph();
-		vertices = new HashMap<String, Vertex>();
-		commonSet = new HashMap<String, Set<String>>();
+		vertices = new HashMap<Long, Vertex>();
+		commonSet = new HashMap<byte[], ArrayList<Long>>();
 	}
 
 	/**
@@ -38,16 +38,18 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * @return returns true if the edge has been created and false if it already
 	 *         existed
 	 */
-	protected boolean storeEdge(String from, String to) {
+	protected boolean storeEdge(long from, long to) {
 		Vertex f = vertices.get(from);
 		if (f == null) {
 			f = new DirectedSparseVertex();
+			f.setUserDatum("ID", from, UserData.REMOVE);
 			vertices.put(from, f);
 			graph.addVertex(f);
 		}
 		Vertex t = vertices.get(to);
 		if (t == null) {
 			t = new DirectedSparseVertex();
+			f.setUserDatum("ID", to, UserData.REMOVE);
 			vertices.put(to, t);
 			graph.addVertex(t);
 		}
@@ -58,7 +60,7 @@ public class RetrievalOptimized implements HaveInCommons {
 			try {
 				graph.addEdge(edge);
 			} catch (Exception e) {
-				//System.out.println("could not add edge");
+				System.out.println("could not add edge");
 				return false;
 			}
 		}
@@ -73,9 +75,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * @param from
 	 * @param to
 	 */
-	private void updateCommons(String from, String to) {
-		if (from == null || to == null)
-			throw new IllegalArgumentException();
+	protected void updateCommons(long from, long to) {
 		Vertex f = this.vertices.get(from);
 		Vertex t = this.vertices.get(to);
 		// include from to the commons set of (tmp and to)
@@ -83,16 +83,18 @@ public class RetrievalOptimized implements HaveInCommons {
 			if (((DirectedSparseEdge) tmp).getSource() == t) {
 				continue;
 			}
-			String key = ((DirectedSparseEdge) tmp).getSource().toString() + ":" + t.toString();
-			saveCommonSetValue(key, from);
+			long fromKey = (long) ((DirectedSparseEdge) tmp).getSource()
+					.getUserDatum("ID");
+			saveCommonSetValue(fromKey, to, from);
 		}
 		// include to to the commons set of (from and tmp)
 		for (Object tmp : t.getOutEdges()) {
 			if (((DirectedSparseEdge) tmp).getDest() == f) {
 				continue;
 			}
-			String key = f.toString() + ":" + ((DirectedSparseEdge) tmp).getDest().toString();
-			saveCommonSetValue(key, to);
+			long toKey = (long) ((DirectedSparseEdge) tmp).getDest()
+					.getUserDatum("ID");
+			saveCommonSetValue(from, toKey, to);
 		}
 	}
 
@@ -103,21 +105,20 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * de.metalcon.haveInCommons.HaveInCommons#getCommonNodes(java.lang.String,
 	 * java.lang.String)
 	 */
-	public Set<String> getCommonNodes(String uuid1, String uuid2) {
-		Vertex f = vertices.get(uuid1);
-		Vertex t = vertices.get(uuid2);
-		String key = f.toString() + ":" + t.toString();
-		return getCommonSetValue(key);
+	@Override
+	public long[] getCommonNodes(long uuid1, long uuid2) {
+		return toPrimitive(getCommonSetValue(generateKey(uuid1, uuid2)));
 	}
 
-	protected Set<String> getCommonSetValue(String key) {
+	protected ArrayList<Long> getCommonSetValue(byte[] key) {
 		return commonSet.get(key);
 	}
 
-	protected void saveCommonSetValue(String key, String value) {
-		Set<String> s = getCommonSetValue(key);
+	protected void saveCommonSetValue(long from, long to, long value) {
+		byte[] key = generateKey(from, to);
+		ArrayList<Long> s = getCommonSetValue(key);
 		if (s == null) {
-			s = new HashSet<String>();
+			s = new ArrayList<Long>();
 		}
 		s.add(value);
 
@@ -130,9 +131,9 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#putEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void putEdge(String from, String to) {
+	public void putEdge(long from, long to) {
 		if (storeEdge(from, to)) {
-//			updateCommons(from, to);
+			updateCommons(from, to);
 		}
 	}
 
@@ -142,14 +143,33 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#delegeEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public boolean delegeEdge(String from, String to) {
+	@Override
+	public boolean deleteEdge(long from, long to) {
 		return false;
 	}
 
-	@Override
-	public void putFinished() {
-		// TODO Auto-generated method stub
+	public byte[] generateKey(long from, long to) {
+		byte[] result = new byte[8];
 
+		result[0] = (byte) (from >> 24);
+		result[1] = (byte) (from >> 16);
+		result[2] = (byte) (from >> 8);
+		result[3] = (byte) (from);
+
+		result[4] = (byte) (to >> 24);
+		result[5] = (byte) (to >> 16);
+		result[6] = (byte) (to >> 8);
+		result[7] = (byte) (to);
+
+		return result;
 	}
 
+	protected long[] toPrimitive(List<Long> list) {
+		long[] ints = new long[list.size()];
+		int i = 0;
+		for (Long n : list) {
+			ints[i++] = n;
+		}
+		return ints;
+	}
 }

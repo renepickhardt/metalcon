@@ -4,40 +4,46 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Set;
 
 import de.metalcon.haveInCommons.HaveInCommons;
+import de.metalcon.haveInCommons.HaveInCommonsInt;
 import de.metalcon.haveInCommons.LuceneRead;
 import de.metalcon.haveInCommons.RetrievalOptimizedLevelDB;
 
+/**
+ * Hello world!
+ * 
+ */
 public class App {
-	static final String dataFile = "../data/wiki-links.tsv";
-
-	private static void run(HaveInCommons r) {
+	private static void run(Object o) {
+		HaveInCommons r = null;
+		HaveInCommonsInt ri = null;
+		if (o instanceof HaveInCommons) {
+			r=(HaveInCommons)o;
+		} else {
+			ri = (HaveInCommonsInt)o;
+		}
 		long start = System.currentTimeMillis();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(dataFile));
+			BufferedReader br = new BufferedReader(new FileReader(
+					"../data/ub.csv"));
 			String line = "";
 			long cnt = 0;
 			while ((line = br.readLine()) != null) {
 				String[] values = line.split("\t");
 				if (values.length != 2)
 					continue;
-				int from = Integer.parseInt(values[0]);
-				int to = Integer.parseInt(values[1]);
-				r.putEdge(from, to);
-				r.putEdge(to, from);
+				r.putEdge(values[0], values[1]);
+				r.putEdge(values[1], values[0]);
 				cnt++;
 				if (cnt % 500 == 0) {
 					long tmp = System.currentTimeMillis();
-					System.out.println(cnt
-							+ " edges added \t time since start "
-							+ (tmp - start));
-					System.err.println(cnt * 2 * 1000 / (tmp - start)
-							+ " edges / sec");
+					System.out.println(cnt + " edges added \t time since start " + (tmp - start) );
+					System.err.println(cnt * 2 * 1000 / (tmp - start) + " edges / sec");
 					// testInCommons(r,"1", "2");
 				}
 			}
-			br.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,15 +57,14 @@ public class App {
 				+ " milliseconds");
 
 		if (r instanceof LuceneRead) {
-			LuceneRead lr = (LuceneRead) r;
 			start = System.currentTimeMillis();
-			lr.putFinished();
+			r.putFinished();
 			end = System.currentTimeMillis();
 			System.out.println("Indexing Lucene needed: " + (end - start)
 					+ " milliseconds");
 		}
 
-		testInCommons(r, 1, 2);
+		testInCommons(r, "1", "2");
 
 		// try {
 		// BufferedReader bufferRead = new BufferedReader(new
@@ -89,9 +94,9 @@ public class App {
 		// }
 	}
 
-	public static void testInCommons(HaveInCommons r, int from, int to) {
+	public static void testInCommons(HaveInCommons r, String from, String to) {
 		long start = System.nanoTime();
-		int[] commons = r.getCommonNodes(from, to);
+		Set<String> commons = r.getCommonNodes(from, to);
 		long end = System.nanoTime();
 		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
 		// " microseconds");
@@ -132,7 +137,7 @@ public class App {
 				if (i == j)
 					continue;
 				try {
-					testInCommons(r, i, j);
+					testInCommons(r, i + "", j + "");
 				} catch (Exception e) {
 					continue;
 				}

@@ -4,7 +4,6 @@
  */
 package de.metalcon.haveInCommons;
 
-import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
 import java.io.ByteArrayInputStream;
@@ -13,13 +12,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 
-public class RetrievalOptimizedLevelDB extends RetrievalOptimized implements HaveInCommons {
+public class RetrievalOptimizedLevelDB extends RetrievalOptimized implements
+		HaveInCommons {
 	private DB db = null;
 
 	/**
@@ -39,23 +38,23 @@ public class RetrievalOptimizedLevelDB extends RetrievalOptimized implements Hav
 	}
 
 	@Override
-	protected Set<String> getCommonSetValue(String key) {
-		byte[] serializedSet = db.get(bytes(key));
+	protected ArrayList<Long> getCommonSetValue(byte[] key) {
+		byte[] serializedSet = db.get(key);
 		@SuppressWarnings("unchecked")
-		HashSet<String> set = (HashSet<String>) DeSerialize(serializedSet);
+		ArrayList<Long> set = (ArrayList<Long>) DeSerialize(serializedSet);
 		return set;
 	}
 
 	@Override
-	protected void saveCommonSetValue(String key, String value) {
-		Set<String> s = getCommonSetValue(key);
+	protected void saveCommonSetValue(long from, long to, long value) {
+		byte[] key = generateKey(from, to);
+		ArrayList<Long> s = getCommonSetValue(key);
 		if (s == null) {
-			s = new HashSet<String>();
+			s = new ArrayList<Long>();
 		}
 		s.add(value);
 
-		byte[] serializedSet = Serialize(s);
-		db.put(bytes(key), serializedSet);
+		db.put(key, Serialize(s));
 	}
 
 	static public byte[] Serialize(Object obj) {

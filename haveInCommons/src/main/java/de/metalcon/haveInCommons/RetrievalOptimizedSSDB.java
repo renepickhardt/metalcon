@@ -4,18 +4,17 @@
  */
 package de.metalcon.haveInCommons;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.udpwork.ssdb.Response;
 import com.udpwork.ssdb.SSDB;
 
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 
-public class RetrievalOptimizedSSDB extends RetrievalOptimized implements HaveInCommons {
+public class RetrievalOptimizedSSDB extends RetrievalOptimized implements
+		HaveInCommons {
 	private SSDB db = null;
 	private Response resp = null;
 
@@ -76,7 +75,8 @@ public class RetrievalOptimizedSSDB extends RetrievalOptimized implements HaveIn
 			if (((DirectedSparseEdge) tmp).getSource() == t) {
 				continue;
 			}
-			String key = ((DirectedSparseEdge) tmp).getSource().toString() + ":" + t.toString();
+			String key = ((DirectedSparseEdge) tmp).getSource().toString()
+					+ ":" + t.toString();
 			saveCommonSetValue(key, from);
 		}
 		// include to to the commons set of (from and tmp)
@@ -84,7 +84,8 @@ public class RetrievalOptimizedSSDB extends RetrievalOptimized implements HaveIn
 			if (((DirectedSparseEdge) tmp).getDest() == f) {
 				continue;
 			}
-			String key = f.toString() + ":" + ((DirectedSparseEdge) tmp).getDest().toString();
+			String key = f.toString() + ":"
+					+ ((DirectedSparseEdge) tmp).getDest().toString();
 			saveCommonSetValue(key, to);
 		}
 	}
@@ -95,7 +96,7 @@ public class RetrievalOptimizedSSDB extends RetrievalOptimized implements HaveIn
 	 * @see de.metalcon.haveInCommons.HaveInCommons#putEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void putEdge(String from, String to) {
+	public void putEdge(int from, int to) {
 		if (storeEdge(from, to)) {
 			try {
 				updateCommons(from, to);

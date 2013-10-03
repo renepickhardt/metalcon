@@ -6,9 +6,7 @@ package de.metalcon.haveInCommons;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -78,13 +76,13 @@ public class LuceneRead implements HaveInCommons {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.metalcon.haveInCommons.HaveInCommons#getCommonNodes(java.lang.String,
-	 * java.lang.String)
+	 * @see de.metalcon.haveInCommons.HaveInCommons#getCommonNodes(int, int)
 	 */
 	@Override
-	public Set<String> getCommonNodes(String uuid1, String uuid2) {
-		Set<String> result = new HashSet<String>();
+	public long[] getCommonNodes(long from, long to) {
+		String uuid1 = "" + from;
+		String uuid2 = "" + from;
+		long[] result = null;
 		try {
 			Query query0 = neighbourQueryParser.parse(uuid1);
 			Query query1 = neighbourQueryParser.parse(uuid2);
@@ -101,14 +99,16 @@ public class LuceneRead implements HaveInCommons {
 			query0AND1.add(combiQuery0, BooleanClause.Occur.MUST);
 			query0AND1.add(combiQuery1, BooleanClause.Occur.MUST);
 
-			TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(10,
+					true);
 			searcher.search(query0AND1, collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			
+
+			result = new long[hits.length];
 			for (int i = 0; i < hits.length; ++i) {
 				int docId = hits[i].doc;
 				Document d = searcher.doc(docId);
-				result.add(d.get("id"));
+				result[i] = Integer.parseInt(d.get("id"));
 			}
 
 		} catch (ParseException e) {
@@ -128,19 +128,20 @@ public class LuceneRead implements HaveInCommons {
 	 * java.lang.String)
 	 */
 	@Override
-	public void putEdge(String from, String to) {
+	public void putEdge(long from, long to) {
+
 		String value = storage.get(from);
 		if (value != null) {
-			storage.put(from, value + " " + to);
+			storage.put("" + from, value + " " + to);
 		} else {
-			storage.put(from, to);
+			storage.put("" + from, "" + to);
 		}
-		
+
 		value = storage.get(to);
 		if (value != null) {
-			storage.put(to, value + " " + from);
+			storage.put("" + to, value + " " + from);
 		} else {
-			storage.put(to, from);
+			storage.put("" + to, "" + from);
 		}
 	}
 
@@ -151,18 +152,22 @@ public class LuceneRead implements HaveInCommons {
 	 * java.lang.String)
 	 */
 	@Override
-	public boolean delegeEdge(String from, String to) {
+	public boolean deleteEdge(long from, long to) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
+	/*
+	 * Called when all vertices/edges have been pushed (putEdge will not be
+	 * called any more)
+	 */
 	public void putFinished() {
 		try {
 			Directory dir = FSDirectory.open(new File(this.IndexDir));
 
 			analyzer = new StandardAnalyzer(Version.LUCENE_44);
-			IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_44, analyzer);
+			IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_44,
+					analyzer);
 
 			iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
 			// iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
@@ -176,8 +181,10 @@ public class LuceneRead implements HaveInCommons {
 
 			DirectoryReader reader = DirectoryReader.open(dir);
 			searcher = new IndexSearcher(reader);
-			idQueryParser = new QueryParser(Version.LUCENE_44, "id", this.analyzer);
-			neighbourQueryParser = new QueryParser(Version.LUCENE_44, "neighbours", this.analyzer);
+			idQueryParser = new QueryParser(Version.LUCENE_44, "id",
+					this.analyzer);
+			neighbourQueryParser = new QueryParser(Version.LUCENE_44,
+					"neighbours", this.analyzer);
 
 		} catch (IOException e) {
 			e.printStackTrace();
