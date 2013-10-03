@@ -30,4 +30,32 @@ public class NewIndexResponse extends Response {
 						+ " already exists. Please choose another one.");
 	}
 
+	/**
+	 * Adds a requestMustBeMultipart-Error to the response. Expects the String
+	 * to be not NULL and correctly formatted.
+	 * 
+	 * @param noImage
+	 */
+	@SuppressWarnings("unchecked")
+	public void addHttpRequestError(String requestMustBeMultipart) {
+		this.jsonResponse.put(CreateStatusCodes.STATUS_REQUEST_NOT_MULTIPART,
+				requestMustBeMultipart);
+	}
+
+	public void addStatusOk(String statusOk) {
+		this.jsonResponse.put(CreateStatusCodes.STATUS_OK, statusOk);
+
+	}
+
+	public void addIndexNotGivenError(String newIndexnameNotGiven) {
+		this.jsonResponse.put(CreateStatusCodes.NEW_INDEXNAME_NOT_GIVEN,
+				newIndexnameNotGiven);
+
+	}
+
+	public void addIndexAlreadyExistError(String indexName) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

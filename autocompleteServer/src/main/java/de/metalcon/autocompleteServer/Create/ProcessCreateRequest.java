@@ -212,8 +212,6 @@ public class ProcessCreateRequest {
 		String indexName = null;
 		try {
 			indexName = items.getField(ProtocolConstants.INDEX_PARAMETER);
-			System.out.println("indexnamemethod"
-					+ ContextListener.getIndex(indexName, context));
 		} catch (IllegalArgumentException e) {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
 			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;

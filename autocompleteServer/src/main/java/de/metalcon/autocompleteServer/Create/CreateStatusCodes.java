@@ -29,6 +29,8 @@ public class CreateStatusCodes {
 	public static final String SUGGESTION_STRING_TOO_LONG = "Your suggestion string is longer than the limit of "
 			+ ProtocolConstants.MAX_SUGGESTION_LENGTH;
 	public static final String IMAGE_WRONG_TYPE = "Wrong image encoding. Only JPEG encoded images are accepted. Please check your file's type!";
+	public static final String NEW_INDEXNAME_NOT_GIVEN = "Missing index name. You need to specify a name for the new index.";
+	public static final String INDEX_ALREADY_EXISTS = "Index already exists. (New) indices need to have a unique name.";
 
 	// Status Keys
 	public static final String STATUS_OK = "Status:OK";
