@@ -17,20 +17,6 @@
 
   <!-- ENTITIES -->
   <entities>
-    <entity name="City">
-      <attr name="name" type="String"/>
-      <output detail="all">
-        <oattr attr="name"/>
-      </output>
-    </entity>
-    <entity name="Band">
-      <attr name="name" type="String"/>
-      <attr name="city" type="City"/>
-      <output detail="all">
-        <oattr attr="name"/>
-        <oattr attr="city" detail="all"/>
-      </output>
-    </entity>
     <!--<entity name="Band">
       <attr name="name" type="String"/>
       <attr name="url" type="String"/>

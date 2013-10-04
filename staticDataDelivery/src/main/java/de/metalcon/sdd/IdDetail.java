@@ -22,9 +22,12 @@ public class IdDetail {
     }
     
     public IdDetail(Server server, Muid id, Detail detail) {
-        if (server == null || id == null || detail == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
+        if (detail == null)
+            throw new IllegalArgumentException("detail was null");
         
         init(server);
         
@@ -33,9 +36,10 @@ public class IdDetail {
     }
     
     public IdDetail(Server server, String idDetail) {
-        if (server == null || idDetail == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (idDetail == null)
+            throw new IllegalArgumentException("idDetail was null");
         
         init(server);
         

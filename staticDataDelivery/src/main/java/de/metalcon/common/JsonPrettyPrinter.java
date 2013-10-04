@@ -19,6 +19,9 @@ public class JsonPrettyPrinter {
      * @return Returns the repeated string. 
      */
     private static String strrepeat(String str, int times) {
+        if (str == null)
+            return null;
+        
         assert(times >= 0);
         
         String result = "";

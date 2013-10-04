@@ -16,6 +16,9 @@ public class Worker implements Runnable {
     private BlockingQueue<QueueAction> queue;
     
     public Worker(BlockingQueue<QueueAction> queue) {
+        if (queue == null)
+            throw new IllegalArgumentException("queue was null");
+        
         running = false;
         stopping = false;
         this.queue = queue;

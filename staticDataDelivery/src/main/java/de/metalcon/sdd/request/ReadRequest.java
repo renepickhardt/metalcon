@@ -22,6 +22,9 @@ public class ReadRequest extends Request {
     }
 
     public void setQuery(String query) {
+        if (query == null)
+            throw new IllegalArgumentException("query was null");
+        
         this.query = query;
     }
 

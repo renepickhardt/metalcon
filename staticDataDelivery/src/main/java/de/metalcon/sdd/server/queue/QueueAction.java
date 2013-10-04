@@ -10,9 +10,10 @@ public abstract class QueueAction implements Comparable<QueueAction> {
     protected Muid id;
     
     public QueueAction(Server server, Muid id) {
-        if (server == null || id == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
         
         this.server = server;
         this.id     = id;
@@ -22,6 +23,9 @@ public abstract class QueueAction implements Comparable<QueueAction> {
     
     @Override
     public int compareTo(QueueAction other) {
+        if (other == null)
+            return -1;
+        
         Class<?> thisclass = getClass();
         Class<?> otherclass = other.getClass();
         

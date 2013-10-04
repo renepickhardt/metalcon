@@ -153,13 +153,34 @@ public class TryOut {
         graphDb.shutdown();
     }
     
+    public static void t6() {
+        int a = 4;
+        switch(a) {
+            case 1:
+                System.out.println("a");
+                break;
+            case 2:
+                System.out.println("b");
+                break;
+            case 3:
+                System.out.println("c");
+                break;
+            case 4:
+                System.out.println("d");
+            case 5:
+                System.out.println("e");
+                break;
+        }
+    }
+    
     public static void main(String[] args) throws IOException,
             UnknownHostException {
 //        t1();
 //        t2();
 //        t3();
 //        t4();
-        t5();
+//        t5();
+        t6();
     }
     
 }

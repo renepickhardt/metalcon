@@ -108,6 +108,9 @@ public class Server implements ServletContextListener {
     }
     
     public boolean queueAction(QueueAction action) {
+        if (action == null)
+            throw new IllegalArgumentException("action was null");
+        
         if (queue.contains(action))
             return true;
         else
@@ -119,13 +122,15 @@ public class Server implements ServletContextListener {
      */
     public String readEntityJson(IdDetail idDetail) {
         if (idDetail == null)
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new IllegalArgumentException("idDetail was null");
         
         return asString(jsonDb.get(bytes(idDetail.toString())));
     }
     
     public void updateEntityJson(Entity entity) {
+        if (entity == null)
+            throw new IllegalArgumentException("entity was null");
+        
         WriteBatch batch = jsonDb.createWriteBatch();
         try {
             for (String metaDetail : config.details) {
@@ -146,6 +151,9 @@ public class Server implements ServletContextListener {
     }
     
     public void deleteEntityJson(Muid id) {
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
+            
         WriteBatch batch = jsonDb.createWriteBatch();
         try {
             for (String metaDetail : config.details) {
@@ -168,8 +176,7 @@ public class Server implements ServletContextListener {
      */
     public Map<String, String> readEntityGraph(Muid id) {
         if (id == null)
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new IllegalArgumentException("id was null");
         
         Node entityNode = entityGraphMuidIndex.get(id);
         if (entityNode == null)
@@ -182,6 +189,9 @@ public class Server implements ServletContextListener {
     }
 
     public void updateEntityGraph(Entity entity) {
+        if (entity == null)
+            throw new IllegalArgumentException("entity was null");
+        
         Muid id = entity.getId();
         Set<Muid> dependencies = entity.getDependencies();
         
@@ -235,6 +245,9 @@ public class Server implements ServletContextListener {
     }
     
     public void deleteEntityGraph(Muid id) {
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
+        
         Transaction tx = entityGraph.beginTx();
         try {
             Node entityNode = entityGraphMuidIndex.get(id);
@@ -253,6 +266,9 @@ public class Server implements ServletContextListener {
      
     // TODO: optimize dependency update
     public void updateEntityDependencies(Muid id) {
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
+        
         Node entityNode = entityGraphMuidIndex.get(id);
         if (entityNode == null)
             // TODO: handle this
@@ -280,6 +296,8 @@ public class Server implements ServletContextListener {
     
     
     public void deleteEntityDependenciesGraph(Muid id) {
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
     }
     
 //    public void writeEntity(Entity entity) {

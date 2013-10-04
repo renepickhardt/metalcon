@@ -14,10 +14,16 @@ public abstract class Request {
     protected Map<String, String[]> params;
 
     public Request(Server server) {
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        
         this.server = server;
     }
     
     public void setParams(Map<String, String[]> params) {
+        if (params == null)
+            throw new IllegalArgumentException("params was null");
+        
         this.params = params;
     }
     

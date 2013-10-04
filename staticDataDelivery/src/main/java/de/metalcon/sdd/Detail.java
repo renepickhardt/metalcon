@@ -10,9 +10,10 @@ public class Detail {
     private String detail;
     
     public Detail(Server server, String detail) {
-        if (server == null || detail == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (detail == null)
+            throw new IllegalArgumentException("detail was null");
         
         if (!server.config.details.contains(detail))
             // TODO: handle this

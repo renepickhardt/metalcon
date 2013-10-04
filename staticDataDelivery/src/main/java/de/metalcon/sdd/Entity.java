@@ -44,9 +44,10 @@ public class Entity {
     }
     
     public Entity(Server server, Muid id) {
-        if (server == null || id == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (id == null)
+            throw new IllegalArgumentException("id was null");
         
         init(server);
         
@@ -57,9 +58,10 @@ public class Entity {
     }
     
     public Entity(Server server, Map<String, String[]> params) {
-        if (server == null || params == null)
-            // TODO: handle this
-            throw new RuntimeException();
+        if (server == null)
+            throw new IllegalArgumentException("server was null");
+        if (params == null)
+            throw new IllegalArgumentException("params was null");
         
         init(server);
         
@@ -93,10 +95,6 @@ public class Entity {
     }
     
     private void loadFromGraph(String paramType) {
-        if (id == null)
-            // TODO: handle this
-            throw new RuntimeException();
-       
         Map<String, String> attrs = server.readEntityGraph(id);
         
         if (attrs == null) { // entity is new for server
@@ -224,6 +222,9 @@ public class Entity {
     }
     
     public String getJson(Detail detail) {
+        if (detail == null)
+            throw new IllegalArgumentException("detail was null");
+        
         return jsons.get(detail);
     }
     

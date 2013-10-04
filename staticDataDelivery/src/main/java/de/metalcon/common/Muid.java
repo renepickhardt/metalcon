@@ -6,8 +6,8 @@ public class Muid {
     
     public Muid(String id) {
         if (id == null)
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new IllegalArgumentException("id was null");
+        
         // TODO: check if is valid MUID
         this.id = id;
     }

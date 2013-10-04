@@ -12,8 +12,7 @@ public class MetaType {
     
     public MetaType(String type) {
         if (type == null)
-            // TODO: handle this
-            throw new RuntimeException();
+            throw new IllegalArgumentException("type was null");
         
         this.type   = type;
         isArray     = false;
