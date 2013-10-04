@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
+import de.metalcon.haveInCommons.NormailzedRetrieval;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
 
 /**
@@ -14,7 +15,7 @@ import de.metalcon.haveInCommons.PersistentReadOptimized;
  * 
  */
 public class App {
-	private static final String DataFile = "../data/ub.csv";
+	private static final String DataFile = "../data/power.csv";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -24,19 +25,35 @@ public class App {
 			BufferedReader br = new BufferedReader(new FileReader(DataFile));
 			String line = "";
 			long cnt = 0;
+			long nodecnt = 0;
 			while ((line = br.readLine()) != null) {
-				String[] values = line.split("\t");
-				if (values.length != 2)
+				String[] values = line.split("\\s");
+				if (values.length < 2) {
 					continue;
-				r.putEdge(Long.parseLong(values[0]), Long.parseLong(values[1]));
-				r.putEdge(Long.parseLong(values[1]), Long.parseLong(values[0]));
-				cnt++;
-				if (cnt % 500 == 0) {
+				} else if (values.length == 2) {
+					r.putEdge(Long.parseLong(values[0]),
+							Long.parseLong(values[1]));
+					cnt++;
+
+					r.putEdge(Long.parseLong(values[1]),
+							Long.parseLong(values[0]));
+					cnt++;
+
+				} else {
+					for (int i = 1; i < values.length; i++) {
+						r.putEdge(Long.parseLong(values[0]),
+								Long.parseLong(values[i]));
+						cnt++;
+
+					}
+				}
+				nodecnt++;
+				if (nodecnt % 500 == 0) {
 					long tmp = System.currentTimeMillis();
-					System.out.println(cnt
+					System.out.println(nodecnt + " nodes processed \t\t" + cnt
 							+ " edges added \t time since start "
 							+ (tmp - start));
-					System.err.println(cnt * 2 * 1000 / (tmp - start)
+					System.err.println(cnt * 1000 / (tmp - start)
 							+ " edges / sec");
 					// testInCommons(r,"1", "2");
 				}
@@ -98,14 +115,14 @@ public class App {
 		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
 		// " microseconds");
 		//
-		 if (commons != null && commons.length > 0) {
-		 System.out.println(commons.length);
-		 for (long s : commons) {
-		  System.out.println(s);
-		  }
-		 } else {
-		 System.out.println("Metallica and Ensiferum have nothing in common!");
-		 }
+//		 if (commons != null && commons.length > 0) {
+//		 System.out.println(commons.length);
+//		 for (long s : commons) {
+//		  System.out.println(s);
+//		  }
+//		 } else {
+//		 System.out.println("Metallica and Ensiferum have nothing in common!");
+//		 }
 
 	}
 
@@ -127,20 +144,25 @@ public class App {
 		// r = new RetrievalOptimizedLevelDB();
 		// run(r);
 
-		System.out.println("RetrievalOptimizedLevelDB:");
-		r = new PersistentReadOptimized();
-		//run(r);
+//		System.out.println("Neo4j:");
+//		r = new PersistentReadOptimized();
+//		run(r);
 
-		testInCommons(r, 2, 3);
-		System.exit(0);
+		System.out.println("JUNG Graph in memory:");
+		r = new NormailzedRetrieval();
+		run(r);
+
+		
+//		testInCommons(r, 2, 3);
+//		System.exit(0);
 		// System.out.println("RetrievalOptimizedLevelDB:");
 		// r = new NormailzedRetrieval();
-		// run(r);
+//		run(r);
 
 		int count = 0;
 		long start = System.nanoTime();
-		for (int i = 1; i < 1000; i++) {
-			for (int j = 1; j < 1000; j++) {
+		for (int i = 99500; i < 100000; i++) {
+			for (int j = 99500; j < 100000; j++) {
 				if (i == j)
 					continue;
 				try {
@@ -149,7 +171,7 @@ public class App {
 					continue;
 				}
 				count++;
-				if (count % 1000 == 0) {
+				if (count % 10 == 0) {
 					System.out.println("\t\t" + count);
 				}
 
