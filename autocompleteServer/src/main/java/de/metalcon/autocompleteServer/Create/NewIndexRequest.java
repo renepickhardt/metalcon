@@ -61,21 +61,21 @@ public class NewIndexRequest {
 	public static NewIndexResponse checkRequestParameter(FormItemList items,
 			NewIndexResponse response, ServletContext context) {
 		statusOk = true;
-		NewIndexContainer newIndexContainer = new NewIndexContainer(context);
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.
 		String indexName = checkIndexName(context, items, response);
-		if (indexName != null) {
-
-			response.addIndexNotGivenError(indexName);
+		if (indexName == null) {
+			statusOk = false;
+			response.addNoIndexError();
 			return response;
 		}
 
 		if (statusOk) {
 			response.addStatusOk(CreateStatusCodes.STATUS_OK);
 		}
-
+		NewIndexContainer newIndexContainer = new NewIndexContainer(context,
+				indexName);
 		response.addContainer(newIndexContainer);
 
 		return response;
@@ -87,8 +87,7 @@ public class NewIndexRequest {
 		try {
 			indexName = items.getField(ProtocolConstants.INDEX_PARAMETER);
 		} catch (IllegalArgumentException e) {
-			response.addIndexNotGivenError(CreateStatusCodes.NEW_INDEXNAME_NOT_GIVEN);
-			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
+			response.addNoIndexError();
 			statusOk = false;
 		}
 

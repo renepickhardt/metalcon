@@ -28,6 +28,8 @@ public class NewIndexServlet extends HttpServlet {
 		super.init(config);
 
 		final ServletContext context = config.getServletContext();
+		this.commandQueue = (BlockingQueue<Command>) context
+				.getAttribute("queue");
 	}
 
 	@Override

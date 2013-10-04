@@ -49,12 +49,6 @@ public class NewIndexResponse extends Response {
 
 	}
 
-	public void addIndexNotGivenError(String newIndexnameNotGiven) {
-		this.jsonResponse.put(CreateStatusCodes.NEW_INDEXNAME_NOT_GIVEN,
-				newIndexnameNotGiven);
-
-	}
-
 	public NewIndexContainer getContainer() {
 
 		return this.container;

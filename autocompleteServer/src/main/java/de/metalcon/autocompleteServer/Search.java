@@ -15,52 +15,40 @@ import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class Search {
 
-	public static void initilizeSuggestTree(ServletContext context) {
+	public static void initializeSuggestTree(ServletContext context) {
 		SuggestTree suggestTree = new SuggestTree(
 				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 
 		try {
-			// FIXME change after debugging
-			File saveFile = new File("/var/lib/tomcat/"
-					+ ProtocolConstants.DEFAULT_INDEX_NAME + ".save");
+			// FIXME change directory to config-variable
+			File saveFile = new File("/var/lib/tomcat/");
+			String[] fileList = saveFile.list();
+			for (String element : fileList) {
+				if (element.endsWith(".save")) {
+					saveFile = new File("/var/lib/tomcat/" + element);
 
-			if (saveFile.exists()) {
+					// System.out.println("filelistpath " + i + " is: "
+					// + fileList[i]);
 
-				FileInputStream fileInputStream = new FileInputStream(saveFile);
+					FileInputStream fileInputStream = new FileInputStream(
+							saveFile);
 
-				ObjectInputStream restore = new ObjectInputStream(
-						fileInputStream);
-				SuggestionComponents suggestTreeEntry = null;
-				while ((suggestTreeEntry = (SuggestionComponents) restore
-						.readObject()) != null) {
-					suggestTree.put(suggestTreeEntry.getSuggestString(),
-							suggestTreeEntry.getWeight(),
-							suggestTreeEntry.getKey());
-					if (suggestTreeEntry.getImageBase64() != null) {
-						imageIndex.put(suggestTreeEntry.getKey(),
-								suggestTreeEntry.getImageBase64());
+					ObjectInputStream restore = new ObjectInputStream(
+							fileInputStream);
+					SuggestionComponents suggestTreeEntry = null;
+					while ((suggestTreeEntry = (SuggestionComponents) restore
+							.readObject()) != null) {
+						suggestTree.put(suggestTreeEntry.getSuggestString(),
+								suggestTreeEntry.getWeight(),
+								suggestTreeEntry.getKey());
+						if (suggestTreeEntry.getImageBase64() != null) {
+							imageIndex.put(suggestTreeEntry.getKey(),
+									suggestTreeEntry.getImageBase64());
+						}
 					}
 				}
-
-				// while (true) {
-				// try {
-				// SuggestionComponents suggestTreeEntry =
-				// (SuggestionComponents) restore
-				// .readObject();
-				// suggestTree.put(suggestTreeEntry.getSuggestString(),
-				// suggestTreeEntry.getWeight(),
-				// suggestTreeEntry.getKey());
-				// // imageIndex.put(suggestTreeEntry.getKey(),
-				// // suggestTreeEntry.getImageBase64());
-				// } catch (EOFException e) {
-				// restore.close();
-				// break;
-				// }
-				//
-				// }
-
 			}
 
 		} catch (IOException | ClassNotFoundException e1) {

@@ -1,10 +1,8 @@
 package de.metalcon.autocompleteServer.Create;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
+import java.io.Serializable;
 
 import javax.servlet.ServletContext;
 
@@ -13,11 +11,12 @@ import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
-public class NewIndexContainer extends Command {
+public class NewIndexContainer extends Command implements Serializable {
 
-	public NewIndexContainer(final ServletContext context) {
+	public NewIndexContainer(final ServletContext context,
+			final String indexName) {
 		super(context);
-		this.indexName = null;
+		this.indexName = indexName;
 	}
 
 	private final String indexName;
@@ -33,15 +32,19 @@ public class NewIndexContainer extends Command {
 		SuggestTree suggestTree = new SuggestTree(
 				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 
-		HashMap<String, String> imageIndex = new HashMap<String, String>();
-
 		ContextListener.setIndex(this.indexName, suggestTree, this.context);
-		ContextListener.setImageIndex(imageIndex, this.context);
 
 		// This creates the database file
+		// FIXME: use config-parameter for file-path
 		File newFile = new File("/var/lib/tomcat/" + this.indexName + ".save");
+		try {
+			newFile.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		this.createFileOnDisc(newFile);
+		// this.createFileOnDisc(newFile);
 
 		this.servlet.commandFinished();
 
@@ -53,24 +56,5 @@ public class NewIndexContainer extends Command {
 
 	public void setRequestServlet(final NewIndexServlet servlet) {
 		this.servlet = servlet;
-	}
-
-	public void createFileOnDisc(File newFile) {
-		try {
-
-			// advice found here:
-			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
-			if (!(newFile.exists())) {
-				FileOutputStream saveFile = new FileOutputStream(newFile, false);
-
-				ObjectOutputStream save = new ObjectOutputStream(saveFile);
-				save.writeObject(this);
-				save.close();
-				saveFile.close();
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
