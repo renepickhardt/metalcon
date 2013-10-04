@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
+import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 
 /**
@@ -14,7 +15,7 @@ import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
  * 
  */
 public class App {
-	private static final String DataFile = "../data/graph10000";
+	private static final String DataFile = "../data/metalcon-all-hashed.csv";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -158,9 +159,9 @@ public class App {
 		// r = new RetrievalOptimizedLevelDB();
 		// run(r);
 
-		// System.out.println("Neo4j:");
-		// r = new PersistentReadOptimized();
-		// run(r);
+//		 System.out.println("Neo4j:");
+//		 r = new PersistentReadOptimized();
+//		 run(r);
 
 		// System.out.println("JUNG Graph in memory:");
 		// r = new NormailzedRetrieval();

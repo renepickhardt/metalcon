@@ -14,6 +14,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
@@ -29,7 +30,7 @@ public class PersistentReadOptimized implements HaveInCommons {
      *
      */
 	public PersistentReadOptimized() {
-		graphDB = new EmbeddedGraphDatabase("neo4j");
+		graphDB = new GraphDatabaseFactory().newEmbeddedDatabase("neo4j");
 		ix = graphDB.index().forNodes("nodes");
 		relIndex = graphDB.index().forRelationships("edges");
 	}
@@ -165,5 +166,4 @@ public class PersistentReadOptimized implements HaveInCommons {
 		}
 		return ints;
 	}
-
 }
