@@ -7,14 +7,14 @@ import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
-import de.metalcon.haveInCommons.PersistentReadOptimized;
+import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 
 /**
  * Hello world!
  * 
  */
 public class App {
-	private static final String DataFile = "../data/wiki-links.tsv";
+	private static final String DataFile = "../data/graph10000";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -24,19 +24,35 @@ public class App {
 			BufferedReader br = new BufferedReader(new FileReader(DataFile));
 			String line = "";
 			long cnt = 0;
+			long nodecnt = 0;
 			while ((line = br.readLine()) != null) {
-				String[] values = line.split("\t");
-				if (values.length != 2)
+				String[] values = line.split("\\s");
+				if (values.length < 2) {
 					continue;
-				r.putEdge(Long.parseLong(values[0]), Long.parseLong(values[1]));
-				r.putEdge(Long.parseLong(values[1]), Long.parseLong(values[0]));
-				cnt++;
-				if (cnt % 500 == 0) {
+				} else if (values.length == 2) {
+					r.putEdge(Long.parseLong(values[0]),
+							Long.parseLong(values[1]));
+					cnt++;
+
+					r.putEdge(Long.parseLong(values[1]),
+							Long.parseLong(values[0]));
+					cnt++;
+
+				} else {
+					for (int i = 1; i < values.length; i++) {
+						r.putEdge(Long.parseLong(values[0]),
+								Long.parseLong(values[i]));
+						cnt++;
+
+					}
+				}
+				nodecnt++;
+				if (nodecnt % 500 == 0) {
 					long tmp = System.currentTimeMillis();
-					System.out.println(cnt
+					System.out.println(nodecnt + " nodes processed \t\t" + cnt
 							+ " edges added \t time since start "
 							+ (tmp - start));
-					System.err.println(cnt * 2 * 1000 / (tmp - start)
+					System.err.println(cnt * 1000 / (tmp - start)
 							+ " edges / sec");
 					// testInCommons(r,"1", "2");
 				}
@@ -98,15 +114,30 @@ public class App {
 		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
 		// " microseconds");
 		//
-		// if (commons != null && commons.size() > 0) {
-		// System.out.println(commons.size());
-		// //for (String s : commons) {
-		// // System.out.println(s);
-		// // }
+		// if (commons != null && commons.length > 0) {
+		// System.out.println(commons.length);
+		// for (long s : commons) {
+		// System.out.println(s);
+		// }
 		// } else {
 		// System.out.println("Metallica and Ensiferum have nothing in common!");
 		// }
 
+	}
+
+	private static void TestSingleNodePreprocessor() {
+		System.out.println("SingleNodePreprocessorNeo4j:");
+		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j(
+				"neo4j");
+
+		for (int i = 0; i < 100; ++i) {
+			long start = System.nanoTime();
+			processor.generateIndex(i);
+			long end = System.nanoTime();
+			System.out.println((end - start) / 1E6f + " milliseconds");
+
+			processor.print(i);
+		}
 	}
 
 	public static void main(String[] args) {
@@ -127,36 +158,44 @@ public class App {
 		// r = new RetrievalOptimizedLevelDB();
 		// run(r);
 
-		System.out.println("RetrievalOptimizedLevelDB:");
-		r = new PersistentReadOptimized();
-		run(r);
+		// System.out.println("Neo4j:");
+		// r = new PersistentReadOptimized();
+		// run(r);
 
+		// System.out.println("JUNG Graph in memory:");
+		// r = new NormailzedRetrieval();
+		// run(r);
+
+		// testInCommons(r, 2, 3);
+		// System.exit(0);
 		// System.out.println("RetrievalOptimizedLevelDB:");
 		// r = new NormailzedRetrieval();
 		// run(r);
 
-		int count = 0;
-		long start = System.nanoTime();
-		for (int i = 1; i < 1000; i++) {
-			for (int j = 1; j < 1000; j++) {
-				if (i == j)
-					continue;
-				try {
-					testInCommons(r, i, j);
-				} catch (Exception e) {
-					continue;
-				}
-				count++;
-				if (count % 1000 == 0) {
-					System.out.println("\t\t" + count);
-				}
+		TestSingleNodePreprocessor();
 
-			}
-		}
-		long end = System.nanoTime();
-		System.out.println((end - start) / (1000 * 1000) + " milliseconds");
-		System.out.println((end - start) / (1000 * count)
-				+ " microsec per operation");
+		//
+		// int count = 0;
+		// long start = System.nanoTime();
+		// for (int i = 99500; i < 100000; i++) {
+		// for (int j = 99500; j < 100000; j++) {
+		// if (i == j)
+		// continue;
+		// try {
+		// testInCommons(r, i, j);
+		// } catch (Exception e) {
+		// continue;
+		// }
+		// count++;
+		// if (count % 10 == 0) {
+		// System.out.println("\t\t" + count);
+		// }
+		// }
+		// }
+		// long end = System.nanoTime();
+		// System.out.println((end - start) / (1000 * 1000) + " milliseconds");
+		// System.out.println((end - start) / (1000 * count)
+		// + " microsec per operation");
 
 	}
 }
