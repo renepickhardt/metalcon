@@ -2,7 +2,6 @@ package de.metalcon.autocompleteServer.Create;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.servlet.ServletContext;
 
@@ -11,7 +10,7 @@ import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
-public class NewIndexContainer extends Command implements Serializable {
+public class NewIndexContainer extends Command {
 
 	public NewIndexContainer(final ServletContext context,
 			final String indexName) {
