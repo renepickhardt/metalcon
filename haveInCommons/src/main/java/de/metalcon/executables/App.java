@@ -7,15 +7,14 @@ import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.LuceneRead;
-import de.metalcon.haveInCommons.NormailzedRetrieval;
-import de.metalcon.haveInCommons.PersistentReadOptimized;
+import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 
 /**
  * Hello world!
  * 
  */
 public class App {
-	private static final String DataFile = "../data/power.csv";
+	private static final String DataFile = "../data/graph10000";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -115,15 +114,30 @@ public class App {
 		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
 		// " microseconds");
 		//
-//		 if (commons != null && commons.length > 0) {
-//		 System.out.println(commons.length);
-//		 for (long s : commons) {
-//		  System.out.println(s);
-//		  }
-//		 } else {
-//		 System.out.println("Metallica and Ensiferum have nothing in common!");
-//		 }
+		// if (commons != null && commons.length > 0) {
+		// System.out.println(commons.length);
+		// for (long s : commons) {
+		// System.out.println(s);
+		// }
+		// } else {
+		// System.out.println("Metallica and Ensiferum have nothing in common!");
+		// }
 
+	}
+
+	private static void TestSingleNodePreprocessor() {
+		System.out.println("SingleNodePreprocessorNeo4j:");
+		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j(
+				"neo4j");
+
+		for (int i = 0; i < 100; ++i) {
+			long start = System.nanoTime();
+			processor.generateIndex(i);
+			long end = System.nanoTime();
+			System.out.println((end - start) / 1E6f + " milliseconds");
+
+			processor.print(i);
+		}
 	}
 
 	public static void main(String[] args) {
@@ -144,43 +158,44 @@ public class App {
 		// r = new RetrievalOptimizedLevelDB();
 		// run(r);
 
-//		System.out.println("Neo4j:");
-//		r = new PersistentReadOptimized();
-//		run(r);
+		// System.out.println("Neo4j:");
+		// r = new PersistentReadOptimized();
+		// run(r);
 
-		System.out.println("JUNG Graph in memory:");
-		r = new NormailzedRetrieval();
-		run(r);
+		// System.out.println("JUNG Graph in memory:");
+		// r = new NormailzedRetrieval();
+		// run(r);
 
-		
-//		testInCommons(r, 2, 3);
-//		System.exit(0);
+		// testInCommons(r, 2, 3);
+		// System.exit(0);
 		// System.out.println("RetrievalOptimizedLevelDB:");
 		// r = new NormailzedRetrieval();
-//		run(r);
+		// run(r);
 
-		int count = 0;
-		long start = System.nanoTime();
-		for (int i = 99500; i < 100000; i++) {
-			for (int j = 99500; j < 100000; j++) {
-				if (i == j)
-					continue;
-				try {
-					testInCommons(r, i, j);
-				} catch (Exception e) {
-					continue;
-				}
-				count++;
-				if (count % 10 == 0) {
-					System.out.println("\t\t" + count);
-				}
+		TestSingleNodePreprocessor();
 
-			}
-		}
-		long end = System.nanoTime();
-		System.out.println((end - start) / (1000 * 1000) + " milliseconds");
-		System.out.println((end - start) / (1000 * count)
-				+ " microsec per operation");
+		//
+		// int count = 0;
+		// long start = System.nanoTime();
+		// for (int i = 99500; i < 100000; i++) {
+		// for (int j = 99500; j < 100000; j++) {
+		// if (i == j)
+		// continue;
+		// try {
+		// testInCommons(r, i, j);
+		// } catch (Exception e) {
+		// continue;
+		// }
+		// count++;
+		// if (count % 10 == 0) {
+		// System.out.println("\t\t" + count);
+		// }
+		// }
+		// }
+		// long end = System.nanoTime();
+		// System.out.println((end - start) / (1000 * 1000) + " milliseconds");
+		// System.out.println((end - start) / (1000 * count)
+		// + " microsec per operation");
 
 	}
 }

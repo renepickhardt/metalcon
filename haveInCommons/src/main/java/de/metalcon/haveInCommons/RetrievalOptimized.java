@@ -21,6 +21,7 @@ import edu.uci.ics.jung.utils.UserData;
 public class RetrievalOptimized implements HaveInCommons {
 	protected Graph graph;
 	protected HashMap<Long, Vertex> vertices;
+	protected HashMap<Vertex, Long> reverseIndex;
 	protected HashMap<byte[], ArrayList<Long>> commonSet;
 
 	/**
@@ -29,6 +30,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	public RetrievalOptimized() {
 		graph = new DirectedSparseGraph();
 		vertices = new HashMap<Long, Vertex>();
+		reverseIndex = new HashMap<Vertex, Long>();
 		commonSet = new HashMap<byte[], ArrayList<Long>>();
 	}
 
@@ -42,15 +44,17 @@ public class RetrievalOptimized implements HaveInCommons {
 		Vertex f = vertices.get(from);
 		if (f == null) {
 			f = new DirectedSparseVertex();
-			f.setUserDatum("ID", from, UserData.REMOVE);
+//			f.setUserDatum("ID", from, UserData.REMOVE);
 			vertices.put(from, f);
+			reverseIndex.put(f, from);
 			graph.addVertex(f);
 		}
 		Vertex t = vertices.get(to);
 		if (t == null) {
 			t = new DirectedSparseVertex();
-			f.setUserDatum("ID", to, UserData.REMOVE);
+//			f.setUserDatum("ID", to, UserData.REMOVE);
 			vertices.put(to, t);
+			reverseIndex.put(t, to);
 			graph.addVertex(t);
 		}
 		Edge edge = new DirectedSparseEdge(f, t);
@@ -83,8 +87,11 @@ public class RetrievalOptimized implements HaveInCommons {
 			if (((DirectedSparseEdge) tmp).getSource() == t) {
 				continue;
 			}
-			long fromKey = (long) ((DirectedSparseEdge) tmp).getSource()
-					.getUserDatum("ID");
+
+			// long fromKey = (long) ((DirectedSparseEdge) tmp).getSource()
+			// .getUserDatum("ID");
+			long fromKey = reverseIndex.get(((DirectedSparseEdge) tmp)
+					.getSource());
 			saveCommonSetValue(fromKey, to, from);
 		}
 		// include to to the commons set of (from and tmp)
@@ -92,8 +99,9 @@ public class RetrievalOptimized implements HaveInCommons {
 			if (((DirectedSparseEdge) tmp).getDest() == f) {
 				continue;
 			}
-			long toKey = (long) ((DirectedSparseEdge) tmp).getDest()
-					.getUserDatum("ID");
+			// long toKey = (long) ((DirectedSparseEdge) tmp).getDest()
+			// .getUserDatum("ID");
+			long toKey = reverseIndex.get(((DirectedSparseEdge) tmp).getDest());
 			saveCommonSetValue(from, toKey, to);
 		}
 	}
