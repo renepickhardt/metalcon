@@ -34,4 +34,9 @@ public interface HaveInCommons {
 	 * @return true if the edge was in the graph
 	 */
 	public boolean deleteEdge(long from, long to);
+	
+	/**
+	 * Flush DB connections
+	 */
+	public void flush();
 }

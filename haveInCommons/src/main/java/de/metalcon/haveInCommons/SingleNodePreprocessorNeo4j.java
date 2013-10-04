@@ -53,8 +53,12 @@ public class SingleNodePreprocessorNeo4j {
 	 * 
 	 * This will be stored in the main Map: commonsMap.get(1).get(3).add(2);
 	 */
-	public void generateIndex(long uuid) {
+	public boolean generateIndex(long uuid) {
 		Node mainNode = ix.get("id", uuid).getSingle();
+		if (mainNode == null) {
+			System.err.println("Node with ID " + uuid + " not found!!!");
+			return false;
+		}
 
 		HashMap<Long, HashSet<Long>> thisUserMap = commonsMap.get(uuid);
 		if (thisUserMap == null) {
@@ -77,6 +81,7 @@ public class SingleNodePreprocessorNeo4j {
 			}
 			conceptFollowers.add(neighbourID);
 		}
+		return true;
 	}
 
 	public long[] getCommonNodes(long uuid1, long uuid2) {
@@ -100,9 +105,15 @@ public class SingleNodePreprocessorNeo4j {
 		System.out.println(commonsMap.size() + " User cached");
 		System.out.println(conceptMap.size() + " concepts for this user");
 
+		int maxSize = 0;
 		for (Long concept : conceptMap.keySet()) {
-			System.out.println("# of in common users with " + concept + ": "
-					+ conceptMap.get(concept).size());
+			int size = conceptMap.get(concept).size();
+			if (size > maxSize) {
+				maxSize = size;
+			}
+//			System.out.println("# of in common users with " + concept + ": "
+//					+ conceptMap.get(concept).size());
 		}
+		System.out.println("Maximum commons list size: "+maxSize+" out of "+conceptMap.size());
 	}
 }

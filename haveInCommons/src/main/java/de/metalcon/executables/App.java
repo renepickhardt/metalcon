@@ -38,7 +38,6 @@ public class App {
 					r.putEdge(Long.parseLong(values[1]),
 							Long.parseLong(values[0]));
 					cnt++;
-
 				} else {
 					for (int i = 1; i < values.length; i++) {
 						r.putEdge(Long.parseLong(values[0]),
@@ -58,6 +57,7 @@ public class App {
 					// testInCommons(r,"1", "2");
 				}
 			}
+			r.flush();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,13 +131,13 @@ public class App {
 		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j(
 				"neo4j");
 
-		for (int i = 0; i < 100; ++i) {
+		for (int i = 1; i < 100; ++i) {
 			long start = System.nanoTime();
-			processor.generateIndex(i);
-			long end = System.nanoTime();
-			System.out.println((end - start) / 1E6f + " milliseconds");
-
-			processor.print(i);
+			if (processor.generateIndex(i)) {
+				long end = System.nanoTime();
+				System.out.println((end - start) / 1E6f + " milliseconds");
+				processor.print(i);
+			}
 		}
 	}
 
@@ -159,9 +159,9 @@ public class App {
 		// r = new RetrievalOptimizedLevelDB();
 		// run(r);
 
-//		 System.out.println("Neo4j:");
-//		 r = new PersistentReadOptimized();
-//		 run(r);
+//		System.out.println("Neo4j:");
+//		r = new PersistentReadOptimized();
+//		run(r);
 
 		// System.out.println("JUNG Graph in memory:");
 		// r = new NormailzedRetrieval();
@@ -173,7 +173,7 @@ public class App {
 		// r = new NormailzedRetrieval();
 		// run(r);
 
-		TestSingleNodePreprocessor();
+		 TestSingleNodePreprocessor();
 
 		//
 		// int count = 0;

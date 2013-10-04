@@ -203,4 +203,10 @@ public class PersistentReadOptimizedHased implements HaveInCommons {
         return i;
     }
 
+	@Override
+	public void flush() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

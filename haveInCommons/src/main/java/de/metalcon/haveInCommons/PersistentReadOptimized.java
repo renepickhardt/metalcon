@@ -79,35 +79,35 @@ public class PersistentReadOptimized implements HaveInCommons {
 
 	@Override
 	public void putEdge(long from, long to) {
-		if (putBuffer_1.size() < bufSize) {
-			putBuffer_1.add(from);
-			putBuffer_2.add(to);
-		} else {
-			Transaction tx = graphDB.beginTx();
-
-			try {
-
-				for (int i = 0; i < bufSize; i++) {
-
-					storeEdge(putBuffer_1.get(i), putBuffer_2.get(i));
-
-				}
-
-				tx.success();
-
-				putBuffer_1.clear();
-				putBuffer_2.clear();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				tx.failure();
-				System.exit(-1);
-				return;
-			} finally {
-				tx.finish();
-			}
+		putBuffer_1.add(from);
+		putBuffer_2.add(to);
+		if (putBuffer_1.size() == bufSize) {
+			flush();
 		}
+	}
 
+	@Override
+	public void flush() {
+		Transaction tx = graphDB.beginTx();
+		try {
+
+			for (int i = 0; i < bufSize; i++) {
+				storeEdge(putBuffer_1.get(i), putBuffer_2.get(i));
+			}
+
+			tx.success();
+
+			putBuffer_1.clear();
+			putBuffer_2.clear();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			tx.failure();
+			System.exit(-1);
+			return;
+		} finally {
+			tx.finish();
+		}
 	}
 
 	/**
