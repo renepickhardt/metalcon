@@ -1,10 +1,14 @@
 package de.metalcon.autocompleteServer.Create;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import de.metalcon.autocompleteServer.AppendingObjectOutputStream;
 import de.metalcon.autocompleteServer.Command;
 import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
@@ -58,4 +62,22 @@ public class CreateRequestContainer extends Command {
 		this.servlet = servlet;
 	}
 
+	public void saveToDisc(File createFile) {
+		try {
+
+			// advice found here:
+			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
+			if (!(createFile.exists())) {
+				FileOutputStream saveFile = new FileOutputStream(createFile,
+						false);
+
+				ObjectOutputStream save = new ObjectOutputStream(saveFile);
+				save.writeObject(this);
+				save.close();
+				saveFile.close();
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 }
