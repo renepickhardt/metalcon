@@ -14,7 +14,7 @@ import de.metalcon.haveInCommons.PersistentReadOptimized;
  * 
  */
 public class App {
-	private static final String DataFile = "../data/wiki-links.tsv";
+	private static final String DataFile = "../data/graph100000";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -25,11 +25,20 @@ public class App {
 			String line = "";
 			long cnt = 0;
 			while ((line = br.readLine()) != null) {
-				String[] values = line.split("\t");
-				if (values.length != 2)
+				String[] values = line.split("\\s");
+				if (values.length < 2) {
 					continue;
-				r.putEdge(Long.parseLong(values[0]), Long.parseLong(values[1]));
-				r.putEdge(Long.parseLong(values[1]), Long.parseLong(values[0]));
+				} else if (values.length == 2) {
+					r.putEdge(Long.parseLong(values[0]),
+							Long.parseLong(values[1]));
+					r.putEdge(Long.parseLong(values[1]),
+							Long.parseLong(values[0]));
+				} else {
+					for (int i = 1; i < values.length; i++) {
+						r.putEdge(Long.parseLong(values[0]),
+								Long.parseLong(values[i]));
+					}
+				}
 				cnt++;
 				if (cnt % 500 == 0) {
 					long tmp = System.currentTimeMillis();
@@ -137,8 +146,8 @@ public class App {
 
 		int count = 0;
 		long start = System.nanoTime();
-		for (int i = 1; i < 1000; i++) {
-			for (int j = 1; j < 1000; j++) {
+		for (int i = 99000; i < 100000; i++) {
+			for (int j = 99000; j < 100000; j++) {
 				if (i == j)
 					continue;
 				try {

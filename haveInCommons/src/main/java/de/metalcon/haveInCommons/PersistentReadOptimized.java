@@ -29,7 +29,7 @@ public class PersistentReadOptimized implements HaveInCommons {
      *
      */
     public PersistentReadOptimized() {
-        graphDB = new EmbeddedGraphDatabase("/home/hartmann/LikeButtonNeo4j");
+        graphDB = new EmbeddedGraphDatabase("neo4j");
         ix = graphDB.index().forNodes("nodes");
         relIndex = graphDB.index().forRelationships("edges");
     }

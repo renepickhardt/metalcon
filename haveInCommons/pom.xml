@@ -61,7 +61,7 @@
 			<artifactId>neo4j-lucene-index</artifactId>
 			<version>1.9.3</version>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
 			<version>4.4.0</version>
@@ -76,7 +76,7 @@
 			<artifactId>lucene-queryparser</artifactId>
 			<version>4.4.0</version>
 		</dependency>
-		<dependency>
+ -->		<dependency>
 			<groupId>org.fusesource.leveldbjni</groupId>
 			<artifactId>leveldbjni-all</artifactId>
 			<version>1.7</version>
