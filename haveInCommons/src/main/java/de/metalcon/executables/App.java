@@ -14,7 +14,7 @@ import de.metalcon.haveInCommons.PersistentReadOptimized;
  * 
  */
 public class App {
-	private static final String DataFile = "../data/wiki-links.tsv";
+	private static final String DataFile = "../data/ub.csv";
 
 	private static void run(HaveInCommons r) {
 		long start = System.currentTimeMillis();
@@ -98,14 +98,14 @@ public class App {
 		// System.out.println("getCommonNodes needed: " + (end - start) / 1000 +
 		// " microseconds");
 		//
-		// if (commons != null && commons.size() > 0) {
-		// System.out.println(commons.size());
-		// //for (String s : commons) {
-		// // System.out.println(s);
-		// // }
-		// } else {
-		// System.out.println("Metallica and Ensiferum have nothing in common!");
-		// }
+		 if (commons != null && commons.length > 0) {
+		 System.out.println(commons.length);
+		 for (long s : commons) {
+		  System.out.println(s);
+		  }
+		 } else {
+		 System.out.println("Metallica and Ensiferum have nothing in common!");
+		 }
 
 	}
 
@@ -129,8 +129,10 @@ public class App {
 
 		System.out.println("RetrievalOptimizedLevelDB:");
 		r = new PersistentReadOptimized();
-		run(r);
+		//run(r);
 
+		testInCommons(r, 2, 3);
+		System.exit(0);
 		// System.out.println("RetrievalOptimizedLevelDB:");
 		// r = new NormailzedRetrieval();
 		// run(r);

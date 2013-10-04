@@ -29,7 +29,7 @@ public class PersistentReadOptimized implements HaveInCommons {
      *
      */
     public PersistentReadOptimized() {
-        graphDB = new EmbeddedGraphDatabase("/home/hartmann/LikeButtonNeo4j");
+        graphDB = new EmbeddedGraphDatabase("neo4j");
         ix = graphDB.index().forNodes("nodes");
         relIndex = graphDB.index().forRelationships("edges");
     }
@@ -49,20 +49,19 @@ public class PersistentReadOptimized implements HaveInCommons {
         if (to == null || from == null)
             return null;
 
-        Set<String> s = new HashSet<String>();
+        Set<Long> s = new HashSet<Long>();
         ArrayList<Long> res = new ArrayList<Long>();
-        for (Relationship r : from.getRelationships()) {
+        for (Relationship r : from.getRelationships(Direction.OUTGOING)) {
             Node tmp = r.getOtherNode(from);
-            s.add((String) tmp.getProperty("id"));
+            s.add((long) tmp.getProperty("id"));
         }
 
-        for (Relationship r : to.getRelationships()) {
+        for (Relationship r : to.getRelationships(Direction.INCOMING)) {
             Node tmp = r.getOtherNode(to);
             long key = (long) tmp.getProperty("id");
             if (s.contains(key))
                 res.add(key);
         }
-
         return toPrimitive(res);
     }
 
