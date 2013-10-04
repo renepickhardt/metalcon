@@ -55,14 +55,14 @@ public class NewIndexResponse extends Response {
 
 	}
 
-	public void addIndexAlreadyExistError(String indexName) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public NewIndexContainer getContainer() {
 
 		return this.container;
+	}
+
+	public void addContainer(NewIndexContainer newIndexContainer) {
+		this.container = newIndexContainer;
+
 	}
 
 }

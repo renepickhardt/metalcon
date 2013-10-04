@@ -61,19 +61,22 @@ public class NewIndexRequest {
 	public static NewIndexResponse checkRequestParameter(FormItemList items,
 			NewIndexResponse response, ServletContext context) {
 		statusOk = true;
+		NewIndexContainer newIndexContainer = new NewIndexContainer(context);
 
 		// When Protocol requirements are not met, response is returned to show
 		// error message and also inhibit creating corrupt entries.
 		String indexName = checkIndexName(context, items, response);
-		if (indexName == null) {
+		if (indexName != null) {
 
-			// TODO
+			response.addIndexNotGivenError(indexName);
 			return response;
 		}
 
 		if (statusOk) {
 			response.addStatusOk(CreateStatusCodes.STATUS_OK);
 		}
+
+		response.addContainer(newIndexContainer);
 
 		return response;
 	}
@@ -91,7 +94,7 @@ public class NewIndexRequest {
 
 		// check if the index we're going to write to exists
 		if (ContextListener.getIndex(indexName, context) != null) {
-			response.addIndexAlreadyExistError(indexName);
+			response.addIndexAlreadyExistsError(indexName);
 			statusOk = false;
 			return null;
 		}
