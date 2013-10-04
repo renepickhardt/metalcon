@@ -11,6 +11,8 @@ public class NewIndexResponse extends Response {
 
 	private final JSONObject jsonResponse;
 
+	private NewIndexContainer container;
+
 	public NewIndexResponse(ServletContext context) {
 		this.jsonResponse = new JSONObject();
 	}
@@ -56,6 +58,11 @@ public class NewIndexResponse extends Response {
 	public void addIndexAlreadyExistError(String indexName) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public NewIndexContainer getContainer() {
+
+		return this.container;
 	}
 
 }

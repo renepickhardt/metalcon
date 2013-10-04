@@ -1,6 +1,9 @@
 package de.metalcon.autocompleteServer.Create;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import javax.servlet.ServletContext;
 
@@ -31,10 +34,9 @@ public class NewIndexContainer extends Command {
 		// TODO
 
 		// This creates the database file
-		File createFile = new File("/var/lib/tomcat/" + this.indexName
-				+ ".save");
+		File newFile = new File("/var/lib/tomcat/" + this.indexName + ".save");
 
-		this.suggestionComponents.saveToDisc(createFile);
+		this.createFileOnDisc(newFile);
 
 		this.servlet.commandFinished();
 
@@ -48,4 +50,22 @@ public class NewIndexContainer extends Command {
 		this.servlet = servlet;
 	}
 
+	public void createFileOnDisc(File newFile) {
+		try {
+
+			// advice found here:
+			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
+			if (!(newFile.exists())) {
+				FileOutputStream saveFile = new FileOutputStream(newFile, false);
+
+				ObjectOutputStream save = new ObjectOutputStream(saveFile);
+				save.writeObject(this);
+				save.close();
+				saveFile.close();
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
