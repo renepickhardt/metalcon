@@ -11,10 +11,6 @@ public class JsonString implements JSONAware {
     private String string;
     
     public JsonString(String string) {
-        if (string == null)
-            // TODO: handle this
-            throw new RuntimeException();
-        
         this.string = string;
     }
     
@@ -25,12 +21,15 @@ public class JsonString implements JSONAware {
     
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (other == this)
             return true;
         if (other == null || getClass() != other.getClass())
             return false;
         JsonString o = (JsonString) other;
-        return string.equals(o.string);
+        if (string == null)
+            return o.string == null;
+        else
+            return string.equals(o.string);
     }
     
     @Override
@@ -38,7 +37,10 @@ public class JsonString implements JSONAware {
         int hash = 92352;
         int mult = 719;
         
-        hash = hash*mult + string.hashCode();
+        if (string == null)
+            hash = hash*mult;
+        else
+            hash = hash*mult + string.hashCode();
         
         return hash;
     }

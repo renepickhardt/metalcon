@@ -3,7 +3,7 @@ package de.metalcon.sdd.server;
 import java.util.concurrent.BlockingQueue;
 
 import de.metalcon.sdd.error.SddError;
-import de.metalcon.sdd.request.Request;
+import de.metalcon.sdd.server.queue.QueueAction;
 
 public class Worker implements Runnable {
     
@@ -13,9 +13,9 @@ public class Worker implements Runnable {
     
     private boolean stopping;
     
-    private BlockingQueue<Request> queue;
+    private BlockingQueue<QueueAction> queue;
     
-    public Worker(BlockingQueue<Request> queue) {
+    public Worker(BlockingQueue<QueueAction> queue) {
         running = false;
         stopping = false;
         this.queue = queue;
@@ -26,11 +26,11 @@ public class Worker implements Runnable {
         running = true;
         
         try {
-            Request request = null;
+            QueueAction queueAction = null;
             while (!stopping) {
                 try {
-                    request = queue.take();
-                    request.runQueueAction();
+                    queueAction = queue.take();
+                    queueAction.runQueueAction();
                 } catch(SddError e) {
                     // A single error in a request does not terminate the server.
                     // TODO: somehow log the error.

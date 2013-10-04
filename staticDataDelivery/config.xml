@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<sdd-config>
+  <leveldb path="/usr/share/sdd/leveldb"/>
+  <neo4j path="/usr/share/sdd/neo4j"/>
+
+  <!-- DETAILS -->
+  <details>
+    <detail name="all"/>
+    <!--<detail name="symbol"/>
+    <detail name="line"/>
+    <detail name="paragraph"/>
+    <detail name="profile"/>
+    <detail name="tooltip"/>
+    <detail name="search_entry"/>
+    <detail name="search_detailed"/>-->
+  </details>
+
+  <!-- ENTITIES -->
+  <entities>
+    <entity name="City">
+      <attr name="name" type="String"/>
+      <output detail="all">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+    <entity name="Band">
+      <attr name="name" type="String"/>
+      <attr name="city" type="City"/>
+      <output detail="all">
+        <oattr attr="name"/>
+        <oattr attr="city" detail="all"/>
+      </output>
+    </entity>
+    <!--<entity name="Band">
+      <attr name="name" type="String"/>
+      <attr name="url" type="String"/>
+      <attr name="foundation" type="String"/>
+      <attr name="city" type="City"/>
+      <attr name="genres" type="Genre[]"/>
+      <attr name="musicians" type="Musician[]"/>
+      <attr name="events" type="Event[]"/>
+      <attr name="tours" type="Tour[]"/>
+      <attr name="records" type="Record[]"/>
+      <output detail="symbol">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+      </output>
+      <output detail="line">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+        <oattr attr="foundation"/>
+        <oattr attr="city" detail="symbol"/>
+      </output>
+      <output detail="paragraph">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+        <oattr attr="foundation"/>
+        <oattr attr="city" detail="line"/>
+        <oattr attr="genres" detail="symbol"/>
+        <oattr attr="records" detail="line"/>
+      </output>
+      <output detail="profile">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+        <oattr attr="foundation"/>
+        <oattr attr="city" detail="line"/>
+        <oattr attr="genres" detail="line"/>
+        <oattr attr="musicians" detail="line"/>
+        <oattr attr="events" detail="line"/>
+        <oattr attr="tours" detail="line"/>
+        <oattr attr="records" detail="line"/>
+      </output>
+      <output detail="tooltip">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+        <oattr attr="foundation"/>
+        <oattr attr="city" detail="symbol"/>
+        <oattr attr="genres" detail="symbol"/>
+        <oattr attr="records" detail="symbol"/>
+      </output>
+      <output detail="search_entry"/>
+      <output detail="search_detailed"/>
+    </entity>
+    <entity name="City">
+    </entity>
+    <entity name="Disc">
+    </entity>
+    <entity name="Event">
+    </entity>
+    <entity name="Genre">
+    </entity>
+    <entity name="Instrument">
+    </entity>
+    <entity name="Musician">
+      <attr name="name" type="String"/>
+      <attr name="url" type="String"/>
+      <attr name="active" type="String"/>
+      <attr name="founder" type="String"/>
+      <attr name="spans" type="String"/>
+      <attr name="band" type="Band"/>
+      <output detail="symbol">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+      </output>
+      <output detail="line">
+        <oattr attr="name"/>
+        <oattr attr="url"/>
+        <oattr attr="band" detail="symbol"/>
+      </output>
+    </entity>
+    <entity name="Person">
+    </entity>
+    <entity name="Record">
+    </entity>
+    <entity name="Tour">
+    </entity>
+    <entity name="Track">
+    </entity>
+    <entity name="Venue">
+    </entity>-->
+  </entities>
+</sdd-config>

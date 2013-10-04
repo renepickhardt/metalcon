@@ -1,29 +1,43 @@
 package de.metalcon.sdd;
 
 import de.metalcon.common.Muid;
-import de.metalcon.sdd.error.IdDetailInvalidDetailSddError;
 import de.metalcon.sdd.error.IdDetailInvalidStringSddError;
+import de.metalcon.sdd.server.Server;
 
 public class IdDetail {
     
-    final public static char delimeter = ':';
+    private String delimeter;
+    
+    @SuppressWarnings("unused")
+    private Server server;
 
     private Muid id;
+    
     private Detail detail;
     
-    public IdDetail(Muid id, Detail detail) {
-        if (id == null || detail == null)
+    public void init(Server server) {
+        this.server = server;
+        
+        delimeter = server.config.getIdDetailDelimeter();
+    }
+    
+    public IdDetail(Server server, Muid id, Detail detail) {
+        if (server == null || id == null || detail == null)
             // TODO: handle this
             throw new RuntimeException();
+        
+        init(server);
         
         this.id = id;
         this.detail = detail;
     }
     
-    public IdDetail(String idDetail) {
-        if (idDetail == null)
+    public IdDetail(Server server, String idDetail) {
+        if (server == null || idDetail == null)
             // TODO: handle this
             throw new RuntimeException();
+        
+        init(server);
         
         int colonPos = idDetail.indexOf(delimeter);
         if (colonPos == -1 || colonPos == 0
@@ -34,13 +48,12 @@ public class IdDetail {
         String detailStr = idDetail.substring(colonPos + 1);
         
         id     = new Muid(idStr);
-        detail = Detail.stringToEnum(detailStr);
-        if (detail == Detail.NONE)
-            throw new IdDetailInvalidDetailSddError(detailStr);
+        detail = new Detail(server, detailStr);
     }
     
+    @Override
     public String toString() {
-        return id.toString() + delimeter + Detail.enumToString(detail);
+        return id.toString() + delimeter + detail.toString();
     }
     
     public Muid getId() {
@@ -53,7 +66,7 @@ public class IdDetail {
     
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (other == this)
             return true;
         if (other == null || getClass() != other.getClass())
             return false;

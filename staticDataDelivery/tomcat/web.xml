@@ -10,11 +10,6 @@
     <servlet-class>de.metalcon.sdd.tomcat.Read</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>Create</servlet-name>
-    <description>TODO</description>
-    <servlet-class>de.metalcon.sdd.tomcat.Create</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>Update</servlet-name>
     <description>TODO</description>
     <servlet-class>de.metalcon.sdd.tomcat.Update</servlet-class>
@@ -27,10 +22,6 @@
   <servlet-mapping>
     <servlet-name>Read</servlet-name>
     <url-pattern>/read</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Create</servlet-name>
-    <url-pattern>/create</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Update</servlet-name>

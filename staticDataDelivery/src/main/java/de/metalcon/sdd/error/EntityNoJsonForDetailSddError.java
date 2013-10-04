@@ -19,7 +19,7 @@ public class EntityNoJsonForDetailSddError extends SddError {
     
     @Override
     public String getSuggestion() {
-        return "The requested detail was \"" + Detail.enumToString(detail) +  "\".\n" +
+        return "The requested detail was \"" + detail +  "\".\n" +
                "Make sure StaticDataDeliveryGenerator generates a JSON response for all detail values.";
     }
     

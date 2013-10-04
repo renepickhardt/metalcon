@@ -9,7 +9,6 @@ import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.common.JsonString;
 import de.metalcon.sdd.IdDetail;
 import de.metalcon.sdd.error.ReadRequestNoQuerySddError;
-import de.metalcon.sdd.error.ReadRequestQueueActionSddError;
 import de.metalcon.sdd.server.Server;
 
 public class ReadRequest extends Request {
@@ -32,35 +31,25 @@ public class ReadRequest extends Request {
 
         if (query == null)
             throw new ReadRequestNoQuerySddError();
-        for (String idDetail : query.split(String.valueOf(queryDelimeter))) {
-            IdDetail entity = new IdDetail(idDetail);
-            result.put(idDetail, new JsonString(server.readEntity(entity)));
+        
+        for (String q : query.split(String.valueOf(queryDelimeter))) {
+            IdDetail idDetail = new IdDetail(server, q);
+            result.put(q, new JsonString(server.readEntityJson(idDetail)));
         }
 
         return result;
-    }
-
-    @Override
-    public void runQueueAction() {
-        throw new ReadRequestQueueActionSddError();
     }
 
     public static void main(String[] args) throws InterruptedException {
         Server s = new Server();
         s.start(); 
         
-        long t = System.currentTimeMillis();
-        
         ReadRequest r = new ReadRequest(s);
-        r.setQuery("5432:line");
+//        r.setQuery("2f364c13c0114e16:line,11233033e2b36cff:line,ce0058ac39a33616:profile");
+        r.setQuery("ec94771fed93cffc:all,664421a1b59263c5:all");
         String json = JSONValue.toJSONString(r.runHttp());
         json = JsonPrettyPrinter.prettyPrintJson(json);
         System.out.println(json);
-        
-        long tt = System.currentTimeMillis();
-        System.out.println(tt - t);
-        
-        Thread.sleep(100);
         
         s.stop();
     }

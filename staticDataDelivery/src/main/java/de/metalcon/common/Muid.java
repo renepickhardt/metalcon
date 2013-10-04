@@ -12,13 +12,14 @@ public class Muid {
         this.id = id;
     }
     
+    @Override
     public String toString() {
         return id;
     }
     
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if (other == this)
             return true;
         if (other == null || getClass() != other.getClass())
             return false;

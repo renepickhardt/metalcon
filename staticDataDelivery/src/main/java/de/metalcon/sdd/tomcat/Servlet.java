@@ -24,6 +24,10 @@ public class Servlet extends HttpServlet {
     }
     
     public static String getParam(Map<String, String[]> params, String key) {
+        if (params == null)
+            // TODO: handle this
+            throw new RuntimeException();
+        
         String[] vals = params.get(key);
         if (vals != null) {
             String val = vals[0];

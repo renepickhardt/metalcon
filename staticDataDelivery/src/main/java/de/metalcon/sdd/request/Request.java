@@ -38,6 +38,4 @@ public abstract class Request {
     
     protected abstract Map<String, Object> runHttpAction();
     
-    public abstract void runQueueAction();
-    
 }

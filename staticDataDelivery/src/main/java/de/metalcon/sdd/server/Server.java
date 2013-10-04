@@ -1,6 +1,5 @@
 package de.metalcon.sdd.server;
 
-import static de.metalcon.sdd.entity.EntityByType.newEntityByType;
 import static org.fusesource.leveldbjni.JniDBFactory.asString;
 import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
@@ -8,11 +7,10 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -32,13 +30,14 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import de.metalcon.common.Muid;
 import de.metalcon.sdd.Detail;
+import de.metalcon.sdd.Entity;
 import de.metalcon.sdd.IdDetail;
-import de.metalcon.sdd.entity.Entity;
-import de.metalcon.sdd.error.ServerDetailNoneSddError;
+import de.metalcon.sdd.config.Config;
 import de.metalcon.sdd.error.ServerLevelDbBatchCloseSddError;
 import de.metalcon.sdd.error.ServerLevelDbCloseSddError;
 import de.metalcon.sdd.error.ServerLevelDbInitializationSddError;
-import de.metalcon.sdd.request.Request;
+import de.metalcon.sdd.server.queue.QueueAction;
+import de.metalcon.sdd.server.queue.UpdateDependencyQueueAction;
 
 public class Server implements ServletContextListener {
 
@@ -46,46 +45,40 @@ public class Server implements ServletContextListener {
         DEPENDS
     }
     
-    private ServerConfig config;
+    public Config config;
     
-    private DB keyvalueDb;
+    private DB jsonDb;
     
-    private GraphDatabaseService graphDb;
+    private GraphDatabaseService entityGraph;
     
-    Map<String, Node> muidIndex;
+    Map<Muid, Node> entityGraphMuidIndex;
     
-    private BlockingQueue<Request> queue;
+    private BlockingQueue<QueueAction> queue;
 
     private Worker worker;
     
-    public Server() {
-        config = new ServerConfig();
-    }
-    
-    public Server(ServerConfig config) {
-        this.config = config;
-    }
-    
     public void start() {
+        config = new Config();
+        
         Options options = new Options();
         options.createIfMissing(true);
         try {
-            keyvalueDb = factory.open(new File(config.getKvDbPath()), options);
+            jsonDb = factory.open(new File(config.getLeveldbPath()),
+                                      options);
         } catch (IOException e) {
             throw new ServerLevelDbInitializationSddError();
         }
         
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
-                config.getGraphDbPath());
+        entityGraph = new GraphDatabaseFactory().newEmbeddedDatabase(
+                config.getNeo4jPath());
         
-        muidIndex = new HashMap<String, Node>();
-        
-        for (Node node : GlobalGraphOperations.at(graphDb).getAllNodes()) {
+        entityGraphMuidIndex = new HashMap<Muid, Node>();
+        for (Node node : GlobalGraphOperations.at(entityGraph).getAllNodes())
             if (node.hasProperty("muid"))
-                muidIndex.put((String) node.getProperty("muid"), node);
-        }
+                entityGraphMuidIndex.put(
+                        new Muid((String) node.getProperty("muid")), node);
         
-        queue = new LinkedBlockingQueue<Request>();
+        queue = new PriorityBlockingQueue<QueueAction>();
         worker = new Worker(queue);
         worker.start();
     }
@@ -94,10 +87,10 @@ public class Server implements ServletContextListener {
         worker.stop();
         worker.waitForShutdown();
         
-        graphDb.shutdown();
+        entityGraph.shutdown();
         
         try {
-            keyvalueDb.close();
+            jsonDb.close();
         } catch (IOException e) {
             throw new ServerLevelDbCloseSddError();
         }
@@ -105,10 +98,8 @@ public class Server implements ServletContextListener {
     
     public void waitUntilQueueEmpty() {
         try {
-            while (!queue.isEmpty()) {
-                System.out.println(queue.size());
+            while (!queue.isEmpty())
                 Thread.sleep(100);
-            }
             Thread.sleep(1000);
         } catch(InterruptedException e) {
             // TODO: handle this
@@ -116,73 +107,125 @@ public class Server implements ServletContextListener {
         }
     }
     
-    public boolean addRequest(Request request) {
-        return queue.offer(request);
+    public boolean queueAction(QueueAction action) {
+        if (queue.contains(action))
+            return true;
+        else
+            return queue.offer(action);
     }
-
+    
     /**
      * @return Returns null if entity does not exist in database.
      */
-    public String readEntity(IdDetail idDetail) {
-        if (idDetail.getDetail() == Detail.NONE)
-            throw new ServerDetailNoneSddError(idDetail);
+    public String readEntityJson(IdDetail idDetail) {
+        if (idDetail == null)
+            // TODO: handle this
+            throw new RuntimeException();
         
-        return asString(keyvalueDb.get(bytes(idDetail.toString())));
+        return asString(jsonDb.get(bytes(idDetail.toString())));
     }
     
-    public void writeEntity(Entity entity) {
-        Muid id = entity.getId();
-//        System.out.println("writeEntity(" + id.toString() + ")");
-        
-        updateDependingOn(entity);
-        updateEntity(entity);
-        updateDependencies(muidIndex.get(id.toString()));
-    }
-
-    private void updateDependingOn(Entity entity) {
-        Muid id = entity.getId();
-        Set<Muid> dependingOn = entity.getDependingOn();
-        String idString = id.toString();
-        
-        Node entityNode = null;
-            
-        Transaction tx = graphDb.beginTx();
+    public void updateEntityJson(Entity entity) {
+        WriteBatch batch = jsonDb.createWriteBatch();
         try {
-            Set<Muid> remainingDependingOn = null;
-            
-            if (!muidIndex.containsKey(idString)) {
-                entityNode = graphDb.createNode();
-                entityNode.setProperty("muid", idString);
-                entityNode.setProperty("type", entity.getType());
-                muidIndex.put(idString, entityNode);
-                
-                remainingDependingOn = dependingOn;
-            } else {
-                entityNode = muidIndex.get(idString);
-                
-                remainingDependingOn = new HashSet<Muid>();
-                remainingDependingOn.addAll(dependingOn);
-                
-                for (Relationship rel : entityNode.getRelationships(
-                        Direction.OUTGOING, GraphRelTypes.DEPENDS))
-                    if (rel.getEndNode().hasProperty("muid")) {
-                        if (!remainingDependingOn.remove((String)
-                                rel.getEndNode().getProperty("muid")))
-                            rel.delete();
-                    } else
-                        // TODO: handle this
-                        throw new RuntimeException();
+            for (String metaDetail : config.details) {
+                Detail   detail   = new Detail(this, metaDetail);
+                IdDetail idDetail = new IdDetail(this, entity.getId(), detail);
+                batch.put(bytes(idDetail.toString()),
+                          bytes(entity.getJson(detail)));
             }
             
-            for (Muid dependId : remainingDependingOn) {
-//                System.out.println("  dependingOn: " + dependId.toString());
-                if (muidIndex.containsKey(dependId.toString()))
-                    entityNode.createRelationshipTo(
-                            muidIndex.get(dependId.toString()),
-                            GraphRelTypes.DEPENDS);
-                else
+            jsonDb.write(batch);
+        } finally {
+            try {
+                batch.close();
+            } catch (IOException e) {
+                throw new ServerLevelDbBatchCloseSddError();
+            }
+        }
+    }
+    
+    public void deleteEntityJson(Muid id) {
+        WriteBatch batch = jsonDb.createWriteBatch();
+        try {
+            for (String metaDetail : config.details) {
+                Detail   detail   = new Detail(this, metaDetail);
+                IdDetail idDetail = new IdDetail(this, id, detail);
+                batch.delete(bytes(idDetail.toString()));
+            }
+             jsonDb.write(batch);
+        } finally {
+            try {
+                batch.close();
+            } catch (IOException e) {
+                throw new ServerLevelDbBatchCloseSddError();
+            }
+        }
+    }
+    
+    /**
+     * @return Returns null if entity does not exists in database.
+     */
+    public Map<String, String> readEntityGraph(Muid id) {
+        if (id == null)
+            // TODO: handle this
+            throw new RuntimeException();
+        
+        Node entityNode = entityGraphMuidIndex.get(id);
+        if (entityNode == null)
+            return null;
+        
+        Map<String, String> attrs = new HashMap<String, String>();
+        for (String key : entityNode.getPropertyKeys())
+            attrs.put(key, (String) entityNode.getProperty(key));
+        return attrs;
+    }
+
+    public void updateEntityGraph(Entity entity) {
+        Muid id = entity.getId();
+        Set<Muid> dependencies = entity.getDependencies();
+        
+        Transaction tx = entityGraph.beginTx();
+        try {
+            Node entityNode = entityGraphMuidIndex.get(id);
+            if (entityNode == null) {
+                entityNode = entityGraph.createNode();
+                entityNode.setProperty("muid", id.toString());
+                entityNode.setProperty("type", entity.getType());
+                entityGraphMuidIndex.put(id, entityNode);
+            } else
+                for (Relationship rel : entityNode.getRelationships(
+                        Direction.OUTGOING, GraphRelTypes.DEPENDS)) {
+                    Node dependency = rel.getEndNode();
+                    if (!dependency.hasProperty("muid"))
+                        // TODO: handle this
+                        throw new RuntimeException();
+                    
+                    Muid dependencyId =
+                            new Muid((String) dependency.getProperty("muid"));
+                    
+                    if (!dependencies.contains(dependencyId))
+                        rel.delete();
+                    else
+                        dependencies.remove(dependencyId);
+                }
+            
+            for (Map.Entry<String, String> attr :
+                    entity.getAttrs().entrySet()) {
+                String attrName  = attr.getKey();
+                String attrValue = attr.getValue();
+                if (!attrName.equals("muid") && !attrName.equals("type"))
+                    entityNode.setProperty(attrName, attrValue);
+            }
+            
+            for (Muid dependencyId : dependencies) {
+                Node dependency = entityGraphMuidIndex.get(dependencyId);
+                if (dependency == null)
                     // TODO: handle this
                     throw new RuntimeException();
+                
+                entityNode.createRelationshipTo(dependency,
+                                                GraphRelTypes.DEPENDS);
             }
             
             tx.success();
@@ -191,60 +234,169 @@ public class Server implements ServletContextListener {
         }
     }
     
-    private void updateEntity(Entity entity) {
-        WriteBatch batch = keyvalueDb.createWriteBatch();
+    public void deleteEntityGraph(Muid id) {
+        Transaction tx = entityGraph.beginTx();
         try {
-            for (Detail detail : Detail.values()) {
-                if (detail == Detail.NONE)
-                    continue;
-                
-                batch.put(
-                        bytes(new IdDetail(entity.getId(), detail).toString()),
-                        bytes(entity.getJson(detail)));
+            Node entityNode = entityGraphMuidIndex.get(id);
+            if (entityNode == null) {
+                // TODO: what happens if we get a delete with a invalid id: ignore or exception?
+            } else {
+                for (Relationship rel : entityNode.getRelationships())
+                    rel.delete();
+                entityNode.delete();
             }
-            
-            keyvalueDb.write(batch);
+            tx.success();
         } finally {
-            try {
-                batch.close();
-            } catch (IOException e) {
-                throw new ServerLevelDbBatchCloseSddError();
-            }
+            tx.finish();
         }
     }
-    
-    private void updateDependencies(Node entityNode) {
+     
+    // TODO: optimize dependency update
+    public void updateEntityDependencies(Muid id) {
+        Node entityNode = entityGraphMuidIndex.get(id);
+        if (entityNode == null)
+            // TODO: handle this
+            throw new RuntimeException();
+        
         for (Relationship rel : entityNode.getRelationships(
                 Direction.INCOMING, GraphRelTypes.DEPENDS)) {
             Node dependencyNode = rel.getStartNode();
-            Entity entity = newEntityByType(
-                    (String) dependencyNode.getProperty("type"), this);
-            entity.loadFromId(
-                    new Muid((String) dependencyNode.getProperty("muid")));
-            updateEntity(entity);
-            updateDependencies(dependencyNode);
+            if (!dependencyNode.hasProperty("muid"))
+                // TODO: handle this
+                throw new RuntimeException();
+            
+            Muid dependencyId =
+                    new Muid((String) dependencyNode.getProperty("muid"));
+            
+            updateEntityDependencies(dependencyId);
+            
+            UpdateDependencyQueueAction action =
+                    new UpdateDependencyQueueAction(this, dependencyId);
+            if (!queueAction(action))
+                // TODO: handle this
+                throw new RuntimeException();
         }
     }
     
-    public void deleteEntity(Muid id) {
-        WriteBatch batch = keyvalueDb.createWriteBatch();
-        try {
-            for (Detail detail : Detail.values()) {
-                if (detail == Detail.NONE)
-                    continue;
-                
-                batch.delete(bytes(new IdDetail(id, detail).toString()));
-            }
-            
-            keyvalueDb.write(batch);
-        } finally {
-            try {
-                batch.close();
-            } catch (IOException e) {
-                throw new ServerLevelDbBatchCloseSddError();
-            }
-        }
+    
+    public void deleteEntityDependenciesGraph(Muid id) {
     }
+    
+//    public void writeEntity(Entity entity) {
+//        Muid id = entity.getId();
+////        System.out.println("writeEntity(" + id.toString() + ")");
+//        
+//        updateDependingOn(entity);
+//        updateEntity(entity);
+//        updateDependencies(muidIndex.get(id.toString()));
+//    }
+//
+//    private void updateDependingOn(Entity entity) {
+//        Muid id = entity.getId();
+//        Set<Muid> dependingOn = entity.getDependingOn();
+//        String idString = id.toString();
+//        
+//        Node entityNode = null;
+//            
+//        Transaction tx = graphDb.beginTx();
+//        try {
+//            Set<Muid> remainingDependingOn = null;
+//            
+//            if (!muidIndex.containsKey(idString)) {
+//                entityNode = graphDb.createNode();
+//                entityNode.setProperty("muid", idString);
+//                entityNode.setProperty("type", entity.getType());
+//                muidIndex.put(idString, entityNode);
+//                
+//                remainingDependingOn = dependingOn;
+//            } else {
+//                entityNode = muidIndex.get(idString);
+//                
+//                remainingDependingOn = new HashSet<Muid>();
+//                remainingDependingOn.addAll(dependingOn);
+//                
+//                for (Relationship rel : entityNode.getRelationships(
+//                        Direction.OUTGOING, GraphRelTypes.DEPENDS))
+//                    if (rel.getEndNode().hasProperty("muid")) {
+//                        if (!remainingDependingOn.remove((String)
+//                                rel.getEndNode().getProperty("muid")))
+//                            rel.delete();
+//                    } else
+//                        // TODO: handle this
+//                        throw new RuntimeException();
+//            }
+//            
+//            for (Muid dependId : remainingDependingOn) {
+////                System.out.println("  dependingOn: " + dependId.toString());
+//                if (muidIndex.containsKey(dependId.toString()))
+//                    entityNode.createRelationshipTo(
+//                            muidIndex.get(dependId.toString()),
+//                            GraphRelTypes.DEPENDS);
+//                else
+//                    // TODO: handle this
+//                    throw new RuntimeException();
+//            }
+//            
+//            tx.success();
+//        } finally {
+//            tx.finish();
+//        }
+//    }
+//    
+//    private void updateEntity(Entity entity) {
+//        WriteBatch batch = keyvalueDb.createWriteBatch();
+//        try {
+//            for (Detail detail : Detail.values()) {
+//                if (detail == Detail.NONE)
+//                    continue;
+//                
+//                batch.put(
+//                        bytes(new IdDetail(entity.getId(), detail).toString()),
+//                        bytes(entity.getJson(detail)));
+//            }
+//            
+//            keyvalueDb.write(batch);
+//        } finally {
+//            try {
+//                batch.close();
+//            } catch (IOException e) {
+//                throw new ServerLevelDbBatchCloseSddError();
+//            }
+//        }
+//    }
+//    
+//    private void updateDependencies(Node entityNode) {
+//        for (Relationship rel : entityNode.getRelationships(
+//                Direction.INCOMING, GraphRelTypes.DEPENDS)) {
+//            Node dependencyNode = rel.getStartNode();
+//            Entity entity = newEntityByType(
+//                    (String) dependencyNode.getProperty("type"), this);
+//            entity.loadFromId(
+//                    new Muid((String) dependencyNode.getProperty("muid")));
+//            updateEntity(entity);
+//            updateDependencies(dependencyNode);
+//        }
+//    }
+//    
+//    public void deleteEntity(Muid id) {
+//        WriteBatch batch = keyvalueDb.createWriteBatch();
+//        try {
+//            for (Detail detail : Detail.values()) {
+//                if (detail == Detail.NONE)
+//                    continue;
+//                
+//                batch.delete(bytes(new IdDetail(id, detail).toString()));
+//            }
+//            
+//            keyvalueDb.write(batch);
+//        } finally {
+//            try {
+//                batch.close();
+//            } catch (IOException e) {
+//                throw new ServerLevelDbBatchCloseSddError();
+//            }
+//        }
+//    }
     
     @Override
     public void contextInitialized(ServletContextEvent arg) {
