@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Command;
 import de.metalcon.autocompleteServer.Helper.ContextListener;
+import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
 public class NewIndexContainer extends Command {
@@ -28,10 +30,13 @@ public class NewIndexContainer extends Command {
 
 	@Override
 	public void run() {
-		SuggestTree suggestTree = ContextListener.getIndex(this.getIndexName(),
-				this.context);
+		SuggestTree suggestTree = new SuggestTree(
+				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 
-		// TODO
+		HashMap<String, String> imageIndex = new HashMap<String, String>();
+
+		ContextListener.setIndex(this.indexName, suggestTree, this.context);
+		ContextListener.setImageIndex(imageIndex, this.context);
 
 		// This creates the database file
 		File newFile = new File("/var/lib/tomcat/" + this.indexName + ".save");
