@@ -14,7 +14,6 @@ import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
  */
 public class App {
 
-
     private static final String DATA_DIR = "/home/hartmann/Desktop/MetalconDev/data/";
     private static final String METALCON_FILE  = DATA_DIR + "metalon-all-hashed.csv";
     private static final String WIKIPEDIA_FILE = "../data/";
@@ -28,6 +27,8 @@ public class App {
         graph = new PersistentReadOptimized();
 
         importGraph(graph, METALCON_FILE);
+
+        TestSingleNodePreprocessor();
 
     }
 
@@ -87,14 +88,19 @@ public class App {
 
 	private static void TestSingleNodePreprocessor() {
 		System.out.println("SingleNodePreprocessorNeo4j:");
-		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j("neo4j");
 
+		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j("neo4j-metalconAll");
+		
+		processor.generateIndex(1);
+		processor.print(1);
+		
 		for (int i = 1; i < 100; ++i) {
 			long start = System.nanoTime();
 			if (processor.generateIndex(i)) {
 				long end = System.nanoTime();
-				System.out.println((end - start) / 1E6f + " milliseconds");
-				processor.print(i);
+				
+				int max = processor.print(i);
+				System.out.println((end - start) / 1E6f + " milliseconds, "+max+ " maximum elements");
 			}
 		}
 	}

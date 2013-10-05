@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.metalcon.haveInCommons;
+package de.metalcon.like;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ import org.neo4j.kernel.Uniqueness;
 /**
  * @author Jonas Kunze
  */
-public class SingleNodePreprocessorNeo4j {
+public class NormalizedFlatFileLikeRetrieval {
 	private GraphDatabaseService graphDB;
 	private Index<Node> ix;
 	private final DynamicRelationshipType followRelationShip = DynamicRelationshipType
@@ -37,7 +37,7 @@ public class SingleNodePreprocessorNeo4j {
 	/**
      *
      */
-	public SingleNodePreprocessorNeo4j(String dbPath) {
+	public NormalizedFlatFileLikeRetrieval(String dbPath) {
 		graphDB = new GraphDatabaseFactory().newEmbeddedDatabase(dbPath);
 		ix = graphDB.index().forNodes("nodes");
 		commonsMap = new HashMap<Long, HashMap<Long, HashSet<Long>>>();

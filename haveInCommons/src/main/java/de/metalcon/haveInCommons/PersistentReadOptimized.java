@@ -73,15 +73,15 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * java.lang.String)
 	 */
 
-	ArrayList<Long> putBuffer_1 = new ArrayList<Long>();
-	ArrayList<Long> putBuffer_2 = new ArrayList<Long>();
+	ArrayList<Long> putBuffer_from = new ArrayList<Long>();
+	ArrayList<Long> putBuffer_to = new ArrayList<Long>();
 	static final int bufSize = 5000;
 
 	@Override
 	public void putEdge(long from, long to) {
-		putBuffer_1.add(from);
-		putBuffer_2.add(to);
-		if (putBuffer_1.size() == bufSize) {
+		putBuffer_from.add(from);
+		putBuffer_to.add(to);
+		if (putBuffer_from.size() == bufSize) {
 			flush();
 		}
 	}
@@ -91,14 +91,14 @@ public class PersistentReadOptimized implements HaveInCommons {
 		Transaction tx = graphDB.beginTx();
 		try {
 
-			for (int i = 0; i < bufSize; i++) {
-				storeEdge(putBuffer_1.get(i), putBuffer_2.get(i));
+			for (int i = 0; i < putBuffer_from.size(); i++) {
+				storeEdge(putBuffer_from.get(i), putBuffer_to.get(i));
 			}
 
 			tx.success();
 
-			putBuffer_1.clear();
-			putBuffer_2.clear();
+			putBuffer_from.clear();
+			putBuffer_to.clear();
 
 		} catch (Exception e) {
 			e.printStackTrace();
