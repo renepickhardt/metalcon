@@ -138,8 +138,9 @@ public class App {
 			long start = System.nanoTime();
 			if (processor.generateIndex(i)) {
 				long end = System.nanoTime();
-				System.out.println((end - start) / 1E6f + " milliseconds");
-				processor.print(i);
+				
+				int max = processor.print(i);
+				System.out.println((end - start) / 1E6f + " milliseconds, "+max+ " maximum elements");
 			}
 		}
 	}
