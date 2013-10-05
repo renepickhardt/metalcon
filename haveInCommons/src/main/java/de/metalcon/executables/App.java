@@ -35,9 +35,9 @@ public class App {
 							Long.parseLong(values[1]));
 					cnt++;
 
-					r.putEdge(Long.parseLong(values[1]),
-							Long.parseLong(values[0]));
-					cnt++;
+//					r.putEdge(Long.parseLong(values[1]),
+//							Long.parseLong(values[0]));
+//					cnt++;
 				} else {
 					for (int i = 1; i < values.length; i++) {
 						r.putEdge(Long.parseLong(values[0]),
@@ -129,8 +129,11 @@ public class App {
 	private static void TestSingleNodePreprocessor() {
 		System.out.println("SingleNodePreprocessorNeo4j:");
 		SingleNodePreprocessorNeo4j processor = new SingleNodePreprocessorNeo4j(
-				"neo4j");
-
+				"neo4j-metalconAll");
+		
+		processor.generateIndex(1);
+		processor.print(1);
+		
 		for (int i = 1; i < 100; ++i) {
 			long start = System.nanoTime();
 			if (processor.generateIndex(i)) {
