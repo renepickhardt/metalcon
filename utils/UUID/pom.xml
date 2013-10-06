@@ -39,6 +39,17 @@
       </roles>
     </developer>
   </developers>
+  
+  
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.5</version>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
     
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -95,4 +106,12 @@
       </plugin>
     </plugins>
   </build>
+  
+  <repositories>
+  <repository>
+    <id>Nexus Sonatype Snapshots</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+  </repository>
+</repositories>
+  
 </project>
