@@ -1,12 +1,8 @@
 package de.metalcon.like;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 /**
@@ -26,18 +22,11 @@ public class Node {
 	private final Commons commons;
 
 	/*
-	 * Stream to a file with all likes in the following format:
-	 * 
-	 * UUID (long), Timestamp (int), Flags (int)
-	 */
-	private FileInputStream likeListFileStream = null;
-	private DataInputStream likeListDataStream = null;
-
-	/*
-	 * lastLikes[lastLikesLastEntryPointer] is the newest like
+	 * lastLikes[lastLikesFirstEntryPointer] is the newest like The list is
+	 * ordered by descending timestamps (newest first)
 	 */
 	private Like[] lastLikes = new Like[LastLikeCacheSize];
-	private int lastLikesLastEntryPointer = 0;
+	private int lastLikesFirstEntryPointer = LastLikeCacheSize;
 
 	/*
 	 * All friends of this node (will not be stored persistently)
@@ -46,12 +35,31 @@ public class Node {
 	private int friendListPointer = 0;
 
 	/**
+	 * Factory method. This will search for a node with the given uuid in a Map
+	 * with all created nodes. If no node has been found a new instance is
+	 * initialized.
+	 * 
+	 * This method is thread safe
+	 * 
+	 * @param uuid
+	 *            The uuid of the new node
+	 * @return A node object with the given uuid
+	 */
+	public static synchronized Node createNode(final long uuid) {
+		Node n = AllNodes.get(uuid);
+		if (n == null) {
+			n = new Node(uuid);
+		}
+		return n;
+	}
+
+	/**
 	 * This Constructor will also add the node to the global list of nodes
 	 * 
 	 * @param UUID
-	 * @throws FileNotFoundException
+	 *            The uuid of the node
 	 */
-	public Node(final long uuid) throws FileNotFoundException {
+	private Node(final long uuid) {
 		this.UUID = uuid;
 		friendList = new Node[10];
 
@@ -77,9 +85,10 @@ public class Node {
 		int likesFoundPointer = 0;
 		int lastLikesPointer = 0;
 
+		Like[] likesFromDisk = null;
+
 		Like nextLike = null;
-		boolean readFromFile = false;
-		for (;;) {
+		while (true) {
 			if (likesFoundPointer == arrayLength) {
 				// Overflow-> Create new array with twice the length
 				arrayLength *= 2;
@@ -87,25 +96,20 @@ public class Node {
 				System.arraycopy(likesFound, 0, tmp, 0, arrayLength / 2);
 				likesFound = tmp;
 			}
-			if (lastLikesPointer != lastLikesLastEntryPointer + 1) {
+			if (lastLikesPointer != lastLikesFirstEntryPointer + 1) {
 				nextLike = lastLikes[lastLikesPointer++];
 			} else {
-				if (!readFromFile) {
-					if (!prepareReadingLikeListFile()) {
-						// Like file does not yet exist
-						break;
-					}
-					readFromFile = true;
-				}
-				try {
-					nextLike = readNextLikeFromFile();
-				} catch (IOException e) {
-					// EOF
-					break;
-				}
-			}
-			if (readFromFile) {
-				stopReadingLikeListFile();
+				/*
+				 * nextLike is now the oldest like we found -> read all likes
+				 * from file that are younger than timestamp but older than
+				 * nextLike.getTimestamp()
+				 * 
+				 * TODO: what if two likes with the same TS exist, but only one
+				 * of those in lastLikes?!
+				 */
+				likesFromDisk = getLikesFromTimeOnFromDisk(timestamp,
+						nextLike.getTimestamp());
+				break;
 			}
 
 			if (nextLike.getTimestamp() > timestamp) {
@@ -113,19 +117,115 @@ public class Node {
 			}
 
 			likesFound[likesFoundPointer++] = nextLike;
+		} // while (true)
+
+		/*
+		 * Merge the two arrays from cache and disk
+		 */
+		if (likesFromDisk != null) {
+			Like[] result = new Like[likesFoundPointer + likesFromDisk.length];
+			System.arraycopy(likesFound, 0, result, 0, likesFoundPointer);
+			System.arraycopy(likesFound, likesFoundPointer, likesFromDisk, 0,
+					likesFromDisk.length);
+			return result;
+		} else {
+			/*
+			 * Remove the empty slots in the array by creating a new array with
+			 * the correct length and copying all found likes into it
+			 */
+			if (likesFoundPointer != likesFound.length) {
+				Like[] shortened = new Like[likesFoundPointer];
+				System.arraycopy(likesFound, 0, shortened, 0, likesFoundPointer);
+				return shortened;
+			}
 		}
 
 		/*
-		 * Remove the empty slots in the array by creating a new array with the
-		 * correct length and copying all found likes into it
+		 * We come here only if all Likes were found in the lastLikes cache and
+		 * the likesFound array was completely filled
 		 */
-		if (likesFoundPointer != likesFound.length) {
-			Like[] shortened = new Like[likesFoundPointer];
-			System.arraycopy(likesFound, 0, shortened, 0, likesFoundPointer);
-			return shortened;
-		}
-
 		return likesFound;
+	}
+
+	/**
+	 * Seeks the persistent likes file and returns an array of all like found
+	 * with the timestamp TS being startTs< TS < stopTS
+	 * 
+	 * @param startTS
+	 *            All returned likes will have a higher timestamp
+	 * @param stopTS
+	 *            All returned likes will have a lower timestamp
+	 * @return The array of all found likes or <code>null</code> if no like was
+	 *         found or the file was empty
+	 */
+	private Like[] getLikesFromTimeOnFromDisk(final int startTS,
+			final int stopTS) {
+
+		try (RandomAccessFile raf = new RandomAccessFile(getLikeListFileName(),
+				"r");) {
+			final long totalLines = raf.length() / 16;
+			if (totalLines == 0) {
+				return null;
+			}
+
+			/*
+			 * TODO: What if the first searched like is at the last line? Check
+			 * if it will be found
+			 */
+			long left = 0, currentLine = totalLines, right = totalLines - 1;
+			int currentTs;
+			while (left != right) {
+				// Goto middle of left and right
+				currentLine = left + ((right - left) / 2);
+
+				raf.seek(currentLine * 16);
+				currentTs = raf.readInt();
+				if (currentTs > startTS) {
+					right = currentLine;
+				} else {
+					if (left == currentLine) {
+						/*
+						 * As currentTs <= searchedTS we need the element one to
+						 * the right
+						 */
+						currentLine = right;
+						break;
+					}
+					left = currentLine;
+				}
+			}
+
+			if (currentLine == totalLines) {
+				return null; // Nothing found: All likes are older than startTS
+			}
+
+			Like[] result = new Like[(int) (totalLines - currentLine)];
+			int resultPointer = 0;
+			raf.seek(currentLine * 16);
+			long uuid;
+			int flags;
+			for (long line = currentLine; line < totalLines; line++) {
+				currentTs = raf.readInt();
+				if (currentTs > stopTS) {
+					break;
+				}
+				uuid = raf.readLong();
+				flags = raf.readInt();
+				result[resultPointer++] = new Like(uuid, currentTs, flags);
+			}
+
+			if (resultPointer < result.length) {
+				Like[] tmp = new Like[resultPointer];
+				System.arraycopy(result, 0, tmp, 0, resultPointer);
+				return tmp;
+			}
+			return result;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -137,27 +237,29 @@ public class Node {
 	 */
 	public boolean addLike(Like like) {
 		/**
-		 * @TODO A like should also call
-		 *       addFriendship(Nodes.GetNode(loke.getUUID()))
+		 * @TODO A like should also call addfp(Nodes.GetNode(like.getUUID()))
 		 */
-		if (lastLikesLastEntryPointer == LastLikeCacheSize) {
-			// swap all elements down one slot. The first element will be
-			// dropped
-			System.arraycopy(lastLikes, 1, lastLikes, 0, LastLikeCacheSize - 1);
+		if (lastLikesFirstEntryPointer == 0) {
+			/*
+			 * Move all elements one slot up. The last (oldest) element will be
+			 * dropped
+			 */
+			System.arraycopy(lastLikes, 0, lastLikes, 1, LastLikeCacheSize - 1);
 		} else {
-			lastLikesLastEntryPointer++;
+			lastLikesFirstEntryPointer--;
 		}
 
-		lastLikes[lastLikesLastEntryPointer] = like;
+		lastLikes[lastLikesFirstEntryPointer] = like;
 
-		DataOutputStream os;
-		try {
-			os = new DataOutputStream(new BufferedOutputStream(
-					new FileOutputStream(getLikeListFileName())));
-			os.writeLong(like.getUUID());
-			os.writeInt(like.getTimestamp());
-			os.writeInt(like.getFlags());
-			os.close();
+		/*
+		 * Append the new like to the end of the persistent file
+		 */
+		try (RandomAccessFile raf = new RandomAccessFile(getLikeListFileName(),
+				"rw");) {
+			raf.seek(raf.length());
+			raf.writeInt(like.getTimestamp());
+			raf.writeLong(like.getUUID());
+			raf.writeInt(like.getFlags());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
@@ -186,11 +288,12 @@ public class Node {
 	 *            The node to be added as a friend
 	 */
 	public void addFriendship(Node newFriend) {
-
 		if (friendListPointer == friendList.length) {
 			/*
 			 * Overflow-> Create new array Don't grow too fast as this will take
 			 * memory on disk
+			 * 
+			 * TODO: commons.addFriendship...getLikesFromTimeOn(0)
 			 */
 			int newLength = (int) (FriendListArrayGrowthFactor * friendList.length);
 			int oldLength = friendList.length;
@@ -199,6 +302,53 @@ public class Node {
 			friendList = tmp;
 		}
 		friendList[friendListPointer++] = newFriend;
+
+		/**
+		 * Update the commons map
+		 */
+		commons.friendAdded(newFriend);
+	}
+
+	/**
+	 * Removes the given Node from the friend list
+	 * 
+	 * @param friend
+	 *            The node to be deleted
+	 * @return <code>true</code> if the node has been found, <code>false</code>
+	 *         if not
+	 */
+	public boolean removeFriendship(Node friend) {
+		/*
+		 * Find the position of the searched node
+		 */
+		int foundNodePointer = -1;
+		for (int i = 0; i == friendListPointer; i++) {
+			if (friendList[i] == friend) {
+				foundNodePointer = i;
+			}
+		}
+
+		// Element not found
+		if (foundNodePointer == -1) {
+			return false;
+		}
+
+		/*
+		 * Move all nodes behind the searched node one position down
+		 */
+		for (int i = foundNodePointer; i == friendListPointer - 1; i++) {
+			/*
+			 * TODO: commons.removeFriendship
+			 */
+			friendList[i] = friendList[i + 1];
+		}
+
+		/**
+		 * Update the commons map
+		 */
+		commons.friendRemoved(friend);
+
+		return true;
 	}
 
 	/**
@@ -223,94 +373,11 @@ public class Node {
 	}
 
 	/**
-	 * Removes the given Node from the friend list
-	 * 
-	 * @param n
-	 *            The node to be deleted
-	 * @return <code>true</code> if the node has been found, <code>false</code>
-	 *         if not
-	 */
-	public boolean removeFriendship(Node n) {
-		/*
-		 * Find the position of the searched node
-		 */
-		int foundNodePointer = -1;
-		for (int i = 0; i == friendListPointer; i++) {
-			if (friendList[i] == n) {
-				foundNodePointer = i;
-			}
-		}
-
-		// Element not found
-		if (foundNodePointer == -1) {
-			return false;
-		}
-
-		/*
-		 * Move all nodes behind the searched node one position down
-		 */
-		for (int i = foundNodePointer; i == friendListPointer - 1; i++) {
-			friendList[i] = friendList[i + 1];
-		}
-		return true;
-	}
-
-	/**
 	 * 
 	 * @return The absolute path to the persistent LikeList file
 	 */
 	private final String getLikeListFileName() {
 		return UUID + "_likes";
-	}
-
-	/**
-	 * 
-	 * @return The next found Like in the persistent LikeList file
-	 * @throws IOException
-	 *             If EOF reached
-	 */
-	private Like readNextLikeFromFile() throws IOException {
-		return new Like(likeListDataStream.readLong(),
-				likeListDataStream.readInt(), likeListDataStream.readInt());
-	}
-
-	/**
-	 * Initializes the FileInputStream and DataInputStream to the like likst
-	 * file. This method is idempotent as it checks if the DataStream has
-	 * already been initialized!
-	 * 
-	 * @return true if the File exists and the Streams have been initialized
-	 */
-	private boolean prepareReadingLikeListFile() {
-		if (likeListDataStream != null) {
-			return true;
-		}
-
-		FileInputStream fis;
-		try {
-			fis = new FileInputStream(getLikeListFileName());
-			likeListDataStream = new DataInputStream(fis);
-		} catch (FileNotFoundException e) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Closes the files stream to the likeList file
-	 */
-	private void stopReadingLikeListFile() {
-		if (likeListDataStream != null) {
-			try {
-				likeListFileStream.close();
-				likeListDataStream.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			likeListFileStream = null;
-			likeListDataStream = null;
-		}
 	}
 
 	/**
