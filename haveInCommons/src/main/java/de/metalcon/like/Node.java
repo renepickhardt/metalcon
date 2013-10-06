@@ -21,6 +21,8 @@ public class Node {
 
 	private final Commons commons;
 
+	private final String persistentLikeListFileName;
+
 	/*
 	 * lastLikes[lastLikesFirstEntryPointer] is the newest like The list is
 	 * ordered by descending timestamps (newest first)
@@ -63,13 +65,15 @@ public class Node {
 		this.UUID = uuid;
 		friendList = new Node[10];
 
-		if (!AllNodes.containsKey(UUID)) {
+		if (AllNodes.containsKey(UUID)) {
 			throw new RuntimeException("A Node with the ID " + uuid
 					+ " has already been initialized");
 		}
 		AllNodes.put(UUID, this);
 
 		commons = new Commons(this);
+
+		persistentLikeListFileName = "/tmp/likebutton/" + UUID + "_likes";
 	}
 
 	/**
@@ -83,7 +87,7 @@ public class Node {
 		int arrayLength = 10;
 		Like[] likesFound = new Like[arrayLength];
 		int likesFoundPointer = 0;
-		int lastLikesPointer = 0;
+		int lastLikesPointer = lastLikesFirstEntryPointer;
 
 		Like[] likesFromDisk = null;
 
@@ -96,9 +100,10 @@ public class Node {
 				System.arraycopy(likesFound, 0, tmp, 0, arrayLength / 2);
 				likesFound = tmp;
 			}
-			if (lastLikesPointer != lastLikesFirstEntryPointer + 1) {
+			if (lastLikesPointer != lastLikes.length) {
 				nextLike = lastLikes[lastLikesPointer++];
 			} else {
+
 				/*
 				 * nextLike is now the oldest like we found -> read all likes
 				 * from file that are younger than timestamp but older than
@@ -107,8 +112,13 @@ public class Node {
 				 * TODO: what if two likes with the same TS exist, but only one
 				 * of those in lastLikes?!
 				 */
-				likesFromDisk = getLikesFromTimeOnFromDisk(timestamp,
-						nextLike.getTimestamp());
+				if (nextLike == null) {
+					likesFromDisk = getLikesFromTimeOnFromDisk(timestamp,
+							Integer.MAX_VALUE);
+				} else {
+					likesFromDisk = getLikesFromTimeOnFromDisk(timestamp,
+							nextLike.getTimestamp());
+				}
 				break;
 			}
 
@@ -125,7 +135,7 @@ public class Node {
 		if (likesFromDisk != null) {
 			Like[] result = new Like[likesFoundPointer + likesFromDisk.length];
 			System.arraycopy(likesFound, 0, result, 0, likesFoundPointer);
-			System.arraycopy(likesFound, likesFoundPointer, likesFromDisk, 0,
+			System.arraycopy(likesFromDisk, 0, result, likesFoundPointer,
 					likesFromDisk.length);
 			return result;
 		} else {
@@ -151,18 +161,20 @@ public class Node {
 	 * Seeks the persistent likes file and returns an array of all like found
 	 * with the timestamp TS being startTs< TS < stopTS
 	 * 
+	 * 
 	 * @param startTS
 	 *            All returned likes will have a higher timestamp
 	 * @param stopTS
 	 *            All returned likes will have a lower timestamp
 	 * @return The array of all found likes or <code>null</code> if no like was
-	 *         found or the file was empty
+	 *         found or the file was empty. The elements are ordered by
+	 *         descending timestamps (newest first).
 	 */
 	private Like[] getLikesFromTimeOnFromDisk(final int startTS,
 			final int stopTS) {
 
-		try (RandomAccessFile raf = new RandomAccessFile(getLikeListFileName(),
-				"r");) {
+		try (RandomAccessFile raf = new RandomAccessFile(
+				persistentLikeListFileName, "r");) {
 			final long totalLines = raf.length() / 16;
 			if (totalLines == 0) {
 				return null;
@@ -200,7 +212,7 @@ public class Node {
 			}
 
 			Like[] result = new Like[(int) (totalLines - currentLine)];
-			int resultPointer = 0;
+			int resultPointer = result.length - 1;
 			raf.seek(currentLine * 16);
 			long uuid;
 			int flags;
@@ -211,17 +223,17 @@ public class Node {
 				}
 				uuid = raf.readLong();
 				flags = raf.readInt();
-				result[resultPointer++] = new Like(uuid, currentTs, flags);
+				result[resultPointer--] = new Like(uuid, currentTs, flags);
 			}
 
-			if (resultPointer < result.length) {
-				Like[] tmp = new Like[resultPointer];
-				System.arraycopy(result, 0, tmp, 0, resultPointer);
+			if (resultPointer != -1) {
+				Like[] tmp = new Like[result.length - resultPointer - 1];
+				System.arraycopy(result, resultPointer + 1, tmp, 0, tmp.length);
 				return tmp;
 			}
 			return result;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -254,8 +266,8 @@ public class Node {
 		/*
 		 * Append the new like to the end of the persistent file
 		 */
-		try (RandomAccessFile raf = new RandomAccessFile(getLikeListFileName(),
-				"rw");) {
+		try (RandomAccessFile raf = new RandomAccessFile(
+				persistentLikeListFileName, "rw");) {
 			raf.seek(raf.length());
 			raf.writeInt(like.getTimestamp());
 			raf.writeLong(like.getUUID());
@@ -370,14 +382,6 @@ public class Node {
 	 */
 	public Node[] getFriends() {
 		return friendList;
-	}
-
-	/**
-	 * 
-	 * @return The absolute path to the persistent LikeList file
-	 */
-	private final String getLikeListFileName() {
-		return UUID + "_likes";
 	}
 
 	/**

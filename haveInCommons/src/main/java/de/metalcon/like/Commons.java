@@ -11,7 +11,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
+
+/**
+ * This is the structure of the raw persistent common file content
+ */
+class CommonsFileRaw implements Serializable {
+	private static final long serialVersionUID = -4126346298168246709L;
+
+	public CommonsFileRaw() {
+	}
+
+	public int lastUpdateTS;
+	public HashMap<Long, long[]> commonsMap;
+}
 
 /**
  * @author Jonas Kunze
@@ -30,21 +44,14 @@ public class Commons {
 	private boolean mayFreeMem = true;
 
 	/**
-	 * This is the structure of the raw persistent common file content
-	 */
-	private class CommonsFileRaw {
-		public int lastUpdateTS;
-		public HashMap<Long, long[]> commonsMap;
-	}
-
-	/**
 	 * 
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
 	public Commons(final Node node) {
 		this.node = node;
-		this.persistentFileName = node.getUUID() + "_commons";
+		this.persistentFileName = "/tmp/likebutton/" + node.getUUID()
+				+ "_commons";
 	}
 
 	/**
@@ -57,17 +64,10 @@ public class Commons {
 	 *         of this Commons in common. The last uuids in the list may be 0
 	 */
 	public long[] getCommonNodes(long uuid) {
-		if (raw != null) {
+		if (raw == null) {
 			readFile();
 		}
 		return raw.commonsMap.get(uuid);
-	}
-
-	/**
-	 * Saves the commonsMap to the persistent commons file;
-	 */
-	public void saveChanges() {
-		writeFile();
 	}
 
 	/**
@@ -90,6 +90,9 @@ public class Commons {
 		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
 		} catch (IOException ex) {
+			raw = new CommonsFileRaw();
+			raw.lastUpdateTS = 0;
+			raw.commonsMap = new HashMap<Long, long[]>();
 		}
 	}
 
@@ -108,6 +111,15 @@ public class Commons {
 			throw new RuntimeException(
 					"Commons.writeToFile called even though raw is null");
 		}
+
+		for (long key : raw.commonsMap.keySet()) {
+			System.out.println(node.getUUID() + " : " + key + ": ");
+			for (long l : raw.commonsMap.get(key)) {
+				System.out.print(l + "\t");
+			}
+		}
+		System.out.println();
+
 		try (OutputStream file = new FileOutputStream(persistentFileName);
 				OutputStream buffer = new BufferedOutputStream(file);
 				ObjectOutput output = new ObjectOutputStream(buffer);) {
@@ -203,6 +215,12 @@ public class Commons {
 	 *            update of this commons till now will be considered.
 	 */
 	private void updateFriend(Node friend, boolean ignoreTimestamp) {
+		if (raw == null) {
+			readFile();
+		}
+
+		mayFreeMem = false;
+
 		int searchTS = ignoreTimestamp ? 0 : raw.lastUpdateTS;
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
 			/*
@@ -222,6 +240,9 @@ public class Commons {
 			raw.commonsMap.put(like.getUUID(),
 					addIntoCommonsList(commons, friend.getUUID()));
 		}
+
+		writeFile();
+		mayFreeMem = true;
 	}
 
 	/**
@@ -259,7 +280,7 @@ public class Commons {
 		 * No empty position found. Array has to be extended
 		 */
 		if (lastEmptyPointer == commons.length) {
-			int newLength = (int) (CommonListGrowthFactor * commons.length);
+			int newLength = (int) (CommonListGrowthFactor * commons.length + 1);
 			int oldLength = commons.length;
 			long[] tmp = new long[newLength];
 			System.arraycopy(commons, 0, tmp, 0, oldLength);
