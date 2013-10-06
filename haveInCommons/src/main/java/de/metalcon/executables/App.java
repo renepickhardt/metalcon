@@ -17,8 +17,7 @@ public class App {
 	private static final String DATA_DIR = "../data/";
 	private static final String METALCON_FILE = DATA_DIR
 			+ "metalcon-all-hashed.csv";
-	private static final String UB_SMALL_FILE = DATA_DIR
-			+ "ub-small.csv";
+	private static final String UB_SMALL_FILE = DATA_DIR + "ub-small.csv";
 	private static final String WIKIPEDIA_FILE = "../data/";
 	private static final String SMALL_FILE = "../data/";
 	public static final int BATCH_SIZE = 100000;
@@ -32,7 +31,28 @@ public class App {
 
 		importGraph(graph, UB_SMALL_FILE);
 
+		testInCommons(graph, 1, 2);
+
 		// TestSingleNodePreprocessor();
+
+	}
+
+	public static void testInCommons(HaveInCommons graph, long from, long to) {
+		long start = System.nanoTime();
+		long[] commons = graph.getCommonNodes(from, to);
+		long end = System.nanoTime();
+		System.out.println("getCommonNodes needed: " + (end - start) / 1000
+				+ " microseconds");
+
+		if (commons != null && commons.length > 0) {
+			System.out.println("Common length: " + commons.length);
+			for (long s : commons) {
+				System.out.println(s);
+			}
+		} else {
+			System.out
+					.println("Metallica and Ensiferum have nothing in common!");
+		}
 
 	}
 

@@ -112,14 +112,13 @@ public class Commons {
 					"Commons.writeToFile called even though raw is null");
 		}
 
-		for (long key : raw.commonsMap.keySet()) {
-			System.out.println(node.getUUID() + " : " + key + ": ");
-			for (long l : raw.commonsMap.get(key)) {
-				System.out.print(l + "\t");
-			}
-		}
-		System.out.println();
-
+		// System.out.println(node.getUUID() + ":");
+		// for (long key : raw.commonsMap.keySet()) {
+		// System.out.println(key + ":\t");
+		// for (long l : raw.commonsMap.get(key)) {
+		// System.out.println("\t" + l);
+		// }
+		// }
 		try (OutputStream file = new FileOutputStream(persistentFileName);
 				OutputStream buffer = new BufferedOutputStream(file);
 				ObjectOutput output = new ObjectOutputStream(buffer);) {
@@ -237,8 +236,8 @@ public class Commons {
 			 * TODO: separate likes, dislikes and neutral likes in 2 different
 			 * maps and delete the entries if we find a neutral like
 			 */
-			raw.commonsMap.put(like.getUUID(),
-					addIntoCommonsList(commons, friend.getUUID()));
+			commons = addIntoCommonsList(commons, friend.getUUID());
+			raw.commonsMap.put(like.getUUID(), commons);
 		}
 
 		writeFile();

@@ -184,7 +184,7 @@ public class Node {
 			 * TODO: What if the first searched like is at the last line? Check
 			 * if it will be found
 			 */
-			long left = 0, currentLine = totalLines, right = totalLines - 1;
+			long left = 0, currentLine = totalLines, right = totalLines;
 			int currentTs;
 			while (left != right) {
 				// Goto middle of left and right

@@ -20,8 +20,7 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 		Node f = Node.createNode(uuid1);
 		Node t = Node.createNode(uuid2);
 
-		f.getCommonNodes(uuid2);
-		return null;
+		return f.getCommonNodes(uuid2);
 	}
 
 	@Override
