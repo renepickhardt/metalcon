@@ -18,3 +18,5 @@ bin/
 
 # Backup Files
 *.*~
+/neo4j-100k
+/neo4j-metalconAll
