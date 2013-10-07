@@ -16,7 +16,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /**
  * @author Rene Pickhardt
@@ -86,7 +85,6 @@ public class PersistentReadOptimized implements HaveInCommons {
 		}
 	}
 
-	@Override
 	public void flush() {
 		Transaction tx = graphDB.beginTx();
 		try {

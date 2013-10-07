@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
+import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
 
@@ -29,29 +30,46 @@ public class App {
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval();
 
-		importGraph(graph, UB_SMALL_FILE);
+		// importGraph(graph, METALCON_FILE);
 
-		testInCommons(graph, 1, 2);
+		int commonsComputeCounter = 0;
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 100; j++) {
+				int commons = testInCommons(graph, j, i, false);
+				if (commons > -1) {
+					commonsComputeCounter++;
+				}
+			}
+		}
+
+		testInCommons(graph, 2, 3, true);
 
 		// TestSingleNodePreprocessor();
-
 	}
 
-	public static void testInCommons(HaveInCommons graph, long from, long to) {
+	public static int testInCommons(HaveInCommons graph, long from, long to,
+			boolean verbose) {
 		long start = System.nanoTime();
 		long[] commons = graph.getCommonNodes(from, to);
 		long end = System.nanoTime();
-		System.out.println("getCommonNodes needed: " + (end - start) / 1000
-				+ " microseconds");
 
-		if (commons != null && commons.length > 0) {
-			System.out.println("Common length: " + commons.length);
-			for (long s : commons) {
-				System.out.println(s);
+		if (commons != null) {
+			// if (commons.length > 10 || end-start>5001E3)
+			System.out.println("getCommonNodes needed: " + (end - start) / 1000
+					+ " microseconds for " + commons.length + " commons");
+			if (commons.length > 0) {
+				if (verbose) {
+					System.out.println("Common length: " + commons.length);
+					for (long s : commons) {
+						System.out.println(s);
+					}
+				}
+				return commons.length;
+			} else {
+				return 0;
 			}
 		} else {
-			System.out
-					.println("Metallica and Ensiferum have nothing in common!");
+			return -1;
 		}
 
 	}
@@ -104,13 +122,15 @@ public class App {
 					last = now;
 				}
 			}
-			graphImpl.flush();
+			if (graphImpl instanceof PersistentReadOptimized) {
+				((PersistentReadOptimized) graphImpl).flush();
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		long end = System.nanoTime();
-		System.out.println("Imported in: " + (int) ((end - start) * 1E9f)
+		System.out.println("Imported in: " + (int) ((end - start) / 1E9f)
 				+ "sec");
 	}
 

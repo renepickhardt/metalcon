@@ -122,7 +122,7 @@ public class Node {
 				break;
 			}
 
-			if (nextLike.getTimestamp() > timestamp) {
+			if (nextLike.getTimestamp() < timestamp) {
 				break;
 			}
 
@@ -409,5 +409,9 @@ public class Node {
 
 	public final long getUUID() {
 		return UUID;
+	}
+
+	public void freeMemory() {
+		commons.freeMemory();
 	}
 }

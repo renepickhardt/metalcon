@@ -13,7 +13,6 @@ import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
-import edu.uci.ics.jung.utils.UserData;
 
 /**
  * @author Jonas Kunze
@@ -44,7 +43,7 @@ public class RetrievalOptimized implements HaveInCommons {
 		Vertex f = vertices.get(from);
 		if (f == null) {
 			f = new DirectedSparseVertex();
-//			f.setUserDatum("ID", from, UserData.REMOVE);
+			// f.setUserDatum("ID", from, UserData.REMOVE);
 			vertices.put(from, f);
 			reverseIndex.put(f, from);
 			graph.addVertex(f);
@@ -52,7 +51,7 @@ public class RetrievalOptimized implements HaveInCommons {
 		Vertex t = vertices.get(to);
 		if (t == null) {
 			t = new DirectedSparseVertex();
-//			f.setUserDatum("ID", to, UserData.REMOVE);
+			// f.setUserDatum("ID", to, UserData.REMOVE);
 			vertices.put(to, t);
 			reverseIndex.put(t, to);
 			graph.addVertex(t);
@@ -182,11 +181,5 @@ public class RetrievalOptimized implements HaveInCommons {
 			ints[i++] = n;
 		}
 		return ints;
-	}
-
-	@Override
-	public void flush() {
-		// TODO Auto-generated method stub
-		
 	}
 }

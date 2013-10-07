@@ -20,6 +20,8 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 		Node f = Node.createNode(uuid1);
 		Node t = Node.createNode(uuid2);
 
+		// f.freeMemory();
+
 		return f.getCommonNodes(uuid2);
 	}
 
@@ -36,11 +38,5 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 	public boolean deleteEdge(long from, long to) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public void flush() {
-		// TODO Auto-generated method stub
-
 	}
 }

@@ -67,7 +67,23 @@ public class Commons {
 		if (raw == null) {
 			readFile();
 		}
-		return raw.commonsMap.get(uuid);
+		long[] commons = raw.commonsMap.get(uuid);
+
+		if (commons != null) {
+			/*
+			 * Remove the trailing zeros
+			 */
+			int firstZero = -1;
+			while (firstZero != commons.length - 1) {
+				if (commons[++firstZero] == 0) {
+					long[] tmp = new long[firstZero];
+					System.arraycopy(commons, 0, tmp, 0, firstZero);
+					return tmp;
+				}
+			}
+		}
+
+		return commons;
 	}
 
 	/**
@@ -136,13 +152,14 @@ public class Commons {
 	 * trigger a disc access
 	 */
 	public void freeMemory() {
-		while (!mayFreeMem) { // Wait until all reads/writes have been performed
-			try {
-				Thread.sleep(1000); // sleep one second
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		// while (!mayFreeMem) { // Wait until all reads/writes have been
+		// performed
+		// try {
+		// Thread.sleep(1000); // sleep one second
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
 		raw = null;
 	}
 
