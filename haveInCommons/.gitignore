@@ -20,3 +20,4 @@ bin/
 *.*~
 /neo4j-100k
 /neo4j-metalconAll
+/luceneIndex

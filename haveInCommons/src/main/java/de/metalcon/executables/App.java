@@ -3,6 +3,7 @@ package de.metalcon.executables;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
@@ -18,31 +19,35 @@ public class App {
 	private static final String DATA_DIR = "../data/";
 	private static final String METALCON_FILE = DATA_DIR
 			+ "metalcon-all-hashed.csv";
+	private static final String METALCON_USER_FILE = DATA_DIR
+			+ "metalcon-user.csv";
+	private static final String METALCON_USER_RAND_FILE = DATA_DIR
+			+ "metalcon-user-random.csv";
 	private static final String UB_SMALL_FILE = DATA_DIR + "ub-small.csv";
 	private static final String WIKIPEDIA_FILE = "../data/";
 	private static final String SMALL_FILE = "../data/";
-	public static final int BATCH_SIZE = 100000;
+	public static final int BATCH_SIZE = 10000;
 
 	private static HaveInCommons graph;
 
 	public static void main(String[] args) {
 
 		// graph = new PersistentReadOptimized();
-		graph = new NormalizedFlatFileLikeRetrieval();
+		graph = new NormalizedFlatFileLikeRetrieval("commonsDB");
 
 		// importGraph(graph, METALCON_FILE);
 
+		Random rand = new Random();
 		int commonsComputeCounter = 0;
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 100; j++) {
-				int commons = testInCommons(graph, j, i, false);
-				if (commons > -1) {
-					commonsComputeCounter++;
-				}
+		for (int i = 0; i < 1000; i++) {
+			int commons = testInCommons(graph, rand.nextInt(10000),
+					rand.nextInt(10000), false);
+			if (commons > -1) {
+				commonsComputeCounter++;
 			}
 		}
 
-		testInCommons(graph, 2, 3, true);
+		testInCommons(graph, 1, 2, true);
 
 		// TestSingleNodePreprocessor();
 	}

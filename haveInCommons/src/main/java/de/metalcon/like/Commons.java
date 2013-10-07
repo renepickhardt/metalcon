@@ -1,18 +1,9 @@
 package de.metalcon.like;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+
+import de.metalcon.utils.Serialization;
 
 /**
  * This is the structure of the raw persistent common file content
@@ -30,7 +21,7 @@ class CommonsFileRaw implements Serializable {
 /**
  * @author Jonas Kunze
  */
-public class Commons {
+class Commons {
 	/*
 	 * FIXME: optimize those two values
 	 */
@@ -48,9 +39,9 @@ public class Commons {
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public Commons(final Node node) {
+	public Commons(final Node node, final String storageDir) {
 		this.node = node;
-		this.persistentFileName = "/tmp/likebutton/" + node.getUUID()
+		this.persistentFileName = storageDir + "/" + node.getUUID()
 				+ "_commons";
 	}
 
@@ -95,17 +86,9 @@ public class Commons {
 	 *            The path to the persistent commons file
 	 */
 	private void readFile() {
-		try ( // resource Statement -> streams will be closed automatically
-		InputStream file = new FileInputStream(persistentFileName);
-				InputStream buffer = new BufferedInputStream(file);
-				ObjectInput input = new ObjectInputStream(buffer);) {
-
-			// deserialize the Map
-			CommonsFileRaw fileContent = (CommonsFileRaw) input.readObject();
-			raw = fileContent;
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
+		raw = (CommonsFileRaw) Serialization
+				.readObjectFromFile(persistentFileName);
+		if (raw == null) {
 			raw = new CommonsFileRaw();
 			raw.lastUpdateTS = 0;
 			raw.commonsMap = new HashMap<Long, long[]>();
@@ -122,7 +105,7 @@ public class Commons {
 	 *            The path to the persistent commons file
 	 * @return <code>true</code> in case of success
 	 */
-	private boolean writeFile() {
+	private synchronized boolean writeFile() {
 		if (raw == null) {
 			throw new RuntimeException(
 					"Commons.writeToFile called even though raw is null");
@@ -135,16 +118,7 @@ public class Commons {
 		// System.out.println("\t" + l);
 		// }
 		// }
-		try (OutputStream file = new FileOutputStream(persistentFileName);
-				OutputStream buffer = new BufferedOutputStream(file);
-				ObjectOutput output = new ObjectOutputStream(buffer);) {
-			// serialize the Map
-			output.writeObject(raw);
-			return true;
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		return false;
+		return Serialization.writeObjectToFile(raw, persistentFileName);
 	}
 
 	/**
@@ -152,14 +126,13 @@ public class Commons {
 	 * trigger a disc access
 	 */
 	public void freeMemory() {
-		// while (!mayFreeMem) { // Wait until all reads/writes have been
-		// performed
-		// try {
-		// Thread.sleep(1000); // sleep one second
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// }
+		while (!mayFreeMem) { // Wait until all reads/writes have been performed
+			try {
+				Thread.sleep(1000); // sleep one second
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		raw = null;
 	}
 
@@ -239,6 +212,13 @@ public class Commons {
 
 		int searchTS = ignoreTimestamp ? 0 : raw.lastUpdateTS;
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
+			/*
+			 * If the friend likes this node we would have a recursion->skip
+			 */
+			if (like.getUUID() == node.getUUID()) {
+				continue;
+			}
+
 			/*
 			 * Find the list of commons with the entity the friend liked
 			 */
