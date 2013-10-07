@@ -1,5 +1,6 @@
 package de.metalcon.like;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -43,6 +44,13 @@ class Commons {
 		this.node = node;
 		this.persistentFileName = storageDir + "/" + node.getUUID()
 				+ "_commons";
+	}
+
+	void delete() {
+
+		File file = new File(persistentFileName);
+		file.renameTo(new File(persistentFileName+".deleted"));
+		
 	}
 
 	/**
@@ -143,8 +151,8 @@ class Commons {
 		mayFreeMem = false;
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
-		for (Node friend : node.getFriends()) {
-			updateFriend(friend, false);
+		for (long friendUUID : node.getFriends()) {
+			updateFriend(Node.getNode(friendUUID), false);
 		}
 
 		raw.lastUpdateTS = now;
