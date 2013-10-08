@@ -33,9 +33,9 @@ public class App {
 	public static void main(String[] args) {
 
 		// graph = new PersistentReadOptimized();
-		graph = new NormalizedFlatFileLikeRetrieval("commonsDB");
+		graph = new NormalizedFlatFileLikeRetrieval("/tmp/commonsDB");
 
-//		importGraph(graph, METALCON_FILE);
+//		importGraph(graph, METALCON_USER_FILE);
 
 		Random rand = new Random();
 		int commonsComputeCounter = 0;
@@ -133,6 +133,7 @@ public class App {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 		long end = System.nanoTime();
 		System.out.println("Imported in: " + (int) ((end - start) / 1E9f)

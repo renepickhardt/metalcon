@@ -4,11 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import de.metalcon.utils.Serialization;
 
 /**
  * @author Jonas Kunze
@@ -18,20 +13,7 @@ class Node {
 	private static final int LastLikeCacheSize = 10;
 	private static final float FriendListArrayGrowthFactor = 1.2f;
 
-	private static String StorageDir = "";
-	private static String PersistentNodesFile = "";
-
-	/*
-	 * This Map stores all nodes that are alive.
-	 */
-	private static HashMap<Long, Node> AllNodesAlive = new HashMap<Long, Node>();
-	/*
-	 * This List stores all node uuids that exist in the DB
-	 */
-	private static Set<Long> AllExistingNodeUUIDs = null;
-
 	// Class Variables
-
 	private final long UUID;
 
 	private final Commons commons;
@@ -53,113 +35,15 @@ class Node {
 	private int friendListPointer = 0;
 
 	/**
-	 * Dumps the Map with all existing nodes to fileName
-	 * 
-	 * @param fileName
-	 *            The file to be written to
-	 * @return true in case of success
-	 */
-	private static boolean saveNodeListToFile() {
-		return Serialization.writeObjectToFile(AllExistingNodeUUIDs,
-				PersistentNodesFile);
-	}
-
-	/**
-	 * Reads all nodes from the given file
-	 * 
-	 * @param fileName
-	 *            The file to be read
-	 */
-	@SuppressWarnings("unchecked")
-	public static void initialize(final String storDir) {
-		if (AllExistingNodeUUIDs != null) {
-			throw new RuntimeException(
-					"AllNodes in Node has already been initialized.");
-		}
-		StorageDir = storDir;
-		PersistentNodesFile = storDir + "/allNodes.dat";
-
-		AllExistingNodeUUIDs = (Set<Long>) Serialization
-				.readObjectFromFile(PersistentNodesFile);
-		if (AllExistingNodeUUIDs == null) {
-			System.err.println("Unable to read Node file "
-					+ PersistentNodesFile);
-			AllExistingNodeUUIDs = new HashSet<Long>();
-		}
-	}
-
-	/**
-	 * Initializes Node objects for all UUIDs that were found in the persistent
-	 * node list file
-	 */
-	public static void pushAllNodesToCache() {
-		for (long uuid : AllExistingNodeUUIDs) {
-			getNode(uuid);
-		}
-	}
-
-	/**
-	 * If a node with this uuid is already alive it will be returned form the
-	 * cache. If not and if the uuid occurs in the AllExistingNodeUUIDs (set of
-	 * all uuids in the db) it will be created
-	 * 
-	 * @param uuid
-	 *            The uuid of the requested node
-	 * @return A node object with the given uuid or null if the uuid doesnt
-	 *         exist in the DB
-	 */
-	public static final Node getNode(final long uuid) {
-		Node n = AllNodesAlive.get(uuid);
-		if (n == null && AllExistingNodeUUIDs.contains(uuid)) {
-			synchronized (Node.class) {
-				n = new Node(uuid, StorageDir);
-				AllNodesAlive.put(uuid, n);
-				AllExistingNodeUUIDs.add(uuid);
-				saveNodeListToFile();
-				return n;
-			}
-		}
-		return n;
-	}
-
-	/**
-	 * Factory method. If a Node with the same uuid already exists no node will
-	 * be created an null will be returned
-	 * 
-	 * This method is thread safe
-	 * 
-	 * @param uuid
-	 *            The uuid of the new node
-	 * @return A node object with the given uuid
-	 */
-	public static final Node createNewNode(final long uuid) {
-		if (AllExistingNodeUUIDs.contains(uuid)) {
-			throw new RuntimeException(
-					"Calling Node.createNode with an uuid that already exists in the DB");
-		}
-		synchronized (Node.class) {
-			Node n = new Node(uuid, StorageDir);
-			AllNodesAlive.put(uuid, n);
-			AllExistingNodeUUIDs.add(uuid);
-			saveNodeListToFile();
-			return n;
-		}
-	}
-
-	/**
 	 * This Constructor will also add the node to the global list of nodes
 	 * 
 	 * @param UUID
 	 *            The uuid of the node
 	 */
-	private Node(final long uuid, final String storageDir) {
+	Node(final long uuid, final String storageDir) {
 		this.UUID = uuid;
 		friendsUUIDs = new long[10];
 
-		if (AllNodesAlive.containsKey(UUID)) {
-			throw new RuntimeException("A Node with the ID " + uuid
-					+ " has already been initialized");
-		}
 		commons = new Commons(this, storageDir);
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
@@ -167,18 +51,17 @@ class Node {
 
 	/**
 	 * Removes this Node from the DB
+	 * 
+	 * @throws IOException
 	 */
-	public void delete() {
+	public void delete() throws IOException {
 		for (long friendUUID : friendsUUIDs) {
-			Node n = getNode(friendUUID);
+			Node n = NodeFactory.getNode(friendUUID);
 			n.removeFriendship(this);
 		}
 		commons.delete();
 
-		AllNodesAlive.remove(UUID);
-		if (AllExistingNodeUUIDs.remove(UUID)) {
-			saveNodeListToFile();
-		}
+		NodeFactory.removeNodeFromPersistentList(UUID);
 
 		File file = new File(persistentLikeListFileName);
 		file.renameTo(new File(persistentLikeListFileName + ".deleted"));
