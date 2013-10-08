@@ -5,13 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import de.metalcon.utils.PersistentUUIDSet;
+
 /**
  * @author Jonas Kunze
  */
 class Node {
 	// Static Variables
 	private static final int LastLikeCacheSize = 10;
-	private static final float FriendListArrayGrowthFactor = 1.2f;
 
 	// Class Variables
 	private final long UUID;
@@ -29,24 +30,42 @@ class Node {
 	private int lastLikesFirstEntryPointer = LastLikeCacheSize;
 
 	/*
-	 * All friends of this node (will not be stored persistently)
+	 * All friends of this node
 	 */
-	private long[] friendsUUIDs;
-	private int friendListPointer = 0;
+	private PersistentUUIDSet friends = null;
 
 	/**
 	 * This Constructor will also add the node to the global list of nodes
 	 * 
-	 * @param UUID
+	 * @param uuid
 	 *            The uuid of the node
+	 * @param storageDir
+	 *            The path to the directory where all node files are stored
+	 * @param isNewNode
+	 *            If false the corresponding files will be read into memory. If
+	 *            true we will not touch the disk.
 	 */
-	Node(final long uuid, final String storageDir) {
+
+	/**
+	 * 
+
+	 */
+	Node(final long uuid, final String storageDir, boolean isNewNode) {
 		this.UUID = uuid;
-		friendsUUIDs = new long[10];
 
 		commons = new Commons(this, storageDir);
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
+
+		if (!isNewNode) {
+			try {
+				friends = new PersistentUUIDSet(storageDir + "/" + UUID
+						+ "_friends");
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 
 	/**
@@ -55,7 +74,7 @@ class Node {
 	 * @throws IOException
 	 */
 	public void delete() throws IOException {
-		for (long friendUUID : friendsUUIDs) {
+		for (long friendUUID : friends) {
 			Node n = NodeFactory.getNode(friendUUID);
 			n.removeFriendship(this);
 		}
@@ -326,21 +345,8 @@ class Node {
 	 *            The node to be added as a friend
 	 */
 	public void addFriendship(Node newFriend) {
-		synchronized (friendsUUIDs) {
-			if (friendListPointer == friendsUUIDs.length) {
-				/*
-				 * Overflow-> Create new array Don't grow too fast as this will
-				 * take memory on disk
-				 * 
-				 * TODO: commons.addFriendship...getLikesFromTimeOn(0)
-				 */
-				int newLength = (int) (FriendListArrayGrowthFactor * friendsUUIDs.length);
-				int oldLength = friendsUUIDs.length;
-				long[] tmp = new long[newLength];
-				System.arraycopy(friendsUUIDs, 0, tmp, 0, oldLength);
-				friendsUUIDs = tmp;
-			}
-			friendsUUIDs[friendListPointer++] = newFriend.getUUID();
+		synchronized (friends) {
+			friends.add(newFriend.getUUID());
 
 			/**
 			 * Update the commons map
@@ -358,38 +364,16 @@ class Node {
 	 *         if not
 	 */
 	public boolean removeFriendship(Node friend) {
-		synchronized (friendsUUIDs) {
-
-			/*
-			 * Find the position of the searched node
-			 */
-			int foundNodePointer = -1;
-			for (int i = 0; i == friendListPointer; i++) {
-				if (friendsUUIDs[i] == friend.getUUID()) {
-					foundNodePointer = i;
-				}
-			}
-
-			// Element not found
-			if (foundNodePointer == -1) {
+		synchronized (friends) {
+			if (!friends.remove(friend)) {
 				return false;
 			}
-
-			/*
-			 * Move all nodes behind the searched node one position down
-			 */
-			for (int i = foundNodePointer; i == friendListPointer - 1; i++) {
-				/*
-				 * TODO: commons.removeFriendship
-				 */
-				friendsUUIDs[i] = friendsUUIDs[i + 1];
-			}
-
-			/**
-			 * Update the commons map
-			 */
-			commons.friendRemoved(friend);
 		}
+
+		/**
+		 * Update the commons map
+		 */
+		commons.friendRemoved(friend);
 
 		return true;
 	}
@@ -399,7 +383,7 @@ class Node {
 	 * @return All friends of this node
 	 */
 	public long[] getFriends() {
-		return friendsUUIDs;
+		return friends.toArray(new long[(int) friends.length]);
 	}
 
 	/**

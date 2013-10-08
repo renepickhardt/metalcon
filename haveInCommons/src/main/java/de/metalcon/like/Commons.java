@@ -46,11 +46,13 @@ class Commons {
 				+ "_commons";
 	}
 
+	/**
+	 * Delete the corresponding file
+	 */
 	void delete() {
-
 		File file = new File(persistentFileName);
-		file.renameTo(new File(persistentFileName+".deleted"));
-		
+		file.renameTo(new File(persistentFileName + ".deleted"));
+
 	}
 
 	/**
@@ -152,7 +154,7 @@ class Commons {
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
 		for (long friendUUID : node.getFriends()) {
-			updateFriend(Node.getNode(friendUUID), false);
+			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
 		raw.lastUpdateTS = now;
