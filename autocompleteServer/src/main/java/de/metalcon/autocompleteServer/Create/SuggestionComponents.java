@@ -72,6 +72,8 @@ public class SuggestionComponents implements Serializable {
 			// advice found here:
 			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
 			if (!(createFile.exists())) {
+				System.out.println(createFile
+						+ " did not exist and has been created");
 				FileOutputStream saveFile = new FileOutputStream(createFile,
 						false);
 
@@ -81,7 +83,7 @@ public class SuggestionComponents implements Serializable {
 				saveFile.close();
 
 			} else {
-
+				System.out.println("appended to " + createFile);
 				FileOutputStream saveFile = new FileOutputStream(createFile,
 						true);
 				AppendingObjectOutputStream save = new AppendingObjectOutputStream(

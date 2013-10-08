@@ -1,8 +1,5 @@
 package de.metalcon.autocompleteServer.Create;
 
-import java.io.File;
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 
 import de.metalcon.autocompleteServer.Command;
@@ -32,18 +29,6 @@ public class NewIndexContainer extends Command {
 				ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
 
 		ContextListener.setIndex(this.indexName, suggestTree, this.context);
-
-		// This creates the database file
-		// FIXME: use config-parameter for file-path
-		File newFile = new File("/var/lib/tomcat/" + this.indexName + ".save");
-		try {
-			newFile.createNewFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// this.createFileOnDisc(newFile);
 
 		this.servlet.commandFinished();
 
