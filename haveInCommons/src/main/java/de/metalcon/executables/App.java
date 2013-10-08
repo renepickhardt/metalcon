@@ -35,7 +35,7 @@ public class App {
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("commonsDB");
 
-		 importGraph(graph, METALCON_FILE);
+		importGraph(graph, METALCON_FILE);
 
 		Random rand = new Random();
 		int commonsComputeCounter = 0;

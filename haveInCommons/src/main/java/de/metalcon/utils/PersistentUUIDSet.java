@@ -1,5 +1,6 @@
 package de.metalcon.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
@@ -28,17 +29,29 @@ public class PersistentUUIDSet implements Set<Long> {
 
 	/**
 	 * 
+	 * @param fileName
+	 *            The file this Set will be stored at
+	 * @throws IOException
+	 *             if the file could not be read
+	 */
+	public PersistentUUIDSet(final String fileName) throws IOException {
+		this.fileName = fileName;
+		loadFile();
+	}
+
+	/**
+	 * 
 	 * @return The number of empty slots in the array
 	 */
 	public float getFragmentationRatio() {
 		return numberOfZerosInFile / ((float) length);
 	}
 
-	public PersistentUUIDSet(final String fileName) throws IOException {
-		this.fileName = fileName;
-		loadFile();
-	}
-
+	/**
+	 * Reads the file content and loads it to the index maps
+	 * 
+	 * @throws IOException
+	 */
 	private void loadFile() throws IOException {
 		if (file == null) {
 			file = new RandomAccessFile(fileName, "rw");
@@ -65,10 +78,33 @@ public class PersistentUUIDSet implements Set<Long> {
 	}
 
 	/**
+	 * Close the file handler. It will be automatically opened as soon as a disk
+	 * access is needed.
+	 * 
+	 * @return true if the handler was opened and we wer able to close it
+	 */
+	public boolean closeFile() {
+		if (file != null) {
+			try {
+				file.close();
+				file = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Adds the given uuid to the end of the file
 	 */
 	public boolean add(long uuid) {
 		try {
+			if (file == null) {
+				file = new RandomAccessFile(fileName, "rw");
+			}
 			file.seek(length);
 			file.writeLong(uuid);
 		} catch (IOException e) {
@@ -80,6 +116,19 @@ public class PersistentUUIDSet implements Set<Long> {
 		UUIDByPos.put(length, uuid);
 
 		return true;
+	}
+
+	/**
+	 * Deletes the persistent file
+	 */
+	public void delete() {
+		try {
+			file.close();
+			File file = new File(fileName);
+			file.renameTo(new File(fileName + ".deleted"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -133,6 +182,9 @@ public class PersistentUUIDSet implements Set<Long> {
 			UUIDByPos.remove(positionInFile);
 
 			try {
+				if (file == null) {
+					file = new RandomAccessFile(fileName, "rw");
+				}
 				file.seek(positionInFile * 8);
 				file.writeLong(0);
 			} catch (IOException e) {

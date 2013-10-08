@@ -195,6 +195,8 @@ class Commons {
 			 */
 			raw.commonsMap.put(like.getUUID(),
 					removeFromCommonsList(commons, friend.getUUID()));
+
+			writeFile();
 		}
 	}
 

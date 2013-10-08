@@ -57,14 +57,12 @@ class Node {
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
 
-		if (!isNewNode) {
-			try {
-				friends = new PersistentUUIDSet(storageDir + "/" + UUID
-						+ "_friends");
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+		try {
+			friends = new PersistentUUIDSet(storageDir + "/" + UUID
+					+ "_friends");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -79,11 +77,13 @@ class Node {
 			n.removeFriendship(this);
 		}
 		commons.delete();
+		friends.delete();
 
 		NodeFactory.removeNodeFromPersistentList(UUID);
 
 		File file = new File(persistentLikeListFileName);
 		file.renameTo(new File(persistentLikeListFileName + ".deleted"));
+
 	}
 
 	/**
@@ -347,6 +347,7 @@ class Node {
 	public void addFriendship(Node newFriend) {
 		synchronized (friends) {
 			friends.add(newFriend.getUUID());
+			friends.closeFile();
 
 			/**
 			 * Update the commons map
@@ -366,8 +367,10 @@ class Node {
 	public boolean removeFriendship(Node friend) {
 		synchronized (friends) {
 			if (!friends.remove(friend)) {
+				friends.closeFile();
 				return false;
 			}
+			friends.closeFile();
 		}
 
 		/**
