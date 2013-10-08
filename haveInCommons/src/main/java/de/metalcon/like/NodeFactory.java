@@ -3,8 +3,6 @@ package de.metalcon.like;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.HashMap;
 
 /**
@@ -98,14 +96,14 @@ class NodeFactory {
 		AllExistingNodeUUIDs = new HashMap<Long, Long>();
 		AllExistingNodeUUIDsReverse = new HashMap<Long, Long>();
 
-		final long numberOfObjects = (int) persistentNodeFile.length() / 8;
-		LastNodeUUIDPosition = numberOfObjects;
-		if (numberOfObjects == 0) {
+		final long numberOfLongs = (int) persistentNodeFile.length() / 8;
+		LastNodeUUIDPosition = numberOfLongs;
+		if (numberOfLongs == 0) {
 			return;
 		}
 
 		NumberOfZeroUUIDsInFile = 0;
-		for (long pos = 0; pos < numberOfObjects; pos++) {
+		for (long pos = 0; pos < numberOfLongs; pos++) {
 			long uuid = persistentNodeFile.readLong();
 			if (uuid == 0) {
 				NumberOfZeroUUIDsInFile++;
@@ -114,6 +112,8 @@ class NodeFactory {
 				AllExistingNodeUUIDsReverse.put(pos, uuid);
 			}
 		}
+		System.out.println("Finished reading "+nodeFilePath+":");
+		System.out.println(numberOfLongs+" uuids read, "+NumberOfZeroUUIDsInFile+" were 0: "+NumberOfZeroUUIDsInFile/numberOfLongs*100+"% fragmentation.");
 	}
 
 	/**
