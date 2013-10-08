@@ -64,7 +64,6 @@ public class ProcessRetrieveResponse {
 	 */
 	@SuppressWarnings("unchecked")
 	public void addError(String message) {
-		// TODO Errors should really stop the request and send the answer away
 		if (this.jsonResponse == null) {
 			this.jsonResponse = new JSONObject();
 		}

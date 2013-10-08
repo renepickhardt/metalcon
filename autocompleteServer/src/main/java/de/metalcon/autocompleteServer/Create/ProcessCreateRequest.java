@@ -107,8 +107,6 @@ public class ProcessCreateRequest {
 		}
 		suggestTreeCreateRequestContainer.getComponents().setWeight(weight);
 
-		// Protocol forbids images for suggestions without keys
-		// TODO: add this piece of information to nokey-Warning
 		if (suggestionKey != null) {
 			String image = checkImage(items, response);
 			if (image == null) {

@@ -17,7 +17,7 @@ public class CreateStatusCodes {
 	public static final String REQUEST_MUST_BE_MULTIPART = "The HTTP request must be multipart/form-data. Your request has another content-type and can't be processed.";
 	public static final String WEIGHT_NOT_GIVEN = "weight not given";
 	public static final String WEIGHT_NOT_A_NUMBER = "weight is not a number and was discarded. Weight needs to be a positive integer.";
-	public static final String SUGGESTION_KEY_NOT_GIVEN = "Suggestion key not given";
+	public static final String SUGGESTION_KEY_NOT_GIVEN = "Suggestion key not given. ASTP forbids images without a key";
 	public static final String NO_IMAGE = "No image inserted";
 	public static final String IMAGE_GEOMETRY_TOO_BIG = "your image geometry exceeds the limit of "
 			+ ProtocolConstants.IMAGE_HEIGHT
