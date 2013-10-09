@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author Jonas Kunze
+ */
 public class PersistentUUIDSet implements Set<Long> {
 	/*
 	 * The number of currently opened file handles
@@ -22,21 +25,23 @@ public class PersistentUUIDSet implements Set<Long> {
 	 */
 	private static final int MaximumOpenFileHandles = 500;
 
+	/*
+	 * Path to the file to be used to store this Set
+	 */
 	private final String fileName;
 
 	private RandomAccessFile file = null;
 
 	/*
 	 * This Map stores all uuids that exist in the file as keys and the position
-	 * (nomber of longs) in the persistent file as value
+	 * (number of longs) in the persistent file as value
 	 */
 	private HashMap<Long, Long> posByUUID = null;
-	private HashMap<Long, Long> UUIDByPos = null;
 
 	private long numberOfZerosInFile = 0;
 
 	/*
-	 * Number of longs in the file
+	 * Number of longs in the file (incuding zeros from fragmentation)
 	 */
 	public long length = 0;
 
@@ -73,7 +78,6 @@ public class PersistentUUIDSet implements Set<Long> {
 		openFileIfClosed();
 
 		posByUUID = new HashMap<Long, Long>();
-		UUIDByPos = new HashMap<Long, Long>();
 
 		length = file.length() / 8;
 		if (length == 0) {
@@ -87,7 +91,6 @@ public class PersistentUUIDSet implements Set<Long> {
 				numberOfZerosInFile++;
 			} else {
 				posByUUID.put(uuid, pos);
-				UUIDByPos.put(pos, uuid);
 			}
 		}
 	}
@@ -149,7 +152,6 @@ public class PersistentUUIDSet implements Set<Long> {
 		}
 
 		posByUUID.put(uuid, length);
-		UUIDByPos.put(length, uuid);
 
 		return true;
 	}
@@ -211,7 +213,6 @@ public class PersistentUUIDSet implements Set<Long> {
 		Long positionInFile = posByUUID.get((Long) uuid);
 		if (positionInFile != null) {
 			posByUUID.remove(uuid);
-			UUIDByPos.remove(positionInFile);
 
 			try {
 				openFileIfClosed();
@@ -242,10 +243,27 @@ public class PersistentUUIDSet implements Set<Long> {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return The number of elements in this set
+	 */
+	public long getSize() {
+		return length - numberOfZerosInFile;
+	}
+
+	/*
+	 * @deprecated Use getSize() to have full long prezision
+	 * 
+	 * @see java.util.Set#size()
+	 */
 	@Override
+	@Deprecated
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		long elements = length - numberOfZerosInFile;
+		if (elements > Integer.MAX_VALUE) {
+			return Integer.MAX_VALUE;
+		}
+		return (int) (elements);
 	}
 
 	@Override

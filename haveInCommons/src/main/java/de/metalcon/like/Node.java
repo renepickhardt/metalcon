@@ -35,7 +35,7 @@ class Node {
 	private PersistentUUIDSet friends = null;
 
 	/**
-	 * This Constructor will also add the node to the global list of nodes
+	 * This constructor may only be called by the NodeFactory class
 	 * 
 	 * @param uuid
 	 *            The uuid of the node
@@ -44,11 +44,6 @@ class Node {
 	 * @param isNewNode
 	 *            If false the corresponding files will be read into memory. If
 	 *            true we will not touch the disk.
-	 */
-
-	/**
-	 * 
-
 	 */
 	Node(final long uuid, final String storageDir, boolean isNewNode) {
 		this.UUID = uuid;
@@ -386,7 +381,7 @@ class Node {
 	 * @return All friends of this node
 	 */
 	public long[] getFriends() {
-		return friends.toArray(new long[(int) friends.length]);
+		return friends.toArray(new long[(int) friends.getSize()]);
 	}
 
 	/**

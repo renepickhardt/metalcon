@@ -1,22 +1,23 @@
 package de.metalcon.like;
 
 import java.io.File;
+import java.io.IOException;
 
-import de.metalcon.utils.LazyPersistentUUIDMap;
+import de.metalcon.utils.PersistentUUIDArrayMap;
 
 /**
  * @author Jonas Kunze
  */
-class Commons {
+class CommonsWithPersistentUUIDArrayMap {
 	/*
 	 * FIXME: optimize those two values
 	 */
-	private static final int InitialCommonListLength = 4;
 	private static final float CommonListGrowthFactor = 1.2f;
 
 	private final Node node;
 	private final String persistentFileName;
-	private LazyPersistentUUIDMap raw = null;
+	// private LazyPersistentUUIDMap persistentcommonsMap = null;
+	private PersistentUUIDArrayMap persistentcommonsMap = null;
 
 	private boolean mayFreeMem = true;
 
@@ -25,7 +26,7 @@ class Commons {
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public Commons(final Node node, final String storageDir) {
+	public CommonsWithPersistentUUIDArrayMap(final Node node, final String storageDir) {
 		this.node = node;
 		this.persistentFileName = storageDir + "/" + node.getUUID()
 				+ "_commons";
@@ -50,10 +51,10 @@ class Commons {
 	 *         of this Commons in common. The last uuids in the list may be 0
 	 */
 	public long[] getCommonNodes(long uuid) {
-		if (raw == null) {
+		if (persistentcommonsMap == null) {
 			readFile();
 		}
-		long[] commons = raw.get(uuid);
+		long[] commons = persistentcommonsMap.get(uuid);
 
 		if (commons != null) {
 			/*
@@ -77,7 +78,13 @@ class Commons {
 	 * 
 	 */
 	private void readFile() {
-		raw = LazyPersistentUUIDMap.getPersistentUUIDMap(persistentFileName);
+		try {
+			persistentcommonsMap = new PersistentUUIDArrayMap(
+					persistentFileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	/**
@@ -92,7 +99,7 @@ class Commons {
 				e.printStackTrace();
 			}
 		}
-		raw = null;
+		persistentcommonsMap = null;
 	}
 
 	/**
@@ -106,8 +113,7 @@ class Commons {
 			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
-		raw.setUpdateTimeStamp(now);
-		raw.save();
+		persistentcommonsMap.setUpdateTimeStamp(now);
 		mayFreeMem = true;
 	}
 
@@ -134,7 +140,7 @@ class Commons {
 			/*
 			 * Find the list of commons with the entity the friend liked
 			 */
-			long[] commons = raw.get(like.getUUID());
+			long[] commons = persistentcommonsMap.get(like.getUUID());
 			if (commons == null) {
 				continue;
 			}
@@ -142,10 +148,8 @@ class Commons {
 			/*
 			 * Remove the friend from the commons list of the liked entity
 			 */
-			raw.put(like.getUUID(),
-					removeFromCommonsList(commons, friend.getUUID()));
-
-			raw.save();
+			persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
+			// removeFromCommonsList(commons, friend.getUUID()));
 		}
 	}
 
@@ -165,113 +169,18 @@ class Commons {
 	 *            update of this commons till now will be considered.
 	 */
 	private void updateFriend(Node friend, boolean ignoreTimestamp) {
-		if (raw == null) {
+		if (persistentcommonsMap == null) {
 			readFile();
 		}
 
 		mayFreeMem = false;
 
-		int searchTS = ignoreTimestamp ? 0 : raw.getLastUpdateTimeStamp();
+		int searchTS = ignoreTimestamp ? 0 : persistentcommonsMap
+				.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
-			/*
-			 * If the friend likes this node we would have a recursion->skip
-			 */
-			if (like.getUUID() == node.getUUID()) {
-				continue;
-			}
+			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
 
-			/*
-			 * Find the list of commons with the entity the friend liked
-			 */
-			long[] commons = raw.get(like.getUUID());
-			if (commons == null) {
-				commons = new long[InitialCommonListLength];
-			}
-
-			/*
-			 * Add the friend to the commons list of the liked entity
-			 * 
-			 * TODO: separate likes, dislikes and neutral likes in 2 different
-			 * maps and delete the entries if we find a neutral like
-			 */
-			commons = addIntoCommonsList(commons, friend.getUUID());
-			raw.put(like.getUUID(), commons);
 		}
-
-		raw.save();
 		mayFreeMem = true;
-	}
-
-	/**
-	 * Seeks the first 0 element in the commons array and puts addUUID into that
-	 * position. If the array is already full its length will be extended by a
-	 * factor of CommonListGrowthFactor
-	 * 
-	 * @param commons
-	 *            The array addUUID will be added to
-	 * @param addUUID
-	 *            The uuid to be added
-	 * @return The commons array (length might have been extended)
-	 */
-	private long[] addIntoCommonsList(long[] commons, long addUUID) {
-		int lastEmptyPointer = 0;
-
-		/*
-		 * Seek the last 0 element or return if addUUID is already in the array
-		 * 
-		 * If neither any 0-element nor addUUID have been found lastEmptyPointer
-		 * will be commons.length after this loop
-		 */
-		while (lastEmptyPointer != commons.length) {
-			long current = commons[lastEmptyPointer];
-			if (current == addUUID) {
-				return commons;
-			}
-			if (current == 0) {
-				break;
-			}
-			lastEmptyPointer++;
-		}
-
-		/*
-		 * No empty position found. Array has to be extended
-		 */
-		if (lastEmptyPointer == commons.length) {
-			int newLength = (int) (CommonListGrowthFactor * commons.length + 1);
-			int oldLength = commons.length;
-			long[] tmp = new long[newLength];
-			System.arraycopy(commons, 0, tmp, 0, oldLength);
-			commons = tmp;
-		}
-
-		commons[lastEmptyPointer] = addUUID;
-		return commons;
-	}
-
-	/**
-	 * Removes the entry in the commons list with the value UUID
-	 * 
-	 * @param commons
-	 *            The array UUID will be removed from
-	 * @param UUID
-	 *            The UUID to be removed
-	 * @return The commons array
-	 */
-	private long[] removeFromCommonsList(long[] commons, long UUID) {
-
-		/*
-		 * Seek the element in commons with the value UUID and move all elements
-		 * behind on to the left
-		 */
-		for (int i = 0; i < commons.length; i++) {
-			if (commons[i] == UUID) {
-				System.arraycopy(commons, i + 1, commons, i, commons.length - i);
-				commons[commons.length - 1] = 0; // remove duplicate last
-													// element
-				return commons;
-			}
-		}
-
-		return commons;
 	}
 }

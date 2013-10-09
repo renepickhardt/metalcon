@@ -12,6 +12,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+/**
+ * @author Jonas Kunze
+ */
 public class Serialization {
 
 	/**
@@ -19,7 +22,7 @@ public class Serialization {
 	 * object
 	 * 
 	 * @param fileName
-	 *            The file to be deserialized
+	 *            The pathname to the file to be deserialized
 	 * @return The deserialized object or null if the file was not found
 	 */
 	public static Object readObjectFromFile(final String fileName) {
@@ -35,7 +38,8 @@ public class Serialization {
 	}
 
 	/**
-	 * Serializes obj and writes it into fileName
+	 * Serializes obj and writes it into the file with the pathname given by
+	 * <code>fileName</code>
 	 * 
 	 * @param obj
 	 *            The object to be serialized

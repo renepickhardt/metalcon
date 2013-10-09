@@ -32,7 +32,7 @@ public class App {
 
 	public static void main(String[] args) {
 		// graph = new PersistentReadOptimized();
-		graph = new NormalizedFlatFileLikeRetrieval("commonsDB");
+		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
 
 		importGraph(graph, METALCON_FILE);
 
@@ -42,7 +42,7 @@ public class App {
 					rand.nextInt(1000), false);
 		}
 
-		testInCommons(graph, 2, 3, false);
+		testInCommons(graph, 1, 2, true);
 
 		// TestSingleNodePreprocessor();
 	}
