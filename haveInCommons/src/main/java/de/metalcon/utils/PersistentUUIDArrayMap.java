@@ -12,12 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Jonas Kunze
  * 
  *         This class can be used to store a HashMap<Long,long[]> on the disk an
- *         access it in a performant way. It is only worth using this class if
- *         the map is very big and a write operation does not occur too often!
- *         The reason is that this will cause many small disk writes.
- * 
- *         In other cases just use Serialization and write/read such a HashMap
- *         directly to/from the disk.
+ *         access it in a performant way. It uses two memory mapped files to
+ *         store keys and values separated.
  */
 class ValueArrayPointer {
 	long pointer;
@@ -101,9 +97,11 @@ public class PersistentUUIDArrayMap {
 	private int numberOfZerosInKeyFile;
 
 	private RandomAccessFile keyRAFile = null;
-	private RandomAccessFile valueFile = null;
+	private RandomAccessFile valueRAFile = null;
+	private MappedByteBuffer valueFile = null;
 	private MappedByteBuffer keyFile = null;
 	private long keyFileBufferSize = 0;
+	private long valueFileBufferSize = 0;
 
 	/**
 	 * 
@@ -132,8 +130,9 @@ public class PersistentUUIDArrayMap {
 			try {
 				NumberOfOpenFileHandles.addAndGet(2);
 				keyRAFile = new RandomAccessFile(keyFileName, "rw");
-				createMemoryMappedBuffer();
-				valueFile = new RandomAccessFile(valueFileName, "rw");
+				createMemoryMappedKeyBuffer();
+				valueRAFile = new RandomAccessFile(valueFileName, "rw");
+				createMemoryMappedValueBuffer();
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -141,7 +140,7 @@ public class PersistentUUIDArrayMap {
 		}
 	}
 
-	private void createMemoryMappedBuffer() {
+	private void createMemoryMappedKeyBuffer() {
 		try {
 			keyFileBufferSize = keyRAFile.length();
 			if (keyFileBufferSize == 0) {
@@ -151,6 +150,22 @@ public class PersistentUUIDArrayMap {
 			}
 			keyFile = keyRAFile.getChannel().map(MapMode.READ_WRITE, 0,
 					keyFileBufferSize);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	private void createMemoryMappedValueBuffer() {
+		try {
+			valueFileBufferSize = valueRAFile.length();
+			if (valueFileBufferSize == 0) {
+				valueFileBufferSize = 4 * 1024;
+			} else {
+				valueFileBufferSize *= 2;
+			}
+			valueFile = valueRAFile.getChannel().map(MapMode.READ_WRITE, 0,
+					valueFileBufferSize);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -173,7 +188,7 @@ public class PersistentUUIDArrayMap {
 		if (keyFileSize == 0) {
 			return;
 		}
-		valueFileSize = valueFile.length();
+		valueFileSize = valueRAFile.length();
 
 		numberOfZerosInKeyFile = 0;
 
@@ -192,10 +207,10 @@ public class PersistentUUIDArrayMap {
 				/*
 				 * Now read the value file
 				 */
-				valueFile.seek(pointer);
+				valueFile.position((int) pointer);
 				long[] valueUUIDs = new long[length];
 				for (int i = 0; i < length; ++i) {
-					valueUUIDs[i] = valueFile.readLong();
+					valueUUIDs[i] = valueFile.getLong();
 				}
 				mainMap.put(uuid, valueUUIDs);
 			}
@@ -231,7 +246,7 @@ public class PersistentUUIDArrayMap {
 		try {
 			if (valueFile != null) {
 				NumberOfOpenFileHandles.decrementAndGet();
-				valueFile.close();
+				valueRAFile.close();
 				valueFile = null;
 				return true;
 			}
@@ -387,13 +402,8 @@ public class PersistentUUIDArrayMap {
 			 * (pointer.pointer) plus the relative position of the first empty
 			 * element in the array (lastEmptyPointer)
 			 */
-			try {
-				valueFile.seek(pointer.pointer + firstEmtpyPointer);
-				valueFile.writeLong(keyUUID);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			valueFile.position((int) pointer.pointer + firstEmtpyPointer);
+			valueFile.putLong(keyUUID);
 			/*
 			 * Now update the array in the cache
 			 */
@@ -462,7 +472,7 @@ public class PersistentUUIDArrayMap {
 	private int writePointerToKeyFile(final long uuid,
 			final ValueArrayPointer p, final long position) throws IOException {
 		if (keyFileBufferSize <= keyFileSize + BytesPerKeyEntry) {
-			createMemoryMappedBuffer();
+			createMemoryMappedKeyBuffer();
 		}
 
 		keyFile.position((int) position);
@@ -484,9 +494,13 @@ public class PersistentUUIDArrayMap {
 	 */
 	private int writeArrayToValueFile(final long[] array, final long position)
 			throws IOException {
-		valueFile.seek(position);
+		if (valueFileBufferSize <= valueFileSize + array.length * 8) {
+			createMemoryMappedValueBuffer();
+		}
+
+		valueFile.position((int) position);
 		for (long l : array) {
-			valueFile.writeLong(l);
+			valueFile.putLong(l);
 		}
 		return array.length * 8;
 	}
