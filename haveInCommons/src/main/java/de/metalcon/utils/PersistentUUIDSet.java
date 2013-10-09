@@ -1,14 +1,27 @@
 package de.metalcon.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PersistentUUIDSet implements Set<Long> {
+	/*
+	 * The number of currently opened file handles
+	 */
+	private static final AtomicInteger NumberOfOpenFileHandles = new AtomicInteger(
+			0);
+
+	/*
+	 * The maximum number of open file handles allowed.
+	 */
+	private static final int MaximumOpenFileHandles = 500;
+
 	private final String fileName;
 
 	private RandomAccessFile file = null;
@@ -37,6 +50,7 @@ public class PersistentUUIDSet implements Set<Long> {
 	public PersistentUUIDSet(final String fileName) throws IOException {
 		this.fileName = fileName;
 		loadFile();
+		closeFileIfNecessary();
 	}
 
 	/**
@@ -44,6 +58,9 @@ public class PersistentUUIDSet implements Set<Long> {
 	 * @return The number of empty slots in the array
 	 */
 	public float getFragmentationRatio() {
+		if (length == 0) {
+			return 0;
+		}
 		return numberOfZerosInFile / ((float) length);
 	}
 
@@ -53,9 +70,7 @@ public class PersistentUUIDSet implements Set<Long> {
 	 * @throws IOException
 	 */
 	private void loadFile() throws IOException {
-		if (file == null) {
-			file = new RandomAccessFile(fileName, "rw");
-		}
+		openFileIfClosed();
 
 		posByUUID = new HashMap<Long, Long>();
 		UUIDByPos = new HashMap<Long, Long>();
@@ -78,14 +93,27 @@ public class PersistentUUIDSet implements Set<Long> {
 	}
 
 	/**
-	 * Close the file handler. It will be automatically opened as soon as a disk
-	 * access is needed.
+	 * Opens the file handle if it was closed
 	 * 
-	 * @return true if the handler was opened and we wer able to close it
+	 * @throws FileNotFoundException
 	 */
-	public boolean closeFile() {
+	private void openFileIfClosed() throws FileNotFoundException {
+		if (file == null) {
+			NumberOfOpenFileHandles.incrementAndGet();
+			file = new RandomAccessFile(fileName, "rw");
+		}
+	}
+
+	/**
+	 * Close the file handle. It will be automatically reopened as soon as a
+	 * disk access is needed.
+	 * 
+	 * @return true if the handle was opened and we were able to close it
+	 */
+	private boolean closeFile() {
 		if (file != null) {
 			try {
+				NumberOfOpenFileHandles.decrementAndGet();
 				file.close();
 				file = null;
 			} catch (IOException e) {
@@ -98,21 +126,29 @@ public class PersistentUUIDSet implements Set<Long> {
 	}
 
 	/**
+	 * Close the file handle if too many are opened. It will be automatically
+	 * reopened as soon as a disk access is needed.
+	 */
+	public void closeFileIfNecessary() {
+		if (NumberOfOpenFileHandles.get() > MaximumOpenFileHandles) {
+			closeFile();
+		}
+	}
+
+	/**
 	 * Adds the given uuid to the end of the file
 	 */
 	public boolean add(long uuid) {
 		try {
-			if (file == null) {
-				file = new RandomAccessFile(fileName, "rw");
-			}
-			file.seek(length);
+			openFileIfClosed();
+			file.seek(length++ * 8);
 			file.writeLong(uuid);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
 
-		posByUUID.put(uuid, length++);
+		posByUUID.put(uuid, length);
 		UUIDByPos.put(length, uuid);
 
 		return true;
@@ -122,13 +158,9 @@ public class PersistentUUIDSet implements Set<Long> {
 	 * Deletes the persistent file
 	 */
 	public void delete() {
-		try {
-			file.close();
-			File file = new File(fileName);
-			file.renameTo(new File(fileName + ".deleted"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		closeFile();
+		File f = new File(fileName);
+		f.renameTo(new File(fileName + ".deleted"));
 	}
 
 	@Override
@@ -182,9 +214,7 @@ public class PersistentUUIDSet implements Set<Long> {
 			UUIDByPos.remove(positionInFile);
 
 			try {
-				if (file == null) {
-					file = new RandomAccessFile(fileName, "rw");
-				}
+				openFileIfClosed();
 				file.seek(positionInFile * 8);
 				file.writeLong(0);
 			} catch (IOException e) {

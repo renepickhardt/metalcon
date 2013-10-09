@@ -31,23 +31,18 @@ public class App {
 	private static HaveInCommons graph;
 
 	public static void main(String[] args) {
-
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("commonsDB");
 
 		importGraph(graph, METALCON_FILE);
 
 		Random rand = new Random();
-		int commonsComputeCounter = 0;
 		for (int i = 0; i < 1000; i++) {
-			int commons = testInCommons(graph, rand.nextInt(10000),
-					rand.nextInt(10000), false);
-			if (commons > -1) {
-				commonsComputeCounter++;
-			}
+			int commons = testInCommons(graph, rand.nextInt(1000),
+					rand.nextInt(1000), false);
 		}
 
-		testInCommons(graph, 1, 2, true);
+		testInCommons(graph, 2, 3, false);
 
 		// TestSingleNodePreprocessor();
 	}
@@ -59,10 +54,17 @@ public class App {
 		long end = System.nanoTime();
 
 		if (commons != null) {
-			// if (commons.length > 10 || end-start>5001E3)
-			System.out.println("getCommonNodes needed: " + (end - start) / 1000
-					+ " microseconds for " + commons.length + " commons");
+			if (verbose) {
+				System.out.println("getCommonNodes needed: " + (end - start)
+						/ 1000 + " microseconds for " + commons.length
+						+ " commons");
+			}
 			if (commons.length > 0) {
+				if (!verbose) {
+					System.out.println("getCommonNodes needed: "
+							+ (end - start) / 1000 + " microseconds for "
+							+ commons.length + " commons");
+				}
 				if (verbose) {
 					System.out.println("Common length: " + commons.length);
 					for (long s : commons) {

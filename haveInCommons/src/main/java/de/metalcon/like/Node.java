@@ -347,7 +347,7 @@ class Node {
 	public void addFriendship(Node newFriend) {
 		synchronized (friends) {
 			friends.add(newFriend.getUUID());
-			friends.closeFile();
+			friends.closeFileIfNecessary();
 
 			/**
 			 * Update the commons map
@@ -367,10 +367,10 @@ class Node {
 	public boolean removeFriendship(Node friend) {
 		synchronized (friends) {
 			if (!friends.remove(friend)) {
-				friends.closeFile();
+				friends.closeFileIfNecessary();
 				return false;
 			}
-			friends.closeFile();
+			friends.closeFileIfNecessary();
 		}
 
 		/**
