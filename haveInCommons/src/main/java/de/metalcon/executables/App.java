@@ -36,11 +36,11 @@ public class App {
 
 		importGraph(graph, METALCON_FILE);
 
-		Random rand = new Random();
-		for (int i = 0; i < 1000; i++) {
-			int commons = testInCommons(graph, rand.nextInt(1000),
-					rand.nextInt(1000), false);
-		}
+//		Random rand = new Random();
+//		for (int i = 0; i < 1000; i++) {
+//			int commons = testInCommons(graph, rand.nextInt(1000),
+//					rand.nextInt(1000), false);
+//		}
 
 		testInCommons(graph, 1, 2, true);
 

@@ -7,12 +7,11 @@ import de.metalcon.utils.LazyPersistentUUIDMap;
 /**
  * @author Jonas Kunze
  */
-class Commons {
+class CommonsSerialization {
 	/*
 	 * FIXME: optimize those two values
 	 */
 	private static final int InitialCommonListLength = 4;
-	private static final float CommonListGrowthFactor = 1.2f;
 
 	private final Node node;
 	private final String persistentFileName;
@@ -25,7 +24,7 @@ class Commons {
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public Commons(final Node node, final String storageDir) {
+	public CommonsSerialization(final Node node, final String storageDir) {
 		this.node = node;
 		this.persistentFileName = storageDir + "/" + node.getUUID()
 				+ "_commons";
@@ -173,6 +172,11 @@ class Commons {
 
 		int searchTS = ignoreTimestamp ? 0 : raw.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
+
+			if (this.node.getUUID() == 1 && like.getUUID() == 2) {
+				System.out.println(friend.getUUID()+"!");
+			}
+
 			/*
 			 * If the friend likes this node we would have a recursion->skip
 			 */
@@ -184,6 +188,7 @@ class Commons {
 			 * Find the list of commons with the entity the friend liked
 			 */
 			long[] commons = raw.get(like.getUUID());
+
 			if (commons == null) {
 				commons = new long[InitialCommonListLength];
 			}
@@ -237,7 +242,7 @@ class Commons {
 		 * No empty position found. Array has to be extended
 		 */
 		if (lastEmptyPointer == commons.length) {
-			int newLength = (int) (CommonListGrowthFactor * commons.length + 1);
+			int newLength = (int) (2 * commons.length + 1);
 			int oldLength = commons.length;
 			long[] tmp = new long[newLength];
 			System.arraycopy(commons, 0, tmp, 0, oldLength);

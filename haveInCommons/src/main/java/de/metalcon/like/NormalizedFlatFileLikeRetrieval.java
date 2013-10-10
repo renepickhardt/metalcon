@@ -19,7 +19,6 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 					+ " because the storage directory does not exist: '"
 					+ storageDir + "'");
 		}
-
 		NodeFactory.initialize(storageDir);
 	}
 
@@ -30,7 +29,7 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 			// System.err.println("Unknown Node uuid: " + uuid1);
 			return new long[0];
 		}
-//		f.freeMemory();
+		// f.freeMemory();
 
 		return f.getCommonNodes(uuid2);
 	}

@@ -1,36 +1,30 @@
 package de.metalcon.like;
 
 import java.io.File;
-import java.io.IOException;
 
-import de.metalcon.utils.PersistentUUIDArrayMap;
+import de.metalcon.utils.PersistentUUIDArrayMapRedis;
 
 /**
  * @author Jonas Kunze
  */
-class CommonsWithPersistentUUIDArrayMap {
-	/*
-	 * FIXME: optimize those two values
-	 */
-	private static final float CommonListGrowthFactor = 1.2f;
-
+class CommonsRedis {
 	private final Node node;
 	private final String persistentFileName;
-	// private LazyPersistentUUIDMap persistentcommonsMap = null;
-	private PersistentUUIDArrayMap persistentcommonsMap = null;
 
-	private boolean mayFreeMem = true;
+	private final PersistentUUIDArrayMapRedis persistentcommonsMap;
 
 	/**
 	 * 
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public CommonsWithPersistentUUIDArrayMap(final Node node,
-			final String storageDir) {
+	public CommonsRedis(final Node node, final String storageDir) {
 		this.node = node;
 		this.persistentFileName = storageDir + "/" + node.getUUID()
 				+ "_commons";
+
+		persistentcommonsMap = new PersistentUUIDArrayMapRedis(
+				Long.toString(node.getUUID()));
 	}
 
 	/**
@@ -52,9 +46,6 @@ class CommonsWithPersistentUUIDArrayMap {
 	 *         of this Commons in common. The last uuids in the list may be 0
 	 */
 	public long[] getCommonNodes(long uuid) {
-		if (persistentcommonsMap == null) {
-			readFile();
-		}
 		long[] commons = persistentcommonsMap.get(uuid);
 
 		if (commons != null) {
@@ -75,50 +66,23 @@ class CommonsWithPersistentUUIDArrayMap {
 	}
 
 	/**
-	 * Reads the persistent commons file
-	 * 
-	 */
-	private void readFile() {
-		try {
-			persistentcommonsMap = new PersistentUUIDArrayMap(
-					persistentFileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-
-	/**
 	 * Frees the cached data. The next getCommonNodes call will therefore
 	 * trigger a disc access
 	 */
 	public void freeMemory() {
-		while (!mayFreeMem) { // Wait until all reads/writes have been performed
-			try {
-				Thread.sleep(1000); // sleep one second
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		persistentcommonsMap = null;
 	}
 
 	/**
 	 * Updates the commons of node and writes the data to disk
 	 */
 	public void update() {
-		mayFreeMem = false;
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
 		for (long friendUUID : node.getFriends()) {
-			if (friendUUID == node.getUUID()) {
-				continue;
-			}
 			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
 		persistentcommonsMap.setUpdateTimeStamp(now);
-		mayFreeMem = true;
 	}
 
 	/**
@@ -173,21 +137,16 @@ class CommonsWithPersistentUUIDArrayMap {
 	 *            update of this commons till now will be considered.
 	 */
 	private void updateFriend(Node friend, boolean ignoreTimestamp) {
-		if (persistentcommonsMap == null) {
-			readFile();
-		}
-
-		mayFreeMem = false;
-
 		int searchTS = ignoreTimestamp ? 0 : persistentcommonsMap
 				.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
+
 			if (like.getUUID() == node.getUUID()) {
 				continue;
 			}
+
 			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
 
 		}
-		mayFreeMem = true;
 	}
 }

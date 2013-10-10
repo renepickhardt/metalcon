@@ -218,13 +218,6 @@ public class PersistentUUIDArrayMap {
 	}
 
 	/**
-	 * Just for compatibility with LazyPersistentUUIDMap
-	 */
-	public boolean save() {
-		return true;
-	}
-
-	/**
 	 * Close the file handle. It will be automatically reopened as soon as a
 	 * disk access is needed.
 	 * 
@@ -514,7 +507,7 @@ public class PersistentUUIDArrayMap {
 	 *         map contains no mapping for the key
 	 * @see HashMap#get(Object)
 	 */
-	public long[] get(long keyUUID) {
+	public long[] get(final long keyUUID) {
 		return mainMap.get(keyUUID);
 	}
 }
