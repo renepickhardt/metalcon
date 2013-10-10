@@ -68,31 +68,29 @@ public class SuggestionComponents implements Serializable {
 
 	public void saveToDisc(File createFile) {
 		try {
+			if (!createFile.exists()) {
 
-			// advice found here:
-			// http://stackoverflow.com/questions/1194656/appending-to-an-objectoutputstream/1195078#1195078
-			if (!(createFile.exists())) {
-				System.out.println(createFile
-						+ " did not exist and has been created");
-				FileOutputStream saveFile = new FileOutputStream(createFile,
-						false);
-
-				ObjectOutputStream save = new ObjectOutputStream(saveFile);
-				save.writeObject(this);
-				save.close();
-				saveFile.close();
-
-			} else {
-				System.out.println("appended to " + createFile);
-				FileOutputStream saveFile = new FileOutputStream(createFile,
-						true);
-				AppendingObjectOutputStream save = new AppendingObjectOutputStream(
-						saveFile);
-				save.writeObject(this);
-				save.close();
-				saveFile.close();
-
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						createFile, true);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+						fileOutputStream);
+				objectOutputStream.writeObject(this);
+				objectOutputStream.flush();
+				objectOutputStream.close();
+				fileOutputStream.close();
 			}
+
+			else {
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						createFile, true);
+				AppendingObjectOutputStream appendingObjectOutputStream = new AppendingObjectOutputStream(
+						fileOutputStream);
+				appendingObjectOutputStream.writeObject(this);
+				appendingObjectOutputStream.flush();
+				appendingObjectOutputStream.close();
+				fileOutputStream.close();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

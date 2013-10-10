@@ -1,5 +1,6 @@
 package de.metalcon.autocompleteServer;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class Search {
 
 			for (String element : fileList) {
 				if (element.endsWith(".save")) {
-					System.out.println("found file: " + element);
 
 				}
 			}
@@ -56,34 +56,35 @@ public class Search {
 							saveFile);
 
 					// this constructor hangs, if he received no data! This
-					// happens if the read files header is broken.
+					// also seems to happen in the read file has a corrupt
+					// header.
 					ObjectInputStream restore = new ObjectInputStream(
 							fileInputStream);
 					SuggestionComponents suggestTreeEntry = null;
 
-					while ((suggestTreeEntry = (SuggestionComponents) restore
-							.readObject()) != null) {
+					try {
+						while ((suggestTreeEntry = (SuggestionComponents) restore
+								.readObject()) != null) {
 
-						System.out.println("inserting String"
-								+ suggestTreeEntry.getSuggestString());
+							suggestTree.put(
+									suggestTreeEntry.getSuggestString(),
+									suggestTreeEntry.getWeight(),
+									suggestTreeEntry.getKey());
 
-						suggestTree.put(suggestTreeEntry.getSuggestString(),
-								suggestTreeEntry.getWeight(),
-								suggestTreeEntry.getKey());
-						if (suggestTreeEntry.getImageBase64() != null) {
-							imageIndex.put(suggestTreeEntry.getKey(),
-									suggestTreeEntry.getImageBase64());
+							if (suggestTreeEntry.getImageBase64() != null) {
+								imageIndex.put(suggestTreeEntry.getKey(),
+										suggestTreeEntry.getImageBase64());
+							}
 						}
+					} catch (EOFException e) {
+						restore.close();
 					}
-					restore.close();
 				}
 			}
 
 		} catch (IOException | ClassNotFoundException e1) {
 
-			// since the while condition eventually triggers an EOF-exception,
-			// printing a stack trace would be rather confusing
-			// e1.printStackTrace();
+			e1.printStackTrace();
 
 		}
 
