@@ -96,6 +96,9 @@ public class PersistentUUIDArrayMap {
 	 */
 	private int numberOfZerosInKeyFile;
 
+	/*
+	 * The first long of each files is the length of the file in bytes
+	 */
 	private RandomAccessFile keyRAFile = null;
 	private RandomAccessFile valueRAFile = null;
 	private MappedByteBuffer valueFile = null;
@@ -127,22 +130,26 @@ public class PersistentUUIDArrayMap {
 	 */
 	private void openFilesIfClosed() {
 		if (keyFile == null) {
-			try {
-				NumberOfOpenFileHandles.addAndGet(2);
-				keyRAFile = new RandomAccessFile(keyFileName, "rw");
-				createMemoryMappedKeyBuffer();
-				valueRAFile = new RandomAccessFile(valueFileName, "rw");
-				createMemoryMappedValueBuffer();
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			openFiles();
+		}
+	}
+
+	private void openFiles() {
+		try {
+			NumberOfOpenFileHandles.addAndGet(2);
+			keyRAFile = new RandomAccessFile(keyFileName, "rw");
+			createMemoryMappedKeyBuffer();
+			valueRAFile = new RandomAccessFile(valueFileName, "rw");
+			createMemoryMappedValueBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
 	private void createMemoryMappedKeyBuffer() {
 		try {
-			keyFileBufferSize = keyRAFile.length();
+			keyFileBufferSize = keyFileSize * 2;
 			if (keyFileBufferSize == 0) {
 				keyFileBufferSize = 4 * 1024;
 			} else {
@@ -158,7 +165,7 @@ public class PersistentUUIDArrayMap {
 
 	private void createMemoryMappedValueBuffer() {
 		try {
-			valueFileBufferSize = valueRAFile.length();
+			valueFileBufferSize = valueFileSize * 2;
 			if (valueFileBufferSize == 0) {
 				valueFileBufferSize = 4 * 1024;
 			} else {
@@ -182,13 +189,19 @@ public class PersistentUUIDArrayMap {
 		keyMap = new HashMap<Long, Long>();
 		arrayPointers = new HashMap<Long, ValueArrayPointer>();
 
-		openFilesIfClosed();
+		openFiles();
 
-		keyFileSize = keyRAFile.length();
+		keyFileSize = keyFile.getLong();
 		if (keyFileSize == 0) {
+			/*
+			 * Whenever we want to append something, we should start at byte 8
+			 * as the first 8 bytes are reserved for the file length
+			 */
+			keyFileSize = 8;
+			valueFileSize = 8;
 			return;
 		}
-		valueFileSize = valueRAFile.length();
+		valueFileSize = valueFile.getLong();
 
 		numberOfZerosInKeyFile = 0;
 
@@ -307,50 +320,18 @@ public class PersistentUUIDArrayMap {
 				ValueArrayPointer pointer = new ValueArrayPointer(
 						valueFileSize, valueArray.length);
 				valueFileSize += valueArray.length * 8;
+				valueFile.putLong(0, valueFileSize);
 
 				keyFileSize += writePointerToKeyFile(keyUUID, pointer,
 						keyFileSize);
+				keyFile.putLong(0, keyFileSize);
+
+				// arrayPointers.put(keyUUID, pointer);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-	}
-
-	/**
-	 * 
-	 * @param keyUUID
-	 * @param valueUUID
-	 */
-	public void remove(final long keyUUID, final long valueUUID) {
-
-	}
-
-	/**
-	 * Removes the entry in the value array associated to the specified value
-	 * UUID
-	 * 
-	 * @param keyUUID
-	 *            The key UUID of the array
-	 * @param UUID
-	 *            The UUID to be removed from the array
-	 * @return true if the specified UUID was found in the array
-	 */
-	private boolean removeFromCommonsList(final long keyUUID, final long UUID) {
-		/*
-		 * Seek the element in commons with the value UUID and move all elements
-		 * behind on to the left
-		 */
-		// for (int i = 0; i < commons.length; i++) {
-		// if (commons[i] == UUID) {
-		// System.arraycopy(commons, i + 1, commons, i, commons.length - i);
-		// commons[commons.length - 1] = 0; // remove duplicate last
-		// // element
-		// return commons;
-		// }
-		// }
-
-		return true;
 	}
 
 	/**
@@ -364,6 +345,8 @@ public class PersistentUUIDArrayMap {
 	 *            The uuid to be added
 	 * @return true if the keySet already contained keyUUID
 	 */
+	static int i = 0;
+
 	private boolean writeIntoValueArray(final long keyUUID, final long valueUUID) {
 		int firstEmtpyPointer = 0;
 		ValueArrayPointer pointer = arrayPointers.get(keyUUID);
@@ -419,6 +402,7 @@ public class PersistentUUIDArrayMap {
 				pointer.length = array.length;
 				pointer.pointer = valueFileSize;
 				valueFileSize += writeArrayToValueFile(array, valueFileSize);
+				valueFile.putLong(0, valueFileSize);
 
 				writePointerToKeyFile(keyUUID, pointer, keyMap.get(keyUUID));
 			} catch (IOException e) {
@@ -428,6 +412,42 @@ public class PersistentUUIDArrayMap {
 			mainMap.put(keyUUID, array);
 
 		}
+
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param keyUUID
+	 * @param valueUUID
+	 */
+	public void remove(final long keyUUID, final long valueUUID) {
+
+	}
+
+	/**
+	 * Removes the entry in the value array associated to the specified value
+	 * UUID
+	 * 
+	 * @param keyUUID
+	 *            The key UUID of the array
+	 * @param UUID
+	 *            The UUID to be removed from the array
+	 * @return true if the specified UUID was found in the array
+	 */
+	private boolean removeFromCommonsList(final long keyUUID, final long UUID) {
+		/*
+		 * Seek the element in commons with the value UUID and move all elements
+		 * behind on to the left
+		 */
+		// for (int i = 0; i < commons.length; i++) {
+		// if (commons[i] == UUID) {
+		// System.arraycopy(commons, i + 1, commons, i, commons.length - i);
+		// commons[commons.length - 1] = 0; // remove duplicate last
+		// // element
+		// return commons;
+		// }
+		// }
 
 		return true;
 	}
@@ -485,12 +505,20 @@ public class PersistentUUIDArrayMap {
 	 * @return The number of bytes written to file
 	 * @throws IOException
 	 */
+	static int num = 0;
+
 	private int writeArrayToValueFile(final long[] array, final long position)
 			throws IOException {
+		if (valueFileBufferSize > 1E6) {
+			System.out.println("!");
+		}
 		if (valueFileBufferSize <= valueFileSize + array.length * 8) {
 			createMemoryMappedValueBuffer();
 		}
-
+		System.out.println(++num);
+		if (num >= 7293) {
+			System.out.println("!");
+		}
 		valueFile.position((int) position);
 		for (long l : array) {
 			valueFile.putLong(l);
