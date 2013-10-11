@@ -27,7 +27,6 @@ public class NewIndex {
 	public static void newSuggestTree(ServletContext context, String indexName,
 			NewIndexResponse response) {
 
-		// TODO: add warning if already existing indexName was given.
 		SuggestTree checkIndex = ContextListener.getIndex(indexName, context);
 
 		if (checkIndex == null) {

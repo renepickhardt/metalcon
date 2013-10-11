@@ -56,6 +56,20 @@ public class TestCreateNewIndex {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
+	@Test
+	public void testDuplicateIndexName() {
+
+		this.processNewIndexRequest(ProtocolTestConstants.VALID_SUGGESTION_INDEX);
+		this.processNewIndexRequest(ProtocolTestConstants.VALID_SUGGESTION_INDEX);
+
+		// TODO adapt error message
+		assertEquals("request invalid: index \""
+				+ ProtocolTestConstants.VALID_SUGGESTION_INDEX
+				+ "\" already exists.",
+				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+	}
+
 	private void processNewIndexRequest(String indexName) {
 
 		this.newIndexResponse = new NewIndexResponse(
