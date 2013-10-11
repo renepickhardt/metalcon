@@ -1,7 +1,5 @@
 package de.metalcon.like;
 
-import java.io.File;
-
 import de.metalcon.utils.PersistentUUIDArrayMapRedis;
 
 /**
@@ -9,7 +7,6 @@ import de.metalcon.utils.PersistentUUIDArrayMapRedis;
  */
 class CommonsRedis {
 	private final Node node;
-	private final String persistentFileName;
 
 	private final PersistentUUIDArrayMapRedis persistentcommonsMap;
 
@@ -20,20 +17,15 @@ class CommonsRedis {
 	 */
 	public CommonsRedis(final Node node, final String storageDir) {
 		this.node = node;
-		this.persistentFileName = storageDir + "/" + node.getUUID()
-				+ "_commons";
-
-		persistentcommonsMap = new PersistentUUIDArrayMapRedis(
-				Long.toString(node.getUUID()));
+		persistentcommonsMap = new PersistentUUIDArrayMapRedis(""
+				+ node.getUUID());
 	}
 
 	/**
-	 * Delete the corresponding file
+	 * Remove all entries in the DB
 	 */
 	void delete() {
-		File file = new File(persistentFileName);
-		file.renameTo(new File(persistentFileName + ".deleted"));
-
+		persistentcommonsMap.removeAll();
 	}
 
 	/**
@@ -61,7 +53,6 @@ class CommonsRedis {
 				}
 			}
 		}
-
 		return commons;
 	}
 
@@ -117,8 +108,8 @@ class CommonsRedis {
 			 * Remove the friend from the commons list of the liked entity
 			 */
 			persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
-			// removeFromCommonsList(commons, friend.getUUID()));
 		}
+		persistentcommonsMap.removeKey(friend.getUUID());
 	}
 
 	/**
@@ -140,13 +131,11 @@ class CommonsRedis {
 		int searchTS = ignoreTimestamp ? 0 : persistentcommonsMap
 				.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
-
 			if (like.getUUID() == node.getUUID()) {
 				continue;
 			}
 
 			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
-
 		}
 	}
 }

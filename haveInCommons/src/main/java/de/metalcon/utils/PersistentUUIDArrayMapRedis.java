@@ -16,11 +16,6 @@ public class PersistentUUIDArrayMapRedis {
 			"localhost");
 	private final static Jedis jedis = pool.getResource();
 
-	/*
-	 * The timestamp when this Map has been updated
-	 */
-	private int lastUpdateTS = 0;
-
 	private final String prefix;
 
 	public PersistentUUIDArrayMapRedis(final String prefix) {
@@ -31,7 +26,11 @@ public class PersistentUUIDArrayMapRedis {
 	 * @return The timestamp of the last update
 	 */
 	public int getLastUpdateTimeStamp() {
-		return lastUpdateTS;
+		try {
+			return Integer.parseInt(jedis.get(prefix + "UpdateTS"));
+		} catch (final NumberFormatException e) {
+			return 0;
+		}
 	}
 
 	/**
@@ -40,7 +39,7 @@ public class PersistentUUIDArrayMapRedis {
 	 *            The timestamp of the last update
 	 */
 	public void setUpdateTimeStamp(final int updateTimeStamp) {
-		this.lastUpdateTS = updateTimeStamp;
+		jedis.set(prefix + "UpdateTS", Integer.toString(updateTimeStamp));
 	}
 
 	/**
@@ -49,7 +48,7 @@ public class PersistentUUIDArrayMapRedis {
 	 * @param valueUUID
 	 */
 	public void append(final long keyUUID, final long valueUUID) {
-		jedis.zadd(prefix+Long.toString(keyUUID), 0, Long.toString(valueUUID));
+		jedis.zadd(prefix + Long.toString(keyUUID), 0, Long.toString(valueUUID));
 	}
 
 	/**
@@ -62,7 +61,8 @@ public class PersistentUUIDArrayMapRedis {
 	 * @see HashMap#get(Object)
 	 */
 	public long[] get(final long keyUUID) {
-		Set<String> strings = jedis.zrange(prefix+Long.toString(keyUUID), 0, -1);
+		Set<String> strings = jedis.zrange(prefix + Long.toString(keyUUID), 0,
+				-1);
 		long[] result = new long[strings.size()];
 		int pointer = 0;
 		for (String s : strings) {
@@ -71,7 +71,38 @@ public class PersistentUUIDArrayMapRedis {
 		return result;
 	}
 
+	/**
+	 * Removes the element valueUUID from the list associated with the given
+	 * keyUUID
+	 * 
+	 * @param keyUUID
+	 *            The key of the list
+	 * @param valueUUID
+	 *            The element to be deleted from the list
+	 */
+	public void removeKey(final long keyUUID) {
+		jedis.del(prefix + keyUUID);
+	}
+
+	/**
+	 * Removes the element valueUUID from the list associated with the given
+	 * keyUUID
+	 * 
+	 * @param keyUUID
+	 *            The key of the list
+	 * @param valueUUID
+	 *            The element to be deleted from the list
+	 */
 	public void remove(final long keyUUID, final long valueUUID) {
-		jedis.zrem(prefix+Long.toString(keyUUID), Long.toString(valueUUID));
+		jedis.zrem(prefix + keyUUID, "" + valueUUID);
+	}
+
+	/**
+	 * Will delete all elements in this map
+	 */
+	public void removeAll() {
+		for (String key : jedis.keys(prefix + "*")) {
+			jedis.del(key);
+		}
 	}
 }

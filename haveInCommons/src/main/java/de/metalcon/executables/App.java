@@ -3,13 +3,11 @@ package de.metalcon.executables;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
-import de.metalcon.utils.PersistentUUIDArrayMap;
 
 /**
  * Hello world!
@@ -36,7 +34,7 @@ public class App {
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
 
-		importGraph(graph, METALCON_USER_FILE);
+		importGraph(graph, UB_SMALL_FILE);
 
 		// Random rand = new Random();
 		// for (int i = 0; i < 1000; i++) {
@@ -45,8 +43,6 @@ public class App {
 		// }
 
 		testInCommons(graph, 1, 2, true);
-
-		// TestSingleNodePreprocessor();
 	}
 
 	public static int testInCommons(HaveInCommons graph, long from, long to,

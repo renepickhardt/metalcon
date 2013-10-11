@@ -190,10 +190,10 @@ public class PersistentUUIDArrayMap {
 	 * 
 	 */
 	private void loadFile() throws IOException {
+		openFiles();
+
 		keyPositions = new HashMap<Long, Long>();
 		arrayPointers = new HashMap<Long, ValueArrayPointer>();
-
-		openFiles();
 
 		keyFileSize = keyFile.getLong();
 		if (keyFileSize == 0) {
@@ -219,7 +219,7 @@ public class PersistentUUIDArrayMap {
 			if (uuid == 0) {
 				numberOfZerosInKeyFile++;
 			} else {
-				keyPositions.put(uuid, elementNum);
+				keyPositions.put(uuid, elementNum * BytesPerKeyEntry);
 				arrayPointers.put(uuid, new ValueArrayPointer(pointer, length));
 				/*
 				 * Now read the value file
@@ -352,7 +352,7 @@ public class PersistentUUIDArrayMap {
 	static int i = 0;
 
 	private boolean writeIntoValueArray(final long keyUUID, final long valueUUID) {
-		int firstEmtpyPointer = 0;
+		int firstEmtpyLongPointer = 0;
 		ValueArrayPointer pointer = arrayPointers.get(keyUUID);
 		if (pointer == null) {
 			return false;
@@ -365,36 +365,30 @@ public class PersistentUUIDArrayMap {
 		 * If neither any 0-element nor addUUID have been found lastEmptyPointer
 		 * will be commons.length after this loop
 		 */
-		while (firstEmtpyPointer != array.length) {
-			long current = array[firstEmtpyPointer];
+		while (firstEmtpyLongPointer != array.length) {
+			long current = array[firstEmtpyLongPointer];
 			if (current == valueUUID) {
 				return true;
 			}
 			if (current == 0) {
 				break;
 			}
-			firstEmtpyPointer++;
+			firstEmtpyLongPointer++;
 		}
 
-		if (firstEmtpyPointer != array.length) {
+		if (firstEmtpyLongPointer != array.length) {
 			/*
 			 * Still space in the array. Just jump to the beginning of the array
 			 * (pointer.pointer) plus the relative position of the first empty
 			 * element in the array (lastEmptyPointer)
 			 */
-			valueFile.position((int) pointer.pointer + firstEmtpyPointer);
-			valueFile.putLong(keyUUID);
+			valueFile.position((int) pointer.pointer + firstEmtpyLongPointer
+					* 8);
+			valueFile.putLong(valueUUID);
 			/*
 			 * Now update the array in the cache
 			 */
-			array[firstEmtpyPointer] = valueUUID;
-
-			try {
-				pointer.length++;
-				writePointerToKeyFile(keyUUID, pointer);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			array[firstEmtpyLongPointer] = valueUUID;
 		} else {
 			/*
 			 * No empty position found. Array has to be extended
@@ -405,7 +399,7 @@ public class PersistentUUIDArrayMap {
 			System.arraycopy(array, 0, tmp, 0, oldLength);
 			array = tmp;
 
-			array[firstEmtpyPointer] = valueUUID;
+			array[firstEmtpyLongPointer] = valueUUID;
 			/*
 			 * Append the new array to the end of the value file
 			 */
@@ -419,7 +413,6 @@ public class PersistentUUIDArrayMap {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 			mainMap.put(keyUUID, array);
 		}
 
@@ -533,5 +526,16 @@ public class PersistentUUIDArrayMap {
 	 */
 	public long[] get(final long keyUUID) {
 		return mainMap.get(keyUUID);
+	}
+
+	public void print() {
+		System.out.println(valueFileName + ":");
+		for (Long key : mainMap.keySet()) {
+			System.out.print("\t" + key + "\n\t\t");
+			for (long l : mainMap.get(key)) {
+				System.out.print(l + "\t");
+			}
+			System.out.println();
+		}
 	}
 }
