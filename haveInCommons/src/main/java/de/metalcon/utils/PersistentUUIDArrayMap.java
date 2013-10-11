@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *         store keys and values separated.
  */
 class ValueArrayPointer {
+	/*
+	 * Pointer to the first byte of the value array in the value file
+	 */
 	long pointer;
 	/*
 	 * Number of Longs in the array
@@ -53,7 +56,7 @@ public class PersistentUUIDArrayMap {
 	/*
 	 * The maximum number of open file handles allowed.
 	 */
-	private static final int MaximumOpenFileHandles = 500;
+	private static final int MaximumOpenFileHandles = 300;
 
 	/*
 	 * Path to the file storing the keys
@@ -74,7 +77,7 @@ public class PersistentUUIDArrayMap {
 	 * Stores the position p of the key k in keyMap.put(k,p). The position is
 	 * the number of key-lines in the key file. Keys are ValueArrayPointer
 	 */
-	private HashMap<Long, Long> keyMap = null;
+	private HashMap<Long, Long> keyPositions = null;
 
 	/*
 	 * All pointers to the value arrays by the uuid key
@@ -134,27 +137,29 @@ public class PersistentUUIDArrayMap {
 		}
 	}
 
+	/**
+	 * Creates the memory mapped files
+	 */
 	private void openFiles() {
 		try {
 			NumberOfOpenFileHandles.addAndGet(2);
 			keyRAFile = new RandomAccessFile(keyFileName, "rw");
-			createMemoryMappedKeyBuffer();
+			updateMemoryMappedKeyBuffer(keyRAFile.length());
 			valueRAFile = new RandomAccessFile(valueFileName, "rw");
-			createMemoryMappedValueBuffer();
+			updateMemoryMappedValueBuffer(valueRAFile.length());
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
-	private void createMemoryMappedKeyBuffer() {
+	private void updateMemoryMappedKeyBuffer(final long minimumBufferSize) {
 		try {
-			keyFileBufferSize = keyFileSize * 2;
-			if (keyFileBufferSize == 0) {
-				keyFileBufferSize = 4 * 1024;
-			} else {
-				keyFileBufferSize *= 2;
-			}
+			if (minimumBufferSize < 4096)
+				keyFileBufferSize = 4096;
+			else
+				keyFileBufferSize = minimumBufferSize;
+
 			keyFile = keyRAFile.getChannel().map(MapMode.READ_WRITE, 0,
 					keyFileBufferSize);
 		} catch (IOException e) {
@@ -163,14 +168,13 @@ public class PersistentUUIDArrayMap {
 		}
 	}
 
-	private void createMemoryMappedValueBuffer() {
+	private void updateMemoryMappedValueBuffer(final long minimumBufferSize) {
 		try {
-			valueFileBufferSize = valueFileSize * 2;
-			if (valueFileBufferSize == 0) {
-				valueFileBufferSize = 4 * 1024;
-			} else {
-				valueFileBufferSize *= 2;
-			}
+			if (minimumBufferSize < 4096)
+				valueFileBufferSize = 4096;
+			else
+				valueFileBufferSize = minimumBufferSize;
+
 			valueFile = valueRAFile.getChannel().map(MapMode.READ_WRITE, 0,
 					valueFileBufferSize);
 		} catch (IOException e) {
@@ -186,7 +190,7 @@ public class PersistentUUIDArrayMap {
 	 * 
 	 */
 	private void loadFile() throws IOException {
-		keyMap = new HashMap<Long, Long>();
+		keyPositions = new HashMap<Long, Long>();
 		arrayPointers = new HashMap<Long, ValueArrayPointer>();
 
 		openFiles();
@@ -215,11 +219,12 @@ public class PersistentUUIDArrayMap {
 			if (uuid == 0) {
 				numberOfZerosInKeyFile++;
 			} else {
-				keyMap.put(uuid, elementNum);
+				keyPositions.put(uuid, elementNum);
 				arrayPointers.put(uuid, new ValueArrayPointer(pointer, length));
 				/*
 				 * Now read the value file
 				 */
+
 				valueFile.position((int) pointer);
 				long[] valueUUIDs = new long[length];
 				for (int i = 0; i < length; ++i) {
@@ -234,19 +239,19 @@ public class PersistentUUIDArrayMap {
 	 * Close the file handle. It will be automatically reopened as soon as a
 	 * disk access is needed.
 	 * 
-	 * @return true if the handle was opened and we were able to close it
+	 * @return true if the handles were opened and we were able to close it
 	 */
-	private boolean closeFile() {
+	public boolean closeFile() {
+		boolean success = false;
 		try {
 			if (keyFile != null) {
 				NumberOfOpenFileHandles.decrementAndGet();
 				keyRAFile.close();
 				keyFile = null;
-				return true;
+				success = true;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
 		}
 
 		try {
@@ -254,14 +259,13 @@ public class PersistentUUIDArrayMap {
 				NumberOfOpenFileHandles.decrementAndGet();
 				valueRAFile.close();
 				valueFile = null;
-				return true;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
+			success = false;
 		}
 
-		return false;
+		return success;
 	}
 
 	/**
@@ -322,9 +326,9 @@ public class PersistentUUIDArrayMap {
 				valueFileSize += valueArray.length * 8;
 				valueFile.putLong(0, valueFileSize);
 
-				keyFileSize += writePointerToKeyFile(keyUUID, pointer,
-						keyFileSize);
-				keyFile.putLong(0, keyFileSize);
+				writePointerToKeyFile(keyUUID, pointer);
+
+				updateMemoryMappedValueBuffer(valueFileSize);
 
 				// arrayPointers.put(keyUUID, pointer);
 			}
@@ -384,6 +388,13 @@ public class PersistentUUIDArrayMap {
 			 * Now update the array in the cache
 			 */
 			array[firstEmtpyPointer] = valueUUID;
+
+			try {
+				pointer.length++;
+				writePointerToKeyFile(keyUUID, pointer);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			/*
 			 * No empty position found. Array has to be extended
@@ -404,13 +415,12 @@ public class PersistentUUIDArrayMap {
 				valueFileSize += writeArrayToValueFile(array, valueFileSize);
 				valueFile.putLong(0, valueFileSize);
 
-				writePointerToKeyFile(keyUUID, pointer, keyMap.get(keyUUID));
+				writePointerToKeyFile(keyUUID, pointer);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			mainMap.put(keyUUID, array);
-
 		}
 
 		return true;
@@ -422,20 +432,6 @@ public class PersistentUUIDArrayMap {
 	 * @param valueUUID
 	 */
 	public void remove(final long keyUUID, final long valueUUID) {
-
-	}
-
-	/**
-	 * Removes the entry in the value array associated to the specified value
-	 * UUID
-	 * 
-	 * @param keyUUID
-	 *            The key UUID of the array
-	 * @param UUID
-	 *            The UUID to be removed from the array
-	 * @return true if the specified UUID was found in the array
-	 */
-	private boolean removeFromCommonsList(final long keyUUID, final long UUID) {
 		/*
 		 * Seek the element in commons with the value UUID and move all elements
 		 * behind on to the left
@@ -448,8 +444,6 @@ public class PersistentUUIDArrayMap {
 		// return commons;
 		// }
 		// }
-
-		return true;
 	}
 
 	/**
@@ -461,7 +455,7 @@ public class PersistentUUIDArrayMap {
 	 * @throws IOException
 	 */
 	private boolean eraseKey(final long uuid) throws IOException {
-		Long pos = keyMap.get(uuid);
+		Long pos = keyPositions.get(uuid);
 		if (pos != null) {
 			keyFile.position(pos.intValue());
 			keyFile.putLong(0);
@@ -482,16 +476,26 @@ public class PersistentUUIDArrayMap {
 	 * @return The number of bytes written to file
 	 * @throws IOException
 	 */
-	private int writePointerToKeyFile(final long uuid,
-			final ValueArrayPointer p, final long position) throws IOException {
-		if (keyFileBufferSize <= keyFileSize + BytesPerKeyEntry) {
-			createMemoryMappedKeyBuffer();
+	private int writePointerToKeyFile(final long uuid, final ValueArrayPointer p)
+			throws IOException {
+		Long position = keyPositions.get(uuid);
+		if (position == null) {
+			position = keyFileSize;
+			if (keyFileBufferSize <= keyFileSize + BytesPerKeyEntry) {
+				updateMemoryMappedKeyBuffer(keyFileSize + BytesPerKeyEntry);
+			}
+			keyFileSize += BytesPerKeyEntry;
+			keyFile.putLong(0, keyFileSize);
+
+			keyPositions.put(uuid, position);
 		}
 
-		keyFile.position((int) position);
-		keyFile.putLong(p.pointer);
+		keyFile.position(position.intValue());
+		keyFile.putLong(uuid);
 		keyFile.putLong(p.pointer);
 		keyFile.putInt(p.length);
+
+		arrayPointers.put(uuid, p);
 		return BytesPerKeyEntry;
 	}
 
@@ -505,20 +509,12 @@ public class PersistentUUIDArrayMap {
 	 * @return The number of bytes written to file
 	 * @throws IOException
 	 */
-	static int num = 0;
-
 	private int writeArrayToValueFile(final long[] array, final long position)
 			throws IOException {
-		if (valueFileBufferSize > 1E6) {
-			System.out.println("!");
-		}
 		if (valueFileBufferSize <= valueFileSize + array.length * 8) {
-			createMemoryMappedValueBuffer();
+			updateMemoryMappedValueBuffer(valueFileSize + array.length * 8);
 		}
-		System.out.println(++num);
-		if (num >= 7293) {
-			System.out.println("!");
-		}
+
 		valueFile.position((int) position);
 		for (long l : array) {
 			valueFile.putLong(l);

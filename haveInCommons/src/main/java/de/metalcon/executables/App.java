@@ -9,6 +9,7 @@ import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
+import de.metalcon.utils.PersistentUUIDArrayMap;
 
 /**
  * Hello world!
@@ -31,16 +32,17 @@ public class App {
 	private static HaveInCommons graph;
 
 	public static void main(String[] args) {
+
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
 
 		importGraph(graph, METALCON_USER_FILE);
 
-//		Random rand = new Random();
-//		for (int i = 0; i < 1000; i++) {
-//			int commons = testInCommons(graph, rand.nextInt(1000),
-//					rand.nextInt(1000), false);
-//		}
+		// Random rand = new Random();
+		// for (int i = 0; i < 1000; i++) {
+		// int commons = testInCommons(graph, rand.nextInt(1000),
+		// rand.nextInt(1000), false);
+		// }
 
 		testInCommons(graph, 1, 2, true);
 
@@ -73,9 +75,17 @@ public class App {
 				}
 				return commons.length;
 			} else {
+				if (verbose) {
+					System.out.println(from + " and " + to
+							+ " have nothing in common");
+				}
 				return 0;
 			}
 		} else {
+			if (verbose) {
+				System.out.println(from + " and " + to
+						+ " have nothing in common");
+			}
 			return -1;
 		}
 

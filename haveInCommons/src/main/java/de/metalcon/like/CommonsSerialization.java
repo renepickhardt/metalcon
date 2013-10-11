@@ -172,11 +172,6 @@ class CommonsSerialization {
 
 		int searchTS = ignoreTimestamp ? 0 : raw.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
-
-			if (this.node.getUUID() == 1 && like.getUUID() == 2) {
-				System.out.println(friend.getUUID()+"!");
-			}
-
 			/*
 			 * If the friend likes this node we would have a recursion->skip
 			 */

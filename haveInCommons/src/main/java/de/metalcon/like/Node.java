@@ -18,7 +18,8 @@ class Node {
 	private final long UUID;
 
 	// private final CommonsRedis commons;
-	private final CommonsWithPersistentUUIDArrayMap commons;
+	 private final CommonsWithPersistentUUIDArrayMap commons;
+//	private final CommonsSerialization commons;
 
 	private final String persistentLikeListFileName;
 
@@ -49,6 +50,7 @@ class Node {
 	Node(final long uuid, final String storageDir, boolean isNewNode) {
 		this.UUID = uuid;
 
+//		commons = new CommonsSerialization(this, storageDir);
 		commons = new CommonsWithPersistentUUIDArrayMap(this, storageDir);
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";

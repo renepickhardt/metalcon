@@ -9,11 +9,6 @@ import de.metalcon.utils.PersistentUUIDArrayMap;
  * @author Jonas Kunze
  */
 class CommonsWithPersistentUUIDArrayMap {
-	/*
-	 * FIXME: optimize those two values
-	 */
-	private static final float CommonListGrowthFactor = 1.2f;
-
 	private final Node node;
 	private final String persistentFileName;
 	// private LazyPersistentUUIDMap persistentcommonsMap = null;
@@ -56,6 +51,7 @@ class CommonsWithPersistentUUIDArrayMap {
 			readFile();
 		}
 		long[] commons = persistentcommonsMap.get(uuid);
+		persistentcommonsMap.closeFileIfNecessary();
 
 		if (commons != null) {
 			/*
@@ -100,6 +96,7 @@ class CommonsWithPersistentUUIDArrayMap {
 				e.printStackTrace();
 			}
 		}
+		persistentcommonsMap.closeFile();
 		persistentcommonsMap = null;
 	}
 
@@ -155,6 +152,7 @@ class CommonsWithPersistentUUIDArrayMap {
 			persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
 			// removeFromCommonsList(commons, friend.getUUID()));
 		}
+		persistentcommonsMap.closeFileIfNecessary();
 	}
 
 	/**
@@ -186,8 +184,8 @@ class CommonsWithPersistentUUIDArrayMap {
 				continue;
 			}
 			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
-
 		}
+		persistentcommonsMap.closeFileIfNecessary();
 		mayFreeMem = true;
 	}
 }
