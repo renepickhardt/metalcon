@@ -5,6 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import de.metalcon.utils.LazyPersistentUUIDMap;
+import de.metalcon.utils.PersistentUUIDArrayMap;
+import de.metalcon.utils.PersistentUUIDArrayMapLevelDB;
+import de.metalcon.utils.PersistentUUIDArrayMapRedis;
 import de.metalcon.utils.PersistentUUIDSet;
 
 /**
@@ -17,9 +21,7 @@ class Node {
 	// Class Variables
 	private final long UUID;
 
-	private final CommonsRedis commons;
-	// private final CommonsWithPersistentUUIDArrayMap commons;
-	// private final CommonsSerialization commons;
+	private final Commons commons;
 
 	private final String persistentLikeListFileName;
 
@@ -35,6 +37,7 @@ class Node {
 	 * All friends of this node
 	 */
 	private PersistentUUIDSet friends = null;
+	private PersistentUUIDSet inNodes = null;
 
 	/**
 	 * This constructor may only be called by the NodeFactory class
@@ -49,15 +52,24 @@ class Node {
 	 */
 	Node(final long uuid, final String storageDir, boolean isNewNode) {
 		this.UUID = uuid;
+		// commons = new Commons(this, storageDir,
+		// PersistentUUIDArrayMap.class);
 
-		// commons = new CommonsSerialization(this, storageDir);
-		commons = new CommonsRedis(this, storageDir);
+		// commons = new Commons(this, storageDir,
+		// PersistentUUIDArrayMapRedis.class);
+
+		// commons = new Commons(this, storageDir, LazyPersistentUUIDMap.class);
+
+		commons = new Commons(this, storageDir,
+				PersistentUUIDArrayMapLevelDB.class);
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
 
 		try {
 			friends = new PersistentUUIDSet(storageDir + "/" + UUID
 					+ "_friends");
+			inNodes = new PersistentUUIDSet(storageDir + "/" + UUID
+					+ "_inNodes");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -76,6 +88,7 @@ class Node {
 		}
 		commons.delete();
 		friends.delete();
+		inNodes.delete();
 
 		NodeFactory.removeNodeFromPersistentList(UUID);
 
@@ -337,7 +350,7 @@ class Node {
 	}
 
 	/**
-	 * Adds a new friend Node to the local friendList array (not persistent)
+	 * Adds a new friend Node to the friendList
 	 * 
 	 * @param newFriend
 	 *            The node to be added as a friend
@@ -351,6 +364,20 @@ class Node {
 			 * Update the commons map
 			 */
 			commons.friendAdded(newFriend);
+		}
+		newFriend.addInNode(this);
+	}
+
+	/**
+	 * Adds a new node to the in-list
+	 * 
+	 * @param inNode
+	 *            The node to be added
+	 */
+	private void addInNode(Node inNode) {
+		synchronized (inNodes) {
+			inNodes.add(inNode.getUUID());
+			inNodes.closeFileIfNecessary();
 		}
 	}
 
@@ -370,6 +397,7 @@ class Node {
 			}
 			friends.closeFileIfNecessary();
 		}
+		friend.removeInNode(this);
 
 		/**
 		 * Update the commons map
@@ -380,11 +408,38 @@ class Node {
 	}
 
 	/**
+	 * Removes the given Node from the friend list
+	 * 
+	 * @param friend
+	 *            The node to be deleted
+	 * @return <code>true</code> if the node has been found, <code>false</code>
+	 *         if not
+	 */
+	private boolean removeInNode(Node inNode) {
+		synchronized (inNodes) {
+			if (!inNodes.remove(inNode)) {
+				inNodes.closeFileIfNecessary();
+				return false;
+			}
+			inNodes.closeFileIfNecessary();
+		}
+		return true;
+	}
+
+	/**
 	 * 
 	 * @return All friends of this node
 	 */
 	public long[] getFriends() {
 		return friends.toArray(new long[(int) friends.getSize()]);
+	}
+
+	/**
+	 * 
+	 * @return All friends Nodes liking this node
+	 */
+	public long[] getInNodes() {
+		return inNodes.toArray(new long[(int) inNodes.getSize()]);
 	}
 
 	/**
@@ -405,5 +460,9 @@ class Node {
 
 	public void freeMemory() {
 		commons.freeMemory();
+	}
+
+	protected Commons getCommons() {
+		return commons;
 	}
 }

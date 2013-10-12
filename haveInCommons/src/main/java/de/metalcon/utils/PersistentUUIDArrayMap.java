@@ -1,5 +1,6 @@
 package de.metalcon.utils;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -35,7 +36,7 @@ class ValueArrayPointer {
  * @author Jonas Kunze
  * 
  */
-public class PersistentUUIDArrayMap {
+public class PersistentUUIDArrayMap implements IPersistentUUIDArrayMap {
 	private HashMap<Long, long[]> mainMap;
 
 	/*
@@ -219,7 +220,7 @@ public class PersistentUUIDArrayMap {
 			if (uuid == 0) {
 				numberOfZerosInKeyFile++;
 			} else {
-				keyPositions.put(uuid, elementNum * BytesPerKeyEntry);
+				keyPositions.put(uuid, 8 + elementNum * BytesPerKeyEntry);
 				arrayPointers.put(uuid, new ValueArrayPointer(pointer, length));
 				/*
 				 * Now read the value file
@@ -299,7 +300,7 @@ public class PersistentUUIDArrayMap {
 	 * @param keyUUID
 	 * @param valueUUID
 	 */
-	public void append(final Long keyUUID, final long valueUUID) {
+	public void append(final long keyUUID, final long valueUUID) {
 		openFilesIfClosed();
 		try {
 			if (!writeIntoValueArray(keyUUID, valueUUID)) {
@@ -324,13 +325,12 @@ public class PersistentUUIDArrayMap {
 				ValueArrayPointer pointer = new ValueArrayPointer(
 						valueFileSize, valueArray.length);
 				valueFileSize += valueArray.length * 8;
-				valueFile.putLong(0, valueFileSize);
-
-				writePointerToKeyFile(keyUUID, pointer);
 
 				updateMemoryMappedValueBuffer(valueFileSize);
 
-				// arrayPointers.put(keyUUID, pointer);
+				valueFile.putLong(0, valueFileSize); // udpate length
+
+				writePointerToKeyFile(keyUUID, pointer);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -382,9 +382,9 @@ public class PersistentUUIDArrayMap {
 			 * (pointer.pointer) plus the relative position of the first empty
 			 * element in the array (lastEmptyPointer)
 			 */
-			valueFile.position((int) pointer.pointer + firstEmtpyLongPointer
-					* 8);
-			valueFile.putLong(valueUUID);
+			valueFile.putLong(
+					(int) pointer.pointer + firstEmtpyLongPointer * 8,
+					valueUUID);
 			/*
 			 * Now update the array in the cache
 			 */
@@ -479,7 +479,6 @@ public class PersistentUUIDArrayMap {
 			}
 			keyFileSize += BytesPerKeyEntry;
 			keyFile.putLong(0, keyFileSize);
-
 			keyPositions.put(uuid, position);
 		}
 
@@ -537,5 +536,35 @@ public class PersistentUUIDArrayMap {
 			}
 			System.out.println();
 		}
+	}
+
+	@Override
+	public void removeKey(long keyUUID) {
+		// TODO To be implemented
+	}
+
+	@Override
+	public void removeAll() {
+		/**
+		 * Delete the corresponding file
+		 */
+		File file = new File(keyFileName);
+		file.renameTo(new File(keyFileName + ".deleted"));
+
+		file = new File(valueFileName);
+		file.renameTo(new File(valueFileName + ".deleted"));
+
+		mainMap.clear();
+		keyPositions.clear();
+		arrayPointers.clear();
+
+		valueFileSize = 8;
+		keyFileSize = 8;
+	}
+
+	@Override
+	public void save() {
+		// TODO Auto-generated method stub
+
 	}
 }

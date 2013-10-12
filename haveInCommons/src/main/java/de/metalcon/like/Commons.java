@@ -1,40 +1,54 @@
 package de.metalcon.like;
 
-import java.io.File;
 import java.io.IOException;
 
+import de.metalcon.utils.IPersistentUUIDArrayMap;
+import de.metalcon.utils.LazyPersistentUUIDMap;
 import de.metalcon.utils.PersistentUUIDArrayMap;
+import de.metalcon.utils.PersistentUUIDArrayMapLevelDB;
+import de.metalcon.utils.PersistentUUIDArrayMapRedis;
 
 /**
  * @author Jonas Kunze
  */
-class CommonsWithPersistentUUIDArrayMap {
+class Commons {
 	private final Node node;
-	private final String persistentFileName;
-	// private LazyPersistentUUIDMap persistentcommonsMap = null;
-	private PersistentUUIDArrayMap persistentcommonsMap = null;
 
-	private boolean mayFreeMem = true;
+	private IPersistentUUIDArrayMap persistentcommonsMap = null;
 
 	/**
 	 * 
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public CommonsWithPersistentUUIDArrayMap(final Node node,
-			final String storageDir) {
+	public Commons(final Node node, final String storageDir, Class<?> c) {
 		this.node = node;
-		this.persistentFileName = storageDir + "/" + node.getUUID()
-				+ "_commons";
+		if (c == PersistentUUIDArrayMapRedis.class) {
+			persistentcommonsMap = new PersistentUUIDArrayMapRedis(""
+					+ node.getUUID());
+		} else if (c == LazyPersistentUUIDMap.class) {
+			persistentcommonsMap = LazyPersistentUUIDMap
+					.getPersistentUUIDMap(storageDir + "/" + node.getUUID()
+							+ "_commons");
+		} else if (c == PersistentUUIDArrayMap.class) {
+			try {
+				persistentcommonsMap = new PersistentUUIDArrayMap(storageDir
+						+ "/" + node.getUUID() + "_commons");
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		} else if (c == PersistentUUIDArrayMapLevelDB.class) {
+			persistentcommonsMap = PersistentUUIDArrayMapLevelDB.generateMap(
+					node.getUUID(), storageDir + "/levelDB");
+		}
 	}
 
 	/**
-	 * Delete the corresponding file
+	 * Remove all entries in the DB
 	 */
-	void delete() {
-		File file = new File(persistentFileName);
-		file.renameTo(new File(persistentFileName + ".deleted"));
-
+	public void delete() {
+		persistentcommonsMap.removeAll();
 	}
 
 	/**
@@ -47,11 +61,7 @@ class CommonsWithPersistentUUIDArrayMap {
 	 *         of this Commons in common. The last uuids in the list may be 0
 	 */
 	public long[] getCommonNodes(long uuid) {
-		if (persistentcommonsMap == null) {
-			readFile();
-		}
 		long[] commons = persistentcommonsMap.get(uuid);
-		persistentcommonsMap.closeFileIfNecessary();
 
 		if (commons != null) {
 			/*
@@ -66,22 +76,7 @@ class CommonsWithPersistentUUIDArrayMap {
 				}
 			}
 		}
-
 		return commons;
-	}
-
-	/**
-	 * Reads the persistent commons file
-	 * 
-	 */
-	private void readFile() {
-		try {
-			persistentcommonsMap = new PersistentUUIDArrayMap(
-					persistentFileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 	}
 
 	/**
@@ -89,33 +84,25 @@ class CommonsWithPersistentUUIDArrayMap {
 	 * trigger a disc access
 	 */
 	public void freeMemory() {
-		while (!mayFreeMem) { // Wait until all reads/writes have been performed
-			try {
-				Thread.sleep(1000); // sleep one second
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		persistentcommonsMap.closeFile();
-		persistentcommonsMap = null;
 	}
 
 	/**
 	 * Updates the commons of node and writes the data to disk
 	 */
 	public void update() {
-		mayFreeMem = false;
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
 		for (long friendUUID : node.getFriends()) {
-			if (friendUUID == node.getUUID()) {
-				continue;
-			}
 			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
+		for (long inNodeID : node.getInNodes()) {
+			Node n = NodeFactory.getNode(inNodeID);
+			n.getCommons().updateFriend(n, false);
+		}
+
 		persistentcommonsMap.setUpdateTimeStamp(now);
-		mayFreeMem = true;
+		persistentcommonsMap.save();
 	}
 
 	/**
@@ -139,20 +126,12 @@ class CommonsWithPersistentUUIDArrayMap {
 	public void friendRemoved(Node friend) {
 		for (Like like : friend.getLikesFromTimeOn(0)) {
 			/*
-			 * Find the list of commons with the entity the friend liked
-			 */
-			long[] commons = persistentcommonsMap.get(like.getUUID());
-			if (commons == null) {
-				continue;
-			}
-
-			/*
 			 * Remove the friend from the commons list of the liked entity
 			 */
 			persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
-			// removeFromCommonsList(commons, friend.getUUID()));
 		}
-		persistentcommonsMap.closeFileIfNecessary();
+		persistentcommonsMap.removeKey(friend.getUUID());
+		persistentcommonsMap.save();
 	}
 
 	/**
@@ -170,13 +149,7 @@ class CommonsWithPersistentUUIDArrayMap {
 	 *            If false only the entities liked by friend from the last
 	 *            update of this commons till now will be considered.
 	 */
-	private void updateFriend(Node friend, boolean ignoreTimestamp) {
-		if (persistentcommonsMap == null) {
-			readFile();
-		}
-
-		mayFreeMem = false;
-
+	public void updateFriend(Node friend, boolean ignoreTimestamp) {
 		int searchTS = ignoreTimestamp ? 0 : persistentcommonsMap
 				.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
@@ -185,7 +158,6 @@ class CommonsWithPersistentUUIDArrayMap {
 			}
 			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
 		}
-		persistentcommonsMap.closeFileIfNecessary();
-		mayFreeMem = true;
+		persistentcommonsMap.save();
 	}
 }

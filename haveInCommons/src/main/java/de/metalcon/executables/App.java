@@ -3,6 +3,7 @@ package de.metalcon.executables;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
@@ -22,9 +23,10 @@ public class App {
 			+ "metalcon-user.csv";
 	private static final String METALCON_USER_RAND_FILE = DATA_DIR
 			+ "metalcon-user-random.csv";
+	private static final String METALCON_USER_SMALL_FILE = DATA_DIR
+			+ "metalcon-user-small.csv";
 	private static final String UB_SMALL_FILE = DATA_DIR + "ub-small.csv";
 	private static final String WIKIPEDIA_FILE = "../data/";
-	private static final String SMALL_FILE = "../data/";
 	public static final int BATCH_SIZE = 10000;
 
 	private static HaveInCommons graph;
@@ -34,13 +36,13 @@ public class App {
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
 
-		importGraph(graph, UB_SMALL_FILE);
+		// importGraph(graph, METALCON_FILE);
 
-		// Random rand = new Random();
-		// for (int i = 0; i < 1000; i++) {
-		// int commons = testInCommons(graph, rand.nextInt(1000),
-		// rand.nextInt(1000), false);
-		// }
+		Random rand = new Random();
+		for (int i = 0; i < 1000; i++) {
+			int commons = testInCommons(graph, rand.nextInt(1000),
+					rand.nextInt(1000), false);
+		}
 
 		testInCommons(graph, 1, 2, true);
 	}

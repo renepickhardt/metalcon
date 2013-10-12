@@ -10,7 +10,7 @@ import redis.clients.jedis.JedisPoolConfig;
 /**
  * @author Jonas Kunze
  */
-public class PersistentUUIDArrayMapRedis {
+public class PersistentUUIDArrayMapRedis implements IPersistentUUIDArrayMap {
 
 	private final static JedisPool pool = new JedisPool(new JedisPoolConfig(),
 			"localhost");
@@ -25,6 +25,7 @@ public class PersistentUUIDArrayMapRedis {
 	/**
 	 * @return The timestamp of the last update
 	 */
+	@Override
 	public int getLastUpdateTimeStamp() {
 		try {
 			return Integer.parseInt(jedis.get(prefix + "UpdateTS"));
@@ -38,6 +39,7 @@ public class PersistentUUIDArrayMapRedis {
 	 * @param updateTimeStamp
 	 *            The timestamp of the last update
 	 */
+	@Override
 	public void setUpdateTimeStamp(final int updateTimeStamp) {
 		jedis.set(prefix + "UpdateTS", Integer.toString(updateTimeStamp));
 	}
@@ -47,7 +49,11 @@ public class PersistentUUIDArrayMapRedis {
 	 * @param keyUUID
 	 * @param valueUUID
 	 */
+	@Override
 	public void append(final long keyUUID, final long valueUUID) {
+		if (keyUUID == 2) {
+			System.out.println(keyUUID + " : " + valueUUID);
+		}
 		jedis.zadd(prefix + Long.toString(keyUUID), 0, Long.toString(valueUUID));
 	}
 
@@ -60,6 +66,7 @@ public class PersistentUUIDArrayMapRedis {
 	 *         map contains no mapping for the key
 	 * @see HashMap#get(Object)
 	 */
+	@Override
 	public long[] get(final long keyUUID) {
 		Set<String> strings = jedis.zrange(prefix + Long.toString(keyUUID), 0,
 				-1);
@@ -80,6 +87,7 @@ public class PersistentUUIDArrayMapRedis {
 	 * @param valueUUID
 	 *            The element to be deleted from the list
 	 */
+	@Override
 	public void removeKey(final long keyUUID) {
 		jedis.del(prefix + keyUUID);
 	}
@@ -93,6 +101,7 @@ public class PersistentUUIDArrayMapRedis {
 	 * @param valueUUID
 	 *            The element to be deleted from the list
 	 */
+	@Override
 	public void remove(final long keyUUID, final long valueUUID) {
 		jedis.zrem(prefix + keyUUID, "" + valueUUID);
 	}
@@ -100,9 +109,16 @@ public class PersistentUUIDArrayMapRedis {
 	/**
 	 * Will delete all elements in this map
 	 */
+	@Override
 	public void removeAll() {
 		for (String key : jedis.keys(prefix + "*")) {
 			jedis.del(key);
 		}
+	}
+
+	@Override
+	public void save() {
+		// TODO Auto-generated method stub
+
 	}
 }
