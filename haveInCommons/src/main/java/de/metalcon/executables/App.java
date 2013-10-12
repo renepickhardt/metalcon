@@ -25,13 +25,15 @@ public class App {
 			+ "metalcon-all-hashed.csv";
 	private static final String METALCON_USER_FILE = DATA_DIR
 			+ "metalcon-user.csv";
+	private static final String METALCON_NONUSER_FILE = DATA_DIR
+			+ "metalcon-nonUser.csv";
 	private static final String METALCON_USER_RAND_FILE = DATA_DIR
 			+ "metalcon-user-random.csv";
 	private static final String METALCON_USER_SMALL_FILE = DATA_DIR
 			+ "metalcon-user-small.csv";
 	private static final String UB_SMALL_FILE = DATA_DIR + "ub-small.csv";
 	private static final String WIKIPEDIA_FILE = "../data/";
-	public static final int BATCH_SIZE = 10000;
+	public static final int BATCH_SIZE = 100000;
 
 	private static HaveInCommons graph;
 
@@ -42,7 +44,17 @@ public class App {
 		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
 		PersistentUUIDSetLevelDB.initialize();
 
-//		importGraph(graph, METALCON_FILE);
+		long time = importGraph(graph, METALCON_USER_FILE);
+		long nodeNum = NodeFactory.getAllNodeUUIDs().size();
+		System.out.println("Importing " + nodeNum + " users took "
+				+ (int) (time / 1E9f) + " s (" + time / 1000 / nodeNum
+				+ " µs per node)");
+
+		time = importGraph(graph, METALCON_NONUSER_FILE);
+		long newNodes = nodeNum - NodeFactory.getAllNodeUUIDs().size();
+		System.out
+				.println("Importing nonUser nodes took " + (int) (time / 1E9f)
+						+ " s (" + newNodes + " new nodes added)");
 
 		// Random rand = new Random();
 		// for (int i = 0; i < 1000; i++) {
@@ -50,22 +62,22 @@ public class App {
 		// rand.nextInt(1000), false);
 		// }
 
-		// updateAllNodes();
+		time = updateAllNodes();
+		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().size()
+				+ " nodes took " + (int) (time / 1E9f) + " s (" + time / 1000
+				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
 
-		testInCommons(graph, 1, 2, true);
+		// testInCommons(graph, 1, 2, true);
 
 	}
 
-	public static void updateAllNodes() {
+	public static long updateAllNodes() {
 		long start = System.nanoTime();
 		for (long uuid : NodeFactory.getAllNodeUUIDs()) {
 			Node n = NodeFactory.getNode(uuid);
 			n.updateCommons();
 		}
-		long time = System.nanoTime() - start;
-		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().size()
-				+ " nodes took " + time / 1E9 + " seconds (" + time / 1000
-				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
+		return System.nanoTime() - start;
 	}
 
 	public static int testInCommons(HaveInCommons graph, long from, long to,
@@ -110,7 +122,7 @@ public class App {
 
 	}
 
-	private static void importGraph(HaveInCommons graphImpl, String dataFile) {
+	private static long importGraph(HaveInCommons graphImpl, String dataFile) {
 		long start = System.nanoTime();
 		long last = System.nanoTime();
 		long now;
@@ -166,9 +178,7 @@ public class App {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		long end = System.nanoTime();
-		System.out.println("Imported in: " + (int) ((end - start) / 1E9f)
-				+ "sec");
+		return System.nanoTime() - start;
 	}
 
 	private static void TestSingleNodePreprocessor() {

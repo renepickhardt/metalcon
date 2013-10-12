@@ -92,19 +92,26 @@ class Commons {
 	public void update() {
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
-		for (long friendUUID : node.getFriends()) {
-			if (friendUUID == 0) {
-				break;
+		final long[] friends = node.getFriends();
+		if (friends != null) {
+
+			for (long friendUUID : friends) {
+				if (friendUUID == 0) {
+					break;
+				}
+				updateFriend(NodeFactory.getNode(friendUUID), false);
 			}
-			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
-		for (long inNodeID : node.getInNodes()) {
-			if (inNodeID == 0) {
-				break;
+		final long[] inNodes = node.getInNodes();
+		if (inNodes != null) {
+			for (long inNodeID : inNodes) {
+				if (inNodeID == 0) {
+					break;
+				}
+				Node n = NodeFactory.getNode(inNodeID);
+				n.getCommons().updateFriend(n, false);
 			}
-			Node n = NodeFactory.getNode(inNodeID);
-			n.getCommons().updateFriend(n, false);
 		}
 
 		persistentcommonsMap.setUpdateTimeStamp(now);

@@ -1,4 +1,4 @@
-fh = open("metalon-all.csv")
+fh = open("metalcon-nonUser.csv")
 
 def java_string_hashcode(s):
     h = 0
