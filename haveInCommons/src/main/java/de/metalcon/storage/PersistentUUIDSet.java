@@ -1,4 +1,4 @@
-package de.metalcon.utils;
+package de.metalcon.storage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,13 +7,12 @@ import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Jonas Kunze
  */
-public class PersistentUUIDSet implements Set<Long> {
+public class PersistentUUIDSet implements IPersistentUUIDSet {
 	/*
 	 * The number of currently opened file handles
 	 */
@@ -272,12 +271,13 @@ public class PersistentUUIDSet implements Set<Long> {
 	}
 
 	/**
-	 * Writes all uuids into the given array
+	 * Returns an array with all uuids
 	 * 
 	 * @param array
 	 * @return
 	 */
 	public long[] toArray(long[] array) {
+		array = new long[(int) getSize()];
 		int i = 0;
 		for (Long n : this) {
 			array[i++] = n;

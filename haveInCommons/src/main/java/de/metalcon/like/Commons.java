@@ -2,11 +2,11 @@ package de.metalcon.like;
 
 import java.io.IOException;
 
-import de.metalcon.utils.IPersistentUUIDArrayMap;
-import de.metalcon.utils.LazyPersistentUUIDMap;
-import de.metalcon.utils.PersistentUUIDArrayMap;
-import de.metalcon.utils.PersistentUUIDArrayMapLevelDB;
-import de.metalcon.utils.PersistentUUIDArrayMapRedis;
+import de.metalcon.storage.IPersistentUUIDArrayMap;
+import de.metalcon.storage.LazyPersistentUUIDMap;
+import de.metalcon.storage.PersistentUUIDArrayMap;
+import de.metalcon.storage.PersistentUUIDArrayMapLevelDB;
+import de.metalcon.storage.PersistentUUIDArrayMapRedis;
 
 /**
  * @author Jonas Kunze
@@ -39,8 +39,8 @@ class Commons {
 				System.exit(1);
 			}
 		} else if (c == PersistentUUIDArrayMapLevelDB.class) {
-			persistentcommonsMap = PersistentUUIDArrayMapLevelDB.generateMap(
-					node.getUUID(), storageDir + "/levelDB");
+			persistentcommonsMap = new PersistentUUIDArrayMapLevelDB(
+					node.getUUID());
 		}
 	}
 
@@ -93,10 +93,16 @@ class Commons {
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
 		for (long friendUUID : node.getFriends()) {
+			if (friendUUID == 0) {
+				break;
+			}
 			updateFriend(NodeFactory.getNode(friendUUID), false);
 		}
 
 		for (long inNodeID : node.getInNodes()) {
+			if (inNodeID == 0) {
+				break;
+			}
 			Node n = NodeFactory.getNode(inNodeID);
 			n.getCommons().updateFriend(n, false);
 		}

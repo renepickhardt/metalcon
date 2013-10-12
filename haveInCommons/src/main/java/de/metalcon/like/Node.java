@@ -5,16 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import de.metalcon.utils.LazyPersistentUUIDMap;
-import de.metalcon.utils.PersistentUUIDArrayMap;
-import de.metalcon.utils.PersistentUUIDArrayMapLevelDB;
-import de.metalcon.utils.PersistentUUIDArrayMapRedis;
-import de.metalcon.utils.PersistentUUIDSet;
+import de.metalcon.storage.IPersistentUUIDSet;
+import de.metalcon.storage.PersistentUUIDArrayMapLevelDB;
+import de.metalcon.storage.PersistentUUIDSetLevelDB;
 
 /**
  * @author Jonas Kunze
  */
-class Node {
+public class Node {
 	// Static Variables
 	private static final int LastLikeCacheSize = 10;
 
@@ -36,8 +34,11 @@ class Node {
 	/*
 	 * All friends of this node
 	 */
-	private PersistentUUIDSet friends = null;
-	private PersistentUUIDSet inNodes = null;
+	private IPersistentUUIDSet friends = null;
+	private IPersistentUUIDSet inNodes = null;
+
+	// private PersistentUUIDSet friends = null;
+	// private PersistentUUIDSet inNodes = null;
 
 	/**
 	 * This constructor may only be called by the NodeFactory class
@@ -65,15 +66,19 @@ class Node {
 
 		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
 
-		try {
-			friends = new PersistentUUIDSet(storageDir + "/" + UUID
-					+ "_friends");
-			inNodes = new PersistentUUIDSet(storageDir + "/" + UUID
-					+ "_inNodes");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		// try {
+		// friends = new PersistentUUIDSet(storageDir + "/" + UUID
+		// + "_friends");
+		// inNodes = new PersistentUUIDSet(storageDir + "/" + UUID
+		// + "_inNodes");
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// System.exit(1);
+		// }
+
+		friends = new PersistentUUIDSetLevelDB(UUID + "friends");
+		inNodes = new PersistentUUIDSetLevelDB(UUID + "inNodes");
 	}
 
 	/**
@@ -431,7 +436,7 @@ class Node {
 	 * @return All friends of this node
 	 */
 	public long[] getFriends() {
-		return friends.toArray(new long[(int) friends.getSize()]);
+		return friends.toArray(new long[0]);
 	}
 
 	/**
@@ -439,7 +444,7 @@ class Node {
 	 * @return All friends Nodes liking this node
 	 */
 	public long[] getInNodes() {
-		return inNodes.toArray(new long[(int) inNodes.getSize()]);
+		return inNodes.toArray(new long[0]);
 	}
 
 	/**
@@ -464,5 +469,9 @@ class Node {
 
 	protected Commons getCommons() {
 		return commons;
+	}
+
+	public void updateCommons() {
+		commons.update();
 	}
 }

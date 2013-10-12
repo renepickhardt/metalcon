@@ -1,4 +1,4 @@
-package de.metalcon.utils;
+package de.metalcon.storage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

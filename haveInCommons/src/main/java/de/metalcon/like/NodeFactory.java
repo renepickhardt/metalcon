@@ -2,13 +2,14 @@ package de.metalcon.like;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
-import de.metalcon.utils.PersistentUUIDSet;
+import de.metalcon.storage.PersistentUUIDSet;
 
 /**
  * @author Jonas Kunze
  */
-class NodeFactory {
+public class NodeFactory {
 	private static String StorageDir = "";
 
 	/*
@@ -126,5 +127,9 @@ class NodeFactory {
 	static void removeNodeFromPersistentList(long nodeID) throws IOException {
 		AllNodesAliveCache.remove(nodeID);
 		AllNodes.remove(nodeID);
+	}
+
+	public static Set<Long> getAllNodeUUIDs() {
+		return AllNodes;
 	}
 }

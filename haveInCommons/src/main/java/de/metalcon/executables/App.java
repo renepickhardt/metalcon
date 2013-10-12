@@ -8,7 +8,11 @@ import java.util.Random;
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
+import de.metalcon.like.Node;
+import de.metalcon.like.NodeFactory;
 import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
+import de.metalcon.storage.LevelDBHandler;
+import de.metalcon.storage.PersistentUUIDSetLevelDB;
 
 /**
  * Hello world!
@@ -35,16 +39,33 @@ public class App {
 
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
+		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
+		PersistentUUIDSetLevelDB.initialize();
 
-		// importGraph(graph, METALCON_FILE);
+//		importGraph(graph, METALCON_FILE);
 
-		Random rand = new Random();
-		for (int i = 0; i < 1000; i++) {
-			int commons = testInCommons(graph, rand.nextInt(1000),
-					rand.nextInt(1000), false);
-		}
+		// Random rand = new Random();
+		// for (int i = 0; i < 1000; i++) {
+		// int commons = testInCommons(graph, rand.nextInt(1000),
+		// rand.nextInt(1000), false);
+		// }
+
+		// updateAllNodes();
 
 		testInCommons(graph, 1, 2, true);
+
+	}
+
+	public static void updateAllNodes() {
+		long start = System.nanoTime();
+		for (long uuid : NodeFactory.getAllNodeUUIDs()) {
+			Node n = NodeFactory.getNode(uuid);
+			n.updateCommons();
+		}
+		long time = System.nanoTime() - start;
+		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().size()
+				+ " nodes took " + time / 1E9 + " seconds (" + time / 1000
+				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
 	}
 
 	public static int testInCommons(HaveInCommons graph, long from, long to,

@@ -1,4 +1,4 @@
-package de.metalcon.utils;
+package de.metalcon.storage;
 
 import java.util.HashMap;
 import java.util.Set;
