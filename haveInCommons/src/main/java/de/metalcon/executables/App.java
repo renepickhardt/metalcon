@@ -3,6 +3,7 @@ package de.metalcon.executables;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
@@ -41,32 +42,56 @@ public class App {
 		graph = new NormalizedLikeRetrieval("/dev/shm/commonsDB");
 		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
 		PersistentUUIDSetLevelDB.initialize();
-
-		long time = importGraph(graph, METALCON_USER_FILE);
+		long time = 0;
+		/*
+		 * Import all users
+		 */
+		time = importGraph(graph, METALCON_USER_FILE);
 		long nodeNum = NodeFactory.getAllNodeUUIDs().size();
 		System.out.println("Importing " + nodeNum + " users took "
 				+ (int) (time / 1E9f) + " s (" + time / 1000 / nodeNum
 				+ " µs per node)");
 
-		// time = importGraph(graph, METALCON_NONUSER_FILE);
-		// long newNodes = NodeFactory.getAllNodeUUIDs().size() - nodeNum;
-		// System.out
-		// .println("Importing nonUser nodes took " + (int) (time / 1E9f)
-		// + " s (" + newNodes + " new nodes added)");
+		/*
+		 * Import Albums and Bands
+		 */
+		time = importGraph(graph, METALCON_NONUSER_FILE);
+		long newNodes = NodeFactory.getAllNodeUUIDs().size() - nodeNum;
+		System.out
+				.println("Importing nonUser nodes took " + (int) (time / 1E9f)
+						+ " s (" + newNodes + " new nodes added)");
 
-		// Random rand = new Random();
-		// for (int i = 0; i < 1000; i++) {
-		// int commons = testInCommons(graph, rand.nextInt(1000),
-		// rand.nextInt(1000), false);
-		// }
-
+		/*
+		 * Update all nodes
+		 */
 		time = updateAllNodes();
 		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().size()
 				+ " nodes took " + (int) (time / 1E9f) + " s (" + time / 1000
 				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
 
-		testInCommons(graph, 1, 2, true);
+		/*
+		 * Process some getInCommon calls
+		 */
+		final Long[] uuids = NodeFactory.getAllNodeUUIDs().toArray(new Long[0]);
 
+		Random rand = new Random();
+		int runs = 100000, found = 0;
+		long start = System.nanoTime();
+		for (int i = 0; i < runs; i++) {
+			int commons = testInCommons(graph,
+					uuids[rand.nextInt(uuids.length)],
+					uuids[rand.nextInt(uuids.length)], false);
+			if (commons > 0) {
+				found++;
+			}
+		}
+		time = System.nanoTime() - start;
+		System.out.println("Generating commons for " + runs
+				+ " node pairs took " + (int) (time / 1E9f) + " s finding "
+				+ found + " non empty lists (" + time / 1000 / runs
+				+ " µs per node)");
+
+		testInCommons(graph, 1, 2, true);
 	}
 
 	public static long updateAllNodes() {

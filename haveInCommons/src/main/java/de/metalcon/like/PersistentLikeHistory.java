@@ -24,7 +24,7 @@ public class PersistentLikeHistory {
 	/*
 	 * The maximum number of open file handles allowed.
 	 */
-	private static final int MaximumOpenFileHandles = 300;
+	private static final int MaximumOpenFileHandles = 1000;
 
 	/*
 	 * The number of currently opened file handles
@@ -83,7 +83,7 @@ public class PersistentLikeHistory {
 	 */
 	private void openFile() {
 		try {
-			NumberOfOpenFileHandles.addAndGet(2);
+			NumberOfOpenFileHandles.addAndGet(1);
 			RAFile = new RandomAccessFile(fileName, "rw");
 			updateMemoryMappedBuffer(RAFile.length());
 		} catch (IOException e) {
@@ -153,11 +153,12 @@ public class PersistentLikeHistory {
 	 *         descending timestamps (newest first).
 	 */
 	Like[] getLikesWithinTimePeriod(final int startTS, final int stopTS) {
-		openFilesIfClosed();
 		final int totalLines = (fileSize - 4) / BytesPerLikeInFile;
 		if (totalLines == 0) {
 			return null;
 		}
+
+		openFilesIfClosed();
 
 		/*
 		 * TODO: What if the first searched like is at the last line? Check if
@@ -186,6 +187,7 @@ public class PersistentLikeHistory {
 		}
 
 		if (currentLine == totalLines) {
+			closeFileIfNecessary();
 			return null; // Nothing found: All likes are older than startTS
 		}
 
