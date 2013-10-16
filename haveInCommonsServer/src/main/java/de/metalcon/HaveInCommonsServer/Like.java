@@ -1,6 +1,7 @@
 package de.metalcon.HaveInCommonsServer;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -40,7 +41,8 @@ public class Like extends HttpServlet{
 	
 	private void response(HttpServletResponse resp, String msg)
 			throws IOException {
-		
+		PrintWriter out = resp.getWriter();
+		out.println(msg);
 		
 	}
 }
