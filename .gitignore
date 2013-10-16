@@ -7,6 +7,7 @@ target/
 .metadata/
 .settings/
 bin/
+data/
 
 # Java class files
 *.class
