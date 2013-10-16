@@ -1,11 +1,14 @@
 package de.metalcon.autocompleteServer;
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
@@ -22,9 +25,28 @@ public class Search {
 
 		boolean defaultFound = false;
 
+		Properties properties = new Properties();
+		BufferedInputStream stream;
 		try {
-			// FIXME change directory to config-variable
-			File saveFile = new File("/var/lib/tomcat/");
+			stream = new BufferedInputStream(new FileInputStream(
+					"autocomplete.conf"));
+
+			try {
+				properties.load(stream);
+				stream.close();
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+
+			}
+		} catch (FileNotFoundException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		}
+		String saveFolder = properties.getProperty("persistency_folder");
+
+		try {
+			File saveFile = new File(saveFolder);
 			String[] fileList = saveFile.list();
 
 			for (String element : fileList) {
@@ -35,8 +57,7 @@ public class Search {
 			for (String element : fileList) {
 				if (element.endsWith(".save")) {
 
-					// FIXME use constants
-					saveFile = new File("/var/lib/tomcat/" + element);
+					saveFile = new File(saveFolder + element);
 
 					SuggestTree suggestTree = new SuggestTree(
 							ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
