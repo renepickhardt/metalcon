@@ -40,10 +40,4 @@ public class LogTest {
 		assertTrue(request.getParameterMap().containsKey("uuid1") && 
 				request.getParameterMap().containsKey("uuid2"));
 	}
-
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
-
 }

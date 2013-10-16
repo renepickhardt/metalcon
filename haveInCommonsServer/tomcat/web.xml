@@ -1,0 +1,19 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee">
+        <display-name>HaveInCommonsServer</display-name>
+         <listener>
+                   <listener-class>de.metalcon.haveInCommons.Server</listener-class>
+           </listener>           
+        <servlet>
+                <servlet-name>like</servlet-name>
+                <description>Create new like between to given entities</description>
+                <servlet-class>de.metalcon.haveInCommons.Like</servlet-class>
+        </servlet>
+        <servlet-mapping>
+                   <servlet-name>like</servlet-name>
+                   <url-pattern>/like</url-pattern>
+        </servlet-mapping>
+        <servlet-mapping>
+                   <servlet-name>default</servlet-name>
+                <url-pattern>*.html</url-pattern>
+        </servlet-mapping>
+</web-app>
