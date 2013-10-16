@@ -4,13 +4,32 @@ package de.metalcon.like;
  * @author Jonas Kunze
  */
 public class Like {
-	public static final int FLAG_REMOVE_VOTE = 1;
-	public static final int FLAG_UPVOTE = 2;
-	public static final int FLAG_DOWN_VOTE = 4;
+
+	public enum Vote {
+		UP((byte) 1), DOWN((byte) 2), NEUTRAL((byte) 3);
+		public byte value;
+
+		private Vote(byte val) {
+			value = val;
+		}
+
+		public static Vote getByFlag(final int voteFlag) {
+			if (voteFlag == 1) {
+				return UP;
+			}
+			if (voteFlag == 2) {
+				return DOWN;
+			}
+			if (voteFlag == 3) {
+				return DOWN;
+			}
+			throw new RuntimeException("Bad vote flag: " + voteFlag);
+		}
+	}
 
 	private final int Timestamp;
 	private final long UUID;
-	private final int Flags;
+	private final Vote Vote;
 
 	/**
 	 * 
@@ -21,21 +40,10 @@ public class Like {
 	 * @param Flags
 	 *            An integer containing flags like unlike
 	 */
-	public Like(final long UUID, final int timestamp, final int flags) {
+	public Like(final long UUID, final int timestamp, final Vote vote) {
 		this.Timestamp = timestamp;
 		this.UUID = UUID;
-		this.Flags = flags;
-
-		int flagNum = 1 & flags + 1 & flags >> 1 + 1 & flags >> 2;
-		assert (flagNum > 0);
-	}
-
-	/**
-	 * 
-	 * @return Returns true if this is an unlike vote
-	 */
-	public boolean isRemoveVote() {
-		return (Flags & FLAG_REMOVE_VOTE) == FLAG_REMOVE_VOTE;
+		this.Vote = vote;
 	}
 
 	/**
@@ -58,7 +66,7 @@ public class Like {
 	 * 
 	 * @return An integer containing flags like unlike
 	 */
-	public int getFlags() {
-		return Flags;
+	public Vote getVote() {
+		return Vote;
 	}
 }

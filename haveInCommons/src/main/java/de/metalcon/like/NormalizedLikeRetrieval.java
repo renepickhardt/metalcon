@@ -4,14 +4,15 @@ import java.io.File;
 import java.io.IOException;
 
 import de.metalcon.haveInCommons.HaveInCommons;
+import de.metalcon.like.Like.Vote;
 
 /**
  * @author Jonas Kunze
  */
-public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
+public class NormalizedLikeRetrieval implements HaveInCommons {
 	private int edgeNum = 0;
 
-	public NormalizedFlatFileLikeRetrieval(final String storageDir) {
+	public NormalizedLikeRetrieval(final String storageDir) {
 		File f = new File(storageDir);
 		if (!f.exists()) {
 			throw new RuntimeException("Unable to initialize "
@@ -47,8 +48,7 @@ public class NormalizedFlatFileLikeRetrieval implements HaveInCommons {
 				t = NodeFactory.createNewNode(to);
 			}
 
-			f.addFriendship(t);
-			f.addLike(new Like(t.getUUID(), edgeNum++, Like.FLAG_UPVOTE));
+			f.addLike(new Like(t.getUUID(), edgeNum++, Vote.UP));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);

@@ -64,14 +64,6 @@ public class NodeAPI {
 	}
 
 	/**
-	 * Test method for {@link de.metalcon.like.Node#addFriendship(de.metalcon.like.Node)}.
-	 */
-	@Test
-	public final void testAddFriendship() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	/**
 	 * Test method for {@link de.metalcon.like.Node#removeFriendship(de.metalcon.like.Node)}.
 	 */
 	@Test

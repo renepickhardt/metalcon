@@ -52,13 +52,4 @@ public class LikeAPI {
 	public final void testGetUUID() {
 		fail("Not yet implemented"); // TODO
 	}
-
-	/**
-	 * Test method for {@link de.metalcon.like.Like#getFlags()}.
-	 */
-	@Test
-	public final void testGetFlags() {
-		fail("Not yet implemented"); // TODO
-	}
-
 }

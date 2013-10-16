@@ -9,10 +9,9 @@ import de.metalcon.haveInCommons.PersistentReadOptimized;
 import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 import de.metalcon.like.Node;
 import de.metalcon.like.NodeFactory;
-import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
+import de.metalcon.like.NormalizedLikeRetrieval;
 import de.metalcon.storage.LevelDBHandler;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
-import de.metalcon.utils.messages.Messages;
 
 /**
  * Hello world!
@@ -39,7 +38,7 @@ public class App {
 
 	public static void main(String[] args) {
 		// graph = new PersistentReadOptimized();
-		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
+		graph = new NormalizedLikeRetrieval("/dev/shm/commonsDB");
 		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
 		PersistentUUIDSetLevelDB.initialize();
 
@@ -49,11 +48,11 @@ public class App {
 				+ (int) (time / 1E9f) + " s (" + time / 1000 / nodeNum
 				+ " µs per node)");
 
-		time = importGraph(graph, METALCON_NONUSER_FILE);
-		long newNodes = nodeNum - NodeFactory.getAllNodeUUIDs().size();
-		System.out
-				.println("Importing nonUser nodes took " + (int) (time / 1E9f)
-						+ " s (" + newNodes + " new nodes added)");
+		// time = importGraph(graph, METALCON_NONUSER_FILE);
+		// long newNodes = NodeFactory.getAllNodeUUIDs().size() - nodeNum;
+		// System.out
+		// .println("Importing nonUser nodes took " + (int) (time / 1E9f)
+		// + " s (" + newNodes + " new nodes added)");
 
 		// Random rand = new Random();
 		// for (int i = 0; i < 1000; i++) {
@@ -66,7 +65,7 @@ public class App {
 				+ " nodes took " + (int) (time / 1E9f) + " s (" + time / 1000
 				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
 
-		// testInCommons(graph, 1, 2, true);
+		testInCommons(graph, 1, 2, true);
 
 	}
 

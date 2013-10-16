@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
+import de.metalcon.like.Like.Vote;
 import de.metalcon.storage.IPersistentUUIDSet;
 import de.metalcon.storage.PersistentUUIDArrayMapLevelDB;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
@@ -19,26 +21,30 @@ public class Node {
 	// Class Variables
 	private final long UUID;
 
-	private final Commons commons;
-
-	private final String persistentLikeListFileName;
+	private final Commons likeCommons;
 
 	/*
 	 * lastLikes[lastLikesFirstEntryPointer] is the newest like The list is
 	 * ordered by descending timestamps (newest first)
 	 */
 	private Like[] lastLikesCache = new Like[LastLikeCacheSize];
-	// TODO: Use AtomicInteger instead of synchronized methods for perfboost:
+	// TODO: Use AtomicInteger instead of synchronized methods for performance
+	// boost:
 	private int lastLikesFirstEntryPointer = LastLikeCacheSize;
 
 	/*
-	 * All friends of this node
+	 * All out nodes liked/diskliked by this node
 	 */
-	private IPersistentUUIDSet friends = null;
-	private IPersistentUUIDSet inNodes = null;
+	private final IPersistentUUIDSet likedOut;
+	private final IPersistentUUIDSet dislikedOut;
 
-	// private PersistentUUIDSet friends = null;
-	// private PersistentUUIDSet inNodes = null;
+	/*
+	 * All out nodes liking/disliking this node
+	 */
+	private final IPersistentUUIDSet likedIn;
+	private final IPersistentUUIDSet dislikedIn;
+
+	private final PersistentLikeHistory likeHistory;
 
 	/**
 	 * This constructor may only be called by the NodeFactory class
@@ -61,10 +67,8 @@ public class Node {
 
 		// commons = new Commons(this, storageDir, LazyPersistentUUIDMap.class);
 
-		commons = new Commons(this, storageDir,
+		likeCommons = new Commons(this, storageDir,
 				PersistentUUIDArrayMapLevelDB.class);
-
-		persistentLikeListFileName = storageDir + "/" + UUID + "_likes";
 
 		// try {
 		// friends = new PersistentUUIDSet(storageDir + "/" + UUID
@@ -77,8 +81,13 @@ public class Node {
 		// System.exit(1);
 		// }
 
-		friends = new PersistentUUIDSetLevelDB(UUID + "friends");
-		inNodes = new PersistentUUIDSetLevelDB(UUID + "inNodes");
+		likedOut = new PersistentUUIDSetLevelDB(UUID + "likedOut");
+		likedIn = new PersistentUUIDSetLevelDB(UUID + "likedIn");
+		dislikedOut = new PersistentUUIDSetLevelDB(UUID + "dislikedOut");
+		dislikedIn = new PersistentUUIDSetLevelDB(UUID + "dislikedIn");
+
+		likeHistory = new PersistentLikeHistory(storageDir + "/" + UUID
+				+ "_likes");
 	}
 
 	/**
@@ -87,19 +96,20 @@ public class Node {
 	 * @throws IOException
 	 */
 	public void delete() throws IOException {
-		for (long friendUUID : friends) {
+		for (long friendUUID : likedOut) {
 			Node n = NodeFactory.getNode(friendUUID);
 			n.removeFriendship(this);
 		}
-		commons.delete();
-		friends.delete();
-		inNodes.delete();
+		likeCommons.delete();
+		likedOut.delete();
+		likedIn.delete();
+
+		dislikedOut.delete();
+		dislikedIn.delete();
 
 		NodeFactory.removeNodeFromPersistentList(UUID);
 
-		File file = new File(persistentLikeListFileName);
-		file.renameTo(new File(persistentLikeListFileName + ".deleted"));
-
+		likeHistory.delete();
 	}
 
 	/**
@@ -230,72 +240,7 @@ public class Node {
 	 */
 	private Like[] getLikesFromTimeOnFromDisk(final int startTS,
 			final int stopTS) {
-
-		try (RandomAccessFile raf = new RandomAccessFile(
-				persistentLikeListFileName, "r");) {
-			final long totalLines = raf.length() / 16;
-			if (totalLines == 0) {
-				return null;
-			}
-
-			/*
-			 * TODO: What if the first searched like is at the last line? Check
-			 * if it will be found
-			 */
-			long left = 0, currentLine = totalLines, right = totalLines;
-			int currentTs;
-			while (left != right) {
-				// Goto middle of left and right
-				currentLine = left + ((right - left) / 2);
-
-				raf.seek(currentLine * 16);
-				currentTs = raf.readInt();
-				if (currentTs > startTS) {
-					right = currentLine;
-				} else {
-					if (left == currentLine) {
-						/*
-						 * As currentTs <= searchedTS we need the element one to
-						 * the right
-						 */
-						currentLine = right;
-						break;
-					}
-					left = currentLine;
-				}
-			}
-
-			if (currentLine == totalLines) {
-				return null; // Nothing found: All likes are older than startTS
-			}
-
-			Like[] result = new Like[(int) (totalLines - currentLine)];
-			int resultPointer = result.length - 1;
-			raf.seek(currentLine * 16);
-			long uuid;
-			int flags;
-			for (long line = currentLine; line < totalLines; line++) {
-				currentTs = raf.readInt();
-				if (currentTs > stopTS) {
-					break;
-				}
-				uuid = raf.readLong();
-				flags = raf.readInt();
-				result[resultPointer--] = new Like(uuid, currentTs, flags);
-			}
-
-			if (resultPointer != -1) {
-				Like[] tmp = new Like[result.length - resultPointer - 1];
-				System.arraycopy(result, resultPointer + 1, tmp, 0, tmp.length);
-				return tmp;
-			}
-			return result;
-		} catch (FileNotFoundException e) {
-			return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return likeHistory.getLikesWithinTimePeriod(startTS, stopTS);
 	}
 
 	/**
@@ -305,12 +250,22 @@ public class Node {
 	 *            The new like performed by this entity
 	 * @return true in case of success, false if a problem with the FS occurred
 	 */
-	public boolean addLike(Like like) {
+	public void addLike(Like like) {
+		final Node likedNode = NodeFactory.getNode(like.getUUID());
+		if (likedNode == null) {
+			throw new RuntimeException("Unable to find Node with uuid "
+					+ like.getUUID());
+		}
+
+		this.addOutNode(likedNode.UUID, like.getVote());
+		likedNode.addInNode(this.UUID, like.getVote());
+
+		/*
+		 * Update the commons map
+		 */
+		likeCommons.friendAdded(likedNode);
+
 		synchronized (lastLikesCache) {
-			/**
-			 * @TODO A like should also call
-			 *       addfriendship(Nodes.getNode(like.getUUID()))
-			 */
 			if (lastLikesFirstEntryPointer == 0) {
 				/*
 				 * Move all elements one slot up. The last (oldest) element will
@@ -324,24 +279,8 @@ public class Node {
 
 			lastLikesCache[lastLikesFirstEntryPointer] = like;
 
-			/*
-			 * Append the new like to the end of the persistent file
-			 */
-			try (RandomAccessFile raf = new RandomAccessFile(
-					persistentLikeListFileName, "rw");) {
-				raf.seek(raf.length());
-				raf.writeInt(like.getTimestamp());
-				raf.writeLong(like.getUUID());
-				raf.writeInt(like.getFlags());
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return false;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
+			likeHistory.addLike(like);
 		}
-		return true;
 	}
 
 	/**
@@ -350,27 +289,36 @@ public class Node {
 	 * @return true in case of success, false if a problem with the FS occurred
 	 * @see Like#Like
 	 */
-	public boolean addLike(final long uuid, final int timestamp, final int flag) {
-		return addLike(new Like(uuid, timestamp, flag));
+	public void addLike(final long uuid, final int timestamp, final Vote vote) {
+		addLike(new Like(uuid, timestamp, vote));
 	}
 
 	/**
-	 * Adds a new friend Node to the friendList
+	 * Adds a new node to the out-list
 	 * 
-	 * @param newFriend
-	 *            The node to be added as a friend
+	 * @param inNode
+	 *            The node to be added
 	 */
-	public void addFriendship(Node newFriend) {
-		synchronized (friends) {
-			friends.add(newFriend.getUUID());
-			friends.closeFileIfNecessary();
+	private void addOutNode(final long outNodeUUID, final Vote v) {
+		synchronized (likedIn) {
+			synchronized (dislikedIn) {
 
-			/**
-			 * Update the commons map
-			 */
-			commons.friendAdded(newFriend);
+				synchronized (likedOut) {
+					if (v == Vote.UP) {
+						likedOut.add(outNodeUUID);
+						dislikedOut.remove(outNodeUUID);
+					} else if (v == Vote.DOWN) {
+						likedOut.remove(outNodeUUID);
+						dislikedOut.add(outNodeUUID);
+					} else {
+						likedOut.remove(outNodeUUID);
+						dislikedOut.remove(outNodeUUID);
+					}
+					likedOut.closeFileIfNecessary();
+					dislikedOut.closeFileIfNecessary();
+				}
+			}
 		}
-		newFriend.addInNode(this);
 	}
 
 	/**
@@ -379,10 +327,22 @@ public class Node {
 	 * @param inNode
 	 *            The node to be added
 	 */
-	private void addInNode(Node inNode) {
-		synchronized (inNodes) {
-			inNodes.add(inNode.getUUID());
-			inNodes.closeFileIfNecessary();
+	private void addInNode(final long inNodeUUID, final Vote v) {
+		synchronized (likedIn) {
+			synchronized (dislikedIn) {
+				if (v == Vote.UP) {
+					likedIn.add(inNodeUUID);
+					dislikedIn.remove(inNodeUUID);
+				} else if (v == Vote.DOWN) {
+					likedIn.remove(inNodeUUID);
+					dislikedIn.add(inNodeUUID);
+				} else {
+					likedIn.remove(inNodeUUID);
+					dislikedIn.remove(inNodeUUID);
+				}
+				likedIn.closeFileIfNecessary();
+				dislikedIn.closeFileIfNecessary();
+			}
 		}
 	}
 
@@ -395,19 +355,19 @@ public class Node {
 	 *         if not
 	 */
 	public boolean removeFriendship(Node friend) {
-		synchronized (friends) {
-			if (!friends.remove(friend)) {
-				friends.closeFileIfNecessary();
+		synchronized (likedOut) {
+			if (!likedOut.remove(friend)) {
+				likedOut.closeFileIfNecessary();
 				return false;
 			}
-			friends.closeFileIfNecessary();
+			likedOut.closeFileIfNecessary();
 		}
 		friend.removeInNode(this);
 
 		/**
 		 * Update the commons map
 		 */
-		commons.friendRemoved(friend);
+		likeCommons.friendRemoved(friend);
 
 		return true;
 	}
@@ -421,12 +381,12 @@ public class Node {
 	 *         if not
 	 */
 	private boolean removeInNode(Node inNode) {
-		synchronized (inNodes) {
-			if (!inNodes.remove(inNode)) {
-				inNodes.closeFileIfNecessary();
+		synchronized (likedIn) {
+			if (!likedIn.remove(inNode)) {
+				likedIn.closeFileIfNecessary();
 				return false;
 			}
-			inNodes.closeFileIfNecessary();
+			likedIn.closeFileIfNecessary();
 		}
 		return true;
 	}
@@ -436,7 +396,7 @@ public class Node {
 	 * @return All friends of this node
 	 */
 	public long[] getFriends() {
-		return friends.toArray(new long[0]);
+		return likedOut.toArray(new long[0]);
 	}
 
 	/**
@@ -444,7 +404,7 @@ public class Node {
 	 * @return All friends Nodes liking this node
 	 */
 	public long[] getInNodes() {
-		return inNodes.toArray(new long[0]);
+		return likedIn.toArray(new long[0]);
 	}
 
 	/**
@@ -456,7 +416,7 @@ public class Node {
 	 * @return The nodes that have the entity uuid with this node in common
 	 */
 	public long[] getCommonNodes(long uuid) {
-		return commons.getCommonNodes(uuid);
+		return likeCommons.getCommonNodes(uuid);
 	}
 
 	public final long getUUID() {
@@ -464,14 +424,14 @@ public class Node {
 	}
 
 	public void freeMemory() {
-		commons.freeMemory();
+		likeCommons.freeMemory();
 	}
 
 	protected Commons getCommons() {
-		return commons;
+		return likeCommons;
 	}
 
 	public void updateCommons() {
-		commons.update();
+		likeCommons.update();
 	}
 }

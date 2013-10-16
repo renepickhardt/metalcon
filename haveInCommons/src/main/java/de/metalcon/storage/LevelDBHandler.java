@@ -150,8 +150,6 @@ public class LevelDBHandler {
 	 *            value to be removed from the array
 	 */
 	public void removeFromSet(final long key, final long value) {
-		db.put(generateKey(key), Serialize(value));
-
 		long[] valueArray = getLongs(key);
 
 		if (valueArray == null) {
