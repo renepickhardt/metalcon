@@ -1,5 +1,5 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee">
-        <display-name>autocompleteServer</display-name>
+        <display-name>HaveInCommonsServer</display-name>
          <listener>
                    <listener-class>de.metalcon.haveInCommons.Server</listener-class>
            </listener>           
