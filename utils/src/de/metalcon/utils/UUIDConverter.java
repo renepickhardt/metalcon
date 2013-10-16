@@ -29,7 +29,7 @@ public class UUIDConverter {
 		}
 	}
 
-	public static String serialize(long uuid) {
+	public static final String serialize(long uuid) {
 		StringBuilder string = new StringBuilder(13);
 		for (int i = 0; i != 13; ++i) {
 			int rest = (int) (uuid % MAX_TOKEN);
@@ -43,7 +43,7 @@ public class UUIDConverter {
 	 * @param idString
 	 * @return
 	 */
-	public static long deserialize(final String idString) {
+	public static final long deserialize(final String idString) {
 		long tmp = 0;
 		for (int i = idString.length() - 1; i >= 0; --i) {
 			tmp *= MAX_TOKEN;

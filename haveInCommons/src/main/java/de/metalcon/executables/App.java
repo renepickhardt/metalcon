@@ -3,7 +3,6 @@ package de.metalcon.executables;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.haveInCommons.PersistentReadOptimized;
@@ -13,6 +12,7 @@ import de.metalcon.like.NodeFactory;
 import de.metalcon.like.NormalizedFlatFileLikeRetrieval;
 import de.metalcon.storage.LevelDBHandler;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
+import de.metalcon.utils.messages.Messages;
 
 /**
  * Hello world!
@@ -38,7 +38,6 @@ public class App {
 	private static HaveInCommons graph;
 
 	public static void main(String[] args) {
-
 		// graph = new PersistentReadOptimized();
 		graph = new NormalizedFlatFileLikeRetrieval("/dev/shm/commonsDB");
 		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
