@@ -11,8 +11,10 @@ import de.metalcon.haveInCommons.SingleNodePreprocessorNeo4j;
 import de.metalcon.like.Node;
 import de.metalcon.like.NodeFactory;
 import de.metalcon.like.NormalizedLikeRetrieval;
+import de.metalcon.like.PersistentLikeHistory;
 import de.metalcon.storage.LevelDBHandler;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
+import de.metalcon.utils.UUIDConverter;
 
 /**
  * Hello world!
@@ -27,21 +29,36 @@ public class App {
 			+ "metalcon-user.csv";
 	private static final String METALCON_NONUSER_FILE = DATA_DIR
 			+ "metalcon-nonUser.csv";
-	private static final String METALCON_USER_RAND_FILE = DATA_DIR
-			+ "metalcon-user-random.csv";
+	private static final String METALCON_NONUSER_RAND_FILE = DATA_DIR
+			+ "metalcon-nonUser-random.csv";
 	private static final String METALCON_USER_SMALL_FILE = DATA_DIR
 			+ "metalcon-user-small.csv";
 	private static final String UB_SMALL_FILE = DATA_DIR + "ub-small.csv";
-	private static final String WIKIPEDIA_FILE = "../data/";
+	private static final String POWER_LAW_USER = DATA_DIR
+			+ "powerlaw-11023-2.5-100-200.csv";
+	private static final String POWER_LAW_USER_SMALL = DATA_DIR
+			+ "powerlaw-5000-2-1-200.csv";
+	private static final String POWER_LAW_USER_SMALL2 = DATA_DIR
+			+ "powerlaw-5000-2.5-10-200.csv";
+	private static final String POWER_LAW_USER_SMALL4 = DATA_DIR
+			+ "powerlaw-5000-2.5-100-200.csv";
+
 	public static final int BATCH_SIZE = 100000;
 
 	private static HaveInCommons graph;
 
 	public static void main(String[] args) {
-		// graph = new PersistentReadOptimized();
+		try {
+			PersistentLikeHistory.initialize("/dev/shm/commonsDB/likesDB");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		graph = new NormalizedLikeRetrieval("/dev/shm/commonsDB");
 		LevelDBHandler.initialize("/dev/shm/commonsDB/levelDB");
 		PersistentUUIDSetLevelDB.initialize();
+
 		long time = 0;
 		/*
 		 * Import all users
@@ -55,7 +72,7 @@ public class App {
 		/*
 		 * Import Albums and Bands
 		 */
-		time = importGraph(graph, METALCON_NONUSER_FILE);
+		time = importGraph(graph, METALCON_NONUSER_RAND_FILE);
 		long newNodes = NodeFactory.getAllNodeUUIDs().size() - nodeNum;
 		System.out
 				.println("Importing nonUser nodes took " + (int) (time / 1E9f)
@@ -87,7 +104,7 @@ public class App {
 		}
 		time = System.nanoTime() - start;
 		System.out.println("Generating commons for " + runs
-				+ " node pairs took " + (int) (time / 1E9f) + " s finding "
+				+ " node pairs took " + (int) (time / 1E6f) + " µs finding "
 				+ found + " non empty lists (" + time / 1000 / runs
 				+ " µs per node)");
 
@@ -193,6 +210,13 @@ public class App {
 					last = now;
 				}
 			}
+
+			now = System.nanoTime();
+			System.out.println("#nodes=" + nodeCount + "\t" + "#edges="
+					+ edgeCount + "\t" + "time total="
+					+ (long) ((now - start) / 1E9f) + "sec.\t" + "batch time="
+					+ (long) ((now - last) / 1E6f) + "msec.");
+
 			if (graphImpl instanceof PersistentReadOptimized) {
 				((PersistentReadOptimized) graphImpl).flush();
 			}

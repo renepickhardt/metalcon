@@ -92,10 +92,9 @@ class Commons {
 	public void update() {
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
-		final long[] friends = node.getFriends();
-		if (friends != null) {
-
-			for (long friendUUID : friends) {
+		final long[] outNodes = node.getFriends();
+		if (outNodes != null) {
+			for (long friendUUID : outNodes) {
 				if (friendUUID == 0) {
 					break;
 				}

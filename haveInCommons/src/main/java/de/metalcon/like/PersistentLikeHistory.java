@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.metalcon.like.Like.Vote;
+import de.metalcon.utils.UUIDConverter;
 
 /**
  * @author Jonas Kunze
@@ -22,9 +23,23 @@ public class PersistentLikeHistory {
 	private static final int BytesPerLikeInFile = 13;
 
 	/*
+	 * Path to the folder where all files will be stored
+	 */
+	private static String storageDir;
+
+	/*
+	 * How many chars of the MUID should be used to define the relative path.
+	 * The MUID abcdefghijklm will be stored in following folder for this
+	 * variable set to 3:
+	 * 
+	 * sotragedir/m/l/k/abcdefghijklm_likes
+	 */
+	private static final int storageRecursiveDepth = 3;
+
+	/*
 	 * The maximum number of open file handles allowed.
 	 */
-	private static final int MaximumOpenFileHandles = 1000;
+	private static final int MaximumOpenFileHandles = 10000;
 
 	/*
 	 * The number of currently opened file handles
@@ -57,14 +72,61 @@ public class PersistentLikeHistory {
 	 * @throws IOException
 	 * 
 	 */
-	public PersistentLikeHistory(final String fileName) {
-		this.fileName = fileName;
+	public PersistentLikeHistory(final long uuid) {
+		this.fileName = generateFileName(uuid);
 		openFile();
 		fileSize = file.getInt();
 		if (fileSize == 0) {
 			fileSize = 4;
 		}
 		closeFileIfNecessary();
+	}
+
+	/**
+	 * Create all folders that might be used
+	 * 
+	 * @throws IOException
+	 */
+	public static void initialize(final String storageDir) throws IOException {
+		PersistentLikeHistory.storageDir = storageDir;
+
+		char[] counters = new char[storageRecursiveDepth];
+		char[] availableTokens = UUIDConverter.getAllowedTokens();
+
+		while (true) {
+			String relPath = "";
+			for (int i = 0; i < counters.length; i++) {
+				relPath += availableTokens[counters[i]] + "/";
+			}
+			final File dir = new File(storageDir, relPath);
+			if (!dir.exists() && !dir.mkdirs()) {
+				throw new IOException("Unable to create "
+						+ dir.getAbsolutePath());
+			}
+			int j = 0;
+			while (++counters[j] == availableTokens.length) {
+				if (j == counters.length - 1) {
+					return;
+				}
+				counters[j++] = 0;
+			}
+		}
+	}
+
+	private static String generateFileName(final long uuid) {
+		String ID = UUIDConverter.serialize(uuid);
+		if (storageRecursiveDepth == 3) {
+			return storageDir + "/" + ID.charAt(0) + "/" + ID.charAt(1) + "/"
+					+ ID.charAt(2) + "/" + uuid + "_likes";
+		}
+		if (storageRecursiveDepth == 2) {
+			return storageDir + "/" + ID.charAt(0) + "/" + ID.charAt(1) + "/"
+					+ uuid + "_likes";
+		} else {
+			throw new RuntimeException(
+					"PersistentLikeHistory.generateFileName must be updated when changing storageRecursiveDepth");
+		}
+
 	}
 
 	/**
@@ -119,6 +181,7 @@ public class PersistentLikeHistory {
 				NumberOfOpenFileHandles.decrementAndGet();
 				RAFile.close();
 				file = null;
+				RAFile = null;
 				return true;
 			}
 		} catch (IOException e) {

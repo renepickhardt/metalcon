@@ -1,10 +1,6 @@
 package de.metalcon.like;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 import de.metalcon.like.Like.Vote;
 import de.metalcon.storage.IPersistentUUIDSet;
@@ -86,8 +82,7 @@ public class Node {
 		dislikedOut = new PersistentUUIDSetLevelDB(UUID + "dislikedOut");
 		dislikedIn = new PersistentUUIDSetLevelDB(UUID + "dislikedIn");
 
-		likeHistory = new PersistentLikeHistory(storageDir + "/" + UUID
-				+ "_likes");
+		likeHistory = new PersistentLikeHistory(UUID);
 	}
 
 	/**
