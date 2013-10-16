@@ -28,6 +28,7 @@
     <developerConnection>scm:git:https://github.com/renepickhardt/metalcon</developerConnection>
     <url>https://github.com/renepickhardt/metalcon.git</url>
   </scm>
+
   
   <developers>
     <developer>
