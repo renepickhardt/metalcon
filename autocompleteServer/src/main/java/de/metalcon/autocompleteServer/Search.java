@@ -28,8 +28,9 @@ public class Search {
 		Properties properties = new Properties();
 		BufferedInputStream stream;
 		try {
+			// FIXME: this needs to be a relative path.
 			stream = new BufferedInputStream(new FileInputStream(
-					"autocomplete.conf"));
+					"/var/lib/tomcat/autocomplete.conf"));
 
 			try {
 				properties.load(stream);
@@ -40,7 +41,7 @@ public class Search {
 
 			}
 		} catch (FileNotFoundException e3) {
-			// TODO Auto-generated catch block
+			// TODO what should happen if the config-file is missing
 			e3.printStackTrace();
 		}
 		String saveFolder = properties.getProperty("persistency_folder");
