@@ -28,9 +28,8 @@ public class Search {
 		Properties properties = new Properties();
 		BufferedInputStream stream;
 		try {
-			// FIXME: this needs to be a relative path.
 			stream = new BufferedInputStream(new FileInputStream(
-					"/var/lib/tomcat/autocomplete.conf"));
+					System.getenv("CATALINA_HOME") + "/autocomplete.conf"));
 
 			try {
 				properties.load(stream);
