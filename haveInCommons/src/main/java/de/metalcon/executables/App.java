@@ -103,7 +103,7 @@ public class App {
 		}
 		time = System.nanoTime() - start;
 		System.out.println("Generating commons for " + runs
-				+ " node pairs took " + (int) (time / 1E6f) + " µs finding "
+				+ " node pairs took " + (int) (time / 1E6f) + " ms finding "
 				+ found + " non empty lists (" + time / 1000 / runs
 				+ " µs per node)");
 
