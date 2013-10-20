@@ -4,14 +4,14 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**
- * This class can serialize and deserialize 64 bit (8 Byte) uuids in alphanumerical strings
- * The class stores the 64 byte string but can also be initialized from a String
+ * This class can serialize and deserialize 64 bit (8 Byte) MUIDS to alphanumerical strings
  * 
- * This code ist GPLv3
+ * This code is GPLv3
  */
 
 /**
  * @author Rene Pickhardt
+ * @author Jonas Kunze
  * 
  */
 public class MUIDConverter {
@@ -22,17 +22,34 @@ public class MUIDConverter {
 	private final static int RADIX = tokens.length;
 	private final static short MUID_LENGTH = 13;
 
-	private final static int[] reverseTokens;
-	static {
-		reverseTokens = new int[256];
-		for (int i = 0; i != reverseTokens.length; ++i) {
-			reverseTokens[i] = -1;
-		}
-		for (int i = 0; i != RADIX; ++i) {
-			reverseTokens[(int) (tokens[i])] = i;
-		}
-	}
-
+	/**
+	 * Generates a MUID containing the given information. The format of the MUID
+	 * is following (in big endianess):
+	 * 
+	 * Bit 0 is always 1 to force constant length of the alphanumeric version
+	 * 
+	 * Bits 1-9 define the type
+	 * 
+	 * Bit 10 is always 0 to enforce the first two tokens in the alphanumeric
+	 * version to be equal for each MUID with the same type
+	 * 
+	 * Bits 11-15 define the Source
+	 * 
+	 * Bits 16-47 define the timestamp
+	 * 
+	 * Bits 48-63 define the ID
+	 * 
+	 * @param type
+	 *            The type of the MUID to be created
+	 * @param source
+	 *            The source of the creator of the MUID (the node running this
+	 *            code)
+	 * @param timestamp
+	 *            The timestamp to be stored in the MUID (creation time)
+	 * @param ID
+	 *            The relative ID within the given timestamp, source and type.
+	 * @return The MUID containing all the given information
+	 */
 	public static long getMUID(final short type, final byte source,
 			final int timestamp, final short ID) {
 		if (type >= (1 << 9)) {
@@ -47,7 +64,7 @@ public class MUIDConverter {
 		return
 		/* Highest bit is 1 for constant length */
 		1l << (64 - 1)
-		/* Highest 10 bits are type */
+		/* Highest 9 bits are type */
 		| (((long) type & 511) << (64 - 9 - 1))
 		/*
 		 * Next bit is empty so that the first two alphanumerics only depend on
@@ -61,23 +78,58 @@ public class MUIDConverter {
 		| (short) ID & 0xFFFFL;
 	}
 
-	public static final short getType(final long uuid) {
-		return (short) ((uuid >>> (64 - 10)) & 511);
+	/**
+	 * Returns the type stored within the given MUID
+	 * 
+	 * @param muid
+	 *            The MUID storing the type searched for
+	 * @return The type within the given muid
+	 */
+	public static final short getType(final long muid) {
+		return (short) ((muid >>> (64 - 9 - 1)) & 511);
 	}
 
-	public static final byte getSource(final long uuid) {
-		return (byte) ((uuid >>> (64 - 1 - 9 - 1 - 5)) & 31);
+	/**
+	 * Returns the source that generated the given MUID
+	 * 
+	 * @param muid
+	 *            The MUID storing the source searched for
+	 * @return The source that created the given MUID
+	 */
+	public static final byte getSource(final long muid) {
+		return (byte) ((muid >>> (64 - 1 - 9 - 1 - 5)) & 31);
 	}
 
-	public static final int getTimestamp(final long uuid) {
-		return (int) ((uuid >>> (64 - 1 - 9 - 1 - 5 - 32)) & 0xFFFFFFFFL);
+	/**
+	 * Returns the timestamp the given MUID has been created
+	 * 
+	 * @param muid
+	 *            The MUID storing the timestamp searched for
+	 * @return The timestamp the given MUID has been created at
+	 */
+	public static final int getTimestamp(final long muid) {
+		return (int) ((muid >>> (64 - 1 - 9 - 1 - 5 - 32)) & 0xFFFFFFFFL);
 	}
 
-	public static final short getID(final long uuid) {
-		return (short) (uuid & 0xFFFFL);
+	/**
+	 * Returns the ID stored within the given MUID
+	 * 
+	 * @param muid
+	 *            The MUID storing the ID searched for
+	 * @return The ID within the given muid
+	 */
+	public static final short getID(final long muid) {
+		return (short) (muid & 0xFFFFL);
 	}
 
-	public static final String serialize(long uuid) {
+	/**
+	 * Parses the given MUID to an alphanumeric string
+	 * 
+	 * @param muid
+	 *            The MUID to be parsed
+	 * @return The alphanumeric string corresponding to the given MUID
+	 */
+	public static final String serialize(final long muid) {
 		// StringBuilder string = new StringBuilder(13);
 		// for (int i = 0; i != MUID_LENGTH; ++i) {
 		// int rest = (int) (uuid % RADIX);
@@ -98,13 +150,17 @@ public class MUIDConverter {
 		/*
 		 * Do not use Long.toString to interpret the uuid as unsigned long
 		 */
-		byte[] bytes = ByteBuffer.allocate(8).putLong(uuid).array();
+		byte[] bytes = ByteBuffer.allocate(8).putLong(muid).array();
 		return new BigInteger(1, bytes).toString(RADIX);
 	}
 
 	/**
+	 * Parses the given MUID in alphanumeric string format to it's corresponding
+	 * long version
+	 * 
 	 * @param idString
-	 * @return
+	 *            The alphanumeric string describing the MUID to be parsed
+	 * @return The MUID in it's long format
 	 */
 	public static final long deserialize(final String idString) {
 		// if (idString.length() != MUID_LENGTH) {
@@ -132,6 +188,11 @@ public class MUIDConverter {
 		return tokens;
 	}
 
+	/**
+	 * 
+	 * @return The number for characters an alphanumeric version of any MUID
+	 *         consist of
+	 */
 	public static short getMUIDLength() {
 		return MUID_LENGTH;
 	}

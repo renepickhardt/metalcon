@@ -28,12 +28,19 @@ public class MUIDConverterTest {
 			rand.nextLong();
 		}
 
+		/*
+		 * Measure time to create random long
+		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
 			rand.nextLong();
 		}
 		long randLongTime = (System.nanoTime() - start) / runs;
 
+		/*
+		 * Measure time to create 4 random ints as we'll use them for
+		 * MUIDConverter.getMUID
+		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
 			rand.nextInt(1 << 9);
@@ -43,13 +50,31 @@ public class MUIDConverterTest {
 		}
 		long rand4IntTime = (System.nanoTime() - start) / runs;
 
+		/*
+		 * Serialization time
+		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
 			String s = MUIDConverter.serialize(rand.nextLong());
 		}
-		long time = (System.nanoTime() - start) / runs - randLongTime;
-		System.out.println("Serialization: " + time + " ns");
+		long serializationTime = (System.nanoTime() - start) / runs
+				- randLongTime;
+		System.out.println("Serialization: " + serializationTime + " ns");
 
+		/*
+		 * Deserialization time
+		 */
+		start = System.nanoTime();
+		for (long l = runs; l != 0; l--) {
+			String s = MUIDConverter.serialize(rand.nextLong());
+			MUIDConverter.deserialize(s);
+		}
+		long time = (System.nanoTime() - start) / runs - serializationTime;
+		System.out.println("Deserialization: " + time + " ns");
+
+		/*
+		 * MUIDConverter.getMUID time
+		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
 			MUIDConverter.getMUID((short) rand.nextInt(1 << 9),
@@ -60,6 +85,9 @@ public class MUIDConverterTest {
 		System.out.println("Generation: " + (getMUIDTime - rand4IntTime)
 				+ " ns");
 
+		/*
+		 * MUIDConverter.getType time
+		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
 			long uuid = MUIDConverter.getMUID((short) rand.nextInt(1 << 9),
@@ -72,8 +100,12 @@ public class MUIDConverterTest {
 		System.out.println("getType: " + (time - getMUIDTime) + " ns");
 	}
 
+	/**
+	 * Generates several random MUIDs and checks if the get methods like getType
+	 * return the initially type used for the creation of the MUID
+	 */
 	@Test
-	public void smokeTest() {
+	public void checkGetMethods() {
 		Random rand = new Random();
 		for (int i = 0; i != 10000; i++) {
 			short oType = (short) (rand.nextInt() & 511);
@@ -118,6 +150,30 @@ public class MUIDConverterTest {
 			if (uuid != deserialized) {
 				fail(uuid + " has been converted to " + s
 						+ " but s is deserialized to " + deserialized);
+			}
+		}
+	}
+
+	/**
+	 * Generates several random MUIDs (long) and checks if the serialized
+	 * version of the MUID get deserialized to the original long number
+	 */
+	@Test
+	public void checkSerialization() {
+		Random rand = new Random();
+		for (int i = 0; i != 10000; i++) {
+			short oType = (short) (rand.nextInt() & 511);
+			byte oSource = (byte) (rand.nextInt() & 31);
+			int oTimestamp = rand.nextInt();
+			short oID = (short) rand.nextInt();
+
+			long uuid = MUIDConverter.getMUID(oType, oSource, oTimestamp, oID);
+			String alphanumeric = MUIDConverter.serialize(uuid);
+			long deserialized = MUIDConverter.deserialize(alphanumeric);
+
+			if (uuid != deserialized) {
+				fail(uuid + " has been serialized to " + alphanumeric
+						+ " and deserialized to " + deserialized);
 			}
 		}
 	}
