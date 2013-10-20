@@ -14,6 +14,8 @@ import org.junit.Test;
  * 
  */
 public class MUIDConverterTest {
+	private static Random rand = new Random();
+
 	@Test
 	public void performanceTest() {
 		long runs = (long) 1E6;
@@ -55,7 +57,7 @@ public class MUIDConverterTest {
 		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
-			String s = MUIDConverter.serialize(rand.nextLong());
+			MUIDConverter.serialize(rand.nextLong());
 		}
 		long serializationTime = (System.nanoTime() - start) / runs
 				- randLongTime;
@@ -77,7 +79,7 @@ public class MUIDConverterTest {
 		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
-			MUIDConverter.getMUID((short) rand.nextInt(1 << 9),
+			MUIDConverter.generateMUID((short) rand.nextInt(1 << 9),
 					(byte) rand.nextInt(1 << 5), rand.nextInt(),
 					(short) rand.nextInt());
 		}
@@ -90,9 +92,7 @@ public class MUIDConverterTest {
 		 */
 		start = System.nanoTime();
 		for (long l = runs; l != 0; l--) {
-			long uuid = MUIDConverter.getMUID((short) rand.nextInt(1 << 9),
-					(byte) rand.nextInt(1 << 5), rand.nextInt(),
-					(short) rand.nextInt());
+			long uuid = generateRandomMUID();
 			MUIDConverter.getType(uuid);
 		}
 
@@ -113,7 +113,7 @@ public class MUIDConverterTest {
 			int oTimestamp = rand.nextInt();
 			short oID = (short) rand.nextInt();
 
-			long uuid = MUIDConverter.getMUID(oType, oSource, oTimestamp, oID);
+			long uuid = MUIDConverter.generateMUID(oType, oSource, oTimestamp, oID);
 
 			short type = MUIDConverter.getType(uuid);
 			byte source = MUIDConverter.getSource(uuid);
@@ -160,14 +160,9 @@ public class MUIDConverterTest {
 	 */
 	@Test
 	public void checkSerialization() {
-		Random rand = new Random();
 		for (int i = 0; i != 10000; i++) {
-			short oType = (short) (rand.nextInt() & 511);
-			byte oSource = (byte) (rand.nextInt() & 31);
-			int oTimestamp = rand.nextInt();
-			short oID = (short) rand.nextInt();
+			long uuid = generateRandomMUID();
 
-			long uuid = MUIDConverter.getMUID(oType, oSource, oTimestamp, oID);
 			String alphanumeric = MUIDConverter.serialize(uuid);
 			long deserialized = MUIDConverter.deserialize(alphanumeric);
 
@@ -176,5 +171,33 @@ public class MUIDConverterTest {
 						+ " and deserialized to " + deserialized);
 			}
 		}
+	}
+
+	@Test
+	public void checkGetMUIDStoragePath() {
+		for (int i = 1; i < 10000; i++) {
+			long uuid = generateRandomMUID();
+			String path = MUIDConverter.getMUIDStoragePath(uuid);
+			if (path.length() != 6) {
+				fail("Wrong MUID path length: " + path);
+			}
+			if (!path.matches("[0-9a-f]/[0-9a-f]/[0-9a-f]/")) {
+				fail("Bad MUID path format: " + path);
+			}
+		}
+	}
+
+	/**
+	 * Generates a new MUID with random values
+	 * 
+	 * @return The generated random MUID
+	 */
+	private long generateRandomMUID() {
+		short oType = (short) (rand.nextInt() & 511);
+		byte oSource = (byte) (rand.nextInt() & 31);
+		int oTimestamp = rand.nextInt();
+		short oID = (short) rand.nextInt();
+
+		return MUIDConverter.generateMUID(oType, oSource, oTimestamp, oID);
 	}
 }

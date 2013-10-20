@@ -2,6 +2,7 @@ package de.metalcon.like;
 
 import java.io.IOException;
 
+import de.metalcon.like.Like.Vote;
 import de.metalcon.storage.IPersistentUUIDArrayMap;
 import de.metalcon.storage.LazyPersistentUUIDMap;
 import de.metalcon.storage.PersistentUUIDArrayMap;
@@ -14,6 +15,8 @@ import de.metalcon.storage.PersistentUUIDArrayMapRedis;
 class Commons {
 	private final Node node;
 
+	private final Vote likeType;
+
 	private IPersistentUUIDArrayMap persistentcommonsMap = null;
 
 	/**
@@ -21,7 +24,8 @@ class Commons {
 	 * @param persistentFileName
 	 *            The path to the persistent commons file
 	 */
-	public Commons(final Node node, final String storageDir, Class<?> c) {
+	public Commons(final Node node, final String storageDir, Class<?> c,
+			final Vote likeType) {
 		this.node = node;
 		if (c == PersistentUUIDArrayMapRedis.class) {
 			persistentcommonsMap = new PersistentUUIDArrayMapRedis(""
@@ -42,6 +46,7 @@ class Commons {
 			persistentcommonsMap = new PersistentUUIDArrayMapLevelDB(
 					node.getUUID());
 		}
+		this.likeType = likeType;
 	}
 
 	/**
@@ -168,7 +173,11 @@ class Commons {
 			if (like.getUUID() == node.getUUID()) {
 				continue;
 			}
-			persistentcommonsMap.append(like.getUUID(), friend.getUUID());
+			if (like.getVote() == likeType) {
+				persistentcommonsMap.append(like.getUUID(), friend.getUUID());
+			} else {
+				persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
+			}
 		}
 		persistentcommonsMap.save();
 	}

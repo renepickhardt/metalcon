@@ -10,7 +10,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.metalcon.like.Like.Vote;
-import de.metalcon.utils.UUIDConverter;
+import de.metalcon.utils.MUIDConverter;
 
 /**
  * @author Jonas Kunze
@@ -91,7 +91,7 @@ public class PersistentLikeHistory {
 		PersistentLikeHistory.storageDir = storageDir;
 
 		char[] counters = new char[storageRecursiveDepth];
-		char[] availableTokens = UUIDConverter.getAllowedTokens();
+		char[] availableTokens = MUIDConverter.getAllowedTokens();
 
 		while (true) {
 			String relPath = "";
@@ -114,19 +114,9 @@ public class PersistentLikeHistory {
 	}
 
 	private static String generateFileName(final long uuid) {
-		String ID = UUIDConverter.serialize(uuid);
-		if (storageRecursiveDepth == 3) {
-			return storageDir + "/" + ID.charAt(0) + "/" + ID.charAt(1) + "/"
-					+ ID.charAt(2) + "/" + uuid + "_likes";
-		}
-		if (storageRecursiveDepth == 2) {
-			return storageDir + "/" + ID.charAt(0) + "/" + ID.charAt(1) + "/"
-					+ uuid + "_likes";
-		} else {
-			throw new RuntimeException(
-					"PersistentLikeHistory.generateFileName must be updated when changing storageRecursiveDepth");
-		}
 
+		return storageDir + "/" + MUIDConverter.getMUIDStoragePath(uuid) + uuid
+				+ "_likes";
 	}
 
 	/**

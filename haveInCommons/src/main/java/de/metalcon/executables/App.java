@@ -14,7 +14,6 @@ import de.metalcon.like.NormalizedLikeRetrieval;
 import de.metalcon.like.PersistentLikeHistory;
 import de.metalcon.storage.LevelDBHandler;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
-import de.metalcon.utils.UUIDConverter;
 
 /**
  * Hello world!

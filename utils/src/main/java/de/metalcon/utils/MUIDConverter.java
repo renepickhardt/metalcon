@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**
- * This class can serialize and deserialize 64 bit (8 Byte) MUIDS to alphanumerical strings
+ * This class defines the 64 bit MUIDS and can generate, serialize and deserialize them 
  * 
  * This code is GPLv3
  */
@@ -50,7 +50,7 @@ public class MUIDConverter {
 	 *            The relative ID within the given timestamp, source and type.
 	 * @return The MUID containing all the given information
 	 */
-	public static long getMUID(final short type, final byte source,
+	public static long generateMUID(final short type, final byte source,
 			final int timestamp, final short ID) {
 		if (type >= (1 << 9)) {
 			throw new RuntimeException("Type may not be larger or equal to "
@@ -85,7 +85,7 @@ public class MUIDConverter {
 	 *            The MUID storing the type searched for
 	 * @return The type within the given muid
 	 */
-	public static final short getType(final long muid) {
+	public static short getType(final long muid) {
 		return (short) ((muid >>> (64 - 9 - 1)) & 511);
 	}
 
@@ -96,7 +96,7 @@ public class MUIDConverter {
 	 *            The MUID storing the source searched for
 	 * @return The source that created the given MUID
 	 */
-	public static final byte getSource(final long muid) {
+	public static byte getSource(final long muid) {
 		return (byte) ((muid >>> (64 - 1 - 9 - 1 - 5)) & 31);
 	}
 
@@ -107,7 +107,7 @@ public class MUIDConverter {
 	 *            The MUID storing the timestamp searched for
 	 * @return The timestamp the given MUID has been created at
 	 */
-	public static final int getTimestamp(final long muid) {
+	public static int getTimestamp(final long muid) {
 		return (int) ((muid >>> (64 - 1 - 9 - 1 - 5 - 32)) & 0xFFFFFFFFL);
 	}
 
@@ -118,7 +118,7 @@ public class MUIDConverter {
 	 *            The MUID storing the ID searched for
 	 * @return The ID within the given muid
 	 */
-	public static final short getID(final long muid) {
+	public static short getID(final long muid) {
 		return (short) (muid & 0xFFFFL);
 	}
 
@@ -129,7 +129,7 @@ public class MUIDConverter {
 	 *            The MUID to be parsed
 	 * @return The alphanumeric string corresponding to the given MUID
 	 */
-	public static final String serialize(final long muid) {
+	public static String serialize(final long muid) {
 		// StringBuilder string = new StringBuilder(13);
 		// for (int i = 0; i != MUID_LENGTH; ++i) {
 		// int rest = (int) (uuid % RADIX);
@@ -162,7 +162,7 @@ public class MUIDConverter {
 	 *            The alphanumeric string describing the MUID to be parsed
 	 * @return The MUID in it's long format
 	 */
-	public static final long deserialize(final String idString) {
+	public static long deserialize(final String idString) {
 		// if (idString.length() != MUID_LENGTH) {
 		// throw new RuntimeException("Malformed MUID: " + idString);
 		// }
@@ -195,5 +195,30 @@ public class MUIDConverter {
 	 */
 	public static short getMUIDLength() {
 		return MUID_LENGTH;
+	}
+
+	/**
+	 * Returns the path corresponding to the given muid. The path consist of 3
+	 * folders with one hex character as name (0-f). The letters are generated
+	 * from 4 consecutive bits in the 32-bit hash of the MUID. The path will be
+	 * in the format [0-9a-f]/[0-9a-f]/[0-9a-f]/
+	 * 
+	 * @param muid
+	 *            The MUID to be taken for the path generation
+	 * @return The path that should be used to store data coresponding to the
+	 *         given MUID
+	 */
+	public static String getMUIDStoragePath(final long muid) {
+		/*
+		 * Split the muid into shorts and xor them
+		 */
+		short hash = (short) ((muid ^ (muid >>> 16)) ^ ((muid >>> 32) ^ (muid >>> 48)));
+		char[] paths = new char[3];
+		paths[0] = (char) ('a' + (hash & 15));
+		paths[1] = (char) ('a' + ((hash >> 4) & 15));
+		paths[2] = (char) ('a' + ((hash >> 8) & 15));
+
+		return tokens[(hash & 15)] + "/" + tokens[((hash >> 4) & 15)] + "/"
+				+ tokens[((hash >> 8) & 15)] + "/";
 	}
 }

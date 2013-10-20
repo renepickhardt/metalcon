@@ -18,6 +18,7 @@ public class Node {
 	private final long UUID;
 
 	private final Commons likeCommons;
+	private final Commons dislikeCommons;
 
 	/*
 	 * lastLikes[lastLikesFirstEntryPointer] is the newest like The list is
@@ -64,7 +65,10 @@ public class Node {
 		// commons = new Commons(this, storageDir, LazyPersistentUUIDMap.class);
 
 		likeCommons = new Commons(this, storageDir,
-				PersistentUUIDArrayMapLevelDB.class);
+				PersistentUUIDArrayMapLevelDB.class, Vote.UP);
+
+		dislikeCommons = new Commons(this, storageDir,
+				PersistentUUIDArrayMapLevelDB.class, Vote.DOWN);
 
 		// try {
 		// friends = new PersistentUUIDSet(storageDir + "/" + UUID
@@ -96,6 +100,7 @@ public class Node {
 			n.removeFriendship(this);
 		}
 		likeCommons.delete();
+		dislikeCommons.delete();
 		likedOut.delete();
 		likedIn.delete();
 
@@ -139,9 +144,6 @@ public class Node {
 				 * nextLike is now the oldest like we found -> read all likes
 				 * from file that are younger than timestamp but older than
 				 * nextLike.getTimestamp()
-				 * 
-				 * TODO: what if two likes with the same TS exist, but only one
-				 * of those in lastLikes?!
 				 */
 				if (nextLike == null) {
 					likesFromDisk = getLikesFromTimeOnFromDisk(timestamp,
@@ -256,9 +258,13 @@ public class Node {
 		likedNode.addInNode(this.UUID, like.getVote());
 
 		/*
-		 * Update the commons map
+		 * Update the commons maps by adding likedNode to all out nodes of
+		 * likedNode
 		 */
-		likeCommons.friendAdded(likedNode);
+		if (like.getVote() == Vote.UP) {
+			likeCommons.friendAdded(likedNode);
+			dislikeCommons.friendAdded(likedNode);
+		}
 
 		synchronized (lastLikesCache) {
 			if (lastLikesFirstEntryPointer == 0) {
@@ -363,6 +369,7 @@ public class Node {
 		 * Update the commons map
 		 */
 		likeCommons.friendRemoved(friend);
+		dislikeCommons.friendRemoved(friend);
 
 		return true;
 	}
@@ -403,8 +410,8 @@ public class Node {
 	}
 
 	/**
-	 * Reads the persistent PersistentCommonsFile from disk and returns all
-	 * uuids that have the node uuid in common with this node
+	 * Returns all MUIDs that are liked by this node and liked the node with the
+	 * given uuid
 	 * 
 	 * @param uuid
 	 *            The entity the returned uuids have in common with this node
@@ -412,6 +419,18 @@ public class Node {
 	 */
 	public long[] getCommonNodes(long uuid) {
 		return likeCommons.getCommonNodes(uuid);
+	}
+
+	/**
+	 * Returns all MUIDs that are liked by this node and disliked the node with
+	 * the given uuid
+	 * 
+	 * @param uuid
+	 *            The entity the returned uuids have in common with this node
+	 * @return The nodes that have the entity uuid with this node in common
+	 */
+	public long[] getCommonDislikedNodes(long uuid) {
+		return dislikeCommons.getCommonNodes(uuid);
 	}
 
 	public final long getUUID() {
