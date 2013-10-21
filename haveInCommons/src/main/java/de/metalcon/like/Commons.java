@@ -97,24 +97,16 @@ class Commons {
 	public void update() {
 		final int now = (int) (System.currentTimeMillis() / 1000l);
 
-		final long[] outNodes = node.getFriends();
+		/*
+		 * Update all outgoing nodes
+		 */
+		final long[] outNodes = node.getLikedNodes();
 		if (outNodes != null) {
 			for (long friendUUID : outNodes) {
 				if (friendUUID == 0) {
 					break;
 				}
 				updateFriend(NodeFactory.getNode(friendUUID), false);
-			}
-		}
-
-		final long[] inNodes = node.getInNodes();
-		if (inNodes != null) {
-			for (long inNodeID : inNodes) {
-				if (inNodeID == 0) {
-					break;
-				}
-				Node n = NodeFactory.getNode(inNodeID);
-				n.getCommons().updateFriend(n, false);
 			}
 		}
 

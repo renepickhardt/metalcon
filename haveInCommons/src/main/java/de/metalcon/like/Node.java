@@ -303,7 +303,6 @@ public class Node {
 	private void addOutNode(final long outNodeUUID, final Vote v) {
 		synchronized (likedIn) {
 			synchronized (dislikedIn) {
-
 				synchronized (likedOut) {
 					if (v == Vote.UP) {
 						likedOut.add(outNodeUUID);
@@ -357,8 +356,7 @@ public class Node {
 	 */
 	public boolean removeFriendship(Node friend) {
 		synchronized (likedOut) {
-			if (!likedOut.remove(friend)) {
-				likedOut.closeFileIfNecessary();
+			if (!likedIn.remove(friend)) {
 				return false;
 			}
 			likedOut.closeFileIfNecessary();
@@ -370,7 +368,6 @@ public class Node {
 		 */
 		likeCommons.friendRemoved(friend);
 		dislikeCommons.friendRemoved(friend);
-
 		return true;
 	}
 
@@ -395,18 +392,34 @@ public class Node {
 
 	/**
 	 * 
-	 * @return All friends of this node
+	 * @return All nodes liked by this node
 	 */
-	public long[] getFriends() {
+	public long[] getLikedNodes() {
 		return likedOut.toArray(new long[0]);
 	}
 
 	/**
 	 * 
-	 * @return All friends Nodes liking this node
+	 * @return All nodes disliked by this node
 	 */
-	public long[] getInNodes() {
+	public long[] getDislikedNodes() {
+		return dislikedOut.toArray(new long[0]);
+	}
+
+	/**
+	 * 
+	 * @return All Nodes liking this node
+	 */
+	public long[] getLikeInNodes() {
 		return likedIn.toArray(new long[0]);
+	}
+
+	/**
+	 * 
+	 * @return All Nodes disliking this node
+	 */
+	public long[] getDislikeInNodes() {
+		return dislikedIn.toArray(new long[0]);
 	}
 
 	/**

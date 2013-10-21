@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import de.metalcon.like.Node;
+
 /**
  * @author Jonas Kunze
  */
@@ -56,14 +58,19 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 
 	}
 
+	/**
+	 * This method is relatively expensive!
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public boolean contains(long key) {
 		return db.containsElementInSet(ID, key);
 	}
 
 	@Override
 	public boolean contains(Object obj) {
-		// TODO To be implemented
-		return false;
+		return contains((long) obj);
 	}
 
 	@Override
@@ -90,8 +97,17 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 	 * @return Returns true if this set contained the uuid
 	 */
 	public boolean remove(long uuid) {
+		/*
+		 * FIXME: do we really need to return a boolean? contains(uuid) is quite
+		 * expensive!
+		 */
+		boolean contains = contains(uuid);
 		db.removeFromSet(ID, uuid);
-		return true;
+		return contains;
+	}
+
+	public boolean remove(Node n) {
+		return remove(n.getUUID());
 	}
 
 	@Override
@@ -117,9 +133,12 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 		return -1;
 	}
 
+	/**
+	 * @deprecated This method is not implemented. Please use raw type arrays by
+	 *             toArray(new long[0])
+	 */
 	@Override
 	public Object[] toArray() {
-		// TODO To be implemented
 		return null;
 	}
 
@@ -133,9 +152,12 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 		return db.getLongs(ID);
 	}
 
+	/**
+	 * @deprecated This method is not implemented. Please use raw type arrays by
+	 *             toArray(new long[0])
+	 */
 	@Override
 	public <T> T[] toArray(T[] obj) {
-		// TODO To be implemented
 		return null;
 	}
 

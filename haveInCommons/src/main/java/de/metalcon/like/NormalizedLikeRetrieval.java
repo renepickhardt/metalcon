@@ -2,6 +2,7 @@ package de.metalcon.like;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 
 import de.metalcon.haveInCommons.HaveInCommons;
 import de.metalcon.like.Like.Vote;
@@ -24,7 +25,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 	}
 
 	@Override
-	public long[] getCommonNodes(long uuid1, long uuid2) {
+	public long[] getCommonNodes(final long uuid1, final long uuid2) {
 		Node f = NodeFactory.getNode(uuid1);
 		if (f == null) {
 			// System.err.println("Unknown Node uuid: " + uuid1);
@@ -36,7 +37,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 	}
 
 	@Override
-	public void putEdge(long from, long to) {
+	public void putEdge(final long from, final long to) {
 		try {
 			Node f = NodeFactory.getNode(from);
 			if (f == null) {
@@ -56,8 +57,126 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 	}
 
 	@Override
-	public boolean deleteEdge(long from, long to) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteEdge(final long from, final long to) {
+		final Node f = NodeFactory.getNode(from);
+		if (f == null) {
+			return false;
+		}
+
+		Node t = NodeFactory.getNode(to);
+		if (t == null) {
+			return false;
+		}
+
+		return f.removeFriendship(t);
+	}
+
+	/**
+	 * Returns a list of MUIDs of nodes liking the node with the MUID 'nodeMUID'
+	 * or null if the requested node does not exist
+	 * 
+	 * @param nodeMUID
+	 *            The requested node
+	 * @return The list of nodes liking the node with the given MUID
+	 */
+	public long[] getLikedInNodes(final long nodeMUID) {
+		final Node n = NodeFactory.getNode(nodeMUID);
+		if (n == null) {
+			return null;
+		}
+		return n.getLikeInNodes();
+	}
+
+	/**
+	 * Returns a list of MUIDs of nodes liked by the node with the MUID
+	 * 'nodeMUID' or null if the requested node does not exist
+	 * 
+	 * @param nodeMUID
+	 *            The requested node
+	 * @return The list of nodes liked by the node with the given MUID
+	 */
+	public long[] getLikedOutNodes(final long nodeMUID) {
+		final Node n = NodeFactory.getNode(nodeMUID);
+		if (n == null) {
+			return null;
+		}
+		return n.getLikedNodes();
+	}
+
+	/**
+	 * Returns a list of MUIDs of nodes disliking the node with the MUID
+	 * 'nodeMUID' or null if the requested node does not exist
+	 * 
+	 * @param nodeMUID
+	 *            The requested node
+	 * @return The list of nodes disliking the node with the given MUID
+	 */
+	public long[] getDislikedInNodes(final long nodeMUID) {
+		final Node n = NodeFactory.getNode(nodeMUID);
+		if (n == null) {
+			return null;
+		}
+		return n.getDislikeInNodes();
+	}
+
+	/**
+	 * Returns a list of MUIDs of nodes disliked by the node with the MUID
+	 * 'nodeMUID' or null if the requested node does not exist
+	 * 
+	 * @param nodeMUID
+	 *            The requested node
+	 * @return The list of nodes liked by the node with the given MUID
+	 */
+	public long[] getDislikedOutNodes(final long nodeMUID) {
+		final Node n = NodeFactory.getNode(nodeMUID);
+		if (n == null) {
+			return null;
+		}
+		return n.getDislikedNodes();
+	}
+
+	/**
+	 * Returns a list of MUIDs of nodes liked by nodes liked by the node
+	 * associated with the given nodeMUID
+	 * 
+	 * @param nodeMUID
+	 *            The requested node
+	 * @return The list of nodes liked by any node liked by the node with the
+	 *         given MUID
+	 */
+	public long[] getLikedLikes(final long nodeMUID) {
+		final Node n = NodeFactory.getNode(nodeMUID);
+		if (n == null) {
+			return null;
+		}
+
+		HashSet<Long> likedLikedNodes = new HashSet<Long>();
+
+		/*
+		 * Iterate through all nodes liked by n
+		 */
+		for (long likedMUID : n.getLikedNodes()) {
+			if (likedMUID == 0) {
+				break;
+			}
+
+			/*
+			 * Iterate through all nodes liked by likedNode and add those liked
+			 * nodes to the set
+			 */
+			final Node likedNode = NodeFactory.getNode(likedMUID);
+			for (long likedlikedMUID : likedNode.getLikedNodes()) {
+				if (likedlikedMUID == 0) {
+					break;
+				}
+				likedLikedNodes.add(likedlikedMUID);
+			}
+		}
+		long[] result = new long[likedLikedNodes.size()];
+		int i = 0;
+		for (long l : likedLikedNodes) {
+			result[i++] = l;
+		}
+		return result;
 	}
 }
