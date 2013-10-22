@@ -100,7 +100,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		if (n == null) {
 			return null;
 		}
-		return n.getLikedNodes();
+		return n.getLikedNodes(Vote.UP);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		if (n == null) {
 			return null;
 		}
-		return n.getDislikedNodes();
+		return n.getLikedNodes(Vote.DOWN);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		/*
 		 * Iterate through all nodes liked by n
 		 */
-		for (long likedMUID : n.getLikedNodes()) {
+		for (long likedMUID : n.getLikedNodes(Vote.UP)) {
 			if (likedMUID == 0) {
 				break;
 			}
@@ -165,7 +165,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 			 * nodes to the set
 			 */
 			final Node likedNode = NodeFactory.getNode(likedMUID);
-			for (long likedlikedMUID : likedNode.getLikedNodes()) {
+			for (long likedlikedMUID : likedNode.getLikedNodes(Vote.UP)) {
 				if (likedlikedMUID == 0) {
 					break;
 				}

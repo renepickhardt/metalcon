@@ -2,8 +2,8 @@ package de.metalcon.like;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Set;
 
+import de.metalcon.storage.IPersistentMUIDSet;
 import de.metalcon.storage.PersistentUUIDSet;
 
 /**
@@ -17,7 +17,7 @@ public class NodeFactory {
 	 * concatenated longs where some might be 0 (fragmentation)
 	 */
 	private static String PersistentNodesFile = "";
-	private static PersistentUUIDSet AllNodes = null;
+	private static IPersistentMUIDSet AllNodes = null;
 
 	/*
 	 * This Map stores all nodes that are alive.
@@ -58,9 +58,9 @@ public class NodeFactory {
 		try {
 			AllNodes = new PersistentUUIDSet(PersistentNodesFile);
 			System.out.println("Finished reading " + PersistentNodesFile + ":");
-			System.out.println(AllNodes.length + " uuids read, "
-					+ AllNodes.getFragmentationRatio() * 100
-					+ "% fragmentation.");
+			System.out.println(AllNodes.size() + " uuids read, "
+					+ ((PersistentUUIDSet) AllNodes).getFragmentationRatio()
+					* 100 + "% fragmentation.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -129,7 +129,7 @@ public class NodeFactory {
 		AllNodes.remove(nodeID);
 	}
 
-	public static Set<Long> getAllNodeUUIDs() {
-		return AllNodes;
+	public static long[] getAllNodeUUIDs() {
+		return AllNodes.toArray();
 	}
 }

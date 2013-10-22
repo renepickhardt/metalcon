@@ -4,15 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.metalcon.like.Node;
+
 /**
  * @author Jonas Kunze
  */
-public class PersistentUUIDSet implements IPersistentUUIDSet {
+public class PersistentUUIDSet implements IPersistentMUIDSet {
 	/*
 	 * The number of currently opened file handles
 	 */
@@ -42,7 +43,7 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	/*
 	 * Number of longs in the file (incuding zeros from fragmentation)
 	 */
-	public long length = 0;
+	private long length = 0;
 
 	/**
 	 * 
@@ -140,19 +141,17 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	/**
 	 * Adds the given uuid to the end of the file
 	 */
-	public boolean add(long uuid) {
+	public void add(long uuid) {
 		try {
 			openFileIfClosed();
 			file.seek(length++ * 8);
 			file.writeLong(uuid);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
+			System.exit(1);
 		}
 
 		posByUUID.put(uuid, length);
-
-		return true;
 	}
 
 	/**
@@ -165,36 +164,8 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	}
 
 	@Override
-	public boolean add(Long uuid) {
-		return add((long) uuid);
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends Long> arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean contains(Object obj) {
-		return posByUUID.containsKey(obj);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> arg0) {
-		return posByUUID.keySet().containsAll(arg0);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean contains(long uuid) {
+		return posByUUID.containsKey(uuid);
 	}
 
 	@Override
@@ -208,6 +179,7 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	 *            Thee uuid to be removed
 	 * @return Returns true if this set contained the uuid
 	 */
+	@Override
 	public boolean remove(long uuid) {
 		Long positionInFile = posByUUID.get((Long) uuid);
 		if (positionInFile != null) {
@@ -226,48 +198,8 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	}
 
 	@Override
-	public boolean remove(Object uuid) {
-		return remove((long) uuid);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/**
-	 * 
-	 * @return The number of elements in this set
-	 */
-	public long getSize() {
-		return length - numberOfZerosInFile;
-	}
-
-	/*
-	 * @deprecated Use getSize() to have full long prezision
-	 * 
-	 * @see java.util.Set#size()
-	 */
-	@Override
-	@Deprecated
-	public int size() {
-		long elements = length - numberOfZerosInFile;
-		if (elements > Integer.MAX_VALUE) {
-			return Integer.MAX_VALUE;
-		}
-		return (int) (elements);
-	}
-
-	@Override
-	public Object[] toArray() {
-		return posByUUID.keySet().toArray();
+	public boolean remove(final Node n) {
+		return remove(n.getUUID());
 	}
 
 	/**
@@ -276,8 +208,8 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 	 * @param array
 	 * @return
 	 */
-	public long[] toArray(long[] array) {
-		array = new long[(int) getSize()];
+	public long[] toArray() {
+		long[] array = new long[(int) size()];
 		int i = 0;
 		for (Long n : this) {
 			array[i++] = n;
@@ -285,8 +217,12 @@ public class PersistentUUIDSet implements IPersistentUUIDSet {
 		return array;
 	}
 
+	/**
+	 * 
+	 * @return The number of elements in this set
+	 */
 	@Override
-	public <T> T[] toArray(T[] obj) {
-		return posByUUID.keySet().toArray(obj);
+	public long size() {
+		return length - numberOfZerosInFile;
 	}
 }

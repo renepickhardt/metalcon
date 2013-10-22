@@ -17,7 +17,7 @@ class Commons {
 
 	private final Vote likeType;
 
-	private IPersistentUUIDArrayMap persistentcommonsMap = null;
+	private IPersistentUUIDArrayMap persistentCommonsMap = null;
 
 	/**
 	 * 
@@ -28,22 +28,22 @@ class Commons {
 			final Vote likeType) {
 		this.node = node;
 		if (c == PersistentUUIDArrayMapRedis.class) {
-			persistentcommonsMap = new PersistentUUIDArrayMapRedis(""
+			persistentCommonsMap = new PersistentUUIDArrayMapRedis(""
 					+ node.getUUID());
 		} else if (c == LazyPersistentUUIDMap.class) {
-			persistentcommonsMap = LazyPersistentUUIDMap
+			persistentCommonsMap = LazyPersistentUUIDMap
 					.getPersistentUUIDMap(storageDir + "/" + node.getUUID()
 							+ "_commons");
 		} else if (c == PersistentUUIDArrayMap.class) {
 			try {
-				persistentcommonsMap = new PersistentUUIDArrayMap(storageDir
+				persistentCommonsMap = new PersistentUUIDArrayMap(storageDir
 						+ "/" + node.getUUID() + "_commons");
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
 		} else if (c == PersistentUUIDArrayMapLevelDB.class) {
-			persistentcommonsMap = new PersistentUUIDArrayMapLevelDB(
+			persistentCommonsMap = new PersistentUUIDArrayMapLevelDB(
 					node.getUUID());
 		}
 		this.likeType = likeType;
@@ -53,7 +53,7 @@ class Commons {
 	 * Remove all entries in the DB
 	 */
 	public void delete() {
-		persistentcommonsMap.removeAll();
+		persistentCommonsMap.removeAll();
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Commons {
 	 *         of this Commons in common. The last uuids in the list may be 0
 	 */
 	public long[] getCommonNodes(long uuid) {
-		long[] commons = persistentcommonsMap.get(uuid);
+		long[] commons = persistentCommonsMap.get(uuid);
 
 		if (commons != null) {
 			/*
@@ -100,7 +100,7 @@ class Commons {
 		/*
 		 * Update all outgoing nodes
 		 */
-		final long[] outNodes = node.getLikedNodes();
+		final long[] outNodes = node.getLikedNodes(Vote.UP);
 		if (outNodes != null) {
 			for (long friendUUID : outNodes) {
 				if (friendUUID == 0) {
@@ -110,8 +110,8 @@ class Commons {
 			}
 		}
 
-		persistentcommonsMap.setUpdateTimeStamp(now);
-		persistentcommonsMap.save();
+		persistentCommonsMap.setUpdateTimeStamp(now);
+		persistentCommonsMap.save();
 	}
 
 	/**
@@ -137,10 +137,10 @@ class Commons {
 			/*
 			 * Remove the friend from the commons list of the liked entity
 			 */
-			persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
+			persistentCommonsMap.remove(like.getUUID(), friend.getUUID());
 		}
-		persistentcommonsMap.removeKey(friend.getUUID());
-		persistentcommonsMap.save();
+		persistentCommonsMap.removeKey(friend.getUUID());
+		persistentCommonsMap.save();
 	}
 
 	/**
@@ -159,18 +159,35 @@ class Commons {
 	 *            update of this commons till now will be considered.
 	 */
 	public void updateFriend(Node friend, boolean ignoreTimestamp) {
-		int searchTS = ignoreTimestamp ? 0 : persistentcommonsMap
+		int searchTS = ignoreTimestamp ? 0 : persistentCommonsMap
 				.getLastUpdateTimeStamp();
 		for (Like like : friend.getLikesFromTimeOn(searchTS)) {
 			if (like.getUUID() == node.getUUID()) {
 				continue;
 			}
 			if (like.getVote() == likeType) {
-				persistentcommonsMap.append(like.getUUID(), friend.getUUID());
+				/*
+				 * Q1 node -> friend -> likedNode
+				 */
+				persistentCommonsMap.append(like.getUUID(), friend.getUUID());
+
+				/*
+				 * Q2 node -> likedNode && node -> friend -> likedNode
+				 * 
+				 * FIXME: This is a dirty hack as the contains() is very
+				 * expensive at the moment. We should sort the out nodes use
+				 * binary search or compute the cross-section between
+				 * node.getLikedNodes() and friend.getLikedNodes()
+				 */
+				if (node.getLikedOutSet(likeType).contains(like.getUUID())) {
+					persistentCommonsMap.append(friend.getUUID(),
+							like.getUUID());
+				}
 			} else {
-				persistentcommonsMap.remove(like.getUUID(), friend.getUUID());
+				persistentCommonsMap.remove(like.getUUID(), friend.getUUID());
+				persistentCommonsMap.remove(friend.getUUID(), like.getUUID());
 			}
 		}
-		persistentcommonsMap.save();
+		persistentCommonsMap.save();
 	}
 }

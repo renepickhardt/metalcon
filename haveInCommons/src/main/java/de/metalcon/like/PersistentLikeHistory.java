@@ -91,12 +91,12 @@ public class PersistentLikeHistory {
 		PersistentLikeHistory.storageDir = storageDir;
 
 		char[] counters = new char[storageRecursiveDepth];
-		char[] availableTokens = MUIDConverter.getAllowedTokens();
+		char[] availableFolderNames = MUIDConverter.getAllowedFolderNames();
 
 		while (true) {
 			String relPath = "";
 			for (int i = 0; i < counters.length; i++) {
-				relPath += availableTokens[counters[i]] + "/";
+				relPath += availableFolderNames[counters[i]] + "/";
 			}
 			final File dir = new File(storageDir, relPath);
 			if (!dir.exists() && !dir.mkdirs()) {
@@ -104,7 +104,7 @@ public class PersistentLikeHistory {
 						+ dir.getAbsolutePath());
 			}
 			int j = 0;
-			while (++counters[j] == availableTokens.length) {
+			while (++counters[j] == availableFolderNames.length) {
 				if (j == counters.length - 1) {
 					return;
 				}

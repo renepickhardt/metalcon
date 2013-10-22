@@ -63,7 +63,7 @@ public class App {
 		 * Import all users
 		 */
 		time = importGraph(graph, METALCON_USER_FILE);
-		long nodeNum = NodeFactory.getAllNodeUUIDs().size();
+		long nodeNum = NodeFactory.getAllNodeUUIDs().length;
 		System.out.println("Importing " + nodeNum + " users took "
 				+ (int) (time / 1E9f) + " s (" + time / 1000 / nodeNum
 				+ " µs per node)");
@@ -72,7 +72,7 @@ public class App {
 		 * Import Albums and Bands
 		 */
 		time = importGraph(graph, METALCON_NONUSER_RAND_FILE);
-		long newNodes = NodeFactory.getAllNodeUUIDs().size() - nodeNum;
+		long newNodes = NodeFactory.getAllNodeUUIDs().length - nodeNum;
 		System.out
 				.println("Importing nonUser nodes took " + (int) (time / 1E9f)
 						+ " s (" + newNodes + " new nodes added)");
@@ -81,14 +81,14 @@ public class App {
 		 * Update all nodes
 		 */
 		time = updateAllNodes();
-		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().size()
+		System.out.println("Updating " + NodeFactory.getAllNodeUUIDs().length
 				+ " nodes took " + (int) (time / 1E9f) + " s (" + time / 1000
-				/ NodeFactory.getAllNodeUUIDs().size() + " µs per node)");
+				/ NodeFactory.getAllNodeUUIDs().length + " µs per node)");
 
 		/*
 		 * Process some getInCommon calls
 		 */
-		final Long[] uuids = NodeFactory.getAllNodeUUIDs().toArray(new Long[0]);
+		final long[] uuids = NodeFactory.getAllNodeUUIDs();
 
 		Random rand = new Random();
 		int runs = 100000, found = 0;
@@ -107,7 +107,7 @@ public class App {
 				+ found + " non empty lists (" + time / 1000 / runs
 				+ " µs per node)");
 
-		testInCommons(graph, 1, 2, true);
+		testInCommons(graph, 1, 4, true);
 	}
 
 	public static long updateAllNodes() {

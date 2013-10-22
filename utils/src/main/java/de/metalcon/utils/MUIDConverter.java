@@ -15,11 +15,9 @@ import java.nio.ByteBuffer;
  * 
  */
 public class MUIDConverter {
-	private final static char[] tokens = { '0', '1', '2', '3', '4', '5', '6',
-			'7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-			'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
-			'x', 'y', 'z' };
-	private final static int RADIX = tokens.length;
+	private final static char[] folderChars = { '0', '1', '2', '3', '4', '5',
+			'6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+	private final static int RADIX = folderChars.length;
 	private final static short MUID_LENGTH = 13;
 
 	/**
@@ -180,12 +178,12 @@ public class MUIDConverter {
 	}
 
 	/**
-	 * Returns all characters a metalcon UUID may consist of
+	 * Returns all characters a MUID path may consist of
 	 * 
 	 * @return All allowed characters
 	 */
-	public static char[] getAllowedTokens() {
-		return tokens;
+	public static char[] getAllowedFolderNames() {
+		return folderChars;
 	}
 
 	/**
@@ -218,7 +216,7 @@ public class MUIDConverter {
 		paths[1] = (char) ('a' + ((hash >> 4) & 15));
 		paths[2] = (char) ('a' + ((hash >> 8) & 15));
 
-		return tokens[(hash & 15)] + "/" + tokens[((hash >> 4) & 15)] + "/"
-				+ tokens[((hash >> 8) & 15)] + "/";
+		return folderChars[(hash & 15)] + "/" + folderChars[((hash >> 4) & 15)]
+				+ "/" + folderChars[((hash >> 8) & 15)] + "/";
 	}
 }

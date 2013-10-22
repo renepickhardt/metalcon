@@ -1,6 +1,5 @@
 package de.metalcon.storage;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -9,7 +8,7 @@ import de.metalcon.like.Node;
 /**
  * @author Jonas Kunze
  */
-public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
+public class PersistentUUIDSetLevelDB implements IPersistentMUIDSet {
 	private static LevelDBHandler db;
 
 	private final long ID;
@@ -29,8 +28,9 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 	/**
 	 * Adds the given uuid to the end of the file
 	 */
+	@Override
 	public void add(long uuid) {
-		db.addToSet(ID, uuid);
+		db.setAdd(ID, uuid);
 	}
 
 	/**
@@ -40,24 +40,6 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 		// TODO To be implemented
 	}
 
-	@Override
-	public boolean add(Long uuid) {
-		add((long) uuid);
-		return true;
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends Long> arg0) {
-		// TODO To be implemented
-		return false;
-	}
-
-	@Override
-	public void clear() {
-		// TODO To be implemented
-
-	}
-
 	/**
 	 * This method is relatively expensive!
 	 * 
@@ -65,24 +47,7 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 	 * @return
 	 */
 	public boolean contains(long key) {
-		return db.containsElementInSet(ID, key);
-	}
-
-	@Override
-	public boolean contains(Object obj) {
-		return contains((long) obj);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> arg0) {
-		// TODO To be implemented
-		return false;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		// TODO To be implemented
-		return false;
+		return db.setContainsElement(ID, key);
 	}
 
 	@Override
@@ -110,59 +75,25 @@ public class PersistentUUIDSetLevelDB implements IPersistentUUIDSet {
 		return remove(n.getUUID());
 	}
 
-	@Override
-	public boolean remove(Object uuid) {
-		return remove((long) uuid);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> arg0) {
-		// TODO To be implemented
-		return false;
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> arg0) {
-		// TODO To be implemented
-		return false;
-	}
-
-	@Override
-	public int size() {
-		// TODO To be implemented
-		return -1;
-	}
-
-	/**
-	 * @deprecated This method is not implemented. Please use raw type arrays by
-	 *             toArray(new long[0])
-	 */
-	@Override
-	public Object[] toArray() {
-		return null;
-	}
-
 	/**
 	 * Writes all uuids into the given array
 	 * 
 	 * @param array
 	 * @return
 	 */
-	public long[] toArray(long[] array) {
+	public long[] toArray() {
 		return db.getLongs(ID);
 	}
 
-	/**
-	 * @deprecated This method is not implemented. Please use raw type arrays by
-	 *             toArray(new long[0])
-	 */
 	@Override
-	public <T> T[] toArray(T[] obj) {
-		return null;
+	public void closeFileIfNecessary() {
+
 	}
 
-	public void closeFileIfNecessary() {
-		// do nothing
+	@Override
+	public long size() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
 

@@ -3,7 +3,7 @@ package de.metalcon.like;
 import java.io.IOException;
 
 import de.metalcon.like.Like.Vote;
-import de.metalcon.storage.IPersistentUUIDSet;
+import de.metalcon.storage.IPersistentMUIDSet;
 import de.metalcon.storage.PersistentUUIDArrayMapLevelDB;
 import de.metalcon.storage.PersistentUUIDSetLevelDB;
 
@@ -32,14 +32,14 @@ public class Node {
 	/*
 	 * All out nodes liked/diskliked by this node
 	 */
-	private final IPersistentUUIDSet likedOut;
-	private final IPersistentUUIDSet dislikedOut;
+	private final IPersistentMUIDSet likedOut;
+	private final IPersistentMUIDSet dislikedOut;
 
 	/*
 	 * All out nodes liking/disliking this node
 	 */
-	private final IPersistentUUIDSet likedIn;
-	private final IPersistentUUIDSet dislikedIn;
+	private final IPersistentMUIDSet likedIn;
+	private final IPersistentMUIDSet dislikedIn;
 
 	private final PersistentLikeHistory likeHistory;
 
@@ -355,11 +355,11 @@ public class Node {
 	 *         if not
 	 */
 	public boolean removeFriendship(Node friend) {
-		synchronized (likedOut) {
+		synchronized (likedIn) {
 			if (!likedIn.remove(friend)) {
 				return false;
 			}
-			likedOut.closeFileIfNecessary();
+			likedIn.closeFileIfNecessary();
 		}
 		friend.removeInNode(this);
 
@@ -391,19 +391,32 @@ public class Node {
 	}
 
 	/**
-	 * 
-	 * @return All nodes liked by this node
+	 * @param vote
+	 *            If this parameter equals Vote.UP all nodes liked by this node
+	 *            will be returned. If it's set to Vote.DOWN all disliked nodes
+	 *            instead. Vote.NEUTRAL will trigger a return null;
+	 * @return All MUIDs liked/disliked by this node, sorted by MUID
 	 */
-	public long[] getLikedNodes() {
-		return likedOut.toArray(new long[0]);
+	public long[] getLikedNodes(final Vote vote) {
+		if (vote == Vote.UP) {
+			return likedOut.toArray();
+		}
+		if (vote == Vote.DOWN) {
+			return dislikedOut.toArray();
+		}
+
+		return null;
 	}
 
-	/**
-	 * 
-	 * @return All nodes disliked by this node
-	 */
-	public long[] getDislikedNodes() {
-		return dislikedOut.toArray(new long[0]);
+	public IPersistentMUIDSet getLikedOutSet(final Vote vote) {
+		if (vote == Vote.UP) {
+			return likedOut;
+		}
+		if (vote == Vote.DOWN) {
+			return dislikedOut;
+		}
+
+		return null;
 	}
 
 	/**
@@ -411,7 +424,7 @@ public class Node {
 	 * @return All Nodes liking this node
 	 */
 	public long[] getLikeInNodes() {
-		return likedIn.toArray(new long[0]);
+		return likedIn.toArray();
 	}
 
 	/**
@@ -419,7 +432,7 @@ public class Node {
 	 * @return All Nodes disliking this node
 	 */
 	public long[] getDislikeInNodes() {
-		return dislikedIn.toArray(new long[0]);
+		return dislikedIn.toArray();
 	}
 
 	/**

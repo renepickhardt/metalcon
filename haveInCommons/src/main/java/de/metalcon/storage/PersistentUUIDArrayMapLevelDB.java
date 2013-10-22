@@ -40,7 +40,7 @@ public class PersistentUUIDArrayMapLevelDB implements IPersistentUUIDArrayMap {
 	 */
 	@Override
 	public void append(final long keyUUID, final long valueUUID) {
-		dbHandler.addToSet(keyUUID, valueUUID);
+		dbHandler.setAdd(keyUUID, valueUUID);
 	}
 
 	/**

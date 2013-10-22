@@ -100,7 +100,7 @@ public class LevelDBHandler {
 	 * @param value
 	 *            value to be added to the array
 	 */
-	public void addToSet(final long key, final long value) {
+	public void setAdd(final long key, final long value) {
 		long[] valueArray = getLongs(key);
 
 		int lastEmptyPointer = 0;
@@ -255,10 +255,15 @@ public class LevelDBHandler {
 	/**
 	 * Try to avoid using this method and use get() instead!
 	 * 
+	 * FIXME: Sort the Set and use binary search
+	 * 
 	 * @param keyUUID
 	 * @return
 	 */
-	public boolean containsElementInSet(final long keyUUID, final long valueUUID) {
+	public boolean setContainsElement(final long keyUUID, final long valueUUID) {
+		if (getLongs(keyUUID) == null) {
+			return false;
+		}
 		for (long l : getLongs(keyUUID)) {
 			if (l == valueUUID) {
 				return true;
