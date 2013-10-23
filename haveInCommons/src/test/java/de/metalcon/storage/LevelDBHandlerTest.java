@@ -3,12 +3,8 @@
  */
 package de.metalcon.storage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-import java.util.Arrays;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

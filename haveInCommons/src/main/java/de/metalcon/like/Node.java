@@ -254,7 +254,7 @@ public class Node {
 					+ like.getUUID());
 		}
 
-		this.addOutNode(likedNode.UUID, like.getVote());
+		addOutNode(likedNode.UUID, like.getVote());
 		likedNode.addInNode(this.UUID, like.getVote());
 
 		/*
@@ -264,6 +264,9 @@ public class Node {
 		if (like.getVote() == Vote.UP) {
 			likeCommons.friendAdded(likedNode);
 			dislikeCommons.friendAdded(likedNode);
+		} else {
+			likeCommons.friendRemoved(likedNode);
+			dislikeCommons.friendRemoved(likedNode);
 		}
 
 		synchronized (lastLikesCache) {
@@ -295,14 +298,27 @@ public class Node {
 	}
 
 	/**
+	 * Removes the given Node from the friend list
+	 * 
+	 * @param friend
+	 *            The node to be deleted
+	 * @return <code>true</code> if the node has been found, <code>false</code>
+	 *         if not
+	 */
+	public void removeFriendship(Node friend) {
+		addLike(new Like(friend.getUUID(),
+				(int) System.currentTimeMillis() / 1000, Vote.NEUTRAL));
+	}
+
+	/**
 	 * Adds a new node to the out-list
 	 * 
 	 * @param inNode
 	 *            The node to be added
 	 */
 	private void addOutNode(final long outNodeUUID, final Vote v) {
-		synchronized (likedIn) {
-			synchronized (dislikedIn) {
+		synchronized (dislikedOut) {
+			synchronized (likedOut) {
 				synchronized (likedOut) {
 					if (v == Vote.UP) {
 						likedOut.add(outNodeUUID);
@@ -347,57 +363,13 @@ public class Node {
 	}
 
 	/**
-	 * Removes the given Node from the friend list
-	 * 
-	 * @param friend
-	 *            The node to be deleted
-	 * @return <code>true</code> if the node has been found, <code>false</code>
-	 *         if not
-	 */
-	public boolean removeFriendship(Node friend) {
-		synchronized (likedIn) {
-			if (!likedIn.remove(friend)) {
-				return false;
-			}
-			likedIn.closeFileIfNecessary();
-		}
-		friend.removeInNode(this);
-
-		/**
-		 * Update the commons map
-		 */
-		likeCommons.friendRemoved(friend);
-		dislikeCommons.friendRemoved(friend);
-		return true;
-	}
-
-	/**
-	 * Removes the given Node from the friend list
-	 * 
-	 * @param friend
-	 *            The node to be deleted
-	 * @return <code>true</code> if the node has been found, <code>false</code>
-	 *         if not
-	 */
-	private boolean removeInNode(Node inNode) {
-		synchronized (likedIn) {
-			if (!likedIn.remove(inNode)) {
-				likedIn.closeFileIfNecessary();
-				return false;
-			}
-			likedIn.closeFileIfNecessary();
-		}
-		return true;
-	}
-
-	/**
 	 * @param vote
 	 *            If this parameter equals Vote.UP all nodes liked by this node
 	 *            will be returned. If it's set to Vote.DOWN all disliked nodes
 	 *            instead. Vote.NEUTRAL will trigger a return null;
 	 * @return All MUIDs liked/disliked by this node, sorted by MUID
 	 */
-	public long[] getLikedNodes(final Vote vote) {
+	public long[] getOutNodes(final Vote vote) {
 		if (vote == Vote.UP) {
 			return likedOut.toArray();
 		}

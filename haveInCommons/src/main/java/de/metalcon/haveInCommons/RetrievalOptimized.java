@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import de.metalcon.like.Like.Vote;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -138,7 +139,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#putEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void putEdge(long from, long to) {
+	public void putEdge(long from, long to, final Vote vote) {
 		if (storeEdge(from, to)) {
 			updateCommons(from, to);
 		}
@@ -151,8 +152,7 @@ public class RetrievalOptimized implements HaveInCommons {
 	 * java.lang.String)
 	 */
 	@Override
-	public boolean deleteEdge(long from, long to) {
-		return false;
+	public void deleteEdge(long from, long to) {
 	}
 
 	public byte[] generateKey(long from, long to) {

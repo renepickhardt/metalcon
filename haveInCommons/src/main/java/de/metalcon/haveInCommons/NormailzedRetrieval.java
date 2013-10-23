@@ -3,14 +3,17 @@
  */
 package de.metalcon.haveInCommons;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import de.metalcon.like.Like.Vote;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
-
-import java.util.*;
 
 /**
  * @author Rene Pickhardt
@@ -28,7 +31,7 @@ public class NormailzedRetrieval implements HaveInCommons {
 	public NormailzedRetrieval() {
 		graph = new DirectedSparseGraph();
 		vertexIndex = new HashMap<Long, Vertex>();
-        reverseVertexIndex = new HashMap<Vertex, Long>();
+		reverseVertexIndex = new HashMap<Vertex, Long>();
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class NormailzedRetrieval implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#putEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void putEdge(long from, long to) {
+	public void putEdge(long from, long to, final Vote vote) {
 		if (storeEdge(from, to)) {
 			// updateCommons(from, to);
 		}
@@ -112,7 +115,6 @@ public class NormailzedRetrieval implements HaveInCommons {
 	 * @see de.metalcon.haveInCommons.HaveInCommons#delegeEdge(java.lang.String,
 	 * java.lang.String)
 	 */
-	public boolean deleteEdge(long from, long to) {
-		return false;
+	public void deleteEdge(long from, long to) {
 	}
 }

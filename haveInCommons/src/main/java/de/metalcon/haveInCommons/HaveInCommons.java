@@ -3,6 +3,8 @@
  */
 package de.metalcon.haveInCommons;
 
+import de.metalcon.like.Like.Vote;
+
 /**
  * @author Rene Pickhardt
  * 
@@ -24,7 +26,7 @@ public interface HaveInCommons {
 	 * @param from
 	 * @param to
 	 */
-	public void putEdge(long from, long to);
+	public void putEdge(long from, long to, final Vote vote);
 
 	/**
 	 * deletes an Edge from the graph
@@ -33,5 +35,5 @@ public interface HaveInCommons {
 	 * @param to
 	 * @return true if the edge was in the graph
 	 */
-	public boolean deleteEdge(long from, long to);
+	public void deleteEdge(long from, long to);
 }

@@ -17,6 +17,8 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 
+import de.metalcon.like.Like.Vote;
+
 /**
  * @author Rene Pickhardt
  */
@@ -77,7 +79,7 @@ public class PersistentReadOptimized implements HaveInCommons {
 	static final int bufSize = 5000;
 
 	@Override
-	public void putEdge(long from, long to) {
+	public void putEdge(long from, long to, final Vote vote) {
 		putBuffer_from.add(from);
 		putBuffer_to.add(to);
 		if (putBuffer_from.size() == bufSize) {
@@ -148,9 +150,7 @@ public class PersistentReadOptimized implements HaveInCommons {
 	 * java.lang.String)
 	 */
 	@Override
-	public boolean deleteEdge(long from, long to) {
-		// TODO Auto-generated method stub
-		return false;
+	public void deleteEdge(long from, long to) {
 	}
 
 	/*

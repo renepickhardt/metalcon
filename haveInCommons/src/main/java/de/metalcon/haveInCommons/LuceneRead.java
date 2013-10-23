@@ -151,7 +151,7 @@ public class LuceneRead implements HaveInCommons {
 	 * java.lang.String)
 	 */
 	@Override
-	public boolean deleteEdge(long from, long to) {
+	public void deleteEdge(long from, long to) {
 		// TODO Auto-generated method stub
 		return false;
 	}

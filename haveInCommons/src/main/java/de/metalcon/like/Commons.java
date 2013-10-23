@@ -100,7 +100,7 @@ class Commons {
 		/*
 		 * Update all outgoing nodes
 		 */
-		final long[] outNodes = node.getLikedNodes(Vote.UP);
+		final long[] outNodes = node.getOutNodes(Vote.UP);
 		if (outNodes != null) {
 			for (long friendUUID : outNodes) {
 				if (friendUUID == 0) {

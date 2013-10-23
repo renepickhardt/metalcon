@@ -47,8 +47,6 @@ public class PersistendMongoDBIndex {
 	}
 	
 	public void deleteEdge(String from, String to) {
-		// TODO: Implement delete
-		//luceneIndex.deleteEdge(from, to);
 		mongoDBStore.delete(Integer.parseInt(from), this.collection);
 	}
 }

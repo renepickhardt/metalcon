@@ -37,7 +37,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 	}
 
 	@Override
-	public void putEdge(final long from, final long to) {
+	public void putEdge(final long from, final long to, final Vote vote) {
 		try {
 			Node f = NodeFactory.getNode(from);
 			if (f == null) {
@@ -49,26 +49,33 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 				t = NodeFactory.createNewNode(to);
 			}
 
-			f.addLike(new Like(t.getUUID(), edgeNum++, Vote.UP));
+			/*
+			 * TODO: Here we need to pass the current timestamp instead of
+			 * edgeNum++
+			 */
+			f.addLike(new Like(t.getUUID(), edgeNum++, vote));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
+	/**
+	 * Delete the friendship between from and to
+	 */
 	@Override
-	public boolean deleteEdge(final long from, final long to) {
+	public void deleteEdge(final long from, final long to) {
 		final Node f = NodeFactory.getNode(from);
 		if (f == null) {
-			return false;
+			return;
 		}
 
 		Node t = NodeFactory.getNode(to);
 		if (t == null) {
-			return false;
+			return;
 		}
 
-		return f.removeFriendship(t);
+		f.removeFriendship(t);
 	}
 
 	/**
@@ -100,7 +107,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		if (n == null) {
 			return null;
 		}
-		return n.getLikedNodes(Vote.UP);
+		return n.getOutNodes(Vote.UP);
 	}
 
 	/**
@@ -132,7 +139,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		if (n == null) {
 			return null;
 		}
-		return n.getLikedNodes(Vote.DOWN);
+		return n.getOutNodes(Vote.DOWN);
 	}
 
 	/**
@@ -155,7 +162,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 		/*
 		 * Iterate through all nodes liked by n
 		 */
-		for (long likedMUID : n.getLikedNodes(Vote.UP)) {
+		for (long likedMUID : n.getOutNodes(Vote.UP)) {
 			if (likedMUID == 0) {
 				break;
 			}
@@ -165,7 +172,7 @@ public class NormalizedLikeRetrieval implements HaveInCommons {
 			 * nodes to the set
 			 */
 			final Node likedNode = NodeFactory.getNode(likedMUID);
-			for (long likedlikedMUID : likedNode.getLikedNodes(Vote.UP)) {
+			for (long likedlikedMUID : likedNode.getOutNodes(Vote.UP)) {
 				if (likedlikedMUID == 0) {
 					break;
 				}

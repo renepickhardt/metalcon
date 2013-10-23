@@ -107,7 +107,7 @@ public class App {
 				+ found + " non empty lists (" + time / 1000 / runs
 				+ " µs per node)");
 
-		testInCommons(graph, 1, 4, true);
+		testInCommons(graph, 1, 2, true);
 	}
 
 	public static long updateAllNodes() {
