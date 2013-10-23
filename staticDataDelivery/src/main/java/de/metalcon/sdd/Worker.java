@@ -39,11 +39,12 @@ public class Worker<T> implements Runnable {
                     queueAction = queue.take();
                     busy = true;
                     queueAction.runQueueAction();
-                } catch(SddError e) {
-                    // A single error in a request does not terminate the
-                    // server.
+                } catch(InterruptedException e) {
+                    throw e;
+                } catch(Exception e) {
+                    // An error in a request does not terminate the server.
                     // TODO: somehow log the error.
-                    e.print();
+                    e.printStackTrace();
                 }
             }
         } catch (InterruptedException e) {
@@ -67,8 +68,8 @@ public class Worker<T> implements Runnable {
         }
     }
     
-    public boolean isBusy() {
-        return busy && queue.isEmpty();
+    public boolean isIdle() {
+        return !busy && queue.isEmpty();
     }
     
     public void waitForShutdown() {

@@ -10,22 +10,29 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import de.metalcon.sdd.config.Config;
+import de.metalcon.sdd.config.MetaEntity;
+import de.metalcon.sdd.config.MetaType;
+import de.metalcon.sdd.error.InvalidAttrException;
+import de.metalcon.sdd.error.InvalidConfigException;
+import de.metalcon.sdd.error.InvalidDependencyException;
 import de.metalcon.sdd.error.InvalidDetailException;
 import de.metalcon.sdd.error.InvalidTypeException;
-import de.metalcon.sdd.queue.DeleteQueueAction;
 import de.metalcon.sdd.queue.QueueAction;
-import de.metalcon.sdd.queue.UpdateQueueAction;
+import de.metalcon.sdd.queue.UpdateDependenciesQueueAction;
+import de.metalcon.sdd.queue.UpdateGraphQueueAction;
+import de.metalcon.sdd.queue.UpdateJsonQueueAction;
 
 /**
  * TODO: doc
@@ -49,12 +56,14 @@ public class Sdd<T> implements Closeable {
     /**
      * TODO: doc
      * @param config  TODO: doc
+     * @throws InvalidConfigException  TODO: doc
      */
-    public Sdd(Config config) {
+    public Sdd(Config config) throws InvalidConfigException {
         if (config == null)
             throw new IllegalArgumentException("config was null");
         
-        // store config
+        // config
+        config.validate();
         this.config = config;
         
         // connect to jsonDb (LevelDB)
@@ -80,10 +89,7 @@ public class Sdd<T> implements Closeable {
             }
         
         // create action queue
-        if (config.isPrioritizedQueue())
-            queue = new PriorityBlockingQueue<QueueAction<T>>();
-        else
-            queue = new LinkedBlockingQueue<QueueAction<T>>();
+        queue = new PriorityBlockingQueue<QueueAction<T>>();
         
         // startup worker thread
         worker = new Worker<T>(queue);
@@ -156,9 +162,11 @@ public class Sdd<T> implements Closeable {
      * @returns True if adding the action to the queue was possible,
      *          False otherwise.
      * @throws InvalidTypeException  If type wasn't a valid type string.
+     * @throws InvalidAttrException  If attrs contained an attr not valid for
+     *                               type.
      */
     public boolean updateEntity(T id, String type, Map<String, String> attrs)
-        throws InvalidTypeException {
+        throws InvalidTypeException, InvalidAttrException {
         if (id == null)
             throw new IllegalArgumentException("id was null");
         if (type == null)
@@ -170,9 +178,22 @@ public class Sdd<T> implements Closeable {
         if (!config.isValidEntity(type))
             throw new InvalidTypeException();
         
-        // TODO: are attrs valid for type?
+        // are attrs valid?
+        MetaEntity metaEntity = config.getEntity(type);
+        for (Map.Entry<String, String> attr : attrs.entrySet()) {
+            String attrName  = attr.getKey();
+            String attrValue = attr.getValue();
+            
+            if (!metaEntity.isValidAttr(attrName)
+                    || attrName.equals("sddid")
+                    || attrName.equals("sddtype"))
+                throw new InvalidAttrException();
+            if (attrValue == null)
+                throw new InvalidAttrException();
+        }
         
-        return queueAction(new UpdateQueueAction<T>(this, id, type, attrs));
+        return queueAction(
+                new UpdateGraphQueueAction<T>(this, id, type, attrs));
     }
     
     /**
@@ -187,8 +208,9 @@ public class Sdd<T> implements Closeable {
     public boolean deleteEntity(T id) {
         if (id == null)
             throw new IllegalArgumentException("id was null");
-            
-        return queueAction(new DeleteQueueAction<T>(this, id));
+        
+        // TODO: queue
+        return false;
     }
     
     /**
@@ -196,7 +218,7 @@ public class Sdd<T> implements Closeable {
      */
     public void waitUntilQueueEmpty() {
         // TODO: implement
-        while (worker.isBusy())
+        while (!worker.isIdle())
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -204,15 +226,58 @@ public class Sdd<T> implements Closeable {
             }
     }
     
-    public void updateEntityImmediately(T id, String type,
-                                        Map<String, String> attrs) {
-        // TODO: implement
-        // TODO: queue UpdateDependencyQueueAction()
+    public void actionUpdateGraph(T id, String type,
+                                  Map<String, String> attrs)
+            throws InvalidDependencyException {
+        MetaEntity metaEntity = config.getEntity(type);
+        
+        Transaction tx = entityGraph.beginTx();
+        try {
+            boolean create = false;
+            
+            Node entity = entityGraphIdIndex.get(id);
+            if (entity == null)
+                create = true;
+            
+            if (create) {
+                entity = entityGraph.createNode();
+                entity.setProperty("sddid",  id);
+                entity.setProperty("sddtype", type);
+            } else {
+            }
+            
+            for (Map.Entry<String, String> attr : attrs.entrySet()) {
+               String   attrName  = attr.getKey();
+               String   attrValue = attr.getValue();
+               MetaType attrType  = metaEntity.getAttr(attrName); 
+               
+               entity.setProperty(attrName, attrValue);
+               
+               if (!attrType.isPrimitive()) {
+                   if (attrType.isArray())
+                       for (String dependencyId :
+                               attrValue.split(config.getIdDelimeter()))
+                           generateDependsRel(entity, attrName, dependencyId);
+                    else
+                       generateDependsRel(entity, attrName, attrValue);
+               }
+            }
+            
+            tx.success();
+            if (create)
+                entityGraphIdIndex.put(id, entity);
+        } finally {
+            tx.finish();
+        }
+        
+        queueAction(new UpdateJsonQueueAction<T>(this, id));
+    }
+
+    public void actionUpdateJson(T id) {
+        queueAction(new UpdateDependenciesQueueAction<T>(this, id));
     }
     
-    public void deleteEntityImmediately(T id) {
-        // TODO: implement
-        // TODO: queue DeleteDependencyQueueAction()
+    public void actionUpdateDependencies(T id) {
     }
     
     private boolean queueAction(QueueAction<T> action) {
@@ -220,6 +285,19 @@ public class Sdd<T> implements Closeable {
             return true;
         else
             return queue.offer(action);
+    }
+    
+    private void generateDependsRel(Node entity, String attr, String id)
+            throws InvalidDependencyException {
+        @SuppressWarnings("unchecked")
+        T    dependencyId = (T) id;
+        Node dependency   = entityGraphIdIndex.get(dependencyId);
+        if (dependency == null)
+            throw new InvalidDependencyException();
+
+        Relationship depends =
+                entity.createRelationshipTo(dependency, GraphRelTypes.DEPENDS);
+        depends.setProperty("attr", attr);
     }
     
 }

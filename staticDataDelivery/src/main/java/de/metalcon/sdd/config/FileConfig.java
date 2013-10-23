@@ -2,7 +2,6 @@ package de.metalcon.sdd.config;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -19,7 +18,6 @@ public class FileConfig extends Config {
         super();
         
         xmlLoad(configPath);
-        validateSemantics();
     }
     
     private void xmlLoad(Path configPath) {
@@ -67,12 +65,12 @@ public class FileConfig extends Config {
     
     private void xmlLoadLeveldb(Element domLeveldb) {
         xmlAssertHasAttribute(domLeveldb, "path");
-        leveldbPath = domLeveldb.getAttribute("path");
+        setLeveldbPath(domLeveldb.getAttribute("path"));
     }
     
     private void xmlLoadNeo4j(Element domNeo4j) {
         xmlAssertHasAttribute(domNeo4j, "path");
-        neo4jPath = domNeo4j.getAttribute("path");
+        setNeo4jPath(domNeo4j.getAttribute("path"));
     }
     
     private void xmlLoadDetails(Element domDetails) {
@@ -87,7 +85,7 @@ public class FileConfig extends Config {
         xmlAssertHasAttribute(domDetail, "name");
 
         String name = domDetail.getAttribute("name");
-        details.add(name);
+        addDetail(name);
     }
     
     private void xmlLoadEntities(Element domEntities) {
@@ -99,16 +97,15 @@ public class FileConfig extends Config {
     
     private void xmlLoadEntity(Element domEntity) {
         xmlAssertNodeName(domEntity, "entity");
-        xmlAssertHasAttribute(domEntity, "name");
+        xmlAssertHasAttribute(domEntity, "type");
         
-        String name = domEntity.getAttribute("name");
+        String type = domEntity.getAttribute("type");
         
-        if (entities.containsKey(name))
+        if (isValidEntity(type))
             // TODO: handle this (duplicate entities)
             throw new RuntimeException();
         
         MetaEntity entity = new MetaEntity();
-        
         
         for (Node domNode = domEntity.getFirstChild(); domNode != null;
                 domNode = domNode.getNextSibling())
@@ -129,7 +126,7 @@ public class FileConfig extends Config {
                 }
             }
         
-        entities.put(name, entity);
+        addEntity(type, entity);
     }
     
     private void xmlLoadEntityAttr(MetaEntity entity, Element domAttr) {
@@ -139,7 +136,7 @@ public class FileConfig extends Config {
 
         String name = domAttr.getAttribute("name");
         String type = domAttr.getAttribute("type");
-        entity.attrs.put(name, new MetaType(type));
+        entity.addAttr(name, new MetaType(type));
     }
     
     private void xmlLoadEntityOutput(MetaEntity entity, Element domOutput) {
@@ -182,50 +179,6 @@ public class FileConfig extends Config {
         if (!domElement.hasAttribute(attribute))
             // TODO: handle this (malformed xml)
             throw new RuntimeException();
-    }
-    
-    private void validateSemantics() {
-        if (leveldbPath == null)
-            // TODO: handle this
-            throw new RuntimeException();
-        
-        if (neo4jPath == null)
-            // TODO: handle this
-            throw new RuntimeException();
-        
-        for (MetaEntity entity : entities.values()) {
-            for (MetaType attrType : entity.attrs.values())
-                if (!attrType.isPrimitive() &&
-                    !entities.containsKey(attrType.getType()))
-                    // TODO: handle this (invalid attr)
-                    throw new RuntimeException();
-                
-            for (Map.Entry<String, MetaEntityOutput> output :
-                    entity.output.entrySet()) {
-                if (!details.contains(output.getKey()))
-                    // TODO: handle this
-                    throw new RuntimeException();
-                
-                for (Map.Entry<String, String> oattr :
-                        output.getValue().oattrs.entrySet()) {
-                    String   attr     = oattr.getKey();
-                    String   detail   = oattr.getValue();
-                    MetaType attrType = entity.attrs.get(attr);
-                    
-                    if (attrType == null)
-                        // TODO: handle this (oattr is with invlid attr)
-                        throw new RuntimeException();
-                    
-                    if (attrType.isPrimitive()) {
-                        if (detail != "")
-                            // TODO: handle this (primitive with detail)
-                            throw new RuntimeException();
-                    } else if (!details.contains(detail))
-                        // TODO: handle this (non primitive with invalid detail)
-                        throw new RuntimeException();
-                }
-            }
-        }
     }
     
 }

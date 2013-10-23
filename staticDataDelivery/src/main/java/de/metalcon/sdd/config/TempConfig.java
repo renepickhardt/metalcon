@@ -3,8 +3,6 @@ package de.metalcon.sdd.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Config implementation where directories are located in a temporary location.
@@ -20,19 +18,18 @@ public class TempConfig extends Config {
      * @throws IOException  If no temporary directory could be created.
      */
     public TempConfig() throws IOException {
+        super();
+        
         Path tmpDir = Files.createTempDirectory("sddTest");
         
         Path leveldb = tmpDir.resolve("leveldb");
         leveldb.toFile().mkdir();
-        leveldbPath = leveldb.toString();
+        setLeveldbPath(leveldb.toString());
+        
         
         Path neo4j = tmpDir.resolve("neo4j");
         neo4j.toFile().mkdir();
-        neo4jPath = neo4j.toString();
-        tmpDir.toFile().deleteOnExit();
-        
-        details     = new HashSet<String>();
-        entities    = new HashMap<String, MetaEntity>();
+        setNeo4jPath(neo4j.toString());
     }
     
 }

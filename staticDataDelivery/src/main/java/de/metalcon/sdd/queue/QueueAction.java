@@ -1,9 +1,22 @@
 package de.metalcon.sdd.queue;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.metalcon.sdd.Sdd;
 
 
 public abstract class QueueAction<T> implements Comparable<QueueAction<T>> {
+    
+    private static final Map<Class<?>, Integer> classPriority;
+    static {
+        Map<Class<?>, Integer> p = new HashMap<Class<?>, Integer>();
+        p.put(UpdateGraphQueueAction.class,        1);
+        p.put(UpdateJsonQueueAction.class,         2);
+        p.put(UpdateDependenciesQueueAction.class, 3);
+        classPriority = Collections.unmodifiableMap(p);
+    }
     
     protected Sdd<T> sdd;
     
@@ -19,32 +32,22 @@ public abstract class QueueAction<T> implements Comparable<QueueAction<T>> {
         this.id  = id;
     }
 
-    public abstract void runQueueAction();
+    public abstract void runQueueAction() throws Exception;
     
     @Override
     public int compareTo(QueueAction<T> other) {
         if (other == null)
             return -1;
         
-        Class<?> thisclass = getClass();
-        Class<?> otherclass = other.getClass();
+        int thisPriority  = classPriority.get(getClass());
+        int otherPriority = classPriority.get(other.getClass());
         
-        boolean thisIsImmediate  = thisclass  == UpdateQueueAction.class ||
-                                   thisclass  == DeleteQueueAction.class;
-        boolean otherIsImmediate = otherclass == UpdateQueueAction.class ||
-                                   otherclass == DeleteQueueAction.class;
-        
-        if (thisIsImmediate) {
-            if (otherIsImmediate)
-                return 0;
-            else
-                return -1;
-        } else {
-            if (otherIsImmediate)
-                return 1;
-            else
-                return 0;
-        }
+        if (thisPriority == otherPriority)
+            return 0;
+        else if (thisPriority > otherPriority)
+            return 1;
+        else
+            return -1;
     }
     
     @Override

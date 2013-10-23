@@ -18,7 +18,7 @@
 
   <!-- ENTITIES -->
   <entities>
-    <entity name="Band">
+    <entity type="Band">
       <attr name="name" type="String"/>
       <attr name="city" type="City"/>
       <attr name="records" type="Record[]"/>
@@ -33,7 +33,7 @@
         <oattr attr="posts" detail="title"/>
       </output>
     </entity>
-    <entity name="City">
+    <entity type="City">
       <attr name="name" type="String"/>
       <output detail="title">
         <oattr attr="name"/>
@@ -42,7 +42,7 @@
         <oattr attr="name"/>
       </output>
     </entity>
-    <entity name="Record">
+    <entity type="Record">
       <attr name="name" type="String"/>
       <attr name="band" type="Band"/>
       <output detail="title">
@@ -53,7 +53,7 @@
         <oattr attr="band" detail="title"/>
       </output>
     </entity>
-    <entity name="Post">
+    <entity type="Post">
       <attr name="title" type="String"/>
       <attr name="date" type="String"/>
       <output detail="title">
@@ -64,13 +64,13 @@
         <oattr attr="date"/>
       </output>
     </entity>
-    <!--<entity name="City">
+    <!--<entity type="City">
       <attr name="name" type="String"/>
       <output detail="all">
         <oattr attr="name"/>
       </output>
     </entity>
-    <entity name="Band">
+    <entity type="Band">
       <attr name="name" type="String"/>
       <attr name="city" type="City"/>
       <output detail="all">
@@ -78,7 +78,7 @@
         <oattr attr="city" detail="all"/>
       </output>
     </entity>-->
-    <!--<entity name="Band">
+    <!--<entity type="Band">
       <attr name="name" type="String"/>
       <attr name="url" type="String"/>
       <attr name="foundation" type="String"/>
@@ -128,17 +128,17 @@
       <output detail="search_entry"/>
       <output detail="search_detailed"/>
     </entity>
-    <entity name="City">
+    <entity type="City">
     </entity>
-    <entity name="Disc">
+    <entity type="Disc">
     </entity>
-    <entity name="Event">
+    <entity type="Event">
     </entity>
-    <entity name="Genre">
+    <entity type="Genre">
     </entity>
-    <entity name="Instrument">
+    <entity type="Instrument">
     </entity>
-    <entity name="Musician">
+    <entity type="Musician">
       <attr name="name" type="String"/>
       <attr name="url" type="String"/>
       <attr name="active" type="String"/>
@@ -155,15 +155,15 @@
         <oattr attr="band" detail="symbol"/>
       </output>
     </entity>
-    <entity name="Person">
+    <entity type="Person">
     </entity>
-    <entity name="Record">
+    <entity type="Record">
     </entity>
-    <entity name="Tour">
+    <entity type="Tour">
     </entity>
-    <entity name="Track">
+    <entity type="Track">
     </entity>
-    <entity name="Venue">
+    <entity type="Venue">
     </entity>-->
   </entities>
 </sdd-config>

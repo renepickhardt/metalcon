@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdd-config>
+  <leveldb path="leveldbpath"/>
+  <neo4j path="neo4jpath"/>
+  
+  <!-- DETAILS -->
+  <details>
+    <detail name="detail0"/>
+    <detail name="detail1"/>
+  </details>
+  
+  <!-- ENTITIES -->
+  <entities>
+    <entity type="entity0">
+      <attr name="attr0" type="String"/>
+      <attr name="attr1" type="entity1"/>
+      <output detail="detail0">
+        <oattr attr="attr0"/>
+        <oattr attr="attr1" detail="detail1"/>
+      </output>
+    </entity>
+    <entity type="entity1">
+      <attr name="attr2" type="String"/>
+      <output detail="detail0">
+      </output>
+      <output detail="detail1">
+        <oattr attr="attr2"/>
+      </output>
+    </entity>
+    <entity type="entity2">
+    </entity>
+  </entities>
+</sdd-config>
