@@ -5,6 +5,7 @@
 
   <!-- DETAILS -->
   <details>
+    <detail name="title"/>
     <detail name="all"/>
     <!--<detail name="symbol"/>
     <detail name="line"/>
@@ -17,6 +18,66 @@
 
   <!-- ENTITIES -->
   <entities>
+    <entity name="Band">
+      <attr name="name" type="String"/>
+      <attr name="city" type="City"/>
+      <attr name="records" type="Record[]"/>
+      <attr name="posts" type="Post[]"/>
+      <output detail="title">
+        <oattr attr="name"/>
+      </output>
+      <output detail="all">
+        <oattr attr="name"/>
+        <oattr attr="city" detail="title"/>
+        <oattr attr="records" detail="title"/>
+        <oattr attr="posts" detail="title"/>
+      </output>
+    </entity>
+    <entity name="City">
+      <attr name="name" type="String"/>
+      <output detail="title">
+        <oattr attr="name"/>
+      </output>
+      <output detail="all">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+    <entity name="Record">
+      <attr name="name" type="String"/>
+      <attr name="band" type="Band"/>
+      <output detail="title">
+        <oattr attr="name"/>
+      </output>
+      <output detail="all">
+        <oattr attr="name"/>
+        <oattr attr="band" detail="title"/>
+      </output>
+    </entity>
+    <entity name="Post">
+      <attr name="title" type="String"/>
+      <attr name="date" type="String"/>
+      <output detail="title">
+        <oattr attr="title"/>
+      </output>
+      <output detail="all">
+        <oattr attr="title"/>
+        <oattr attr="date"/>
+      </output>
+    </entity>
+    <!--<entity name="City">
+      <attr name="name" type="String"/>
+      <output detail="all">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+    <entity name="Band">
+      <attr name="name" type="String"/>
+      <attr name="city" type="City"/>
+      <output detail="all">
+        <oattr attr="name"/>
+        <oattr attr="city" detail="all"/>
+      </output>
+    </entity>-->
     <!--<entity name="Band">
       <attr name="name" type="String"/>
       <attr name="url" type="String"/>

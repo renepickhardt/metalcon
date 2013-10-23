@@ -19,6 +19,11 @@
     <description>TODO</description>
     <servlet-class>de.metalcon.sdd.tomcat.Delete</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>Benchmark</servlet-name>
+    <description>TODO</description>
+    <servlet-class>de.metalcon.sdd.tomcat.Benchmark</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Read</servlet-name>
     <url-pattern>/read</url-pattern>
@@ -30,6 +35,10 @@
   <servlet-mapping>
     <servlet-name>Delete</servlet-name>
     <url-pattern>/delete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Benchmark</servlet-name>
+    <url-pattern>/benchmark</url-pattern>
   </servlet-mapping>
 </web-app>
 
