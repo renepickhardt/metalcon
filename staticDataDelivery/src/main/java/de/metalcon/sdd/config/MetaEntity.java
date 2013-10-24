@@ -9,11 +9,11 @@ public class MetaEntity {
     
     private Map<String, MetaType> attrs;
     
-    public Map<String, MetaEntityOutput> output;
+    private Map<String, MetaEntityOutput> outputs;
     
     public MetaEntity() {
-        attrs  = new HashMap<String, MetaType>();
-        output = new HashMap<String, MetaEntityOutput>();
+        attrs   = new HashMap<String, MetaType>();
+        outputs = new HashMap<String, MetaEntityOutput>();
     }
     
     public Set<String> getAttrs() {
@@ -30,6 +30,18 @@ public class MetaEntity {
     
     public void addAttr(String name, MetaType type) {
         attrs.put(name, type);
+    }
+    
+    public Set<String> getOutputs() {
+        return Collections.unmodifiableSet(outputs.keySet());
+    }
+    
+    public MetaEntityOutput getOutput(String detail) {
+        return outputs.get(detail);
+    }
+    
+    public void addOutput(String detail, MetaEntityOutput output) {
+        outputs.put(detail, output);
     }
     
 }

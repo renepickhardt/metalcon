@@ -1,5 +1,7 @@
 package de.metalcon.sdd.queue;
 
+import java.io.IOException;
+
 import de.metalcon.sdd.Sdd;
 
 public class UpdateJsonQueueAction<T> extends QueueAction<T> {
@@ -9,7 +11,7 @@ public class UpdateJsonQueueAction<T> extends QueueAction<T> {
     }
     
     @Override
-    public void runQueueAction() {
+    public void runQueueAction() throws IOException {
         System.out.println("UpdateJsonQueueAction");
         sdd.actionUpdateJson(id);
     }

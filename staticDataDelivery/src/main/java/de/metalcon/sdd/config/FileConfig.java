@@ -151,7 +151,7 @@ public class FileConfig extends Config {
             if (domNode.getNodeType() == Node.ELEMENT_NODE)
                 xmlLoadEntityOutputOattr(output, (Element) domNode);
         
-        entity.output.put(detail, output);
+        entity.addOutput(detail, output);
     }
     
     private void xmlLoadEntityOutputOattr(MetaEntityOutput output,
@@ -164,9 +164,9 @@ public class FileConfig extends Config {
         if (domOattr.hasAttribute("detail")) {
             String detail = domOattr.getAttribute("detail");
 
-            output.oattrs.put(attr, detail);
+            output.addOattr(attr, detail);
         } else
-            output.oattrs.put(attr, "");
+            output.addOattr(attr, "");
     }
     
     private void xmlAssertNodeName(Element domElement, String nodeName) {

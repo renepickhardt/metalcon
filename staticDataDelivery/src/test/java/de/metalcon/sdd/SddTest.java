@@ -10,8 +10,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.metalcon.common.JsonPrettyPrinter;
 import de.metalcon.sdd.config.Config;
 import de.metalcon.sdd.config.MetaEntity;
+import de.metalcon.sdd.config.MetaEntityOutput;
 import de.metalcon.sdd.config.MetaType;
 import de.metalcon.sdd.config.TempConfig;
 import de.metalcon.sdd.error.InvalidAttrException;
@@ -33,10 +35,19 @@ public class SddTest {
         MetaEntity entity0 = new MetaEntity();
         entity0.addAttr("attr0", new MetaType("String"));
         entity0.addAttr("attr1", new MetaType("entity1"));
+        MetaEntityOutput entity0_detail0 = new MetaEntityOutput();
+        entity0_detail0.addOattr("attr0", "");
+        entity0_detail0.addOattr("attr1", "detail1");
+        entity0.addOutput("detail0", entity0_detail0);
         config.addEntity("entity0", entity0);
         
         MetaEntity entity1 = new MetaEntity();
         entity1.addAttr("attr2", new MetaType("String"));
+        MetaEntityOutput entity1_detail0 = new MetaEntityOutput();
+        entity1.addOutput("detail0", entity1_detail0);
+        MetaEntityOutput entity1_detail1 = new MetaEntityOutput();
+        entity1_detail1.addOattr("attr2", "");
+        entity1.addOutput("detail1", entity1_detail1);
         config.addEntity("entity1", entity1);
         
         MetaEntity entity2 = new MetaEntity();
@@ -46,7 +57,7 @@ public class SddTest {
     }
     
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         sdd.close();
     }
     
@@ -78,9 +89,14 @@ public class SddTest {
             throws InvalidDetailException, InvalidTypeException,
             InvalidAttrException {
         Map<String, String> attrs = new HashMap<String, String>();
+        attrs.put("attr0", "YOLO");
         sdd.updateEntity(1L, "entity0", attrs);
         sdd.waitUntilQueueEmpty();
         assertNotNull(sdd.readEntity(1L, "detail0"));
+        System.out.println(JsonPrettyPrinter.prettyPrintJson(
+                sdd.readEntity(1L, "detail0")));
+        System.out.println(JsonPrettyPrinter.prettyPrintJson(
+                sdd.readEntity(1L, "detail1")));
     }
 
 }

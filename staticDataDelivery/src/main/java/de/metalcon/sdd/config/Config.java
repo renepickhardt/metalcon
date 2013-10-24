@@ -100,28 +100,26 @@ public abstract class Config {
                     throw new InvalidConfigException("invalid attr type \"" + attrType.getType() + "\" for attr \"" + attrName + "\" on entity type \"" + type + "\"");
             }
             
-            for (Map.Entry<String, MetaEntityOutput> output :
-                    entity.output.entrySet()) {
-                String           outputDetail = output.getKey();
-                MetaEntityOutput outputObj    = output.getValue();
+            for (String outputDetail : entity.getOutputs()) {
+                MetaEntityOutput output = entity.getOutput(outputDetail);
                 
                 if (!isValidDetail(outputDetail))
                     throw new InvalidConfigException("invalid output detail \"" + outputDetail + "\" on entity type \"" + type + "\"");
                 
-                for (Map.Entry<String, String> oattr :
-                        outputObj.oattrs.entrySet()) {
-                    String   attr     = oattr.getKey();
-                    String   detail   = oattr.getValue();
-                    MetaType attrType = entity.getAttr(attr);
+//                for (Map.Entry<String, String> oattr :
+//                        output.oattrs.entrySet()) {
+                for (String oattr : output.getOattrs()) {
+                    String   oattrDetail = output.getOattr(oattr);
+                    MetaType oattrType   = entity.getAttr(oattr);
                     
-                    if (attrType == null)
-                        throw new InvalidConfigException("oattr for invalid attr \"" + attr + "\" on entity type \"" + type + "\"");
+                    if (oattrType == null)
+                        throw new InvalidConfigException("oattr for invalid attr \"" + oattr + "\" on entity type \"" + type + "\"");
                     
-                    if (attrType.isPrimitive()) {
-                        if (!detail.equals(""))
-                            throw new InvalidConfigException("oattr for primitive attr \"" + attr + "\" has detail on entity type \"" + type + "\"");
-                    } else if (!isValidDetail(detail))
-                        throw new InvalidConfigException("oattr for non primitive attr \"" + attr + "\" has no detail on entity type \"" + type + "\"");
+                    if (oattrType.isPrimitive()) {
+                        if (!oattrDetail.equals(""))
+                            throw new InvalidConfigException("oattr for primitive attr \"" + oattr + "\" has detail on entity type \"" + type + "\"");
+                    } else if (!isValidDetail(oattrDetail))
+                        throw new InvalidConfigException("oattr for non primitive attr \"" + oattr + "\" has no detail on entity type \"" + type + "\"");
                 }
             }
         }

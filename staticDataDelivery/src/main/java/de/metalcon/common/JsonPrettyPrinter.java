@@ -35,9 +35,12 @@ public class JsonPrettyPrinter {
      * Formats a JSON-String into a "pretty-printed" more human readable format.
      * @param json  The JSON-String to be formatted. This needs to be a minimal
      *              JSON, meaning no whitespace or newlines inside it.
-     * @return The formatted JSON-String.
+     * @return The formatted JSON-String. Returns null if json was null.
      */
     public static String prettyPrintJson(String json) {
+        if (json == null)
+            return null;
+        
         int indent = 0;
         boolean inString = false;
         boolean inEscape = false;
