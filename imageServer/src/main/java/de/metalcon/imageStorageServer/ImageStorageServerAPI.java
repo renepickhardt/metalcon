@@ -8,7 +8,7 @@ import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
 import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 
 /**
- * prototype interface for the image storage server API
+ * java interface for the image storage server API
  * 
  * @author sebschlicht
  * 
@@ -16,154 +16,136 @@ import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 public interface ImageStorageServerAPI {
 
 	/**
-	 * create an image using a binary file
+	 * create an image in its actual size
 	 * 
 	 * @param imageIdentifier
-	 *            image identifier
+	 *            unused image identifier
 	 * @param imageStream
-	 *            image input stream
+	 *            input stream of the binary image
 	 * @param metaData
-	 *            image meta data (JSON)
+	 *            optional meta data (JSON)
 	 * @param autoRotate
-	 *            rotation flag - if set to <b>true</b> the server will rotate
-	 *            the image using its EXIF data automatically
+	 *            enables the optional image auto rotation according to its EXIF
+	 *            information if set to <b>true</b>
 	 * @param response
-	 *            create response object
-	 * @return true - if the image has been created successfully<br>
+	 *            create response object for status messages
+	 * @return true - if the creation was successful<br>
+	 * 
 	 *         false - otherwise
 	 */
 	boolean createImage(String imageIdentifier, InputStream imageStream,
 			String metaData, boolean autoRotate, CreateResponse response);
 
 	/**
-	 * create a cropped image using a binary file
+	 * create an image using only a certain frame of it
 	 * 
 	 * @param imageIdentifier
-	 *            image identifier
+	 *            unused image identifier
 	 * @param imageStream
-	 *            image input stream
+	 *            input stream of the binary image
 	 * @param metaData
-	 *            image meta data (JSON)
-	 * @param left
-	 *            distance between the old and the new left border of the image
-	 * @param top
-	 *            distance between the old and the new upper border of the image
-	 * @param width
-	 *            new image width
-	 * @param height
-	 *            new image height
+	 *            optional meta data (JSON)
+	 * @param croppingInformation
+	 *            cropping information specifying the used image frame
 	 * @param response
-	 *            create response object
-	 * @return true - if the image has been created successfully<br>
+	 *            create response object for status messages
+	 * @return true - if the creation was successful<br>
 	 *         false - otherwise
 	 */
-	boolean createImage(String imageIdentifier, InputStream imageStream,
-			String metaData, int left, int top, int width, int height,
+	boolean createCroppedImage(String imageIdentifier, InputStream imageStream,
+			String metaData, ImageFrame croppingInformation,
 			CreateResponse response);
 
 	/**
-	 * create an image using a link to an existing image
+	 * create an image in its actual size using an URL
 	 * 
 	 * @param imageIdentifier
-	 *            image identifier
+	 *            unused image identifier
 	 * @param imageUrl
 	 *            URL to the existing image
-	 * @param response
-	 *            create response object
-	 * @return true - if the image has been created successfully<br>
-	 *         false - otherwise
-	 */
-	boolean createImage(String imageIdentifier, String imageUrl,
-			CreateResponse response);
-
-	/**
-	 * read the image in its original state with meta data
-	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @param response
-	 *            read response object
-	 * @return stream of the original image<br>
-	 *         <b>null</b> if the image identifier was invalid
-	 */
-	ImageData readImageWithMetaData(String imageIdentifier,
-			ReadResponse response);
-
-	/**
-	 * read the image having new dimensions
-	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @param width
-	 *            alternate width
-	 * @param height
-	 *            alternate height
-	 * @param response
-	 *            read response object
-	 * @return stream of the image version having the dimensions passed<br>
-	 *         <b>null</b> if the image identifier was invalid
-	 */
-	InputStream readImage(String imageIdentifier, int width, int height,
-			ReadResponse response);
-
-	/**
-	 * read the image having new dimensions with meta data
-	 * 
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @param width
-	 *            alternate width
-	 * @param height
-	 *            alternate height
-	 * @param response
-	 *            read response object
-	 * @return stream of the image version having the dimensions passed<br>
-	 *         <b>null</b> if the image identifier was invalid
-	 */
-	ImageData readImageWithMetaData(String imageIdentifier, int width,
-			int height, ReadResponse response);
-
-	/**
-	 * read a bunch of images
-	 * 
-	 * @param imageIdentifiers
-	 *            array of image identifiers
-	 * @param width
-	 *            alternate width
-	 * @param height
-	 *            alternate height
-	 * @param response
-	 *            read response object
-	 * @return stream of the archive including the images<br>
-	 *         <b>null</b> if any image identifier was invalid
-	 */
-	InputStream readImages(String[] imageIdentifiers, int width, int height,
-			ReadResponse response);
-
-	/**
-	 * update the meta data of an image
-	 * 
-	 * @param imageIdentifier
-	 *            image identifier
 	 * @param metaData
-	 *            meta data that shall be appended/updated
+	 *            optional meta data (JSON)
 	 * @param response
-	 *            update response object
-	 * @return true - if the meta data was appended/updated successfully<br>
+	 *            create response object for status messages
+	 * @return true - if the creation was successful<br>
 	 *         false - otherwise
 	 */
-	boolean appendImageMetaData(String imageIdentifier, String metaData,
+	boolean createImageFromUrl(String imageIdentifier, String imageUrl,
+			String metaData, CreateResponse response);
+
+	/**
+	 * read the original image and its meta data
+	 * 
+	 * @param imageIdentifier
+	 *            identifier of an existing image
+	 * @param response
+	 *            read response object for status messages
+	 * @return stream and meta data of the original image<br>
+	 *         <b>null</b> if there is no image with such identifier or internal
+	 *         errors occurred
+	 */
+	ImageData readOriginalImage(String imageIdentifier, ReadResponse response);
+
+	/**
+	 * read the basis image<br>
+	 * (compressed image including rotation and cropping)
+	 * 
+	 * @param imageIdentifier
+	 *            identifier of an existing image
+	 * @param response
+	 *            read response object for status messages
+	 * @return stream and meta data of the basis image<br>
+	 *         <b>null</b> if there is no image with such identifier or internal
+	 *         errors occurred
+	 */
+	ImageData readImage(String imageIdentifier, ReadResponse response);
+
+	/**
+	 * read a scaled version of the basis image
+	 * 
+	 * @param imageIdentifier
+	 *            identifier of an existing image
+	 * @param width
+	 *            width of the new image frame
+	 * @param height
+	 *            height of the new image frame
+	 * @param scalingType
+	 *            specifies the way the scaling should happen
+	 * @param response
+	 *            read response object for status messages
+	 * @return stream and meta data of the scaled basis image<br>
+	 *         stream and meta data of the basis image if the size requested was
+	 *         larger than the basis image<br>
+	 *         <b>null</b> if there is no image with such identifier or internal
+	 *         errors occurred
+	 */
+	ImageData readScaledImage(String imageIdentifier, int width, int height,
+			ScalingType scalingType, ReadResponse response);
+
+	/**
+	 * update the meta data stored for an image
+	 * 
+	 * @param imageIdentifier
+	 *            identifier of an existing image
+	 * @param metaData
+	 *            meta data that shall be appended (JSON)
+	 * @param response
+	 *            update response object for status messages
+	 * @return true - if the update was successful<br>
+	 *         false - if there is no image with such identifier
+	 */
+	boolean updateImageMetaData(String imageIdentifier, String metaData,
 			UpdateResponse response);
 
 	/**
-	 * delete an image from the server
+	 * delete an image
 	 * 
 	 * @param imageIdentifier
-	 *            image identifier
+	 *            identifier of an existing image
 	 * @param response
-	 *            delete response object
-	 * @return true - if the image was deleted successfully<br>
-	 *         false - if the image identifier was invalid
+	 *            delete response object for status messages
+	 * @return true - if the deletion was successful<br>
+	 *         false - if there is no image with such identifier
 	 */
 	boolean deleteImage(String imageIdentifier, DeleteResponse response);
 

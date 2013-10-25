@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.metalcon.imageStorageServer.ImageData;
+import de.metalcon.imageStorageServer.ImageFrame;
 import de.metalcon.imageStorageServer.ImageStorageServer;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.Response;
@@ -176,14 +177,16 @@ public class ImageStorageServerTest {
 
 	@Test
 	public void testCreateImageCropping() {
-		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
-				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_CROPPING_LEFT,
-				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
-				VALID_CROPPING_HEIGHT, this.createResponse));
-		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
-				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, VALID_CROPPING_LEFT,
-				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
-				VALID_CROPPING_HEIGHT, this.createResponse));
+		assertTrue(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, new ImageFrame(
+						VALID_CROPPING_LEFT, VALID_CROPPING_TOP,
+						VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT),
+				this.createResponse));
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, new ImageFrame(
+						VALID_CROPPING_LEFT, VALID_CROPPING_TOP,
+						VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT),
+				this.createResponse));
 	}
 
 	/**
@@ -191,8 +194,8 @@ public class ImageStorageServerTest {
 	 */
 	@Test
 	public void testCreateImageFromUrl() {
-		assertTrue(this.server.createImage(VALID_CREATE_IDENTIFIER,
-				VALID_IMAGE_URL, this.createResponse));
+		assertTrue(this.server.createImageFromUrl(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_URL, VALID_META_DATA, this.createResponse));
 	}
 
 	/**
@@ -203,7 +206,7 @@ public class ImageStorageServerTest {
 	 */
 	@Test
 	public void testReadOriginalImage() throws FileNotFoundException {
-		final ImageData imageData = this.server.readImageWithMetaData(
+		final ImageData imageData = this.server.readOriginalImage(
 				VALID_READ_IDENTIFIER, this.readResponse);
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
@@ -226,7 +229,7 @@ public class ImageStorageServerTest {
 			throws MalformedURLException, IOException {
 		this.testCreateImageFromUrl();
 
-		final ImageData imageData = this.server.readImageWithMetaData(
+		final ImageData imageData = this.server.readOriginalImage(
 				VALID_CREATE_IDENTIFIER, this.readResponse);
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
@@ -244,7 +247,7 @@ public class ImageStorageServerTest {
 	 */
 	@Test
 	public void testReadOriginalImageInvalid() {
-		assertNull(this.server.readImageWithMetaData(INVALID_READ_IDENTIFIER,
+		assertNull(this.server.readOriginalImage(INVALID_READ_IDENTIFIER,
 				this.readResponse));
 
 		// check for status message
@@ -254,25 +257,32 @@ public class ImageStorageServerTest {
 	}
 
 	/**
-	 * assert the multiple reading of a scaled image to success and to return an
-	 * image having the dimension passed
+	 * assert the reading of a scaled image to return an image having the
+	 * dimension passed and exactly the meta data used in the create request
 	 */
 	@Test
 	public void testReadImageScaling() {
 		// let the server create a scaled version
-		InputStream imageStream = this.server.readImage(VALID_READ_IDENTIFIER,
-				VALID_READ_WIDTH, VALID_READ_HEIGHT, this.readResponse);
+		ImageData imageData = this.server.readScaledImage(
+				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
+				null, this.readResponse);
 
-		assertNotNull(imageStream);
-		this.checkImageDimension(imageStream, VALID_READ_WIDTH,
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+
+		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
 				VALID_READ_HEIGHT);
 
 		// read the scaled version created before again
-		imageStream = this.server.readImage(VALID_READ_IDENTIFIER,
-				VALID_READ_WIDTH, VALID_READ_HEIGHT, this.readResponse);
+		imageData = this.server.readScaledImage(VALID_READ_IDENTIFIER,
+				VALID_READ_WIDTH, VALID_READ_HEIGHT, null, this.readResponse);
 
-		assertNotNull(imageStream);
-		this.checkImageDimension(imageStream, VALID_READ_WIDTH,
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+
+		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
 				VALID_READ_HEIGHT);
 	}
 
@@ -282,10 +292,10 @@ public class ImageStorageServerTest {
 	 */
 	@Test
 	public void testReadImageScalingTooLarge() {
-		final InputStream imageStream = this.server.readImage(
+		final ImageData imageData = this.server.readScaledImage(
 				VALID_READ_IDENTIFIER, INVALID_READ_WIDTH_TOO_LARGE,
-				INVALID_READ_HEIGHT_TOO_LARGE, this.readResponse);
-		assertNull(imageStream);
+				INVALID_READ_HEIGHT_TOO_LARGE, null, this.readResponse);
+		assertNull(imageData);
 
 		// check for status message
 		this.jsonResponse = extractJson(this.readResponse);
@@ -294,23 +304,7 @@ public class ImageStorageServerTest {
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
 	}
 
-	/**
-	 * assert the reading of a scaled image to return an image having the
-	 * dimension passed and exactly the meta data used in the create request
-	 */
-	@Test
-	public void testReadImageScalingWithMetadata() {
-		final ImageData imageData = this.server.readImageWithMetaData(
-				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
-				this.readResponse);
-		assertNotNull(imageData);
-		assertNotNull(imageData.getImageStream());
-		compareJson(VALID_META_DATA, imageData.getMetaData());
-
-		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
-				VALID_READ_HEIGHT);
-	}
-
+	// TODO: move to image application server tests
 	@Test
 	public void testReadImages() throws IOException {
 		// let the server create the scaled versions
@@ -347,6 +341,7 @@ public class ImageStorageServerTest {
 		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
 	}
 
+	// TODO: move to image application server tests
 	@Test
 	public void testReadImagesWithDuplicate() throws IOException {
 		// let the server create the scaled versions
@@ -385,7 +380,7 @@ public class ImageStorageServerTest {
 
 	@Test
 	public void testAppendMetaData() {
-		assertTrue(this.server.appendImageMetaData(VALID_READ_IDENTIFIER,
+		assertTrue(this.server.updateImageMetaData(VALID_READ_IDENTIFIER,
 				VALID_UPDATE_META_DATA, this.updateResponse));
 	}
 
@@ -393,7 +388,7 @@ public class ImageStorageServerTest {
 	public void testReadAppendedMetaData() {
 		this.testAppendMetaData();
 
-		final ImageData imageData = this.server.readImageWithMetaData(
+		final ImageData imageData = this.server.readImage(
 				VALID_READ_IDENTIFIER, this.readResponse);
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
@@ -403,7 +398,7 @@ public class ImageStorageServerTest {
 
 	@Test
 	public void testAppendMetaDataInvalidIdentifier() {
-		assertFalse(this.server.appendImageMetaData(INVALID_READ_IDENTIFIER,
+		assertFalse(this.server.updateImageMetaData(INVALID_READ_IDENTIFIER,
 				VALID_UPDATE_META_DATA, this.updateResponse));
 		this.jsonResponse = extractJson(this.updateResponse);
 		assertEquals(ProtocolConstants.StatusMessage.Update.IMAGE_NOT_EXISTING,
@@ -412,7 +407,7 @@ public class ImageStorageServerTest {
 
 	@Test
 	public void testAppendMetaDataInvalidMetaData() {
-		assertFalse(this.server.appendImageMetaData(VALID_READ_IDENTIFIER,
+		assertFalse(this.server.updateImageMetaData(VALID_READ_IDENTIFIER,
 				INVALID_META_DATA, this.updateResponse));
 	}
 
@@ -432,7 +427,7 @@ public class ImageStorageServerTest {
 	public void testReadOriginalImageDeleted() {
 		this.testDeleteImage();
 
-		assertNull(this.server.readImageWithMetaData(VALID_READ_IDENTIFIER,
+		assertNull(this.server.readOriginalImage(VALID_READ_IDENTIFIER,
 				this.readResponse));
 	}
 

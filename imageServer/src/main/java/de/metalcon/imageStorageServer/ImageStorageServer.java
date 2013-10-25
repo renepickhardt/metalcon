@@ -392,20 +392,19 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	public boolean createImage(final String imageIdentifier,
 			final InputStream imageStream, final String metaData,
 			final boolean autoRotate, final CreateResponse response) {
-		final String hash = generateHash(imageIdentifier);
-
-		JSONObject metaDataJSON = null;
-		if (metaData != null) {
-			try {
-				metaDataJSON = (JSONObject) PARSER.parse(metaData);
-			} catch (final ParseException e) {
-				// error: meta data format invalid
-				response.metaDataMalformed();
-				return false;
-			}
-		}
-
 		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+			final String hash = generateHash(imageIdentifier);
+
+			JSONObject metaDataJSON = null;
+			if (metaData != null) {
+				try {
+					metaDataJSON = (JSONObject) PARSER.parse(metaData);
+				} catch (final ParseException e) {
+					// error: meta data format invalid
+					response.metaDataMalformed();
+					return false;
+				}
+			}
 
 			try {
 				// store and try to load original image
@@ -454,24 +453,22 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public boolean createImage(final String imageIdentifier,
+	public boolean createCroppedImage(final String imageIdentifier,
 			final InputStream imageStream, final String metaData,
-			final int left, final int top, final int width, final int height,
-			final CreateResponse response) {
-		final String hash = generateHash(imageIdentifier);
-
-		JSONObject metaDataJSON = null;
-		if (metaData != null) {
-			try {
-				metaDataJSON = (JSONObject) PARSER.parse(metaData);
-			} catch (final ParseException e) {
-				// error: meta data format invalid
-				response.metaDataMalformed();
-				return false;
-			}
-		}
-
+			final ImageFrame croppingInformation, final CreateResponse response) {
 		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+			final String hash = generateHash(imageIdentifier);
+
+			JSONObject metaDataJSON = null;
+			if (metaData != null) {
+				try {
+					metaDataJSON = (JSONObject) PARSER.parse(metaData);
+				} catch (final ParseException e) {
+					// error: meta data format invalid
+					response.metaDataMalformed();
+					return false;
+				}
+			}
 
 			try {
 				// store and try to load original image
@@ -479,7 +476,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 				if (image != null) {
 					// crop the image
-					image = cropImage(image, left, top, width, height);
+					image = cropImage(image, croppingInformation.getLeft(),
+							croppingInformation.getTop(),
+							croppingInformation.getWidth(),
+							croppingInformation.getHeight());
 
 					if (image != null) {
 						// store basis version
@@ -492,7 +492,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 						// register basis size
 						this.imageMetaDatabase.registerImageSize(
-								imageIdentifier, width, height,
+								imageIdentifier,
+								croppingInformation.getWidth(),
+								croppingInformation.getHeight(),
 								basisFile.getAbsolutePath());
 
 						return true;
@@ -522,12 +524,24 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public boolean createImage(String imageIdentifier, String imageUrl,
+	public boolean createImageFromUrl(final String imageIdentifier,
+			final String imageUrl, final String metaData,
 			final CreateResponse response) {
-		final String hash = generateHash(imageIdentifier);
-		final File tmpImageFile = this.getTemporaryFile(hash);
-
 		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
+
+			final String hash = generateHash(imageIdentifier);
+			final File tmpImageFile = this.getTemporaryFile(hash);
+
+			JSONObject metaDataJSON = null;
+			if (metaData != null) {
+				try {
+					metaDataJSON = (JSONObject) PARSER.parse(metaData);
+				} catch (final ParseException e) {
+					// error: meta data format invalid
+					response.metaDataMalformed();
+					return false;
+				}
+			}
 
 			try {
 				// download and store original image
@@ -540,8 +554,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					final File basisFile = this.getBasisFile(hash);
 					storeCompressedImage(image, basisFile);
 
+					// create image in database
 					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-							null);
+							metaDataJSON);
 
 					// register basis size
 					final int width = (int) image.getDimension().getWidth();
@@ -556,7 +571,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					System.err
 							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 				}
-
 			} catch (final MalformedURLException e) {
 				// error: no valid URL
 				response.imageUrlMalformed(imageUrl);
@@ -578,7 +592,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public ImageData readImageWithMetaData(final String imageIdentifier,
+	public ImageData readOriginalImage(final String imageIdentifier,
 			final ReadResponse response) {
 		final String hash = generateHash(imageIdentifier);
 		final String metaData = this.imageMetaDatabase
@@ -603,71 +617,26 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public InputStream readImage(final String imageIdentifier, final int width,
-			final int height, final ReadResponse response) {
-		final String hash = generateHash(imageIdentifier);
-		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
-			try {
-				final File scaledImageFile = this.getScaledFile(hash, width,
-						height);
-
-				if (this.imageMetaDatabase.imageHasSizeRegistered(
-						imageIdentifier, width, height)) {
-					// read the scaled image
-					return new FileInputStream(scaledImageFile);
-				} else {
-					// try to create the scaled version
-					final String largerImagePath = this.imageMetaDatabase
-							.getSmallestImagePath(imageIdentifier, width,
-									height);
-
-					if (largerImagePath != null) {
-						final InputStream imageStream = this
-								.storeAndAccessScaledImage(hash, width, height,
-										largerImagePath, scaledImageFile,
-										imageIdentifier);
-						if (imageStream != null) {
-							return imageStream;
-						}
-
-						response.internalServerError();
-						System.err
-								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
-					} else {
-						response.addGeometryBiggerThanOriginalWarning();
-
-						// read the basis image
-						return new FileInputStream(this.getBasisFile(hash));
-					}
-				}
-
-			} catch (final FileNotFoundException e) {
-				// internal server error: file not found
-				response.internalServerError();
-				e.printStackTrace();
-			} catch (final MagickException e) {
-				// internal server error: failed to load/scale/store image
-				response.internalServerError();
-				e.printStackTrace();
-			}
-		} else {
-			response.addImageNotFoundError();
-		}
-
+	public ImageData readImage(final String imageIdentifier,
+			final ReadResponse response) {
+		// TODO: implement or remove from API
 		return null;
 	}
 
 	@Override
-	public ImageData readImageWithMetaData(String imageIdentifier, int width,
-			int height, final ReadResponse response) {
+	public ImageData readScaledImage(final String imageIdentifier,
+			final int width, final int height, final ScalingType scalingType,
+			final ReadResponse response) {
 		final String metaData = this.imageMetaDatabase
 				.getMetadata(imageIdentifier);
+
 		if (metaData != null) {
 			final String hash = generateHash(imageIdentifier);
-			final File scaledImageFile = this
-					.getScaledFile(hash, width, height);
 
 			try {
+				final File scaledImageFile = this.getScaledFile(hash, width,
+						height);
+
 				if (this.imageMetaDatabase.imageHasSizeRegistered(
 						imageIdentifier, width, height)) {
 					// read the scaled image
@@ -684,7 +653,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 								.storeAndAccessScaledImage(hash, width, height,
 										largerImagePath, scaledImageFile,
 										imageIdentifier);
-
 						if (imageStream != null) {
 							return new ImageData(metaData, imageStream);
 						}
@@ -716,7 +684,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		return null;
 	}
 
-	@Override
+	// TODO: move to image application server
 	public InputStream readImages(final String[] imageIdentifiers, int width,
 			final int height, final ReadResponse response) {
 
@@ -811,36 +779,34 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	@Override
-	public boolean appendImageMetaData(final String imageIdentifier,
+	public boolean updateImageMetaData(final String imageIdentifier,
 			final String metaData, final UpdateResponse response) {
-		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
-			JSONObject metaDataJSON = null;
-			try {
-				metaDataJSON = (JSONObject) PARSER.parse(metaData);
-			} catch (final ParseException e) {
-				// error: meta data format invalid
-				response.metaDataMalformed();
-				return false;
-			}
+		JSONObject metaDataJSON = null;
+		try {
+			metaDataJSON = (JSONObject) PARSER.parse(metaData);
+		} catch (final ParseException e) {
+			// error: meta data format invalid
+			response.metaDataMalformed();
+			return false;
+		}
 
-			this.imageMetaDatabase
-					.appendMetadata(imageIdentifier, metaDataJSON);
-			return true;
-		} else {
+		final boolean successFlag = this.imageMetaDatabase.appendMetadata(
+				imageIdentifier, metaDataJSON);
+		if (!successFlag) {
 			// error: no image with such identifier
 			response.imageNotExisting(imageIdentifier);
 		}
 
-		return false;
+		return successFlag;
 	}
 
 	@Override
 	public boolean deleteImage(final String imageIdentifier,
 			final DeleteResponse response) {
-		if (this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
-			final String[] imagePaths = this.imageMetaDatabase
-					.getRegisteredImagePaths(imageIdentifier);
+		final String[] imagePaths = this.imageMetaDatabase
+				.getRegisteredImagePaths(imageIdentifier);
 
+		if (imagePaths != null) {
 			// TODO: do we delete original images?
 			// TODO: IF we do we have to register the path if we do not expect
 			// creation and deletion to happen at the same day
