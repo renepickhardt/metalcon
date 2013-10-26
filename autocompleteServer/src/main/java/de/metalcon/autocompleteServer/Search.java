@@ -28,19 +28,17 @@ public class Search {
 		Properties properties = new Properties();
 		BufferedInputStream stream;
 		try {
-			stream = new BufferedInputStream(new FileInputStream(
-					System.getenv("CATALINA_HOME") + "/autocomplete.conf"));
+			stream = new BufferedInputStream(new FileInputStream("/etc/acs/autocomplete.conf"));
 
 			try {
 				properties.load(stream);
 				stream.close();
 			} catch (IOException e2) {
-				// TODO Auto-generated catch block
 				e2.printStackTrace();
 
 			}
 		} catch (FileNotFoundException e3) {
-			// TODO what should happen if the config-file is missing
+			System.err.println("No config file found! Please make sure /etc/acs/autocomplete.conf exists and is readable!");
 			e3.printStackTrace();
 		}
 		String saveFolder = properties.getProperty("persistency_folder");
@@ -48,12 +46,8 @@ public class Search {
 		try {
 			File saveFile = new File(saveFolder);
 			String[] fileList = saveFile.list();
-
-			for (String element : fileList) {
-				if (element.endsWith(".save")) {
-
-				}
-			}
+			if (fileList == null) {System.out.println(saveFolder + " is either not a directory or an IO-Error occured.");}
+			
 			for (String element : fileList) {
 				if (element.endsWith(".save")) {
 
