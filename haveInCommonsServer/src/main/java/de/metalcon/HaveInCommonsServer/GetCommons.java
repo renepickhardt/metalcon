@@ -21,7 +21,7 @@ public class GetCommons extends HttpServlet{
 	JSONArray jsonArr;
 	String muid1, muid2;
 	int[] foo = {23, 42, 1024, 666};
-		
+			
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response)
