@@ -1,7 +1,7 @@
 package de.metalcon.HaveInCommonsServer;
 
 public enum Vote {
-	UP("VOTE.UP") , DOWN("VOTE.DOWN"), NONE("VOTE.NEUTRAL");
+	UP("VOTE.UP") , DOWN("VOTE.DOWN"), NEUTRAL("VOTE.NEUTRAL");
 	
 	private String name;
 	private Vote(String name){
