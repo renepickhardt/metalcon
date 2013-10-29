@@ -18,7 +18,6 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -31,6 +30,7 @@ import org.junit.Test;
 import de.metalcon.imageStorageServer.ImageData;
 import de.metalcon.imageStorageServer.ImageFrame;
 import de.metalcon.imageStorageServer.ImageStorageServer;
+import de.metalcon.imageStorageServer.ScalingType;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
 import de.metalcon.imageStorageServer.protocol.Response;
 import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
@@ -47,12 +47,6 @@ public class ImageStorageServerTest {
 	private static final String VALID_READ_IDENTIFIER2 = "img2";
 
 	private static final String INVALID_READ_IDENTIFIER = "img0";
-
-	private static final String[] VALID_READ_IDENTIFIERS = {
-			VALID_READ_IDENTIFIER, VALID_READ_IDENTIFIER2 };
-
-	private static final String[] DUPLICATE_READ_IDENTIFIERS = {
-			VALID_READ_IDENTIFIER, VALID_READ_IDENTIFIER };
 
 	private static final String VALID_CREATE_IDENTIFIER = "img3";
 
@@ -234,10 +228,7 @@ public class ImageStorageServerTest {
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
 
-		final String metaData = imageData.getMetaData();
-		final JSONObject metaDataJson = parseToJson(metaData);
-		assertTrue(metaDataJson.isEmpty());
-
+		compareJson(VALID_META_DATA, imageData.getMetaData());
 		this.compareImages(new URL(VALID_IMAGE_URL).openStream(),
 				imageData.getImageStream());
 	}
@@ -261,11 +252,11 @@ public class ImageStorageServerTest {
 	 * dimension passed and exactly the meta data used in the create request
 	 */
 	@Test
-	public void testReadImageScaling() {
+	public void testReadImageScalingFit() {
 		// let the server create a scaled version
 		ImageData imageData = this.server.readScaledImage(
 				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
-				null, this.readResponse);
+				ScalingType.FIT, this.readResponse);
 
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
@@ -286,6 +277,36 @@ public class ImageStorageServerTest {
 				VALID_READ_HEIGHT);
 	}
 
+	@Test
+	public void testReadImageScalingWidth() {
+		// let the server create a scaled version
+		final ImageData imageData = this.server.readScaledImage(
+				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, 0, ScalingType.WIDTH,
+				this.readResponse);
+
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+
+		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
+				0);
+	}
+
+	@Test
+	public void testReadImageScalingHeight() {
+		// let the server create a scaled version
+		final ImageData imageData = this.server.readScaledImage(
+				VALID_READ_IDENTIFIER, 0, VALID_READ_HEIGHT,
+				ScalingType.HEIGHT, this.readResponse);
+
+		assertNotNull(imageData);
+		assertNotNull(imageData.getImageStream());
+		compareJson(VALID_META_DATA, imageData.getMetaData());
+
+		this.checkImageDimension(imageData.getImageStream(), 0,
+				VALID_READ_HEIGHT);
+	}
+
 	/**
 	 * assert the reading to fail if the reading dimension passed is larger than
 	 * the one of the basis image
@@ -302,80 +323,6 @@ public class ImageStorageServerTest {
 		assertEquals(
 				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
 				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
-	}
-
-	// TODO: move to image application server tests
-	@Test
-	public void testReadImages() throws IOException {
-		// let the server create the scaled versions
-		InputStream inputStream = this.server.readImages(
-				VALID_READ_IDENTIFIERS, VALID_READ_WIDTH, VALID_READ_WIDTH,
-				this.readResponse);
-		assertNotNull(inputStream);
-
-		ZipInputStream archiveStream = new ZipInputStream(inputStream);
-
-		int numEntries = 0;
-		while (archiveStream.getNextEntry() != null) {
-			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
-					VALID_READ_HEIGHT);
-
-			numEntries += 1;
-		}
-		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
-
-		// read the scaled versions created before
-		inputStream = this.server.readImages(VALID_READ_IDENTIFIERS,
-				VALID_READ_WIDTH, VALID_READ_WIDTH, this.readResponse);
-		assertNotNull(inputStream);
-
-		archiveStream = new ZipInputStream(inputStream);
-
-		numEntries = 0;
-		while (archiveStream.getNextEntry() != null) {
-			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
-					VALID_READ_HEIGHT);
-
-			numEntries += 1;
-		}
-		assertEquals(VALID_READ_IDENTIFIERS.length, numEntries);
-	}
-
-	// TODO: move to image application server tests
-	@Test
-	public void testReadImagesWithDuplicate() throws IOException {
-		// let the server create the scaled versions
-		InputStream inputStream = this.server.readImages(
-				DUPLICATE_READ_IDENTIFIERS, VALID_READ_WIDTH, VALID_READ_WIDTH,
-				this.readResponse);
-		assertNotNull(inputStream);
-
-		ZipInputStream archiveStream = new ZipInputStream(inputStream);
-
-		int numEntries = 0;
-		while (archiveStream.getNextEntry() != null) {
-			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
-					VALID_READ_HEIGHT);
-
-			numEntries += 1;
-		}
-		assertEquals(DUPLICATE_READ_IDENTIFIERS.length, numEntries);
-
-		// read the scaled versions created before
-		inputStream = this.server.readImages(DUPLICATE_READ_IDENTIFIERS,
-				VALID_READ_WIDTH, VALID_READ_WIDTH, this.readResponse);
-		assertNotNull(inputStream);
-
-		archiveStream = new ZipInputStream(inputStream);
-
-		numEntries = 0;
-		while (archiveStream.getNextEntry() != null) {
-			this.checkImageDimension(archiveStream, VALID_READ_WIDTH,
-					VALID_READ_HEIGHT);
-
-			numEntries += 1;
-		}
-		assertEquals(DUPLICATE_READ_IDENTIFIERS.length, numEntries);
 	}
 
 	@Test
@@ -441,13 +388,17 @@ public class ImageStorageServerTest {
 	 * @param height
 	 *            expected height
 	 */
-	private void checkImageDimension(final InputStream imageStream,
-			final int width, final int height) {
+	private void checkImageDimension(final InputStream imageStream, int width,
+			int height) {
 		try {
 			final BufferedImage image = ImageIO.read(imageStream);
 
-			assertEquals(width, image.getWidth());
-			assertEquals(height, image.getHeight());
+			if (width != 0) {
+				assertEquals(width, image.getWidth());
+			}
+			if (height != 0) {
+				assertEquals(height, image.getHeight());
+			}
 		} catch (final IOException e) {
 			fail("IO exception occurred!");
 		}

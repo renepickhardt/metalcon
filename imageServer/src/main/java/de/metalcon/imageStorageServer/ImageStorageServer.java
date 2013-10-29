@@ -1,8 +1,6 @@
 package de.metalcon.imageStorageServer;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,8 +14,6 @@ import java.net.UnknownHostException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import magick.CompressionType;
 import magick.ImageInfo;
@@ -264,6 +260,64 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	}
 
 	/**
+	 * check if the cropping information are valid within the image's boundary
+	 * 
+	 * @param image
+	 *            image that will get cropped
+	 * @param croppingInformation
+	 *            new image frame
+	 * @param response
+	 *            create response object for status messages
+	 * @return true - if the cropping information are valid<br>
+	 *         false - otherwise
+	 * @throws MagickException
+	 *             if the image dimension could not be accessed
+	 */
+	private static boolean checkCroppingInformation(final MagickImage image,
+			final ImageFrame croppingInformation, final CreateResponse response)
+			throws MagickException {
+		final int imageWidth = (int) image.getDimension().getWidth();
+		final int imageHeight = (int) image.getDimension().getHeight();
+		final int left = croppingInformation.getLeft();
+		final int top = croppingInformation.getTop();
+		final int width = croppingInformation.getWidth();
+		final int height = croppingInformation.getHeight();
+
+		// TODO: use more specific error messages
+
+		if (left < 0) {
+			// left too low
+			response.cropLeftCoordinateInvalid(left);
+		} else if (left >= imageWidth) {
+			// left too high
+			response.cropLeftCoordinateInvalid(left);
+		} else if (top < 0) {
+			// top too low
+			response.cropTopCoordinateInvalid(top);
+		} else if (top >= imageHeight) {
+			// top too high
+			response.cropTopCoordinateInvalid(top);
+		} else if (width <= 0) {
+			// width too low
+			response.cropWidthInvalid(width);
+		} else if ((left + width) > imageWidth) {
+			// width too high
+			response.cropWidthInvalid(width);
+		} else if (height <= 0) {
+			// height too low
+			response.cropHeightInvalid(height);
+		} else if ((top + height) > imageHeight) {
+			// height too high
+			response.cropHeightInvalid(height);
+		} else {
+			return true;
+		}
+
+		// cropping information invalid
+		return false;
+	}
+
+	/**
 	 * crop an image
 	 * 
 	 * @param image
@@ -277,17 +331,13 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 * @param height
 	 *            target height
 	 * @return cropped image<br>
-	 *         <b>null</b> if the cropping failed
+	 * @throws MagickException
+	 *             if the cropping failed
 	 */
 	private static MagickImage cropImage(final MagickImage image,
-			final int left, final int top, final int width, final int height) {
-		try {
-			return image.cropImage(new Rectangle(left, top, width, height));
-		} catch (final MagickException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+			final int left, final int top, final int width, final int height)
+			throws MagickException {
+		return image.cropImage(new Rectangle(left, top, width, height));
 	}
 
 	/**
@@ -299,18 +349,33 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	 *            target width
 	 * @param height
 	 *            target height
-	 * @return scaled image<br>
-	 *         <b>null</b> if the scaling failed
+	 * @param scalingType
+	 *            scaling type
+	 * @return scaled image
+	 * @throws MagickException
+	 *             if the scaling failed
 	 */
-	private static MagickImage scaleImage(final MagickImage image,
-			final int width, final int height) {
-		try {
-			return image.scaleImage(width, height);
-		} catch (final MagickException e) {
-			e.printStackTrace();
+	private static MagickImage scaleImage(final MagickImage image, int width,
+			int height, final ScalingType scalingType) throws MagickException {
+
+		switch (scalingType) {
+
+		case WIDTH:
+			height = (int) ((image.getDimension().getHeight() / image
+					.getDimension().getWidth()) * width);
+			break;
+
+		case HEIGHT:
+			width = (int) ((image.getDimension().getWidth() / image
+					.getDimension().getHeight()) * height);
+			break;
+
+		default:
+			// width and height have the values desired
+
 		}
 
-		return null;
+		return image.scaleImage(width, height);
 	}
 
 	/**
@@ -406,46 +471,70 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			}
 
+			// store and try to load original image
+			MagickImage image = null;
 			try {
-				// store and try to load original image
-				MagickImage image = this.storeAndLoadImage(hash, imageStream);
+				image = this.storeAndLoadImage(hash, imageStream);
+			} catch (final MagickException e) {
+				// error: image invalid
+				response.imageStreamInvalid();
+				return false;
+			} catch (final IOException e) {
+				// internal server error: failed to store original image
+				response.internalServerError();
+				e.printStackTrace();
+				return false;
+			}
 
-				if (image != null) {
-					if (autoRotate) {
+			if (image != null) {
+				if (autoRotate) {
+					try {
 						image = autoRotate(image);
+					} catch (final MagickException e) {
+						// internal server error: rotation failed
+						response.internalServerError();
+						System.err
+								.println(ProtocolConstants.LogMessage.ROTATION_FAILURE);
+						return false;
 					}
+				}
 
-					// store basis version
-					final File basisFile = this.getBasisFile(hash);
+				// store basis version
+				final File basisFile = this.getBasisFile(hash);
+				try {
 					storeCompressedImage(image, basisFile);
+				} catch (final MagickException e) {
+					// TODO: internal server error: compression/writing failed
+					response.internalServerError();
+					return false;
+				}
 
-					// create image in database
-					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-							metaDataJSON);
+				// create image in database
+				this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+						metaDataJSON);
 
-					// register basis size
+				// register basis size
+				try {
 					final int width = (int) image.getDimension().getWidth();
 					final int height = (int) image.getDimension().getHeight();
 					this.imageMetaDatabase.registerImageSize(imageIdentifier,
 							width, height, basisFile.getAbsolutePath());
 
 					return true;
-				} else {
-					// internal server error: hash collision
-					response.internalServerError();
-					System.err
-							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
-				}
-			} catch (final MagickException e) {
-				// error: image invalid
-				response.imageStreamInvalid();
-			} catch (final IOException e) {
-				// internal server error: failed to store image(s)
-				response.internalServerError();
-				e.printStackTrace();
-			}
 
+				} catch (final MagickException e) {
+					// TODO: internal server error: failed to access image
+					// dimension
+					response.internalServerError();
+					return false;
+				}
+			} else {
+				// internal server error: hash collision
+				response.internalServerError();
+				System.err.println(ProtocolConstants.LogMessage.HASH_COLLISION);
+			}
 		} else {
+			// error: image identifier used
 			response.imageIdentifierInUse(imageIdentifier);
 		}
 
@@ -470,53 +559,79 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			}
 
+			// store and try to load original image
+			MagickImage image = null;
 			try {
-				// store and try to load original image
-				MagickImage image = this.storeAndLoadImage(hash, imageStream);
-
-				if (image != null) {
-					// crop the image
-					image = cropImage(image, croppingInformation.getLeft(),
-							croppingInformation.getTop(),
-							croppingInformation.getWidth(),
-							croppingInformation.getHeight());
-
-					if (image != null) {
-						// store basis version
-						final File basisFile = this.getBasisFile(hash);
-						storeCompressedImage(image, basisFile);
-
-						// create image in database
-						this.imageMetaDatabase.addDatabaseEntry(
-								imageIdentifier, metaDataJSON);
-
-						// register basis size
-						this.imageMetaDatabase.registerImageSize(
-								imageIdentifier,
-								croppingInformation.getWidth(),
-								croppingInformation.getHeight(),
-								basisFile.getAbsolutePath());
-
-						return true;
-					}
-
-					response.internalServerError();
-					System.err
-							.println(ProtocolConstants.LogMessage.CROPPING_FAILURE);
-				} else {
-					response.internalServerError();
-					System.err
-							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
-				}
+				image = this.storeAndLoadImage(hash, imageStream);
 			} catch (final MagickException e) {
 				// error: image invalid
 				response.imageStreamInvalid();
+				return false;
 			} catch (final IOException e) {
-				// internal server error: failed to store image(s)
+				// internal server error: failed to store original image
 				response.internalServerError();
 				e.printStackTrace();
+				return false;
+			}
+
+			if (image != null) {
+				// check the cropping information and add error messages
+				boolean croppingInformationValid = false;
+				try {
+					croppingInformationValid = checkCroppingInformation(image,
+							croppingInformation, response);
+				} catch (final MagickException e) {
+					// TODO: internal server error: failed to access image
+					// dimension
+					response.internalServerError();
+					return false;
+				}
+
+				if (croppingInformationValid) {
+					// crop the image
+					try {
+						image = cropImage(image, croppingInformation.getLeft(),
+								croppingInformation.getTop(),
+								croppingInformation.getWidth(),
+								croppingInformation.getHeight());
+					} catch (final MagickException e) {
+						// internal server error: cropping failed
+						response.internalServerError();
+						System.err
+								.println(ProtocolConstants.LogMessage.CROPPING_FAILURE);
+						return false;
+					}
+
+					// store basis version
+					final File basisFile = this.getBasisFile(hash);
+					try {
+						storeCompressedImage(image, basisFile);
+					} catch (final MagickException e) {
+						// TODO: internal server error: compression/writing
+						// failed
+						response.internalServerError();
+						return false;
+					}
+
+					// create image in database
+					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+							metaDataJSON);
+
+					// register basis size
+					this.imageMetaDatabase.registerImageSize(imageIdentifier,
+							croppingInformation.getWidth(),
+							croppingInformation.getHeight(),
+							basisFile.getAbsolutePath());
+
+					return true;
+				}
+			} else {
+				// internal server error: hash collision between originals
+				response.internalServerError();
+				System.err.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 			}
 		} else {
+			// error: image identifier used
 			response.imageIdentifierInUse(imageIdentifier);
 		}
 
@@ -528,7 +643,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			final String imageUrl, final String metaData,
 			final CreateResponse response) {
 		if (!this.imageMetaDatabase.hasEntryWithIdentifier(imageIdentifier)) {
-
 			final String hash = generateHash(imageIdentifier);
 			final File tmpImageFile = this.getTemporaryFile(hash);
 
@@ -543,45 +657,66 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				}
 			}
 
+			URL url = null;
 			try {
-				// download and store original image
-				final URL url = new URL(imageUrl);
-				final MagickImage image = this.storeAndLoadImage(hash,
-						url.openStream());
+				url = new URL(imageUrl);
+			} catch (final MalformedURLException e) {
+				// error: no valid URL
+				response.imageUrlMalformed(imageUrl);
+				return false;
+			}
 
-				if (image != null) {
-					// store basis version
-					final File basisFile = this.getBasisFile(hash);
+			// download and store original image
+			MagickImage image = null;
+			try {
+				image = this.storeAndLoadImage(hash, url.openStream());
+			} catch (final MagickException e) {
+				// TODO: check what happens if an URL throws 404/is invalid
+				// error: no image file
+				response.imageUrlInvalid(imageUrl);
+				tmpImageFile.delete();
+				return false;
+			} catch (final IOException e) {
+				// internal server error: failed to store image(s)
+				response.internalServerError();
+				return false;
+			}
+
+			if (image != null) {
+				// store basis version
+				final File basisFile = this.getBasisFile(hash);
+				try {
 					storeCompressedImage(image, basisFile);
+				} catch (final MagickException e) {
+					// TODO: internal server error: compression/writing
+					// failed
+					response.internalServerError();
+					return false;
+				}
 
-					// create image in database
-					this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
-							metaDataJSON);
+				// create image in database
+				this.imageMetaDatabase.addDatabaseEntry(imageIdentifier,
+						metaDataJSON);
 
-					// register basis size
+				// register basis size
+				try {
 					final int width = (int) image.getDimension().getWidth();
 					final int height = (int) image.getDimension().getHeight();
 					this.imageMetaDatabase.registerImageSize(imageIdentifier,
 							width, height, basisFile.getAbsolutePath());
 
 					return true;
-				} else {
-					// internal server error: hash collision
+
+				} catch (final MagickException e) {
+					// TODO: internal server error: failed to access image
+					// dimension
 					response.internalServerError();
-					System.err
-							.println(ProtocolConstants.LogMessage.HASH_COLLISION);
+					return false;
 				}
-			} catch (final MalformedURLException e) {
-				// error: no valid URL
-				response.imageUrlMalformed(imageUrl);
-			} catch (final MagickException e) {
-				// TODO: check what happens if an URL throws 404/is invalid
-				// error: no image file
-				response.imageUrlInvalid(imageUrl);
-				tmpImageFile.delete();
-			} catch (final IOException e) {
-				// internal server error: failed to store image(s)
+			} else {
+				// internal server error: hash collision
 				response.internalServerError();
+				System.err.println(ProtocolConstants.LogMessage.HASH_COLLISION);
 			}
 		} else {
 			// error: image identifier in use
@@ -594,11 +729,12 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	@Override
 	public ImageData readOriginalImage(final String imageIdentifier,
 			final ReadResponse response) {
-		final String hash = generateHash(imageIdentifier);
 		final String metaData = this.imageMetaDatabase
 				.getMetadata(imageIdentifier);
 
 		if (metaData != null) {
+			final String hash = generateHash(imageIdentifier);
+
 			try {
 				// return the original image
 				return new ImageData(metaData, new FileInputStream(
@@ -619,7 +755,25 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 	@Override
 	public ImageData readImage(final String imageIdentifier,
 			final ReadResponse response) {
-		// TODO: implement or remove from API
+		final String metaData = this.imageMetaDatabase
+				.getMetadata(imageIdentifier);
+
+		if (metaData != null) {
+			final String hash = generateHash(imageIdentifier);
+
+			try {
+				return new ImageData(metaData, new FileInputStream(
+						this.getBasisFile(hash)));
+			} catch (final FileNotFoundException e) {
+				// internal server error: file not found
+				response.internalServerError();
+				e.printStackTrace();
+			}
+		} else {
+			// error: no image with such identifier
+			response.addImageNotFoundError();
+		}
+
 		return null;
 	}
 
@@ -649,17 +803,44 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 									height);
 
 					if (largerImagePath != null) {
-						final InputStream imageStream = this
-								.storeAndAccessScaledImage(hash, width, height,
-										largerImagePath, scaledImageFile,
-										imageIdentifier);
-						if (imageStream != null) {
-							return new ImageData(metaData, imageStream);
+						MagickImage basicImage = null;
+						try {
+							basicImage = new MagickImage(new ImageInfo(
+									largerImagePath));
+						} catch (final MagickException e) {
+							// TODO: internal server error: failed to load basis
+							// image
+							response.internalServerError();
+							return null;
 						}
 
-						response.internalServerError();
-						System.err
-								.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
+						MagickImage image = null;
+						try {
+							image = scaleImage(basicImage, width, height,
+									scalingType);
+						} catch (final MagickException e) {
+							// internal server error: scaling failed
+							response.internalServerError();
+							System.err
+									.println(ProtocolConstants.LogMessage.SCALING_FAILURE);
+							return null;
+						}
+
+						try {
+							storeCompressedImage(image, scaledImageFile);
+							this.imageMetaDatabase.registerImageSize(
+									imageIdentifier, width, height,
+									scaledImageFile.getAbsolutePath());
+						} catch (final MagickException e) {
+							// TODO: internal server error: compression/writing
+							// failed
+							response.internalServerError();
+							return null;
+						}
+
+						return new ImageData(metaData, new FileInputStream(
+								scaledImageFile));
+
 					} else {
 						response.addGeometryBiggerThanOriginalWarning();
 
@@ -672,107 +853,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				// internal server error: file not found
 				response.internalServerError();
 				e.printStackTrace();
-			} catch (final MagickException e) {
-				// internal server error: failed to load/scale/store image
-				response.internalServerError();
-				e.printStackTrace();
 			}
 		} else {
+			// error: no image with such identifier
 			response.addImageNotFoundError();
-		}
-
-		return null;
-	}
-
-	// TODO: move to image application server
-	public InputStream readImages(final String[] imageIdentifiers, int width,
-			final int height, final ReadResponse response) {
-
-		boolean succeeded = true;
-		try {
-			final ByteArrayOutputStream memoryOutputStream = new ByteArrayOutputStream();
-			final ZipOutputStream archiveStream = new ZipOutputStream(
-					memoryOutputStream);
-
-			// no ZIP compression while JPEG is already compressed
-			archiveStream.setLevel(ZipOutputStream.STORED);
-
-			ZipEntry zipEntry;
-			try {
-				for (String imageIdentifier : imageIdentifiers) {
-					final String hash = generateHash(imageIdentifier);
-					if (this.imageMetaDatabase
-							.hasEntryWithIdentifier(imageIdentifier)) {
-						final File scaledImageFile = this.getScaledFile(hash,
-								width, height);
-
-						zipEntry = new ZipEntry(imageIdentifier);
-						archiveStream.putNextEntry(zipEntry);
-
-						if (this.imageMetaDatabase.imageHasSizeRegistered(
-								imageIdentifier, width, height)) {
-							// add scaled image
-							IOUtils.copy(new FileInputStream(scaledImageFile),
-									archiveStream);
-						} else {
-							// try to create the scaled version
-							final String largerImagePath = this.imageMetaDatabase
-									.getSmallestImagePath(imageIdentifier,
-											width, height);
-							if (largerImagePath != null) {
-								// add scaled image
-								IOUtils.copy(this.storeAndAccessScaledImage(
-										hash, width, height, largerImagePath,
-										scaledImageFile, imageIdentifier),
-										archiveStream);
-							} else {
-								response.addGeometryBiggerThanOriginalWarning();
-
-								// add basis image
-								IOUtils.copy(
-										new FileInputStream(this
-												.getBasisFile(hash)),
-										archiveStream);
-							}
-						}
-
-						archiveStream.closeEntry();
-
-					} else {
-						response.addImageNotFoundError();
-						succeeded = false;
-						break;
-					}
-				}
-			} catch (final FileNotFoundException e) {
-				// internal server error: file not found
-				response.internalServerError();
-				e.printStackTrace();
-				succeeded = false;
-			} catch (final IOException e) {
-				// internal server error: failed to write to archive stream
-				response.internalServerError();
-				System.err
-						.println(ProtocolConstants.LogMessage.ARCHIVE_STREAM_WRITING_FAILED);
-				e.printStackTrace();
-				succeeded = false;
-			} catch (final MagickException e) {
-				// internal server error: failed to load/scale/store image
-				response.internalServerError();
-				e.printStackTrace();
-				succeeded = false;
-			}
-
-			archiveStream.close();
-
-			if (succeeded) {
-				return new ByteArrayInputStream(
-						memoryOutputStream.toByteArray());
-			}
-		} catch (final IOException e) {
-			// internal server error: failed to create archive
-			response.internalServerError();
-			e.printStackTrace();
 		}
 
 		return null;
@@ -931,46 +1015,6 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		}
 
 		// collision between original image files
-		return null;
-	}
-
-	/**
-	 * store and access a scaled image
-	 * 
-	 * @param hash
-	 *            image identifier hash
-	 * @param width
-	 *            target width
-	 * @param height
-	 *            target height
-	 * @param basisImagePath
-	 *            path to the basic version for scaling
-	 * @param imageFile
-	 *            file handle to the scaled image version that shall be created
-	 * @param imageIdentifier
-	 *            image identifier
-	 * @return input stream of the scaled image<br>
-	 *         <b>null</b> if the scaling failed
-	 * @throws MagickException
-	 *             if the basis image could not be loaded
-	 * @throws FileNotFoundException
-	 *             if the image was not found
-	 */
-	private InputStream storeAndAccessScaledImage(final String hash,
-			final int width, final int height, final String basisImagePath,
-			final File imageFile, final String imageIdentifier)
-			throws MagickException, FileNotFoundException {
-		final MagickImage image = scaleImage(new MagickImage(new ImageInfo(
-				basisImagePath)), width, height);
-
-		if (image != null) {
-			storeCompressedImage(image, imageFile);
-			this.imageMetaDatabase.registerImageSize(imageIdentifier, width,
-					height, imageFile.getAbsolutePath());
-
-			return new FileInputStream(imageFile);
-		}
-
 		return null;
 	}
 

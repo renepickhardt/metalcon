@@ -146,6 +146,7 @@ public class ProtocolConstants {
 
 		// TODO: improve log messages
 		public static final String HASH_COLLISION = "Hash collision occured";
+		public static final String ROTATION_FAILURE = "Rotation failed";
 		public static final String CROPPING_FAILURE = "Cropping failed";
 		public static final String SCALING_FAILURE = "Scaling failed";
 		public static final String ARCHIVE_STREAM_WRITING_FAILED = "Writing the archive stream failed";
