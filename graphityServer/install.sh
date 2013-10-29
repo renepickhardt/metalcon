@@ -47,5 +47,10 @@ cache_type = strong
 # Sets the HTTP header \"Access-Control-Allow-Origin\".
 headerAccessControl = *" > /etc/graphity/graphity.conf
 
+echo "<class name=\"Plain\" version=\"1.0\">
+  <param name=\"message\" type=\"String\" />
+</class>" > /etc/graphity/templates/Plain.xml
+
+
 # set directory permissions
 chown -R tomcat.tomcat /etc/graphity/
