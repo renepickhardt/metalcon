@@ -316,7 +316,7 @@ public class ImageStorageServerTest {
 		final ImageData imageData = this.server.readScaledImage(
 				VALID_READ_IDENTIFIER, INVALID_READ_WIDTH_TOO_LARGE,
 				INVALID_READ_HEIGHT_TOO_LARGE, null, this.readResponse);
-		assertNull(imageData);
+		assertNotNull(imageData);
 
 		// check for status message
 		this.jsonResponse = extractJson(this.readResponse);
