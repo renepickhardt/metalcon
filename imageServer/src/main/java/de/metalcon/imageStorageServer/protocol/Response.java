@@ -15,6 +15,11 @@ public abstract class Response {
 	 */
 	protected int statusCode;
 
+	/**
+	 * request error flag
+	 */
+	protected boolean requestError;
+
 	// response JSON object
 	protected final JSONObject json;
 
@@ -39,6 +44,7 @@ public abstract class Response {
 			final String solution) {
 		this.json.put(ProtocolConstants.SOLUTION, solution);
 		this.json.put(ProtocolConstants.STATUS_MESSAGE, statusMessage);
+		this.requestError = true;
 	}
 
 	/**
@@ -53,6 +59,13 @@ public abstract class Response {
 			final String solution) {
 		this.addStatusMessage("request incomplete: parameter \"" + paramName
 				+ "\" is missing", solution);
+	}
+
+	/**
+	 * @return request error flag
+	 */
+	public boolean getRequestErrorFlag() {
+		return this.requestError;
 	}
 
 	/**

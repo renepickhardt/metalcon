@@ -8,11 +8,11 @@ package de.metalcon.imageStorageServer;
  */
 public class ImageFrame {
 
-	private final int left;
-	private final int top;
+	private int left;
+	private int top;
 
-	private final int width;
-	private final int height;
+	private int width;
+	private int height;
 
 	/**
 	 * create a new image frame
@@ -41,11 +41,19 @@ public class ImageFrame {
 		return this.left;
 	}
 
+	public void setLeft(final int left) {
+		this.left = left;
+	}
+
 	/**
 	 * @return distance to upper border specifying where the image begins
 	 */
 	public int getTop() {
 		return this.top;
+	}
+
+	public void setTop(final int top) {
+		this.top = top;
 	}
 
 	/**
@@ -55,11 +63,19 @@ public class ImageFrame {
 		return this.width;
 	}
 
+	public void setWidth(final int width) {
+		this.width = width;
+	}
+
 	/**
 	 * @return height of the image frame
 	 */
 	public int getHeight() {
 		return this.height;
+	}
+
+	public void setHeight(final int height) {
+		this.height = height;
 	}
 
 }

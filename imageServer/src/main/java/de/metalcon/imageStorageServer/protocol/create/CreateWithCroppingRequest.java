@@ -93,7 +93,7 @@ public class CreateWithCroppingRequest {
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
-				if (metaData != null) {
+				if ((metaData != null) || !response.getRequestErrorFlag()) {
 					final Integer top = checkTop(formItemList, response);
 					if (top != null) {
 						final Integer left = checkLeft(formItemList, response);
@@ -170,7 +170,8 @@ public class CreateWithCroppingRequest {
 	 * 
 	 * @param formItemList
 	 * @param response
-	 * @return String metaData if valid, else null
+	 * @return valid meta data<br>
+	 *         <b>null</b> if field missing or malformed
 	 */
 	protected static String checkMetaData(final FormItemList formItemList,
 			final CreateResponse response) {
@@ -184,7 +185,7 @@ public class CreateWithCroppingRequest {
 				response.metaDataMalformed();
 			}
 		} catch (final IllegalArgumentException e) {
-			response.metaDataMissing();
+			// optional meta data missing
 		}
 
 		return null;
@@ -210,7 +211,8 @@ public class CreateWithCroppingRequest {
 					return top;
 				}
 
-				response.cropTopCoordinateInvalid(top);
+				response.cropTopCoordinateInvalid(top,
+						"Value must be equal to or greater than zero.");
 
 			} catch (final NumberFormatException e) {
 				response.cropTopCoordinateMalformed(sTop);
@@ -242,7 +244,8 @@ public class CreateWithCroppingRequest {
 					return left;
 				}
 
-				response.cropLeftCoordinateInvalid(left);
+				response.cropLeftCoordinateInvalid(left,
+						"Value must be equal to or greater than zero.");
 
 			} catch (final NumberFormatException e) {
 				response.cropLeftCoordinateMalformed(sLeft);
@@ -274,7 +277,8 @@ public class CreateWithCroppingRequest {
 					return width;
 				}
 
-				response.cropWidthInvalid(width);
+				response.cropWidthInvalid(width,
+						"Value must be greater than zero.");
 
 			} catch (final NumberFormatException e) {
 				response.cropWidthMalformed(sWidth);
@@ -306,7 +310,8 @@ public class CreateWithCroppingRequest {
 					return height;
 				}
 
-				response.cropHeightInvalid(height);
+				response.cropHeightInvalid(height,
+						"Value must be greater than zero.");
 
 			} catch (final NumberFormatException e) {
 				response.cropHeightMalformed(sHeight);

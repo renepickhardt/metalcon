@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -25,20 +24,21 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.metalcon.imageServer.protocol.RequestTest;
 import de.metalcon.imageStorageServer.ImageData;
 import de.metalcon.imageStorageServer.ImageFrame;
 import de.metalcon.imageStorageServer.ImageStorageServer;
 import de.metalcon.imageStorageServer.ScalingType;
 import de.metalcon.imageStorageServer.protocol.ProtocolConstants;
-import de.metalcon.imageStorageServer.protocol.Response;
 import de.metalcon.imageStorageServer.protocol.create.CreateResponse;
 import de.metalcon.imageStorageServer.protocol.delete.DeleteResponse;
 import de.metalcon.imageStorageServer.protocol.read.ReadResponse;
 import de.metalcon.imageStorageServer.protocol.update.UpdateResponse;
 
-public class ImageStorageServerTest {
+public class ImageStorageServerTest extends RequestTest {
 
 	private static final JSONParser PARSER = new JSONParser();
 
@@ -64,6 +64,8 @@ public class ImageStorageServerTest {
 
 	private static final String VALID_IMAGE_URL = "http://mos.totalfilm.com/images/6/6-original-casting-ideas-for-the-a-team.jpg";
 
+	private static final String INVALID_IMAGE_URL = "http://en.wikipedia.org/wiki/Sign_%28mathematics%29";
+
 	private static final int VALID_CROPPING_LEFT = 100;
 
 	private static final int VALID_CROPPING_TOP = 100;
@@ -71,6 +73,18 @@ public class ImageStorageServerTest {
 	private static final int VALID_CROPPING_WIDTH = 200;
 
 	private static final int VALID_CROPPING_HEIGHT = 200;
+
+	private static final int INVALID_CROPPING_LEFT_TOO_LOW = -1;
+	private static int INVALID_CROPPING_LEFT_TOO_HIGH;
+
+	private static final int INVALID_CROPPING_TOP_TOO_LOW = -1;
+	private static int INVALID_CROPPING_TOP_TOO_HIGH;
+
+	private static final int INVALID_CROPPING_WIDTH_TOO_LOW = 0;
+	private static int INVALID_CROPPING_WIDTH_TOO_HIGH;
+
+	private static final int INVALID_CROPPING_HEIGHT_TOO_LOW = 0;
+	private static int INVALID_CROPPING_HEIGHT_TOO_HIGH;
 
 	private static final int VALID_READ_WIDTH = 200;
 
@@ -82,9 +96,9 @@ public class ImageStorageServerTest {
 
 	private static final String VALID_UPDATE_META_DATA = "{ \"author\": \"Komissar Kugelblitz\" }";
 
-	private ImageStorageServer server;
+	private static double IMAGE_WIDTH, IMAGE_HEIGHT;
 
-	private JSONObject jsonResponse;
+	private ImageStorageServer server;
 
 	private CreateResponse createResponse;
 
@@ -93,6 +107,19 @@ public class ImageStorageServerTest {
 	private UpdateResponse updateResponse;
 
 	private DeleteResponse deleteResponse;
+
+	@BeforeClass
+	public static void beforeClass() throws FileNotFoundException, IOException {
+		BufferedImage image = ImageIO.read(new FileInputStream(
+				VALID_IMAGE_PATH_JPEG));
+		IMAGE_WIDTH = image.getWidth();
+		IMAGE_HEIGHT = image.getHeight();
+
+		INVALID_CROPPING_LEFT_TOO_HIGH = image.getWidth();
+		INVALID_CROPPING_TOP_TOO_HIGH = image.getHeight();
+		INVALID_CROPPING_WIDTH_TOO_HIGH = (image.getWidth() - VALID_CROPPING_LEFT) + 1;
+		INVALID_CROPPING_HEIGHT_TOO_HIGH = (image.getHeight() - VALID_CROPPING_TOP) + 1;
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -124,10 +151,9 @@ public class ImageStorageServerTest {
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, false,
 				this.createResponse));
-		this.jsonResponse = extractJson(this.createResponse);
-		assertEquals(
-				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE);
 	}
 
 	@Test
@@ -139,10 +165,9 @@ public class ImageStorageServerTest {
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_PNG, VALID_META_DATA, false,
 				this.createResponse));
-		this.jsonResponse = extractJson(this.createResponse);
-		assertEquals(
-				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE);
 	}
 
 	@Test
@@ -156,10 +181,9 @@ public class ImageStorageServerTest {
 		assertFalse(this.server.createImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, INVALID_META_DATA, false,
 				this.createResponse));
-		this.jsonResponse = extractJson(this.createResponse);
-		assertEquals(
-				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED);
 	}
 
 	@Test
@@ -170,17 +194,131 @@ public class ImageStorageServerTest {
 	}
 
 	@Test
-	public void testCreateImageCropping() {
+	public void testCreateCroppedImage() {
 		assertTrue(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, new ImageFrame(
 						VALID_CROPPING_LEFT, VALID_CROPPING_TOP,
 						VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT),
 				this.createResponse));
+
 		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, new ImageFrame(
 						VALID_CROPPING_LEFT, VALID_CROPPING_TOP,
 						VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT),
 				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE);
+	}
+
+	@Test
+	public void testCreateCroppedImageLeftTooLow() {
+		final ImageFrame frame = new ImageFrame(INVALID_CROPPING_LEFT_TOO_LOW,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageLeftTooHigh() {
+		final ImageFrame frame = new ImageFrame(INVALID_CROPPING_LEFT_TOO_HIGH,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageTopTooLow() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				INVALID_CROPPING_TOP_TOO_LOW, VALID_CROPPING_WIDTH,
+				VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageTopTooHigh() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				INVALID_CROPPING_TOP_TOO_HIGH, VALID_CROPPING_WIDTH,
+				VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageWidthTooLow() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, INVALID_CROPPING_WIDTH_TOO_LOW,
+				VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageWidthTooHigh() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, INVALID_CROPPING_WIDTH_TOO_HIGH,
+				VALID_CROPPING_HEIGHT);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageHeightTooLow() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
+				INVALID_CROPPING_HEIGHT_TOO_LOW);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID);
+	}
+
+	@Test
+	public void testCreateCroppedImageHeightTooHigh() {
+		final ImageFrame frame = new ImageFrame(VALID_CROPPING_LEFT,
+				VALID_CROPPING_TOP, VALID_CROPPING_WIDTH,
+				INVALID_CROPPING_HEIGHT_TOO_HIGH);
+
+		assertFalse(this.server.createCroppedImage(VALID_CREATE_IDENTIFIER,
+				VALID_IMAGE_STREAM_JPEG, VALID_META_DATA, frame,
+				this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID);
 	}
 
 	/**
@@ -190,6 +328,15 @@ public class ImageStorageServerTest {
 	public void testCreateImageFromUrl() {
 		assertTrue(this.server.createImageFromUrl(VALID_CREATE_IDENTIFIER,
 				VALID_IMAGE_URL, VALID_META_DATA, this.createResponse));
+	}
+
+	@Test
+	public void testCreateImageFromUrlInvalid() {
+		assertFalse(this.server.createImageFromUrl(VALID_CREATE_IDENTIFIER,
+				INVALID_IMAGE_URL, VALID_META_DATA, this.createResponse));
+
+		this.extractJson(this.createResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Create.IMAGE_URL_INVALID);
 	}
 
 	/**
@@ -241,10 +388,8 @@ public class ImageStorageServerTest {
 		assertNull(this.server.readOriginalImage(INVALID_READ_IDENTIFIER,
 				this.readResponse));
 
-		// check for status message
-		this.jsonResponse = extractJson(this.readResponse);
-		assertEquals(ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+		this.extractJson(this.readResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND);
 	}
 
 	/**
@@ -263,7 +408,7 @@ public class ImageStorageServerTest {
 		compareJson(VALID_META_DATA, imageData.getMetaData());
 
 		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
-				VALID_READ_HEIGHT);
+				VALID_READ_HEIGHT, ScalingType.FIT);
 
 		// read the scaled version created before again
 		imageData = this.server.readScaledImage(VALID_READ_IDENTIFIER,
@@ -274,29 +419,29 @@ public class ImageStorageServerTest {
 		compareJson(VALID_META_DATA, imageData.getMetaData());
 
 		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
-				VALID_READ_HEIGHT);
+				VALID_READ_HEIGHT, ScalingType.FIT);
 	}
 
 	@Test
 	public void testReadImageScalingWidth() {
 		// let the server create a scaled version
 		final ImageData imageData = this.server.readScaledImage(
-				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, 0, ScalingType.WIDTH,
-				this.readResponse);
+				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
+				ScalingType.WIDTH, this.readResponse);
 
 		assertNotNull(imageData);
 		assertNotNull(imageData.getImageStream());
 		compareJson(VALID_META_DATA, imageData.getMetaData());
 
 		this.checkImageDimension(imageData.getImageStream(), VALID_READ_WIDTH,
-				0);
+				0, ScalingType.WIDTH);
 	}
 
 	@Test
 	public void testReadImageScalingHeight() {
 		// let the server create a scaled version
 		final ImageData imageData = this.server.readScaledImage(
-				VALID_READ_IDENTIFIER, 0, VALID_READ_HEIGHT,
+				VALID_READ_IDENTIFIER, VALID_READ_WIDTH, VALID_READ_HEIGHT,
 				ScalingType.HEIGHT, this.readResponse);
 
 		assertNotNull(imageData);
@@ -304,7 +449,7 @@ public class ImageStorageServerTest {
 		compareJson(VALID_META_DATA, imageData.getMetaData());
 
 		this.checkImageDimension(imageData.getImageStream(), 0,
-				VALID_READ_HEIGHT);
+				VALID_READ_HEIGHT, ScalingType.HEIGHT);
 	}
 
 	/**
@@ -318,11 +463,8 @@ public class ImageStorageServerTest {
 				INVALID_READ_HEIGHT_TOO_LARGE, null, this.readResponse);
 		assertNotNull(imageData);
 
-		// check for status message
-		this.jsonResponse = extractJson(this.readResponse);
-		assertEquals(
-				ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+		this.extractJson(this.readResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.GEOMETRY_BIGGER_THAN_ORIGINAL);
 	}
 
 	@Test
@@ -347,15 +489,18 @@ public class ImageStorageServerTest {
 	public void testAppendMetaDataInvalidIdentifier() {
 		assertFalse(this.server.updateImageMetaData(INVALID_READ_IDENTIFIER,
 				VALID_UPDATE_META_DATA, this.updateResponse));
-		this.jsonResponse = extractJson(this.updateResponse);
-		assertEquals(ProtocolConstants.StatusMessage.Update.IMAGE_NOT_EXISTING,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+		this.extractJson(this.updateResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Update.IMAGE_NOT_EXISTING);
 	}
 
 	@Test
 	public void testAppendMetaDataInvalidMetaData() {
 		assertFalse(this.server.updateImageMetaData(VALID_READ_IDENTIFIER,
 				INVALID_META_DATA, this.updateResponse));
+
+		this.extractJson(this.updateResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Update.META_DATA_MALFORMED);
 	}
 
 	@Test
@@ -365,9 +510,9 @@ public class ImageStorageServerTest {
 
 		assertFalse(this.server.deleteImage(VALID_READ_IDENTIFIER,
 				this.deleteResponse));
-		this.jsonResponse = extractJson(this.deleteResponse);
-		assertEquals(ProtocolConstants.StatusMessage.Delete.IMAGE_NOT_EXISTING,
-				this.jsonResponse.get(ProtocolConstants.STATUS_MESSAGE));
+
+		this.extractJson(this.deleteResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Delete.IMAGE_NOT_EXISTING);
 	}
 
 	@Test
@@ -376,6 +521,9 @@ public class ImageStorageServerTest {
 
 		assertNull(this.server.readOriginalImage(VALID_READ_IDENTIFIER,
 				this.readResponse));
+
+		this.extractJson(this.readResponse);
+		this.checkForStatusMessage(ProtocolConstants.StatusMessage.Read.NO_IMAGE_FOUND);
 	}
 
 	/**
@@ -387,18 +535,31 @@ public class ImageStorageServerTest {
 	 *            expected width
 	 * @param height
 	 *            expected height
+	 * @param scalingType
+	 *            scaling type being checked
 	 */
 	private void checkImageDimension(final InputStream imageStream, int width,
-			int height) {
+			int height, final ScalingType scalingType) {
 		try {
 			final BufferedImage image = ImageIO.read(imageStream);
 
-			if (width != 0) {
-				assertEquals(width, image.getWidth());
+			if (scalingType == ScalingType.WIDTH) {
+				height = (int) ((width * IMAGE_HEIGHT) / IMAGE_WIDTH);
+			} else if (scalingType == ScalingType.HEIGHT) {
+				width = (int) ((height * IMAGE_WIDTH) / IMAGE_HEIGHT);
+			} else if (scalingType == ScalingType.FIT) {
+				double ratioWidth = width / IMAGE_WIDTH;
+				double ratioHeight = height / IMAGE_HEIGHT;
+
+				if (ratioWidth <= ratioHeight) {
+					height *= ratioWidth;
+				} else {
+					width *= ratioHeight;
+				}
 			}
-			if (height != 0) {
-				assertEquals(height, image.getHeight());
-			}
+
+			assertEquals(width, image.getWidth());
+			assertEquals(height, image.getHeight());
 		} catch (final IOException e) {
 			fail("IO exception occurred!");
 		}
@@ -470,25 +631,6 @@ public class ImageStorageServerTest {
 		}
 
 		return null;
-	}
-
-	/**
-	 * extract the JSON object from the response, failing the test if this is
-	 * not possible
-	 * 
-	 * @param response
-	 *            NSSP response
-	 * @return JSON object in the response passed
-	 */
-	private static JSONObject extractJson(final Response response) {
-		try {
-			final Field field = Response.class.getDeclaredField("json");
-			field.setAccessible(true);
-			return (JSONObject) field.get(response);
-		} catch (final Exception e) {
-			fail("failed to extract the JSON object from class Response");
-			return null;
-		}
 	}
 
 }

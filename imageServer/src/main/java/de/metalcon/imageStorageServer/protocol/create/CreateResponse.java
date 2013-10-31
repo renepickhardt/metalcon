@@ -6,85 +6,50 @@ import de.metalcon.imageStorageServer.protocol.Response;
 /**
  * Response class for any type of ISS create request
  * 
- * @author Christian Schowalter
+ * @author Sebastian Schlicht, Christian Schowalter
  * 
  */
 public class CreateResponse extends Response {
 
-	// TODO: write helpful solution messages for missing parameters!
 	// TODO: JavaDoc
 
-	/**
-	 * Adds an error message for missing image identifier parameter to the
-	 * response.
-	 */
+	private static final String SUPPORTED_FORMATS = "JPEG, PNG";
+
 	public void imageIdentifierMissing() {
 		this.parameterMissing(
 				ProtocolConstants.Parameters.Create.IMAGE_IDENTIFIER,
-				"The image identifier is missing. Please deliver one");
+				"Please provide an image identifier that is not used yet.");
 	}
 
-	/**
-	 * Adds an error message about the requested image identifier already being
-	 * in use to the response.
-	 */
 	public void imageIdentifierInUse(final String imageIdentifier) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_IDENTIFIER_IN_USE,
 				"There is already an image using the identifier \""
 						+ imageIdentifier
-						+ "\". Please provide another one that is not used yet.");
+						+ "\". Please provide an unused image identifier.");
 	}
 
-	/**
-	 * Adds an error message for missing image stream to the response.
-	 */
 	public void imageStreamMissing() {
 		this.parameterMissing(ProtocolConstants.Parameters.Create.IMAGE_STREAM,
-				"The image stream is missing. Please deliver one");
+				"Please provide a stream of an image having one of the formats supported. ("
+						+ SUPPORTED_FORMATS + ")");
 	}
 
-	/**
-	 * Adds an error message for an invalid image stream to the response.
-	 */
 	public void imageStreamInvalid() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_STREAM_INVALID,
-				"The image stream passed is no valid image stream. Please provide a stream of an image encoded in one of the formats supported.");
+				"The stream passed is not a supported image stream. Please provide a stream of an image having one of the formats supported. ("
+						+ SUPPORTED_FORMATS + ")");
 	}
 
-	/**
-	 * Adds an error message for missing auto rotate flag to the response.
-	 */
-	public void autoRotateFlagMissing() {
-		this.parameterMissing(
-				ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG,
-				"The autoRotate flag is missing. Please deliver one");
-	}
-
-	/**
-	 * Adds an error message for a malformed auto rotate flag String to the
-	 * response.
-	 */
 	public void autoRotateFlagMalformed(final String autoRotateFlag) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.AUTOROTATE_FLAG_MALFORMED,
 				"\""
 						+ autoRotateFlag
-						+ "\" is not a number. Please provide a number such as \"1\" to enable or \"0\" to disable automatic rotation.");
+						+ "\" is not a flag value. Please pass \"1\" to enable automatic rotation, pass \"0\" or leave the field blank if you do not want to use automatic rotation.");
 	}
 
-	/**
-	 * Adds an error message for missing meta data to the response.
-	 */
-	public void metaDataMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.META_DATA,
-				"The image meta data is missing. Please deliver some");
-	}
-
-	/**
-	 * Adds an error message for a malformed meta data String to the response.
-	 */
 	public void metaDataMalformed() {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.META_DATA_MALFORMED,
@@ -92,42 +57,35 @@ public class CreateResponse extends Response {
 	}
 
 	public void imageUrlMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.URL,
-				"The image URL is missing. Please deliver one");
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Create.URL,
+				"An URL is needed to locate the image you want to create. Please pass an URL referring to an image having one of the formats supported. ("
+						+ SUPPORTED_FORMATS + ")");
 
 	}
 
-	/**
-	 * Adds an error message for a malformed URL to the response. This means the
-	 * URL can't be parsed correctly.
-	 */
 	public void imageUrlMalformed(final String imageUrl) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_URL_MALFORMED,
 				"\""
 						+ imageUrl
-						+ "\" is not a valid URL. Please provide a valid URL referring to an image.");
+						+ "\" is not an URL. Please pass an URL referring to an image having one of the formats supported. ("
+						+ SUPPORTED_FORMATS + ")");
 	}
 
-	/**
-	 * Adds an error message for an invalid URL to the response. This refers to
-	 * the URL not leading to an image file.
-	 */
 	public void imageUrlInvalid(final String imageUrl) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.IMAGE_URL_INVALID,
 				"The URL \""
 						+ imageUrl
-						+ "\" does not lead to an existing image. Please provide an URL that referrs to an image encoded in one of the formats supported.");
+						+ "\" does not lead to a valid image. Please pass an URL referring to an image having one of the formats supported. ("
+						+ SUPPORTED_FORMATS + ")");
 	}
 
-	/**
-	 * Adds an error message for missing left cropping coordinate parameter to
-	 * the response.
-	 */
 	public void cropLeftCoordinateMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_LEFT,
-				"The cropping coordinate left is missing. Please deliver one");
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Create.CROP_LEFT,
+				"The distance to the left border of the image is needed to place the cropping frame. Please provide a non-negative number being less than the image width.");
 	}
 
 	/**
@@ -142,27 +100,19 @@ public class CreateResponse extends Response {
 				"\""
 						+ left
 						+ "\" is not a number."
-						+ " Please provide a number to specify the left cropping coordinate.");
+						+ " Please provide a number to specify the distance to the left border of the image.");
 	}
 
-	/**
-	 * Adds an error message for invalid left cropping coordinate parameter to
-	 * the response.
-	 */
-	public void cropLeftCoordinateInvalid(int left) {
+	public void cropLeftCoordinateInvalid(final int left, final String solution) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_LEFT_INVALID,
-				"The left-hand cropping coordinate is" + left
-						+ ". This value should be greater or equals 0");
+				solution);
 	}
 
-	/**
-	 * Adds an error message for missing top cropping coordinate parameter to
-	 * the response.
-	 */
 	public void cropTopCoordinateMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_TOP,
-				"The cropping coordinate top is missing. Please deliver one");
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Create.CROP_TOP,
+				"The distance to the upper border of the image is needed to place the cropping frame. Please provide a non-negative number being less than the image height.");
 	}
 
 	/**
@@ -177,27 +127,19 @@ public class CreateResponse extends Response {
 				"\""
 						+ top
 						+ "\" is not a number."
-						+ " Please provide a number to specify the upper cropping coordinate.");
+						+ " Please provide a number to specify the distance to the upper border of the image.");
 	}
 
-	/**
-	 * Adds an error message for invalid top cropping coordinate parameter to
-	 * the response.
-	 */
-	public void cropTopCoordinateInvalid(int top) {
+	public void cropTopCoordinateInvalid(final int top, final String solution) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_TOP_INVALID,
-				"The top side cropping coordinate is" + top
-						+ ". This value should be greater or equals 0");
+				solution);
 	}
 
-	/**
-	 * Adds an error message for missing cropping width parameter to the
-	 * response.
-	 */
 	public void cropWidthMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_WIDTH,
-				"The cropping width is missing. Please deliver one");
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Create.CROP_WIDTH,
+				"The width of the cropping frame is needed. Please provide a number greater than zero being valid within the image boundary.");
 	}
 
 	/**
@@ -212,28 +154,19 @@ public class CreateResponse extends Response {
 				"\""
 						+ width
 						+ "\" is not a number."
-						+ " Please provide a number to specify the cropping width.");
+						+ " Please provide a number to specify the width of the cropping frame.");
 	}
 
-	/**
-	 * Adds an error message for invalid cropping width parameter to the
-	 * response.
-	 */
-	public void cropWidthInvalid(int width) {
+	public void cropWidthInvalid(final int width, final String solution) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_WIDTH_INVALID,
-				"The top side cropping coordinate is" + width
-						+ ". This value should be greater or equals 0");
-
+				solution);
 	}
 
-	/**
-	 * Adds an error message for missing cropping height parameter to the
-	 * response.
-	 */
 	public void cropHeightMissing() {
-		this.parameterMissing(ProtocolConstants.Parameters.Create.CROP_HEIGHT,
-				"The cropping height is missing. Please deliver one");
+		this.parameterMissing(
+				ProtocolConstants.Parameters.Create.CROP_HEIGHT,
+				"The height of the cropping frame is needed. Please provide a number greater than zero being valid within the image boundary.");
 	}
 
 	/**
@@ -248,18 +181,13 @@ public class CreateResponse extends Response {
 				"\""
 						+ height
 						+ "\" is not a number."
-						+ " Please provide a number to specify the cropping height.");
+						+ " Please provide a number to specify the height of the cropping frame.");
 	}
 
-	/**
-	 * Adds an error message for invalid cropping height parameter to the
-	 * response.
-	 */
-	public void cropHeightInvalid(int height) {
+	public void cropHeightInvalid(final int height, final String solution) {
 		this.addStatusMessage(
 				ProtocolConstants.StatusMessage.Create.CROP_HEIGHT_INVALID,
-				"The top side cropping coordinate is" + height
-						+ ". This value should be greater or equals 0");
+				solution);
 
 	}
 

@@ -146,10 +146,12 @@ public class ProtocolConstants {
 
 		// TODO: improve log messages
 		public static final String HASH_COLLISION = "Hash collision occured";
+		public static final String DIMENSION_ACCESS_FAILURE = "Dimension access failed";
+		public static final String COMPRESSION_FAILURE = "Compression/writing failed";
+		public static final String BASIS_IMAGE_LOADING_FAILURE = "Loading of the basis image failed";
 		public static final String ROTATION_FAILURE = "Rotation failed";
 		public static final String CROPPING_FAILURE = "Cropping failed";
 		public static final String SCALING_FAILURE = "Scaling failed";
-		public static final String ARCHIVE_STREAM_WRITING_FAILED = "Writing the archive stream failed";
 
 	}
 

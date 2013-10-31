@@ -283,32 +283,41 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 		final int width = croppingInformation.getWidth();
 		final int height = croppingInformation.getHeight();
 
-		// TODO: use more specific error messages
-
 		if (left < 0) {
 			// left too low
-			response.cropLeftCoordinateInvalid(left);
+			response.cropLeftCoordinateInvalid(left,
+					"Value must be equal to or greater than zero.");
 		} else if (left >= imageWidth) {
 			// left too high
-			response.cropLeftCoordinateInvalid(left);
+			response.cropLeftCoordinateInvalid(left,
+					"Value must be less than the image width.  (< "
+							+ imageWidth + ")");
 		} else if (top < 0) {
 			// top too low
-			response.cropTopCoordinateInvalid(top);
+			response.cropTopCoordinateInvalid(top,
+					"Value must be equal to or greater than zero.");
 		} else if (top >= imageHeight) {
 			// top too high
-			response.cropTopCoordinateInvalid(top);
+			response.cropTopCoordinateInvalid(top,
+					"Value must be less than the image height. (< "
+							+ imageHeight + ")");
 		} else if (width <= 0) {
 			// width too low
-			response.cropWidthInvalid(width);
+			response.cropWidthInvalid(width, "Value must be greater than zero.");
 		} else if ((left + width) > imageWidth) {
 			// width too high
-			response.cropWidthInvalid(width);
+			response.cropWidthInvalid(width,
+					"Value must be valid within the image boundary. (<= "
+							+ (imageWidth - left) + ")");
 		} else if (height <= 0) {
 			// height too low
-			response.cropHeightInvalid(height);
+			response.cropHeightInvalid(height,
+					"Value must be greater than zero.");
 		} else if ((top + height) > imageHeight) {
 			// height too high
-			response.cropHeightInvalid(height);
+			response.cropHeightInvalid(height,
+					"Value must be valid within the image boundary. (<= "
+							+ (imageHeight - top) + ")");
 		} else {
 			return true;
 		}
@@ -360,6 +369,20 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 		switch (scalingType) {
 
+		case FIT:
+			double ratioWidth = width / image.getDimension().getWidth();
+			double ratioHeight = height / image.getDimension().getHeight();
+			double ratio = 1;
+
+			if (ratioWidth <= ratioHeight) {
+				ratio = ratioWidth;
+				height *= ratio;
+			} else {
+				ratio = ratioHeight;
+				width *= ratio;
+			}
+			break;
+
 		case WIDTH:
 			height = (int) ((image.getDimension().getHeight() / image
 					.getDimension().getWidth()) * width);
@@ -371,7 +394,8 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			break;
 
 		default:
-			// width and height have the values desired
+			throw new IllegalArgumentException("scaling type \"" + scalingType
+					+ "\" not implemented!");
 
 		}
 
@@ -504,8 +528,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				try {
 					storeCompressedImage(image, basisFile);
 				} catch (final MagickException e) {
-					// TODO: internal server error: compression/writing failed
+					// internal server error: compression/writing failed
 					response.internalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.COMPRESSION_FAILURE);
 					return false;
 				}
 
@@ -523,8 +549,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					return true;
 
 				} catch (final MagickException e) {
-					// TODO: internal server error: failed to access image
-					// dimension
+					// internal server error: failed to access image dimension
+					System.err
+							.println(ProtocolConstants.LogMessage.DIMENSION_ACCESS_FAILURE);
 					response.internalServerError();
 					return false;
 				}
@@ -581,8 +608,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					croppingInformationValid = checkCroppingInformation(image,
 							croppingInformation, response);
 				} catch (final MagickException e) {
-					// TODO: internal server error: failed to access image
-					// dimension
+					// internal server error: failed to access image dimension
+					System.err
+							.println(ProtocolConstants.LogMessage.DIMENSION_ACCESS_FAILURE);
 					response.internalServerError();
 					return false;
 				}
@@ -607,9 +635,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					try {
 						storeCompressedImage(image, basisFile);
 					} catch (final MagickException e) {
-						// TODO: internal server error: compression/writing
-						// failed
+						// internal server error: compression/writing failed
 						response.internalServerError();
+						System.err
+								.println(ProtocolConstants.LogMessage.COMPRESSION_FAILURE);
 						return false;
 					}
 
@@ -667,11 +696,21 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			}
 
 			// download and store original image
+			InputStream imageStream = null;
+
+			try {
+				imageStream = url.openStream();
+			} catch (final IOException e) {
+				// error: URL not accessible
+				response.imageUrlInvalid(imageUrl);
+				return false;
+			}
+
 			MagickImage image = null;
 			try {
-				image = this.storeAndLoadImage(hash, url.openStream());
+				image = this.storeAndLoadImage(hash, imageStream);
 			} catch (final MagickException e) {
-				// TODO: check what happens if an URL throws 404/is invalid
+				// TODO: check what happens if an URL throws 404
 				// error: no image file
 				response.imageUrlInvalid(imageUrl);
 				tmpImageFile.delete();
@@ -688,9 +727,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 				try {
 					storeCompressedImage(image, basisFile);
 				} catch (final MagickException e) {
-					// TODO: internal server error: compression/writing
-					// failed
+					// internal server error: compression/writing failed
 					response.internalServerError();
+					System.err
+							.println(ProtocolConstants.LogMessage.COMPRESSION_FAILURE);
 					return false;
 				}
 
@@ -708,8 +748,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 					return true;
 
 				} catch (final MagickException e) {
-					// TODO: internal server error: failed to access image
-					// dimension
+					// internal server error: failed to access image dimension
+					System.err
+							.println(ProtocolConstants.LogMessage.DIMENSION_ACCESS_FAILURE);
 					response.internalServerError();
 					return false;
 				}
@@ -808,8 +849,9 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 							basicImage = new MagickImage(new ImageInfo(
 									largerImagePath));
 						} catch (final MagickException e) {
-							// TODO: internal server error: failed to load basis
-							// image
+							// internal server error: failed to load basis image
+							System.err
+									.println(ProtocolConstants.LogMessage.BASIS_IMAGE_LOADING_FAILURE);
 							response.internalServerError();
 							return null;
 						}
@@ -832,9 +874,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 									imageIdentifier, width, height,
 									scaledImageFile.getAbsolutePath());
 						} catch (final MagickException e) {
-							// TODO: internal server error: compression/writing
-							// failed
+							// internal server error: compression/writing failed
 							response.internalServerError();
+							System.err
+									.println(ProtocolConstants.LogMessage.COMPRESSION_FAILURE);
 							return null;
 						}
 
@@ -892,7 +935,7 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 
 		if (imagePaths != null) {
 			// TODO: do we delete original images?
-			// TODO: IF we do we have to register the path if we do not expect
+			// IF we do we have to register the path if we do not expect
 			// creation and deletion to happen at the same day
 
 			// delete all image versions registered
@@ -994,6 +1037,10 @@ public class ImageStorageServer implements ImageStorageServerAPI {
 			try {
 				final MagickImage originalImage = new MagickImage(
 						new ImageInfo(tmpFile.getAbsolutePath()));
+				if ((originalImage.getDimension().getWidth() <= 0)
+						|| (originalImage.getDimension().getHeight() <= 0)) {
+					// check if this an image
+				}
 
 				// save the original image to the disk
 				tmpInputStream = new FileInputStream(tmpFile);

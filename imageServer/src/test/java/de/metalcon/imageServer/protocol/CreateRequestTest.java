@@ -126,11 +126,11 @@ public class CreateRequestTest extends RequestTest {
 	}
 
 	@Test
-	public void testAutorotateFlagMissing() {
+	public void testAutorotateFlagMissing() throws IOException {
 		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG,
-				ProtocolTestConstants.VALID_IMAGE_METADATA, null);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
-		assertNull(this.createRequest);
+				VALID_CREATE_META_DATA, null);
+		assertNotNull(this.createRequest);
+		assertEquals(false, this.createRequest.isAutoRotateFlag());
 	}
 
 	@Test
@@ -145,8 +145,8 @@ public class CreateRequestTest extends RequestTest {
 	public void testImageMetadataMissing() {
 		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG, null,
 				VALID_AUTOROTATE_FLAG_TRUE);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
-		assertNull(this.createRequest);
+		assertNotNull(this.createRequest);
+		assertNull(this.createRequest.getMetaData());
 	}
 
 	@Test

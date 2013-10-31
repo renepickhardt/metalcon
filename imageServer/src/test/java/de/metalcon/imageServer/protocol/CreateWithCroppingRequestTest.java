@@ -139,8 +139,8 @@ public class CreateWithCroppingRequestTest extends RequestTest {
 		this.fillRequest(VALID_IDENTIFIER, VALID_IMAGE_ITEM_JPEG, null,
 				VALID_CROPPING_WIDTH, VALID_CROPPING_HEIGHT,
 				VALID_CROPPING_LEFT_COORDINATE, VALID_CROPPING_TOP_COORDINATE);
-		this.checkForMissingParameterMessage(ProtocolConstants.Parameters.Create.META_DATA);
-		assertNull(this.createWithCroppingRequest);
+		assertNotNull(this.createWithCroppingRequest);
+		assertNull(this.createWithCroppingRequest.getMetaData());
 	}
 
 	@Test

@@ -71,7 +71,7 @@ public class CreateRequest {
 					response);
 			if (imageStream != null) {
 				final String metaData = checkMetaData(formItemList, response);
-				if (metaData != null) {
+				if ((metaData != null) || !response.getRequestErrorFlag()) {
 					final Boolean autoRotateFlag = checkAutoRotateFlag(
 							formItemList, response);
 					if (autoRotateFlag != null) {
@@ -144,13 +144,16 @@ public class CreateRequest {
 		try {
 			final String autoRotateFlag = formItemList
 					.getField(ProtocolConstants.Parameters.Create.AUTOROTATE_FLAG);
-			try {
-				return (Integer.parseInt(autoRotateFlag) != 0);
-			} catch (final NumberFormatException e) {
+
+			if ("1".equals(autoRotateFlag)) {
+				return true;
+			} else if ("0".equals(autoRotateFlag)) {
+				return false;
+			} else {
 				response.autoRotateFlagMalformed(autoRotateFlag);
 			}
 		} catch (final IllegalArgumentException e) {
-			response.autoRotateFlagMissing();
+			return false;
 		}
 
 		return null;
@@ -162,24 +165,23 @@ public class CreateRequest {
 	 * 
 	 * @param formItemList
 	 * @param response
-	 * @return String metaData if valid, else null
+	 * @return valid meta data<br>
+	 *         <b>null</b> if field missing or malformed
 	 */
 	protected static String checkMetaData(final FormItemList formItemList,
 			final CreateResponse response) {
 		try {
 			final String metaData = formItemList
 					.getField(ProtocolConstants.Parameters.Create.META_DATA);
+
 			try {
 				PARSER.parse(metaData);
 				return metaData;
-
-				// FIXME: ParseException is also thrown when (metadata == null),
-				// so metaDataMissing() is never added to response
 			} catch (final ParseException e) {
 				response.metaDataMalformed();
 			}
 		} catch (final IllegalArgumentException e) {
-			response.metaDataMissing();
+			// optional meta data is missing
 		}
 
 		return null;
