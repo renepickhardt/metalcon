@@ -11,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import de.metalcon.HaveInCommonsServer.Like;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +29,7 @@ public class LikeTest {
 	@Before
 	public void init(){
 		this.request = mock(HttpServletRequest.class);
-		HttpServlet servlet = mock(HttpServlet.class);
+		Like servlet = mock(Like.class);
 		when(this.servletConfig.getServletContext()).thenReturn(
 				this.servletContext);
 		
@@ -58,7 +60,7 @@ public class LikeTest {
 			if(!valid)
 				valid &= request.getParameterMap().get("vote")[0] == Vote.DOWN.getString();
 			if(!valid)
-				valid &= request.getParameterMap().get("vote")[0] == Vote.NONE.getString();
+				valid &= request.getParameterMap().get("vote")[0] == Vote.NEUTRAL.getString();
 		}
 		assertTrue(valid);
 	}

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.metalcon.HaveInCommonsServer.helper.ProtocolConstants;
+import de.metalcon.HaveInCommonsServer.helper.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
@@ -27,8 +27,7 @@ public class GetLikedLikes extends HttpServlet{
 	int[] foo = {23, 42, 1024, 666};
 		
 	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response)
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException{
 		muid = request.getParameter("muid");
 		if(StringUtils.isNotBlank(request.getParameter("timestamp")))
