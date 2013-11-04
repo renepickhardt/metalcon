@@ -5,6 +5,32 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>HaveInCommonsServer</name>
   <description>Server frontend for HaveInCommons Service</description>
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.0</version>
+            <configuration>
+                <source>1.7</source>
+                <target>1.7</target>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.3</version>
+            <configuration>
+               <webResources>
+                  <resource>
+                     <directory>tomcat/</directory>
+                     <targetPath>WEB-INF</targetPath>
+                  </resource>
+               </webResources>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
   <dependencies>
   	<dependency>
   		<groupId>org.mockito</groupId>
@@ -29,28 +55,3 @@
   	</dependency>
   </dependencies>
 </project>
- <build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.0</version>
-            <configuration>
-                <source>1.7</source>
-                <target>1.7</target>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-                <webXml>tomcat\WEB-INF\web.xml</webXml>
-            </configuration>
-        </plugin>
-    </plugins>
-  </build>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
