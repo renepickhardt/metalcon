@@ -9,6 +9,8 @@ import java.util.Set;
 import de.metalcon.sdd.error.InvalidConfigException;
 
 public abstract class Config {
+    
+    // TODO: check if attrs are valid names (not id, not type, not starts with json-)
 
     private String leveldbPath;
     
@@ -75,7 +77,7 @@ public abstract class Config {
         return entities.get(type);
     }
     
-    public boolean isValidEntity(String type) {
+    public boolean isValidEntityType(String type) {
         return entities.containsKey(type);
     }
     
@@ -96,7 +98,7 @@ public abstract class Config {
                 MetaType attrType = entity.getAttr(attrName);
                 
                 if (!attrType.isPrimitive() &&
-                    !isValidEntity(attrType.getType()))
+                    !isValidEntityType(attrType.getType()))
                     throw new InvalidConfigException("invalid attr type \"" + attrType.getType() + "\" for attr \"" + attrName + "\" on entity type \"" + type + "\"");
             }
             

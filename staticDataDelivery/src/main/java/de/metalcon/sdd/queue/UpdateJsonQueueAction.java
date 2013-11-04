@@ -2,18 +2,23 @@ package de.metalcon.sdd.queue;
 
 import java.io.IOException;
 
+import de.metalcon.sdd.Entity;
 import de.metalcon.sdd.Sdd;
+import de.metalcon.sdd.error.InvalidTypeException;
 
-public class UpdateJsonQueueAction<T> extends QueueAction<T> {
+public class UpdateJsonQueueAction extends QueueAction {
     
-    public UpdateJsonQueueAction(Sdd<T> sdd, T id) {
-        super(sdd, id);
+    private Entity entity;
+    
+    public UpdateJsonQueueAction(Sdd sdd, Entity entity) {
+        super(sdd, entity.getId());
+        this.entity = entity;
     }
     
     @Override
-    public void runQueueAction() throws IOException {
-        System.out.println("UpdateJsonQueueAction");
-        sdd.actionUpdateJson(id);
+    public void runQueueAction()
+    throws IOException, InvalidTypeException {
+        sdd.actionUpdateJson(entity);
     }
     
     @Override
@@ -21,7 +26,7 @@ public class UpdateJsonQueueAction<T> extends QueueAction<T> {
         int hash = 91241;
         int mult = 251;
         
-        hash = hash*mult + id.hashCode();
+        hash = hash*mult + ((Long) id).hashCode();
         
         return hash;
     }

@@ -3,9 +3,8 @@ package de.metalcon.sdd;
 import java.util.concurrent.BlockingQueue;
 
 import de.metalcon.sdd.queue.QueueAction;
-import de.metalcon.sddServer.error.SddError;
 
-public class Worker<T> implements Runnable {
+public class Worker implements Runnable {
     
     private Thread thread;
     
@@ -15,9 +14,9 @@ public class Worker<T> implements Runnable {
     
     private boolean busy;
     
-    private BlockingQueue<QueueAction<T>> queue;
+    private BlockingQueue<QueueAction> queue;
     
-    public Worker(BlockingQueue<QueueAction<T>> queue) {
+    public Worker(BlockingQueue<QueueAction> queue) {
         if (queue == null)
             throw new IllegalArgumentException("queue was null");
         
@@ -32,7 +31,7 @@ public class Worker<T> implements Runnable {
         running = true;
         
         try {
-            QueueAction<T> queueAction = null;
+            QueueAction queueAction = null;
             while (!stopping) {
                 try {
                     busy = false;

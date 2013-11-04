@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import de.metalcon.sdd.config.Config;
 import de.metalcon.sdd.config.FileConfig;
+import de.metalcon.sdd.error.InvalidAttrNameException;
 import de.metalcon.sdd.error.InvalidConfigException;
 
 public class FileConfigTest {
@@ -16,7 +17,7 @@ public class FileConfigTest {
     private Config config;
     
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidAttrNameException {
         config = new FileConfig(Paths.get("test/fileConfigTest.xml"));
     }
 
@@ -42,6 +43,7 @@ public class FileConfigTest {
         assertNotNull(config.getEntity("entity0"));
         assertNotNull(config.getEntity("entity1"));
         assertNotNull(config.getEntity("entity2"));
+        assertNotNull(config.getEntity("entity3"));
         assertNull(config.getEntity("invalidentity"));
     }
     

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.metalcon.sdd.error.InvalidAttrNameException;
+
 public class MetaEntity {
     
     private Map<String, MetaType> attrs;
@@ -28,7 +30,17 @@ public class MetaEntity {
         return attrs.containsKey(name);
     }
     
-    public void addAttr(String name, MetaType type) {
+    public void addAttr(String name, String type)
+    throws InvalidAttrNameException {
+        addAttr(name, new MetaType(type));
+    }
+    
+    public void addAttr(String name, MetaType type)
+    throws InvalidAttrNameException {
+        if (name.equals("id") ||
+            name.equals("type") ||
+            name.startsWith("json-"))
+            throw new InvalidAttrNameException();
         attrs.put(name, type);
     }
     
@@ -42,6 +54,18 @@ public class MetaEntity {
     
     public void addOutput(String detail, MetaEntityOutput output) {
         outputs.put(detail, output);
+    }
+    
+    public boolean dependsOn(String type, Set<String> modifiedDetails) {
+        for (MetaEntityOutput output : outputs.values())
+            for (String oattrName : output.getOattrs()) {
+                String   oattrDetail = output.getOattr(oattrName);
+                MetaType oattrType   = attrs.get(oattrName);
+                if (type.equals(oattrType.getType())
+                        && modifiedDetails.contains(oattrDetail))
+                    return true;
+            }
+        return false;
     }
     
 }

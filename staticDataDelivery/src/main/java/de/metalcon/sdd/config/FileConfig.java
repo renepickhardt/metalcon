@@ -12,15 +12,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import de.metalcon.sdd.error.InvalidAttrNameException;
+
 public class FileConfig extends Config {
 
-    public FileConfig(Path configPath) {
+    public FileConfig(Path configPath) throws InvalidAttrNameException {
         super();
         
         xmlLoad(configPath);
     }
     
-    private void xmlLoad(Path configPath) {
+    private void xmlLoad(Path configPath) throws
+            InvalidAttrNameException {
         Document domDoc = null;
         try {
             domDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -88,20 +91,22 @@ public class FileConfig extends Config {
         addDetail(name);
     }
     
-    private void xmlLoadEntities(Element domEntities) {
+    private void xmlLoadEntities(Element domEntities) throws
+            InvalidAttrNameException {
         for (Node domNode = domEntities.getFirstChild(); domNode != null;
                 domNode = domNode.getNextSibling())
             if (domNode.getNodeType() == Node.ELEMENT_NODE)
                 xmlLoadEntity((Element) domNode);
     }
     
-    private void xmlLoadEntity(Element domEntity) {
+    private void xmlLoadEntity(Element domEntity) throws
+            InvalidAttrNameException {
         xmlAssertNodeName(domEntity, "entity");
         xmlAssertHasAttribute(domEntity, "type");
         
         String type = domEntity.getAttribute("type");
         
-        if (isValidEntity(type))
+        if (isValidEntityType(type))
             // TODO: handle this (duplicate entities)
             throw new RuntimeException();
         
@@ -129,7 +134,8 @@ public class FileConfig extends Config {
         addEntity(type, entity);
     }
     
-    private void xmlLoadEntityAttr(MetaEntity entity, Element domAttr) {
+    private void xmlLoadEntityAttr(MetaEntity entity, Element domAttr) throws
+            InvalidAttrNameException {
         xmlAssertNodeName(domAttr, "attr");
         xmlAssertHasAttribute(domAttr, "name");
         xmlAssertHasAttribute(domAttr, "type");

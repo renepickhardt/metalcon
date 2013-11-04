@@ -29,5 +29,34 @@
     </entity>
     <entity type="entity2">
     </entity>
+    <entity type="entity3">
+      <attr name="attr3" type="entity1[]"/>
+      <output detail="detail0">
+        <oattr attr="attr3" detail="detail1"/>
+      </output>
+    </entity>
+    
+    <entity type="cross1">
+      <attr name="title" type="String"/>
+      <attr name="elem" type="cross2"/>
+      <output detail="detail0">
+        <oattr attr="title"/>
+        <oattr attr="elem" detail="detail1"/>
+      </output>
+      <output detail="detail1">
+        <oattr attr="title"/>
+      </output>
+    </entity>
+    <entity type="cross2">
+      <attr name="title" type="String"/>
+      <attr name="elem" type="cross1"/>
+      <output detail="detail0">
+        <oattr attr="title"/>
+        <oattr attr="elem" detail="detail1"/>
+      </output>
+      <output detail="detail1">
+        <oattr attr="title"/>
+      </output>
+    </entity>
   </entities>
 </sdd-config>
