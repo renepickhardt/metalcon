@@ -40,7 +40,7 @@ public class SddMetalconPersistentTest {
     
     @Test
     public void testExampleSetUp()
-    throws InvalidTypeException, InvalidAttrException, InvalidDetailException {
+    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException {
         int run = 1;
         
         if (run == 1) {
