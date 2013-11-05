@@ -122,7 +122,7 @@ public class SddTest {
     
     @Test
     public void testCreateRead()
-    throws InvalidDetailException, InvalidTypeException, InvalidAttrException {
+    throws InvalidDetailException, InvalidTypeException, InvalidAttrException, IOException {
         Map<String, String> attrs = new HashMap<String, String>();
         attrs.put("attr0", "YOLO");
         sdd.updateEntity(1L, "entity0", attrs);
@@ -132,7 +132,7 @@ public class SddTest {
     
     @Test
     public void testCreateCrossReference()
-    throws InvalidTypeException, InvalidAttrException, InvalidDetailException {
+    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException {
         Map<String, String> cross1 = new HashMap<String, String>();
         cross1.put("title", "foo");
         Map<String, String> cross1n = new HashMap<String, String>();
@@ -143,7 +143,9 @@ public class SddTest {
         sdd.updateEntity(51L, "cross1", cross1);
         sdd.updateEntity(52L, "cross2", cross2);
         sdd.updateRelationship(51L, "cross1", "elem", 52L);
+        sdd.waitUntilQueueEmpty();
         sdd.updateRelationship(52L, "cross2", "elem", 51L);
+        sdd.waitUntilQueueEmpty();
         sdd.updateEntity(51L, "cross1", cross1n);
         sdd.waitUntilQueueEmpty();
         

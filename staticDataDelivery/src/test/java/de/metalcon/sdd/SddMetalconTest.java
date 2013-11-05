@@ -99,7 +99,7 @@ public class SddMetalconTest {
     
     @Test
     public void testExampleSetUp()
-    throws InvalidTypeException, InvalidAttrException, InvalidDetailException {
+    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException {
         Map<String, String> ensiferum = new HashMap<String, String>();
         ensiferum.put("name", "Ensiferum");
         Map<String, String> iron = new HashMap<String, String>();
@@ -112,6 +112,8 @@ public class SddMetalconTest {
         laiLaiHei.put("name", "Lai Lai Hei");
         Map<String, String> ahti = new HashMap<String, String>();
         ahti.put("name", "Ahti");
+        
+        long t1 = System.currentTimeMillis();
         
         sdd.updateEntity(31L, "Band", ensiferum);
         sdd.updateEntity(32L, "Record", iron);
@@ -133,6 +135,9 @@ public class SddMetalconTest {
         sdd.updateRelationship(35L, "Track", "record", 33L);
         
         sdd.waitUntilQueueEmpty();
+        
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1);
         
         System.out.println(JsonPrettyPrinter.prettyPrintJson(sdd.readEntity(32L, "page")));
     }

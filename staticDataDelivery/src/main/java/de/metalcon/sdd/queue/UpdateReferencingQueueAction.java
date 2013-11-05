@@ -28,6 +28,11 @@ public class UpdateReferencingQueueAction extends QueueAction {
     }
     
     @Override
+    public QueueActionType getType() {
+        return QueueActionType.updateJsonQueueAction;
+    }
+    
+    @Override
     public int hashCode() {
         int hash = 82210;
         int mult = 137;

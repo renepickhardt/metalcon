@@ -41,6 +41,8 @@ public abstract class QueueAction implements Comparable<QueueAction> {
 
     public abstract void runQueueAction() throws Exception;
     
+    public abstract QueueActionType getType();
+    
     @Override
     public int compareTo(QueueAction other) {
         if (other == null)

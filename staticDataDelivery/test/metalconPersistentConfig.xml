@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<sdd-config>
+  <leveldb path="/usr/share/sdd/leveldb"/>
+  <neo4j path="/usr/share/sdd/neo4j"/>
+  
+  <!-- DETAILS -->
+  <details>
+    <detail name="page"/>
+    <detail name="big"/>
+    <detail name="small"/>
+  </details>
+  
+  <!-- ENTITIES -->
+  <entities>
+    <entity type="Band">
+      <attr name="name" type="String"/>
+      <attr name="records" type="Record[]"/>
+      <output detail="page">
+        <oattr attr="name"/>
+        <oattr attr="records" detail="big"/>
+      </output>
+      <output detail="page">
+        <oattr attr="name"/>
+        <oattr attr="records" detail="small"/>
+      </output>
+      <output detail="small">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+    <entity type="Record">
+      <attr name="name" type="String"/>
+      <attr name="band" type="Band"/>
+      <attr name="tracks" type="Track[]"/>
+      <output detail="page">
+        <oattr attr="name"/>
+        <oattr attr="band" detail="big"/>
+        <oattr attr="tracks" detail="big"/>
+      </output>
+      <output detail="big">
+        <oattr attr="name"/>
+        <oattr attr="band" detail="small"/>
+        <oattr attr="tracks" detail="small"/>
+      </output>
+      <output detail="small">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+    <entity type="Track">
+      <attr name="name" type="String"/>
+      <attr name="band" type="Band"/>
+      <attr name="record" type="Record"/>
+      <output detail="page">
+        <oattr attr="name"/>
+        <oattr attr="band" detail="big"/>
+        <oattr attr="record" detail="big"/>
+      </output>
+      <output detail="big">
+        <oattr attr="name"/>
+        <oattr attr="band" detail="small"/>
+        <oattr attr="record" detail="small"/>
+      </output>
+      <output detail="small">
+        <oattr attr="name"/>
+      </output>
+    </entity>
+  </entities>
+</sdd-config>

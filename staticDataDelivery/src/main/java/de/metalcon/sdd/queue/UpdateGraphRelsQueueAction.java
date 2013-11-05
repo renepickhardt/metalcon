@@ -30,6 +30,11 @@ public class UpdateGraphRelsQueueAction extends QueueAction {
     }
     
     @Override
+    public QueueActionType getType() {
+        return QueueActionType.updateGraphQueueAction;
+    }
+    
+    @Override
     public boolean equals(Object other) {
         if (other == this)
             return true;
