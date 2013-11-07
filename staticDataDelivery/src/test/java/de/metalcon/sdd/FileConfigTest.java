@@ -48,7 +48,7 @@ public class FileConfigTest {
     }
     
     @Test
-    public void testValidate() throws InvalidConfigException {
+    public void testValidate() throws InvalidConfigException, InvalidAttrNameException {
         config.validate();
     }
 

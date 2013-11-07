@@ -1,4 +1,4 @@
-package de.metalcon;
+package de.metalcon.sdd;
 
 import static org.junit.Assert.*;
 
@@ -40,7 +40,7 @@ public class SddMetalconPersistentTest {
     
     @Test
     public void testExampleSetUp()
-    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException {
+    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException, InvalidAttrNameException {
         int run = 1;
         
         if (run == 1) {
@@ -59,24 +59,24 @@ public class SddMetalconPersistentTest {
             
             long t1 = System.currentTimeMillis();
             
-            sdd.updateEntity(31L, "Band", ensiferum);
-            sdd.updateEntity(32L, "Record", iron);
-            sdd.updateEntity(33L, "Record", victorySongs);
-            sdd.updateEntity(34L, "Track", intoBattle);
-            sdd.updateEntity(35L, "Track", laiLaiHei);
-            sdd.updateEntity(36L, "Track", ahti);
+            sdd.updateEntityAttrs(31L, "Band", ensiferum);
+            sdd.updateEntityAttrs(32L, "Record", iron);
+            sdd.updateEntityAttrs(33L, "Record", victorySongs);
+            sdd.updateEntityAttrs(34L, "Track", intoBattle);
+            sdd.updateEntityAttrs(35L, "Track", laiLaiHei);
+            sdd.updateEntityAttrs(36L, "Track", ahti);
             
-            sdd.updateRelationship(31L, "Band", "records", new long[]{32L, 33L});
-            sdd.updateRelationship(32L, "Record", "band", 31L);
-            sdd.updateRelationship(32L, "Record", "tracks", new long[]{34L, 35L});
-            sdd.updateRelationship(33L, "Record", "band", 31L);
-            sdd.updateRelationship(33L, "Record", "tracks", new long[]{36L});
-            sdd.updateRelationship(34L, "Track", "band", 31L);
-            sdd.updateRelationship(34L, "Track", "record", 32L);
-            sdd.updateRelationship(35L, "Track", "band", 31L);
-            sdd.updateRelationship(35L, "Track", "record", 32L);
-            sdd.updateRelationship(36L, "Track", "band", 31L);
-            sdd.updateRelationship(35L, "Track", "record", 33L);
+            sdd.updateEntityRel(31L, "Band", "records", new long[]{32L, 33L});
+            sdd.updateEntityRel(32L, "Record", "band", 31L);
+            sdd.updateEntityRel(32L, "Record", "tracks", new long[]{34L, 35L});
+            sdd.updateEntityRel(33L, "Record", "band", 31L);
+            sdd.updateEntityRel(33L, "Record", "tracks", new long[]{36L});
+            sdd.updateEntityRel(34L, "Track", "band", 31L);
+            sdd.updateEntityRel(34L, "Track", "record", 32L);
+            sdd.updateEntityRel(35L, "Track", "band", 31L);
+            sdd.updateEntityRel(35L, "Track", "record", 32L);
+            sdd.updateEntityRel(36L, "Track", "band", 31L);
+            sdd.updateEntityRel(35L, "Track", "record", 33L);
             
             sdd.waitUntilQueueEmpty();
             

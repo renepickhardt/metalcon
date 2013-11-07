@@ -22,8 +22,11 @@ public class MetaEntity {
         return Collections.unmodifiableSet(attrs.keySet());
     }
     
-    public MetaType getAttr(String name) {
-        return attrs.get(name);
+    public MetaType getAttr(String name) throws InvalidAttrNameException {
+        MetaType attr = attrs.get(name);
+        if (attr == null)
+            throw new InvalidAttrNameException();
+        return attr;
     }
     
     public boolean isValidAttr(String name) {
@@ -49,7 +52,10 @@ public class MetaEntity {
     }
     
     public MetaEntityOutput getOutput(String detail) {
-        return outputs.get(detail);
+        MetaEntityOutput output = outputs.get(detail);
+        if (output == null)
+            throw new RuntimeException();
+        return output;
     }
     
     public void addOutput(String detail, MetaEntityOutput output) {

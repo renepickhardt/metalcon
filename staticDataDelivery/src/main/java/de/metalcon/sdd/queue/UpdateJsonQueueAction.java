@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.metalcon.sdd.Entity;
 import de.metalcon.sdd.Sdd;
+import de.metalcon.sdd.error.InvalidAttrNameException;
 import de.metalcon.sdd.error.InvalidTypeException;
 
 public class UpdateJsonQueueAction extends QueueAction {
@@ -17,7 +18,7 @@ public class UpdateJsonQueueAction extends QueueAction {
     
     @Override
     public void runQueueAction()
-    throws IOException, InvalidTypeException {
+    throws IOException, InvalidTypeException, InvalidAttrNameException {
         sdd.actionUpdateJson(entity);
     }
     

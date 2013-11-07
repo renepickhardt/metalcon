@@ -1,12 +1,19 @@
 package de.metalcon.sdd;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 import de.metalcon.sdd.queue.QueueAction;
 import de.metalcon.sdd.queue.QueueActionType;
 
 public class Worker implements Runnable {
+    
+    public class QueueStatus {
+        public Queue<QueueAction> queue;
+        public Queue<QueueAction> queueDone;
+    }
     
     public static final int graphTransactionCount = 20;
     
@@ -28,6 +35,8 @@ public class Worker implements Runnable {
     
     private BlockingQueue<QueueAction> queue;
     
+    private Queue<QueueAction> queueDone;
+    
     public Worker(Sdd sdd, BlockingQueue<QueueAction> queue) {
         if (queue == null)
             throw new IllegalArgumentException("queue was null");
@@ -39,6 +48,7 @@ public class Worker implements Runnable {
         state      = null;
         count      = 0;
         this.queue = queue;
+        queueDone  = new LinkedList<QueueAction>();
     }
     
     @Override
@@ -50,7 +60,13 @@ public class Worker implements Runnable {
             while (!stopping) {
                 try {
                     busy = false;
-                    queueAction = queue.take();
+                    queueAction = queue.poll(); // get frist action or null
+                    if (queueAction == null) {
+                        onStateEnd();
+                        state       = null;
+                        count       = 0;
+                        queueAction = queue.take(); // wait for first action
+                    }
                     busy = true;
                     
                     QueueActionType newState = queueAction.getType();
@@ -63,6 +79,7 @@ public class Worker implements Runnable {
                     onStateUpdate();
                     
                     queueAction.runQueueAction();
+                    queueDone.add(queueAction);
                     ++count;
                 } catch(InterruptedException e) {
                     throw e;
@@ -172,6 +189,13 @@ public class Worker implements Runnable {
                 } catch (InterruptedException e) {
                     // stopped by server
                 }
+    }
+        
+    public QueueStatus getQueueState() {
+        QueueStatus status = new QueueStatus();
+        status.queue     = queue;
+        status.queueDone = queueDone;
+        return status;
     }
 
 }

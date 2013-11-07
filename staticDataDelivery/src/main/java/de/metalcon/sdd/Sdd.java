@@ -36,6 +36,7 @@ import de.metalcon.sdd.config.MetaEntityOutput;
 import de.metalcon.sdd.config.MetaType;
 import de.metalcon.sdd.error.InconsitentTypeException;
 import de.metalcon.sdd.error.InvalidAttrException;
+import de.metalcon.sdd.error.InvalidAttrNameException;
 import de.metalcon.sdd.error.InvalidConfigException;
 import de.metalcon.sdd.error.InvalidReferenceException;
 import de.metalcon.sdd.error.InvalidDetailException;
@@ -49,9 +50,13 @@ import de.metalcon.sdd.queue.UpdateJsonQueueAction;
 
 public class Sdd implements Closeable {
     
+    // TODO: implement delete
+    // TODO: add validate data option
     // TODO: dont make index lookup for relation
     // TODO: create temporary index until transaction is finished
     // TODO: split up entity/relationship transactions
+    // TODO: rel with nonexisting entity???
+    // TODO: bug that attrs are only update after second reload?
     
     private Config config;
     
@@ -70,7 +75,7 @@ public class Sdd implements Closeable {
     private Worker worker;
     
     public Sdd(Config config)
-    throws InvalidConfigException, IOException {
+    throws InvalidConfigException, IOException, InvalidAttrNameException {
         if (config == null)
             throw new IllegalArgumentException("config was null");
         
@@ -149,7 +154,60 @@ public class Sdd implements Closeable {
     }
     
     public boolean updateEntity(long id, String type, Map<String, String> attrs)
-    throws InvalidTypeException, InvalidAttrException {
+    throws InvalidTypeException, InvalidAttrException, InvalidAttrNameException {
+        if (type == null)
+            throw new IllegalArgumentException("type was null");
+        if (attrs == null)
+            throw new IllegalArgumentException("attrs was null");
+        
+        Entity entity = new Entity(config, id, type);
+        
+        Map<String, String>     primitives = new HashMap<String, String>(); 
+        Map<String, Long>       entityRel  = new HashMap<String, Long>();
+        Map<String, List<Long>> entityRels = new HashMap<String, List<Long>>();
+        
+        for (Map.Entry<String, String> attr: attrs.entrySet()) {
+            String   attrName  = attr.getKey();
+            String   attrValue = attr.getValue();
+            MetaType attrType  = entity.getMetaEntity().getAttr(attrName);
+            
+            if (attrValue == null)
+                throw new InvalidAttrException();
+            
+            if (attrType.isPrimitive())
+                primitives.put(attrName, attrValue);
+            else if (attrType.isArray()) {
+                String[] relsStrings = attrValue.split(config.getIdDelimeter());
+                List<Long> rels = new LinkedList<Long>();
+                for (String relString : relsStrings)
+                    rels.add(Long.parseLong(relString));
+                entityRels.put(attrName, rels);
+            } else
+                entityRel.put(attrName, Long.parseLong(attrValue));
+        }
+        
+        boolean worked = updateEntityAttrs(id, type, primitives);
+        for (Map.Entry<String, Long> r : entityRel.entrySet()) {
+            String attr = r.getKey();
+            long   rel  = r.getValue();
+            worked = worked && updateEntityRel(id, type, attr, rel);
+        }
+        for (Map.Entry<String, List<Long>> r : entityRels.entrySet()) {
+            String     attr    = r.getKey();
+            List<Long> relList = r.getValue();
+            long[]     rels    = new long[relList.size()];
+            
+            int i = 0;
+            for (long rel : relList)
+                rels[i++] = rel;
+            worked = worked && updateEntityRel(id, type, attr, rels);
+        }
+        return worked;
+    }
+    
+    public boolean updateEntityAttrs(long id, String type,
+                                     Map<String, String> attrs)
+    throws InvalidTypeException, InvalidAttrException, InvalidAttrNameException {
         if (type == null)
             throw new IllegalArgumentException("type was null");
         if (attrs == null)
@@ -162,18 +220,16 @@ public class Sdd implements Closeable {
             String   attrValue = attr.getValue();
             MetaType attrType  = entity.getMetaEntity().getAttr(attrName);
             
-            if (attrType == null
-                    || !attrType.isPrimitive()
-                    || attrValue == null)
+            if (!attrType.isPrimitive() || attrValue == null)
                 throw new InvalidAttrException();
         }
         
         return queueAction(new UpdateGraphEntityQueueAction(this, entity, attrs));
     }
     
-    public boolean updateRelationship(long id, String type,
+    public boolean updateEntityRel(long id, String type,
                                       String attr, long rel)
-    throws InvalidTypeException, InvalidAttrException {
+    throws InvalidTypeException, InvalidAttrException, InvalidAttrNameException {
         if (type == null)
             throw new IllegalArgumentException("type was null");
         if (attr == null)
@@ -182,17 +238,15 @@ public class Sdd implements Closeable {
         Entity entity = new Entity(config, id, type);
         
         MetaType attrType = entity.getMetaEntity().getAttr(attr);
-        if (attrType == null
-                || attrType.isPrimitive()
-                || attrType.isArray())
+        if (attrType.isPrimitive() || attrType.isArray())
             throw new InvalidAttrException();
         
         return queueAction(new UpdateGraphRelQueueAction(this, entity, attr, rel));
     }
   
-    public boolean updateRelationship(long id, String type,
+    public boolean updateEntityRel(long id, String type,
                                       String attr, long[] rel)
-    throws InvalidTypeException, InvalidAttrException {
+    throws InvalidTypeException, InvalidAttrException, InvalidAttrNameException {
         if (type == null)
             throw new IllegalArgumentException("type was null");
         if (attr == null)
@@ -201,10 +255,7 @@ public class Sdd implements Closeable {
         Entity entity = new Entity(config, id, type);
         
         MetaType attrType = entity.getMetaEntity().getAttr(attr);
-        if (attrType == null
-                || attrType.isPrimitive()
-                || !attrType.isArray()
-                || rel == null)
+        if (attrType.isPrimitive() || !attrType.isArray() || rel == null)
             throw new InvalidAttrException();
         
         return queueAction(new UpdateGraphRelsQueueAction(this, entity, attr, rel));
@@ -217,12 +268,10 @@ public class Sdd implements Closeable {
     
     public void waitUntilQueueEmpty() throws IOException {
         worker.waitUntilQueueEmpty();
-//        while (!worker.isIdle())
-//            try {
-//                Thread.sleep(10);
-//            } catch (InterruptedException e) {
-//                // stopped
-//            }
+    }
+    
+    public Worker.QueueStatus getQueueStatus() {
+        return worker.getQueueState();
     }
     
     /* package */ void startEntityGraphTransaction() {
@@ -263,97 +312,6 @@ public class Sdd implements Closeable {
         return "json-" + detail;
     }
     
-    /*
-    public void actionUpdateGraph(Entity entity, Map<String, Object> attrs)
-    throws InvalidReferenceException, InconsitentTypeException,
-           InvalidTypeException {
-        // TODO: check if old attrs are considered
-        
-        // TODO: check if attr = id
-    
-        Transaction tx = entityGraph.beginTx();
-        try {
-            boolean create = false;
-            
-            Node entityNode = entityGraphIdIndex.get(entity.getId());
-            if (entityNode == null) {
-                create = true;
-                entityNode = entityGraph.createNode();
-                entityNode.setProperty("id",   entity.getId());
-                entityNode.setProperty("type", entity.getType());
-            }
-            entity.setNode(entityNode);
-                
-            for (Map.Entry<String, Object> attr : attrs.entrySet()) {
-                String attrName  = attr.getKey();
-                Object attrValue = attr.getValue();
-                entityNode.setProperty(attrName, attrValue);
-            }
-                
-            if (!create)
-                for (Relationship referenceRel :
-                        entityNode.getRelationships(Direction.OUTGOING)) {
-                    String attrName  = referenceRel.getType().name();
-                    Object attrValue = attrs.get(attrName);
-                    if (attrValue == null)
-                        continue;
-                    MetaType attrType = entity.getMetaEntity().getAttr(
-                            attrName);
-                    
-                    Node reference   = referenceRel.getEndNode();
-                    long referenceId = (Long) reference.getProperty("id");
-                    
-                    if (attrType.isPrimitive())
-                        // TODO: this shouldn't happen
-                        throw new RuntimeException();
-                    else if (attrType.isArray()) {
-                        // TODO: optimize
-                        long[] attrIds = (long[]) attrValue;
-                        boolean found = false;
-                        for (long attrId : attrIds)
-                            if (attrId == referenceId) {
-                                found = true;
-                                break;
-                            }
-                        if (!found)
-                            referenceRel.delete();
-                    } else {
-                        long attrId = (long) attrValue;
-                        if (attrId != referenceId)
-                            referenceRel.delete();
-                    }
-                }
-            
-            for (Map.Entry<String, Object> attr : attrs.entrySet()) {
-                String attrName  = attr.getKey();
-                Object attrValue = attr.getValue();
-                if (attrValue == null)
-                    continue;
-                MetaType attrType = entity.getMetaEntity().getAttr(attrName);
-                
-                if (!attrType.isPrimitive()) {
-                    if (attrType.isArray()) {
-                        long[] attrIds = (long[]) attrValue;
-                        for (long attrId : attrIds)
-                            generateReference(entityNode, attrName, attrId);
-                    } else {
-                        long attrId = (long) attrValue;
-                        generateReference(entityNode, attrName, attrId);
-                    }
-                }
-            }
-                
-            tx.success();
-            if (create)
-                entityGraphIdIndex.put(entity.getId(), entityNode);
-        
-            queueAction(new UpdateJsonQueueAction(this, entity));
-        } finally {
-            tx.finish();
-        }
-    }
-    */
-
     public void actionUpdateGraphEntity(Entity entity,
                                         Map<String, String> attrs)
     throws InconsitentTypeException {
@@ -373,7 +331,7 @@ public class Sdd implements Closeable {
     
     public void actionUpdateGraphRel(Entity entity, String attr, long rel)
     throws InconsitentTypeException, InvalidTypeException,
-           InvalidReferenceException {
+           InvalidReferenceException, InvalidAttrNameException {
         entity.setNode(entityGraphIdIndex.get(entity.getId()));
         
         boolean exists = false;
@@ -387,14 +345,14 @@ public class Sdd implements Closeable {
         }
         
         if (!exists)
-            generateReference(entity.getNode(), attr, rel);
+            generateReference(entity, attr, rel);
         
         queueAction(new UpdateJsonQueueAction(this, entity));
     }
     
     public void actionUpdateGraphRels(Entity entity, String attr, long[] rels)
     throws InvalidReferenceException, InconsitentTypeException,
-           InvalidTypeException {
+           InvalidTypeException, InvalidAttrNameException {
         entity.setNode(entityGraphIdIndex.get(entity.getId()));
         
         Set<Long> remainingRels = new HashSet<Long>();
@@ -412,23 +370,32 @@ public class Sdd implements Closeable {
         }
         
         for (long rel : remainingRels)
-            generateReference(entity.getNode(), attr, rel);
+            generateReference(entity, attr, rel);
         
         queueAction(new UpdateJsonQueueAction(this, entity));
     }
     
-    private void generateReference(Node entity, String attr, long refrenceId)
-    throws InvalidReferenceException {
-        Node reference = entityGraphIdIndex.get(refrenceId);
-        if (reference == null)
-            throw new InvalidReferenceException();
-
-        entity.createRelationshipTo(reference,
-                                    DynamicRelationshipType.withName(attr));
+    private void generateReference(Entity entity, String attr, long refrenceId)
+    throws InvalidReferenceException, InvalidTypeException, InvalidAttrNameException, InconsitentTypeException {
+        MetaType attrType = entity.getMetaEntity().getAttr(attr);
+        
+        Node referenceNode = entityGraphIdIndex.get(refrenceId);
+        if (referenceNode == null)
+            throw new InvalidReferenceException("reference was not found");
+        
+        Entity reference = new Entity(config, referenceNode);
+        
+        if (reference.getId() == entity.getId())
+            throw new InvalidReferenceException("cant reference oneself");
+        if (reference.getType() != attrType.getType())
+            throw new InvalidReferenceException("reference was of invalid type");
+        
+        entity.getNode().createRelationshipTo(
+                referenceNode, DynamicRelationshipType.withName(attr));
     }
     
     public void actionUpdateJson(Entity entity)
-    throws IOException, InvalidTypeException {
+    throws IOException, InvalidTypeException, InvalidAttrNameException {
         Set<String> modifiedDetails = new HashSet<String>();
         
         for (String detail : config.getDetails()) {
@@ -451,7 +418,7 @@ public class Sdd implements Closeable {
     }
     
     private String generateJson(Entity entity, String detail)
-    throws InvalidTypeException {
+    throws InvalidTypeException, InvalidAttrNameException {
         MetaEntity metaEntity = entity.getMetaEntity();
         if (metaEntity == null)
             throw new RuntimeException();

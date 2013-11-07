@@ -112,9 +112,9 @@ public class SddTest {
     
     @Test
     public void testUpdateInvalidType()
-    throws InvalidAttrException {
+    throws InvalidAttrException, InvalidAttrNameException {
         try {
-            sdd.updateEntity(1234L, "", new HashMap<String, String>());
+            sdd.updateEntityAttrs(1234L, "", new HashMap<String, String>());
             fail("invalid type wasn't caught");
         } catch (InvalidTypeException e) {
         }
@@ -122,17 +122,17 @@ public class SddTest {
     
     @Test
     public void testCreateRead()
-    throws InvalidDetailException, InvalidTypeException, InvalidAttrException, IOException {
+    throws InvalidDetailException, InvalidTypeException, InvalidAttrException, IOException, InvalidAttrNameException {
         Map<String, String> attrs = new HashMap<String, String>();
         attrs.put("attr0", "YOLO");
-        sdd.updateEntity(1L, "entity0", attrs);
+        sdd.updateEntityAttrs(1L, "entity0", attrs);
         sdd.waitUntilQueueEmpty();
         assertNotNull(sdd.readEntity(1L, "detail0"));
     }
     
     @Test
     public void testCreateCrossReference()
-    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException {
+    throws InvalidTypeException, InvalidAttrException, InvalidDetailException, IOException, InvalidAttrNameException {
         Map<String, String> cross1 = new HashMap<String, String>();
         cross1.put("title", "foo");
         Map<String, String> cross1n = new HashMap<String, String>();
@@ -140,13 +140,13 @@ public class SddTest {
         Map<String, String> cross2 = new HashMap<String, String>();
         cross2.put("title", "bar");
         
-        sdd.updateEntity(51L, "cross1", cross1);
-        sdd.updateEntity(52L, "cross2", cross2);
-        sdd.updateRelationship(51L, "cross1", "elem", 52L);
+        sdd.updateEntityAttrs(51L, "cross1", cross1);
+        sdd.updateEntityAttrs(52L, "cross2", cross2);
+        sdd.updateEntityRel(51L, "cross1", "elem", 52L);
         sdd.waitUntilQueueEmpty();
-        sdd.updateRelationship(52L, "cross2", "elem", 51L);
+        sdd.updateEntityRel(52L, "cross2", "elem", 51L);
         sdd.waitUntilQueueEmpty();
-        sdd.updateEntity(51L, "cross1", cross1n);
+        sdd.updateEntityAttrs(51L, "cross1", cross1n);
         sdd.waitUntilQueueEmpty();
         
         System.out.println(JsonPrettyPrinter.prettyPrintJson(sdd.readEntity(51L, "detail0")));

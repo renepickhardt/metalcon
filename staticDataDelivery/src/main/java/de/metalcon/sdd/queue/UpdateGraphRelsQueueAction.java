@@ -3,6 +3,7 @@ package de.metalcon.sdd.queue;
 import de.metalcon.sdd.Entity;
 import de.metalcon.sdd.Sdd;
 import de.metalcon.sdd.error.InconsitentTypeException;
+import de.metalcon.sdd.error.InvalidAttrNameException;
 import de.metalcon.sdd.error.InvalidReferenceException;
 import de.metalcon.sdd.error.InvalidTypeException;
 
@@ -25,7 +26,7 @@ public class UpdateGraphRelsQueueAction extends QueueAction {
     @Override
     public void runQueueAction()
     throws InvalidReferenceException, InconsitentTypeException,
-           InvalidTypeException {
+           InvalidTypeException, InvalidAttrNameException {
         sdd.actionUpdateGraphRels(entity, attr, rels);
     }
     

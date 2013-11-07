@@ -6,12 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.metalcon.sdd.error.InvalidAttrNameException;
 import de.metalcon.sdd.error.InvalidConfigException;
 
 public abstract class Config {
     
-    // TODO: check if attrs are valid names (not id, not type, not starts with json-)
-
     private String leveldbPath;
     
     private String neo4jPath;
@@ -85,7 +84,7 @@ public abstract class Config {
         entities.put(type, entity);
     }
     
-    public void validate() throws InvalidConfigException {
+    public void validate() throws InvalidConfigException, InvalidAttrNameException {
         if (getLeveldbPath() == null)
             throw new InvalidConfigException("no Leveldb path");
         
@@ -96,6 +95,11 @@ public abstract class Config {
             MetaEntity entity = getEntity(type);
             for (String attrName : entity.getAttrs()) {
                 MetaType attrType = entity.getAttr(attrName);
+                
+                if (attrType.getType().equals("id") ||
+                    attrType.getType().equals("type") ||
+                    attrType.getType().startsWith("json-"))
+                    throw new InvalidConfigException("invalid attr type name \"" + attrType.getType() + "\"");
                 
                 if (!attrType.isPrimitive() &&
                     !isValidEntityType(attrType.getType()))
@@ -108,14 +112,15 @@ public abstract class Config {
                 if (!isValidDetail(outputDetail))
                     throw new InvalidConfigException("invalid output detail \"" + outputDetail + "\" on entity type \"" + type + "\"");
                 
-//                for (Map.Entry<String, String> oattr :
-//                        output.oattrs.entrySet()) {
                 for (String oattr : output.getOattrs()) {
                     String   oattrDetail = output.getOattr(oattr);
-                    MetaType oattrType   = entity.getAttr(oattr);
                     
-                    if (oattrType == null)
-                        throw new InvalidConfigException("oattr for invalid attr \"" + oattr + "\" on entity type \"" + type + "\"");
+                    MetaType oattrType;
+                    try {
+                        oattrType   = entity.getAttr(oattr);
+                    } catch(InvalidAttrNameException e) {
+                        throw new InvalidConfigException("oattr for invalid attr \"" + oattr + "\" on entity type \"" + type + "\"", e);
+                    }
                     
                     if (oattrType.isPrimitive()) {
                         if (!oattrDetail.equals(""))
