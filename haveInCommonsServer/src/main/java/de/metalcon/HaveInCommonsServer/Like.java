@@ -22,7 +22,7 @@ public class Like extends HttpServlet{
 	Vote vote;
 		
 	@Override
-	protected void doPost(HttpServletRequest request,
+	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		muid1 = request.getParameter("muid1");
 		muid2 = request.getParameter("muid2");
@@ -30,7 +30,7 @@ public class Like extends HttpServlet{
 			vote = Vote.valueOf(request.getParameter("vote"));
 		}
 		catch (RuntimeException e) {
-			System.out.println("[LIKE]: " + ProtocolConstants.TIMESTAMP_INVALID);
+			System.out.println("[LIKE]: " + ProtocolConstants.VOTE_MALFORMED);
 			e.printStackTrace();
 		}
 		if(muid1 == null || muid2 == null)
@@ -47,6 +47,7 @@ public class Like extends HttpServlet{
 			//TODO: Calling haveInCommonsService;
 		}	
 		response.setContentType("application/json");
+		//TODO: Define API response if everything went right
 		response(response, jsonObj.toJSONString());
 	}
 	
