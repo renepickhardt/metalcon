@@ -2,7 +2,9 @@ package de.metalcon.imageApplicationServer;
 
 import java.io.InputStream;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 import de.metalcon.imageStorageServer.ImageStorageServer;
 import de.metalcon.imageStorageServer.ScalingType;
@@ -16,21 +18,33 @@ public class ImageApplicationServer extends ImageStorageServer implements
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public String readScaledMetaData(final String[] imageIdentifiers,
 			final int width, final int height, final ScalingType scalingType,
 			final ReadResponse response) {
 		final JSONObject scaledMetaData = new JSONObject();
+		final JSONArray images = new JSONArray();
 
+		JSONObject image;
 		for (String imageIdentifier : imageIdentifiers) {
-			// TODO: check if image exisiting
-			if (false) {
-				// TODO: load and add meta data
+			String metaData = this.imageMetaDatabase
+					.getMetadata(imageIdentifier);
+			if (metaData != null) {
+				try {
+					image = (JSONObject) PARSER.parse(metaData);
+					images.add(image);
+				} catch (final ParseException e) {
+					// TODO: internal server error
+					return null;
+				}
 			} else {
-				// TODO: add error message
+				// error: no image with such identifier
+				response.addImageNotFoundError();
 				return null;
 			}
 		}
 
+		scaledMetaData.put(ImageApplicationMetaData.IMAGES, images);
 		return scaledMetaData.toJSONString();
 	}
 
