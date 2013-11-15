@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.metalcon</groupId>
+  <artifactId>imageApplicationServer</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Image Application Server</name>
+  <description>image server including metalcon web application logic</description>
+  
+  <dependencies>
+ 	<dependency>
+ 		<groupId>de.metalcon</groupId>
+ 		<artifactId>image-storage-server</artifactId>
+ 		<version>1.0.2</version>
+ 	</dependency>
+ </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+	    <artifactId>wagon-ssh</artifactId>
+      </extension>
+    </extensions>
+  </build>
+ <distributionManagement>
+    <repository>
+      <id>metalcon-repo</id>
+      <uniqueVersion>false</uniqueVersion>
+      <name>Metalcon Repository</name>
+      <url>scp://localhost/metalcon-mvn/</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>
+</project>
