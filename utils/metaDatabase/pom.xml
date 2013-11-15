@@ -51,6 +51,12 @@
         <version>2.2.1</version>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+	    <artifactId>wagon-ssh</artifactId>
+      </extension>
+    </extensions>
   </build>
   <distributionManagement>
     <repository>
