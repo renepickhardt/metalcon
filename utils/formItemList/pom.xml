@@ -1,14 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
-  
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.metalcon.utils</groupId>
   <artifactId>form-item-list</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>jar</packaging>
   
   <name>FormItemList</name>
@@ -66,48 +60,26 @@
           <target>1.7</target>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-source-plugin</artifactId>
-		<executions>
-		  <execution>
-		    <id>attach-sources</id>
-			<goals>
-			  <goal>jar</goal>
-			</goals>
-		  </execution>
-		</executions>
-	  </plugin>
 	  <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.2.1</version>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+	    <artifactId>wagon-ssh</artifactId>
+      </extension>
+    </extensions>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>metalcon-repo</id>
+      <uniqueVersion>false</uniqueVersion>
+      <name>Metalcon Repository</name>
+      <url>scp://localhost/metalcon-mvn/</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>
 </project>
