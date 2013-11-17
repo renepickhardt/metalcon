@@ -18,7 +18,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     
     <!-- Spring -->
-    <spring-framework.version>3.1.1.RELEASE</spring-framework.version>
+    <springframework.version>3.2.5.RELEASE</springframework.version>
     
     <!-- Logging -->
     <slf4j.version>1.6.6</slf4j.version>
@@ -32,27 +32,22 @@
   
   <dependencies>
     <!-- Spring -->
-    <!--<dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>${spring-framework.version}</version>
+      <version>${springframework.version}</version>
       <exclusions>
-        <!- Exclude Commons Logging in favor of SLF4j ->
+        <!-- Exclude Commons Logging in favor of SLF4j -->
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
          </exclusion>
       </exclusions>
-    </dependency>-->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring-framework.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
-      <version>${spring-framework.version}</version>
+      <version>${springframework.version}</version>
     </dependency>
 
     <!-- Servlet -->
@@ -62,7 +57,7 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>javax.servlet.jsp</groupId>
       <artifactId>jsp-api</artifactId>
       <version>2.1</version>
@@ -72,17 +67,18 @@
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
-    </dependency>
+    </dependency>-->
  
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>jcl-over-slf4j</artifactId>
       <version>${slf4j.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -96,6 +92,7 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
+      <scope>runtime</scope>
       <exclusions>
         <exclusion>
           <groupId>javax.mail</groupId>
@@ -114,14 +111,13 @@
           <artifactId>jmxri</artifactId>
         </exclusion>
       </exclusions>
-      <scope>runtime</scope>
     </dependency>
 
     <!-- Test -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>${spring-framework.version}</version>
+      <version>${springframework.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
