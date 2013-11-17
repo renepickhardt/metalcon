@@ -32,6 +32,7 @@ public class Like extends HttpServlet{
 		catch (RuntimeException e) {
 			System.out.println("[LIKE]: " + ProtocolConstants.VOTE_MALFORMED);
 			e.printStackTrace();
+			jsonObj.put("Error", ProtocolConstants.VOTE_MALFORMED);
 		}
 		if(muid1 == null || muid2 == null)
 			jsonObj.put("Error", ProtocolConstants.MUID_NOT_GIVEN);
@@ -39,15 +40,25 @@ public class Like extends HttpServlet{
 			jsonObj.put("Error", ProtocolConstants.MUID_MALFORMED);
 		else if (vote == null)
 			jsonObj.put("Error", ProtocolConstants.VOTE_NOT_GIVEN);
-		else {	
-						
-			//TODO: API call goes here;
-			//TODO: Parameter validation;
-			//TODO: MUID validation;
-			//TODO: Calling haveInCommonsService;
-		}	
+	
+		//NormalizedLikeRetrieval	likeEngine = new NormalizedLikeRetrieval("/home/user/likeEngine/");
+		
+		long id1, id2;
+		
+		try {
+			id1 = Integer.parseInt(muid1);
+			id2 = Integer.parseInt(muid2);
+		}
+		catch(NumberFormatException e) {
+			e.printStackTrace();
+			jsonObj.put("Error", ProtocolConstants.MUID_MALFORMED);
+		}
+			
+		//likeEngine.putEdge(id1, id2, vote.getString());
+		
+		jsonObj.put("Response", ProtocolConstants.REQUEST_VALID);
+		
 		response.setContentType("application/json");
-		//TODO: Define API response if everything went right
 		response(response, jsonObj.toJSONString());
 	}
 	
