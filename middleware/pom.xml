@@ -4,33 +4,33 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
     http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>de.metalcon</groupId>
   <artifactId>middleware</artifactId>
   <name>middleware</name>
   <version>1.0.0-BUILD-SNAPSHOT</version>
-  
+
   <packaging>war</packaging>
-  
+
   <properties>
     <!-- Generic -->
     <java.version>1.7</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    
+
     <!-- Spring -->
     <springframework.version>3.2.5.RELEASE</springframework.version>
-    
+
     <!-- Logging -->
-    <slf4j.version>1.6.6</slf4j.version>
-    <log4j.version>1.2.15</log4j.version>
-    
+    <slf4j.version>1.7.5</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
+
     <!-- Test -->
     <junit.version>4.11</junit.version>
     <mockito.version>1.9.5</mockito.version>
     <hamcrest.version>1.3</hamcrest.version>
   </properties>
-  
+
   <dependencies>
     <!-- Spring -->
     <dependency>
@@ -69,17 +69,16 @@
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>-->
- 
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>jcl-over-slf4j</artifactId>
       <version>${slf4j.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -140,7 +139,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
