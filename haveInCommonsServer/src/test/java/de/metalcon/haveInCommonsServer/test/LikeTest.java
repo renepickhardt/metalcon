@@ -66,7 +66,7 @@ public class LikeTest {
 		likeServlet.doPost(request, response);
 		String result = sw.getBuffer().toString().trim();
 				
-		TestCase.assertEquals(result, new String("OK"));
+		TestCase.assertEquals(result, ProtocolConstants.REQUEST_VALID);
 	}
 	
 	@Test
@@ -83,16 +83,46 @@ public class LikeTest {
 		String result = sw.getBuffer().toString().trim();
 				
 		TestCase.assertEquals(result, ProtocolConstants.MUID_MALFORMED);
-	}
-	
-	@Test
-	public void isUUIDvalid(){
-		//("Not yet ")
-	}
-	
-	@Test
-	public void isJSONValid(){
 		
+		result = null;
+		sw.getBuffer().setLength(0);
+				
+		when(request.getParameter("muid1")).thenReturn("1234143124");
+		when(request.getParameter("muid2")).thenReturn("-1");
+				
+		likeServlet.doPost(request, response);
+		result = sw.getBuffer().toString().trim();
+		
+		TestCase.assertEquals(result, ProtocolConstants.MUID_MALFORMED);
+	}
+	
+	@Test
+	public void invalidVote() throws IOException, ServletException{
+		StringWriter sw = new StringWriter();
+		PrintWriter pw  =new PrintWriter(sw);
+
+		when(request.getParameter("muid1")).thenReturn("1235234223");
+		when(request.getParameter("muid2")).thenReturn("1234143124");
+		when(request.getParameter("vote")).thenReturn("foobar");
+		when(response.getWriter()).thenReturn(pw);
+		
+		likeServlet.doPost(request, response);
+		String result = sw.getBuffer().toString().trim();
+				
+		TestCase.assertEquals(result, ProtocolConstants.VOTE_MALFORMED);
+		result = null;
+		sw.getBuffer().setLength(0);
+		
+		//*********missing vote*********//
+		
+		when(request.getParameter("muid1")).thenReturn("1235234223");
+		when(request.getParameter("muid2")).thenReturn("1234143124");
+		when(request.getParameter("vote")).thenReturn("");
+		when(response.getWriter()).thenReturn(pw);
+		
+		likeServlet.doPost(request, response);
+		result = sw.getBuffer().toString().trim();				
+		TestCase.assertEquals(result, ProtocolConstants.VOTE_NOT_GIVEN);
 	}
 	
 	@Test
