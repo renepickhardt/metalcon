@@ -78,7 +78,7 @@
       <id>metalcon-repo</id>
       <uniqueVersion>false</uniqueVersion>
       <name>Metalcon Repository</name>
-      <url>scp://localhost/metalcon-mvn/</url>
+      <url>scp://metalcon2.physik.uni-mainz.de/metalcon-mvn/</url>
       <layout>default</layout>
     </repository>
   </distributionManagement>
