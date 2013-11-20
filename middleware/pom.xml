@@ -54,8 +54,8 @@
     <!-- Servlet -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
     <!--<dependency>
@@ -126,7 +126,7 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>
@@ -137,7 +137,7 @@
       <artifactId>hamcrest-library</artifactId>
       <version>${hamcrest.version}</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
   </dependencies>
 
   <build>
