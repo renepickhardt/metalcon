@@ -20,6 +20,9 @@
 
     <!-- Spring -->
     <springframework.version>3.2.5.RELEASE</springframework.version>
+    
+    <!-- Servlet -->
+    <servlet.version>3.1.0</servlet.version>
 
     <!-- Logging -->
     <slf4j.version>1.7.5</slf4j.version>
@@ -55,20 +58,9 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
+      <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!--<dependency>
-      <groupId>javax.servlet.jsp</groupId>
-      <artifactId>jsp-api</artifactId>
-      <version>2.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
-    </dependency>-->
 
     <!-- Logging -->
     <dependency>
@@ -126,18 +118,6 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--<dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>${hamcrest.version}</version>
-      <scope>test</scope>
-    </dependency>-->
   </dependencies>
 
   <build>
@@ -145,13 +125,23 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>3.1</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
           <compilerArgument>-Xlint:all</compilerArgument>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <url>http://localhost:8080/manager/text</url>
+          <server>tomcat-server</server>
+          <path>/middleware</path>
         </configuration>
       </plugin>
     </plugins>
