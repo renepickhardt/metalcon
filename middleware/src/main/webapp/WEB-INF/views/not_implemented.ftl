@@ -9,16 +9,13 @@
       lang="de" xml:lang="de">
   <#escape x as x?html>
     <head>
-      <title>Home - Metalcon Middleware</title>
+      <title>Not implemented.</title>
       <meta http-equiv="content-type"
             content="application/xhtml+xml; charset=UTF-8" />
     </head>
     <body>
-      <ul>
-        <#list bands as band>
-          <li>${band}</li>
-        </#list>
-      </ul>
+      <h1>Not implemented</h1>
+      <p>This view is not implemented yet.</p>
     </body>
   </#escape>
 </html>
