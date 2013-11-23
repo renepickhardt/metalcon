@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+body {
+    font: 1.1em monospace;
+    margin: 0 0 0 -1em;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+    margin: 0 1em 1em 0;
+    padding: 0;
+}
+
+ul.list, ul.hash {
+    margin-top: 1em;
+    margin-left: 2em;
+}
+
+div.name {
+    font-weight: bold;
+}
+
+span.type {
+    font-style: italic;
+    color: grey;
+}
+
+span.empty {
+    font-style: italic;
+}
