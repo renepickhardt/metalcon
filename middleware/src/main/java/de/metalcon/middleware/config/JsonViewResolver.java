@@ -18,7 +18,7 @@ public class JsonViewResolver implements ViewResolver {
         view.setEncoding(JsonEncoding.UTF8);
         view.setPrettyPrint(true);
         //view.setExposePathVariables(true);
-        view.setExtractValueFromSingleKeyModel(true);
+        //view.setExtractValueFromSingleKeyModel(true);
         return view;
     }
     
