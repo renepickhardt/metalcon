@@ -63,19 +63,22 @@ public class Search {
 //
 //		}
 
-				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
-				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
+//FIXME: comment me in
+//				ImportScript.loadFilesToIndex(true, suggestTree, imageIndex);
+//				ImportScript.loadFilesToIndex(false, suggestTree, imageIndex);
 				
 				SuggestTree wikiTree = new SuggestTree(ProtocolConstants.MAX_NUMBER_OF_SUGGESTIONS);
-				ImportScript.loadWikipedia(wikiTree,imageIndex);
-
+				HashMap<String, String> hitMap = new HashMap<String,String>();
+				//ImportScript.loadWikipedia(wikiTree,imageIndex);
+				ImportScript.loadServerWiki(wikiTree, imageIndex,hitMap );
 				
 				context.setAttribute("indexName:"
 						+ "wikitree", wikiTree);
-				
-				context.setAttribute("indexName:"
-						+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
+//FIXME: comment me in				
+//				context.setAttribute("indexName:"
+//						+ ProtocolConstants.DEFAULT_INDEX_NAME, suggestTree);
 				ContextListener.setImageIndex(imageIndex, context);
+				ContextListener.setHitMap(hitMap, context,"wikitree");
 				
 				
 				//				BufferedReader in = new BufferedReader(new FileReader(filename));

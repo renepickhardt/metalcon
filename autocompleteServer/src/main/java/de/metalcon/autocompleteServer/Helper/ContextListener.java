@@ -33,4 +33,20 @@ public class ContextListener implements ServletContextListener {
 		ServletContext context = arg0.getServletContext();
 		Search.initilizeSuggestTree(context);
 	}
+	/**
+	 * @param hitMap
+	 * @param context
+	 */
+	public static void setHitMap(HashMap<String, String> hitMap,
+			ServletContext context, String indexName) {
+		context.setAttribute("hitmap:"+indexName, hitMap);		
+	}
+	/**
+	 * @param indexName
+	 * @param context
+	 * @return
+	 */
+	public static HashMap<String, String> getHitMap(String indexName,
+			ServletContext context) {
+		return (HashMap<String, String>)context.getAttribute("hitmap:" + indexName);	}
 }

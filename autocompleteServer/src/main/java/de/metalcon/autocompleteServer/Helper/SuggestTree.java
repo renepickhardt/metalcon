@@ -236,6 +236,7 @@ public class SuggestTree {
                 }else if(n.weight == -1) {
                     n.suggestion = suggestion;
                     n.weight = weight;
+                    n.key = key;
                     insertIntoLists(n);
                     size++;
                     return;

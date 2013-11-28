@@ -1,5 +1,9 @@
 package de.metalcon.autocompleteServer.Retrieve;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,10 +35,44 @@ public class ProcessRetrieveRequest {
 			response.addError(RetrieveStatusCodes.NO_INDEX_AVAILABLE);
 			return response;
 		}
-		retrieveSuggestions(request, response, index, term, numItems);
+		
+		HashMap<String, String> hitMap = checkHitMap(request,response,context);
+		
+		retrieveSuggestions(request, response, index, hitMap, term, numItems);
 		return response;
 	}	
 	
+	/**
+	 * @param request
+	 * @param response
+	 * @param context
+	 * @return
+	 * FIXME: implement better checking for this map
+	 */
+	private static HashMap<String, String> checkHitMap(
+			HttpServletRequest request, ProcessRetrieveResponse response,
+			ServletContext context) {
+		String indexName = request.getParameter(ProtocolConstants.INDEX_PARAMETER);
+		HashMap<String, String> hitMap = null;
+		// if no indexName Parameter was provided use the default index.
+		if (indexName==null){
+			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
+			response.addIndexWarning(RetrieveStatusCodes.NO_INDEX_GIVEN);
+			hitMap = ContextListener.getHitMap(indexName, context);
+		}
+		// if an indexName Parameter was provided use this one
+		else {
+			hitMap = ContextListener.getHitMap(indexName, context);
+			// if the indexName given is unknown to the server use the default.
+			if (hitMap==null){
+				indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
+				response.addIndexWarning(RetrieveStatusCodes.INDEX_UNKNOWN);
+				hitMap = ContextListener.getHitMap(indexName, context);
+			}
+		}
+		return hitMap;
+	}
+
 	/**
 	 * checks the ASTP request for the number of items that should be retrieved
 	 * If the parameter is not set we use the default value
@@ -117,20 +155,41 @@ public class ProcessRetrieveRequest {
 	 * @param request
 	 * @param response
 	 * @param index
+	 * @param hitMap 
 	 * @param term 
 	 * @param numItems 
 	 */
 	private static void retrieveSuggestions(HttpServletRequest request,
-			ProcessRetrieveResponse response, SuggestTree index, String term, Integer numItems) {
+			ProcessRetrieveResponse response, SuggestTree index, HashMap<String, String> hitMap, String term, Integer numItems) {
 		Node suggestions = index.getBestSuggestions(term);
 		if (suggestions == null){
 			response.addError(RetrieveStatusCodes.NO_SUGGESTIONS_MATCHING_TERM);
 			return;
 		}
-		for (int i = 0; i < Math.min(suggestions.listLength(), numItems); ++i) {
-			String suggestString = suggestions.getSuggestion(i);
-			String key = suggestions.getKey(i);
-			response.addSuggestion(suggestString, key);
+		
+		HashSet<String> usedSuggestions = new HashSet<String>(20);
+		
+		if (hitMap != null && hitMap.containsKey(term)){
+			response.addSuggestion(term, hitMap.get(term));
+			usedSuggestions.add(hitMap.get(term));
+			for (int i = 0; i < Math.min(suggestions.listLength(), numItems) -1; ++i) {
+				String suggestString = suggestions.getSuggestion(i);
+				String key = suggestions.getKey(i);
+				if (!usedSuggestions.contains(key)){
+					response.addSuggestion(suggestString, key);
+					usedSuggestions.add(key);
+				}
+			}			
+		}
+		else {
+			for (int i = 0; i < Math.min(suggestions.listLength(), numItems); ++i) {
+				String suggestString = suggestions.getSuggestion(i);
+				String key = suggestions.getKey(i);
+				if (!usedSuggestions.contains(key)){
+					response.addSuggestion(suggestString, key);
+					usedSuggestions.add(key);
+				}
+			}
 		}
 	}
 
