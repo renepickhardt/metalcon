@@ -11,10 +11,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import de.metalcon.middleware.domain.Band;
 
 @Controller
+@RequestMapping(value = "/band", method = RequestMethod.GET)
 public class BandController {
     
-    @RequestMapping(value = "/band/{bandName}", method = RequestMethod.GET)
-    public String handleRequest(
+    @RequestMapping("")
+    public String handleRequest() {
+        return "band";
+    }
+    
+    @RequestMapping("{bandName}")
+    public String handleRequestByBandName(
             @PathVariable("bandName") String bandName,
             Model model) {
         Band band = new Band(bandName, Calendar.getInstance().getTime());
