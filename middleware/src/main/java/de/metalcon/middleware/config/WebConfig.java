@@ -1,7 +1,9 @@
 package de.metalcon.middleware.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,10 +33,13 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void configureContentNegotiation(
             ContentNegotiationConfigurer configurer) {
-        configurer.ignoreAcceptHeader(true)
+        Map<String, MediaType> mediaTypes = new HashMap<String, MediaType>();
+        mediaTypes.put("html", MediaType.APPLICATION_XHTML_XML);
+        mediaTypes.put("json", MediaType.APPLICATION_JSON);
+        
+        configurer.replaceMediaTypes(mediaTypes)
                   .favorPathExtension(true)
                   .useJaf(false)
-                  .mediaType("json", MediaType.APPLICATION_JSON)
                   .defaultContentType(MediaType.APPLICATION_XHTML_XML);
     }
     
