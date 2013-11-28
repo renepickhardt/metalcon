@@ -16,7 +16,8 @@
             href="/middleware/resources/css/model.css"/>
     </head>
     <body>
-      <#assign blacklist = ["springMacroRequestContext", "Request"]>
+      <#assign blacklist = ["springMacroRequestContext", "Request", "Session",
+                            "RequestParameters", "Application", "JspTaglibs"]>
     
       <#macro print name var rec>
         <div class="name">${name}</div>

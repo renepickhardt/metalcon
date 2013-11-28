@@ -1,25 +1,26 @@
 package de.metalcon.middleware.controller;
 
+import java.util.Calendar;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import de.metalcon.middleware.domain.Band;
 
 @Controller
-public class BandController extends MetalconController {
+public class BandController {
     
     @RequestMapping("/band/{bandName}")
     public String handleRequest(
             @PathVariable("bandName") String bandName,
-            @RequestParam(value="model", required=false, defaultValue="")
-                String viewModel,
             Model model) {
-        preRequest(model);
+        Band band = new Band(bandName, Calendar.getInstance().getTime());
         
-        model.addAttribute("bandName", bandName);
+//        model.addAttribute("band", band);
         
-        return postRequest(viewModel, model, "band");
+        return "model";
     }
 
 }
