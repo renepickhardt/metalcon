@@ -20,7 +20,7 @@ public class BandController {
         
 //        model.addAttribute("band", band);
         
-        return "model";
+        return "band";
     }
 
 }
