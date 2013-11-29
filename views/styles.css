@@ -1,0 +1,11 @@
+.filterBox {border:thin solid red;
+	background-color:#FFFFAA;
+	width:750;height:80}
+.filterOptionsBox {border:thin solid red;background-color:#FFFFAA;width:750;height:80}
+.filterSelection {float:left}
+.sortSelection {float:right}
+.newsfeedEntry {border:thin solid red;background-color:#FFFFAA;width:750;height:80}
+.newsfeedEntryImage {width:68;float:left}
+.infoTab {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.tabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.tabPreviewContainer {float:left}
