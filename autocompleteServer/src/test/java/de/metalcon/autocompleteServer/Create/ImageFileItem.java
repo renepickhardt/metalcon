@@ -12,6 +12,10 @@ import org.apache.commons.fileupload.FileItemHeaders;
 
 public class ImageFileItem implements FileItem {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8355853836800944661L;
 	private final File file;
 
 	public ImageFileItem(File file) {

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import de.metalcon.autocompleteServer.AppendingObjectOutputStream;
+
 /**
  * 
  * Contains the data extracted from the HTTP-request, which will be inserted
@@ -66,17 +68,30 @@ public class SuggestionComponents implements Serializable {
 
 	public void saveToDisc(File createFile) {
 		try {
-			FileOutputStream saveFile = new FileOutputStream(createFile, true);
+			if (!createFile.exists()) {
 
-			// TODO check if AppendableObjectOutputStream has to be used instead
-			ObjectOutputStream save = new ObjectOutputStream(saveFile);
-			save.writeObject(this);
-			save.close();
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						createFile, true);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+						fileOutputStream);
+				objectOutputStream.writeObject(this);
+				objectOutputStream.flush();
+				objectOutputStream.close();
+				fileOutputStream.close();
+			}
 
-		}
-		// maybe there is a way to store failed save-processes, to try them
-		// again, when the issue is solved?^
-		catch (IOException e) {
+			else {
+				FileOutputStream fileOutputStream = new FileOutputStream(
+						createFile, true);
+				AppendingObjectOutputStream appendingObjectOutputStream = new AppendingObjectOutputStream(
+						fileOutputStream);
+				appendingObjectOutputStream.writeObject(this);
+				appendingObjectOutputStream.flush();
+				appendingObjectOutputStream.close();
+				fileOutputStream.close();
+			}
+
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

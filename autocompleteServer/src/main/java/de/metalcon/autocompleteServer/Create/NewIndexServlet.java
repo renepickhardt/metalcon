@@ -13,22 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.metalcon.autocompleteServer.Command;
 
-public class CreateServlet extends HttpServlet {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8203320841384299096L;
+public class NewIndexServlet extends HttpServlet {
 
 	private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(
 			1);
 
 	private BlockingQueue<Command> commandQueue;
 
-	public CreateServlet() {
+	public NewIndexServlet() {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
@@ -42,10 +36,10 @@ public class CreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException {
 
-		ProcessCreateResponse resp = ProcessCreateRequest.handleServlet(
-				request, this.getServletContext());
+		NewIndexResponse resp = NewIndexRequest.handleServlet(request,
+				this.getServletContext());
 
-		final CreateRequestContainer container = resp.getContainer();
+		final NewIndexContainer container = resp.getContainer();
 
 		if (container != null) {
 			// stack command

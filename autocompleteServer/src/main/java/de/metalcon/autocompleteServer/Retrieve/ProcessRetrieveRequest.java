@@ -134,7 +134,6 @@ public class ProcessRetrieveRequest {
 			ProcessRetrieveResponse response, SuggestTree index, String term,
 			Integer numItems) {
 		Node suggestions = index.getBestSuggestions(term);
-		System.out.println(index.size() + " , " + suggestions.listLength());
 		if (suggestions == null) {
 			response.addError(RetrieveStatusCodes.NO_SUGGESTIONS_MATCHING_TERM);
 			return;
