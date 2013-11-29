@@ -1,5 +1,6 @@
 package de.metalcon.middleware.controller;
 
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class HomeController {
 	    bands.add("Manowar");
 	    bands.add("Blind Guardian");
 	    bands.add("Bolt Thrower");
+	    bands.add("another test");
 	    
 	    model.addAttribute("bands", bands);
 	    return "model";
