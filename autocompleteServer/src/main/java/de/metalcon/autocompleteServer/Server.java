@@ -26,7 +26,7 @@ public class Server implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		final ServletContext context = arg0.getServletContext();
 		context.setAttribute("queue", this.commands);
-		Search.initilizeSuggestTree(context);
+		Search.initializeSuggestTree(context);
 	}
 
 }

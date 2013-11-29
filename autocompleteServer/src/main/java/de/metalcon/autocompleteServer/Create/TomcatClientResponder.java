@@ -36,15 +36,16 @@ public class TomcatClientResponder implements ClientResponder {
 		this.writer = response.getWriter();
 	}
 
+	@Override
 	public void addLine(final String line) {
 		this.writer.println(line);
 	}
 
+	@Override
 	public void error(final String message) {
-		// TODO: Error responder, which writes error messages to the respond
-		// JSON.
 	}
 
+	@Override
 	public void finish() {
 		// this.writer.close();
 	}

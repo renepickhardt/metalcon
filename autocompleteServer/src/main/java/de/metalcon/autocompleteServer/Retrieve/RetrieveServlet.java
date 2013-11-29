@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.metalcon.autocompleteServer.Search;
-
 /**
  * Servlet implementation class TestServlet
  */
@@ -26,20 +24,18 @@ public class RetrieveServlet extends HttpServlet {
 
 	/**
 	 * de.metalcon.autocompleteServer.Retrieve.RetrieveServlet
+	 * 
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		long start = System.nanoTime();
-		ProcessRetrieveResponse responseObject = ProcessRetrieveRequest.checkRequestParameter(request,
-				this.getServletContext());
+		ProcessRetrieveResponse responseObject = ProcessRetrieveRequest
+				.checkRequestParameter(request, this.getServletContext());
 		String resultJson = responseObject.buildJsonResonse();
-		response.setContentType("application/json"); 
+		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		long end = System.nanoTime();
-		//+ " " + (end - start)/1000 + " micro seconds"
 		out.println(resultJson);
 		out.flush();
 	}

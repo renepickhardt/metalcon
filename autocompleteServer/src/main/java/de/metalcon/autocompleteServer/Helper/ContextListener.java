@@ -17,6 +17,7 @@ public class ContextListener {
 				index);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> getImageIndex(ServletContext context) {
 		return (HashMap<String, String>) context
 				.getAttribute(ProtocolConstants.IMAGE_SERVER_CONTEXT_KEY);

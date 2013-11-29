@@ -16,6 +16,12 @@ import org.junit.Test;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.autocompleteServer.Helper.SuggestTree;
 
+/**
+ * This class test the writing operations of the Container class.
+ * 
+ * @author Christian Schowalter
+ * 
+ */
 public class TestSuggestComponents {
 
 	SuggestionComponents testComponents = new SuggestionComponents();
@@ -67,6 +73,12 @@ public class TestSuggestComponents {
 
 	}
 
+	/**
+	 * This test contains the actual implementation of the initialization method
+	 * as calling the method without a server would otherwise fail.
+	 * 
+	 * @author Christian Schowalter
+	 */
 	@Test
 	public void testServerInitialization() {
 		SuggestTree suggestTree = new SuggestTree(

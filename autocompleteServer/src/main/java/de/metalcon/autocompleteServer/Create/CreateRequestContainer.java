@@ -32,7 +32,6 @@ public class CreateRequestContainer extends Command {
 		suggestTree.put(this.suggestionComponents.getSuggestString(),
 				this.suggestionComponents.getWeight(),
 				this.suggestionComponents.getKey());
-		System.out.println(suggestTree.size());
 		if (this.suggestionComponents.getImageBase64() != null) {
 			HashMap<String, String> map = ContextListener
 					.getImageIndex(this.context);
@@ -42,7 +41,8 @@ public class CreateRequestContainer extends Command {
 		}
 
 		// This creates the database file if it doesn't exist
-		File createFile = new File("/var/lib/tomcat/Database.save");
+		File createFile = new File("/var/lib/tomcat/"
+				+ this.suggestionComponents.getIndexName() + ".save");
 
 		this.suggestionComponents.saveToDisc(createFile);
 

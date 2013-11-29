@@ -1,7 +1,9 @@
 package de.metalcon.autocompleteServer.Create;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,6 +12,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
+import de.metalcon.autocompleteServer.Helper.ContextListener;
 import de.metalcon.autocompleteServer.Helper.ProtocolConstants;
 import de.metalcon.utils.FormFile;
 import de.metalcon.utils.FormItemList;
@@ -20,6 +23,8 @@ import de.metalcon.utils.FormItemList;
  * 
  */
 public class ProcessCreateRequest {
+
+	private static boolean statusOk = true;
 
 	private static final DiskFileItemFactory factory = new DiskFileItemFactory();
 
@@ -68,6 +73,7 @@ public class ProcessCreateRequest {
 	public static ProcessCreateResponse checkRequestParameter(
 			FormItemList items, ProcessCreateResponse response,
 			ServletContext context) {
+		statusOk = true;
 		CreateRequestContainer suggestTreeCreateRequestContainer = new CreateRequestContainer(
 				context);
 
@@ -82,7 +88,12 @@ public class ProcessCreateRequest {
 		suggestTreeCreateRequestContainer.getComponents().setSuggestString(
 				suggestionString);
 
-		String indexName = checkIndexName(items, response);
+		String indexName = checkIndexName(context, items, response);
+		if (indexName == null) {
+			suggestTreeCreateRequestContainer = null;
+			return response;
+		}
+
 		suggestTreeCreateRequestContainer.getComponents().setIndexName(
 				indexName);
 
@@ -96,16 +107,18 @@ public class ProcessCreateRequest {
 		}
 		suggestTreeCreateRequestContainer.getComponents().setWeight(weight);
 
-		// Protocol forbids images for suggestions without keys
-		// TODO: add this piece of information to nokey-Warning
 		if (suggestionKey != null) {
 			String image = checkImage(items, response);
 			if (image == null) {
+				statusOk = false;
 				response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			}
 
 			suggestTreeCreateRequestContainer.getComponents().setImageBase64(
 					image);
+		}
+		if (statusOk) {
+			response.addStatusOk(CreateStatusCodes.STATUS_OK);
 		}
 		response.addContainer(suggestTreeCreateRequestContainer);
 
@@ -116,22 +129,41 @@ public class ProcessCreateRequest {
 			ProcessCreateResponse response) {
 		FormFile image = null;
 		String imageB64 = null;
-		FileItem imageFile;
-		// FormItem imageFile = null;
+		FileItem imageFileItem;
 		try {
-			// TODO: double check, if it works that way on images
 			image = items.getFile(ProtocolConstants.IMAGE);
-			imageFile = image.getFormItem();
-			// imageFile = image.get;
+			imageFileItem = image.getFormItem();
+
+			BufferedImage bufferedImage = ImageIO.read(imageFileItem
+					.getInputStream());
+			if ((bufferedImage.getWidth() > ProtocolConstants.IMAGE_WIDTH)
+					|| (bufferedImage.getHeight() > ProtocolConstants.IMAGE_HEIGHT)) {
+				response.addImageGeometryTooBigWarning(CreateStatusCodes.IMAGE_GEOMETRY_TOO_BIG);
+				return null;
+			}
+
+			if (imageFileItem.getSize() > ProtocolConstants.MAX_IMAGE_FILE_LENGTH) {
+				response.addImageFileSizeTooBigWarning(CreateStatusCodes.IMAGE_FILE_TOO_LARGE);
+				return null;
+			}
+
 		} catch (IllegalArgumentException e) {
-			// response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
+			statusOk = false;
+			return null;
+		} catch (IOException e) {
+			statusOk = false;
+
+			return null;
+		} catch (NullPointerException e) {
+			statusOk = false;
+			response.addNoImageWarning(CreateStatusCodes.NO_IMAGE);
 			return null;
 		}
 
-		byte[] buffer = new byte[(int) imageFile.getSize()];
+		byte[] buffer = new byte[(int) imageFileItem.getSize()];
 		byte[] tmp = null;
 		try {
-			int size = imageFile.getInputStream().read(buffer);
+			int size = imageFileItem.getInputStream().read(buffer);
 			if (size > 0) {
 				tmp = new byte[size];
 				for (int i = 0; i < size; i++) {
@@ -146,6 +178,7 @@ public class ProcessCreateRequest {
 			byte[] base64EncodedImage = Base64.encodeBase64(tmp);
 			imageB64 = new String(base64EncodedImage);
 		} else {
+			statusOk = false;
 			return null;
 		}
 
@@ -159,6 +192,7 @@ public class ProcessCreateRequest {
 			weight = items.getField(ProtocolConstants.SUGGESTION_WEIGHT);
 		} catch (IllegalArgumentException e) {
 			response.addWeightNotGivenError(CreateStatusCodes.WEIGHT_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 
@@ -166,20 +200,29 @@ public class ProcessCreateRequest {
 			return Integer.parseInt(weight);
 		} catch (NumberFormatException e) {
 			response.addWeightNotANumberError(CreateStatusCodes.WEIGHT_NOT_A_NUMBER);
+			statusOk = false;
 			return null;
 		}
 	}
 
-	private static String checkIndexName(FormItemList items,
-			ProcessCreateResponse response) {
-		String index = null;
+	private static String checkIndexName(ServletContext context,
+			FormItemList items, ProcessCreateResponse response) {
+		String indexName = null;
 		try {
-			index = items.getField(ProtocolConstants.INDEX_PARAMETER);
+			indexName = items.getField(ProtocolConstants.INDEX_PARAMETER);
 		} catch (IllegalArgumentException e) {
 			response.addDefaultIndexWarning(CreateStatusCodes.INDEXNAME_NOT_GIVEN);
-			index = ProtocolConstants.DEFAULT_INDEX_NAME;
+			indexName = ProtocolConstants.DEFAULT_INDEX_NAME;
+			statusOk = false;
 		}
-		return index;
+
+		// check if the index we're going to write to exists
+		if (ContextListener.getIndex(indexName, context) == null) {
+			response.addIndexDoesNotExistError(indexName);
+			statusOk = false;
+			return null;
+		}
+		return indexName;
 	}
 
 	private static String checkSuggestionKey(FormItemList items,
@@ -191,11 +234,13 @@ public class ProcessCreateRequest {
 
 		catch (IllegalArgumentException e) {
 			response.addNoKeyWarning(CreateStatusCodes.SUGGESTION_KEY_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 		//
 		if (key.length() > ProtocolConstants.MAX_KEY_LENGTH) {
 			response.addKeyTooLongWarning(CreateStatusCodes.KEY_TOO_LONG);
+			statusOk = false;
 			return null;
 		}
 		return key;
@@ -208,10 +253,12 @@ public class ProcessCreateRequest {
 			suggestString = items.getField(ProtocolConstants.SUGGESTION_STRING);
 		} catch (IllegalArgumentException e) {
 			response.addQueryNameMissingError(CreateStatusCodes.QUERYNAME_NOT_GIVEN);
+			statusOk = false;
 			return null;
 		}
 		if (suggestString.length() > ProtocolConstants.MAX_SUGGESTION_LENGTH) {
 			response.addQueryNameTooLongError(CreateStatusCodes.SUGGESTION_STRING_TOO_LONG);
+			statusOk = false;
 			return null;
 		}
 		return suggestString;

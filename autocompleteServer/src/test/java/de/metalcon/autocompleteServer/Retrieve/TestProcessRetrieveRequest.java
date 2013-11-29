@@ -55,9 +55,10 @@ public class TestProcessRetrieveRequest {
 		generalIndex.put("Melechesh", 94, "Metallica");
 
 		when(
-				this.servletContext.getAttribute("indexName:"
-						+ ProtocolConstants.DEFAULT_INDEX_NAME)).thenReturn(
-				generalIndex);
+				this.servletContext
+						.getAttribute(ProtocolConstants.INDEX_PARAMETER
+								+ ProtocolConstants.DEFAULT_INDEX_NAME))
+				.thenReturn(generalIndex);
 
 		SuggestTree venueIndex = new SuggestTree(7);
 		venueIndex.put("Das Kult", 55, "http://www.daskult.de");
@@ -68,8 +69,10 @@ public class TestProcessRetrieveRequest {
 		venueIndex.put("Das Haus", 25, "http://www.dashaus-lu.de/home.html");
 		venueIndex.put("Druckluftkammer", 25, "http://www.druckluftkammer.de/");
 
-		when(this.servletContext.getAttribute("indexName:" + "venueIndex"))
-				.thenReturn(venueIndex);
+		when(
+				this.servletContext
+						.getAttribute(ProtocolConstants.INDEX_PARAMETER
+								+ "venueIndex")).thenReturn(venueIndex);
 
 		HashMap<String, String> imageIndex = new HashMap<String, String>();
 		when(
@@ -100,7 +103,7 @@ public class TestProcessRetrieveRequest {
 	public void testCheckRequestParameter() throws ServletException {
 		HttpServletRequest request = this.initializeTest();
 		JSONObject jsonResponse = this.testRequest(request, "Me", "7",
-				"generalIndex");
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
 				.get("suggestionList");
 		assertTrue(suggestionList.size() == 7);
@@ -114,14 +117,15 @@ public class TestProcessRetrieveRequest {
 	public void testTermField() {
 		HttpServletRequest request = this.initializeTest();
 		JSONObject jsonResponse = this.testRequest(request, "Ne", "7",
-				"generalIndex");
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 
-		jsonResponse = this.testRequest(request, null, "7", "generalIndex");
+		jsonResponse = this.testRequest(request, null, "7",
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 	}
 
@@ -133,7 +137,7 @@ public class TestProcessRetrieveRequest {
 	public void testNumItemField() {
 		HttpServletRequest request = this.initializeTest();
 		JSONObject jsonResponse = this.testRequest(request, "Me", "8",
-				"generalIndex");
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		assertTrue(jsonResponse.get("warning:numItems").equals(
 				RetrieveStatusCodes.NUMITEMS_OUT_OF_RANGE));
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
@@ -141,14 +145,15 @@ public class TestProcessRetrieveRequest {
 		assertTrue(suggestionList.size() == 7);
 
 		jsonResponse = this.testRequest(request, "Me", "someRandomString",
-				"generalIndex");
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
 				.get("suggestionList");
 		assertTrue(jsonResponse.get("warning:numItems").equals(
 				RetrieveStatusCodes.NUMITEMS_NOT_AN_INTEGER));
 		assertTrue(suggestionList.size() == 7);
 
-		jsonResponse = this.testRequest(request, "Me", null, "generalIndex");
+		jsonResponse = this.testRequest(request, "Me", null,
+				ProtocolConstants.DEFAULT_INDEX_NAME);
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
 				.get("suggestionList");
 		assertTrue(jsonResponse.get("warning:numItems").equals(
@@ -163,27 +168,27 @@ public class TestProcessRetrieveRequest {
 		JSONObject jsonResponse = this.testRequest(request, "D", "7",
 				"venueIndex");
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 7);
 
 		jsonResponse = this.testRequest(request, "M", "7", "venueIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 
 		jsonResponse = this.testRequest(request, "D", "7", "generalIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 0);
 
 		jsonResponse = this.testRequest(request, "M", "7", "generalIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(suggestionList.size() == 7);
 
 		jsonResponse = this.testRequest(request, "Me", "7", "someRandomIndex");
 		suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
-				.get("suggestionList");
+				.get(ProtocolConstants.RESP_JSON_FIELD_SUGGESTION_LIST);
 		assertTrue(jsonResponse.get("warning:noIndexGiven").equals(
 				RetrieveStatusCodes.INDEX_UNKNOWN));
 		assertTrue(suggestionList.size() == 7);
@@ -193,11 +198,13 @@ public class TestProcessRetrieveRequest {
 	 * tests if the keys are correctly trasfered TODO: need to be more specific
 	 * what happens if no keys are in the answer and if mixed keys are availabel
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testKeys() {
 		HttpServletRequest request = this.initializeTest();
 		JSONObject jsonResponse = this.testRequest(request, "D", "7",
 				"venueIndex");
+
 		ArrayList<HashMap<String, String>> suggestionList = (ArrayList<HashMap<String, String>>) jsonResponse
 				.get("suggestionList");
 		suggestionList.get(0).get("key").equals("http://www.daskult.de");
@@ -217,9 +224,12 @@ public class TestProcessRetrieveRequest {
 	 */
 	private JSONObject testRequest(HttpServletRequest request, String term,
 			String numItems, String indexName) {
-		when(request.getParameter("term")).thenReturn(term);
-		when(request.getParameter("numItems")).thenReturn(numItems);
-		when(request.getParameter("indexName")).thenReturn(indexName);
+		when(request.getParameter(ProtocolConstants.QUERY_PARAMETER))
+				.thenReturn(term);
+		when(request.getParameter(ProtocolConstants.NUM_ITEMS)).thenReturn(
+				numItems);
+		when(request.getParameter(ProtocolConstants.INDEX_PARAMETER))
+				.thenReturn(indexName);
 		ProcessRetrieveResponse response = ProcessRetrieveRequest
 				.checkRequestParameter(request, this.servletContext);
 		response.buildJsonResonse();
