@@ -33,7 +33,7 @@ $(document).ready(function() {
 		}
 		
 		//from small to big
-		$("div.left-side").css({'height': '129', 'left': '40%', 'top':  pusher, 'opacity': '0'});
+		$("div.left-side").css({'transform': 'translate3d(0, 0, 0)','height': '129', 'left': '40%', 'top':  pusher, 'opacity': '0'});
 		$("div.left-side").animate({'left': '0%','top': '0', 'height': '800', 'opacity': '1'}, 500);
 		$("div.left-side").empty().html($(switchHelper).html());
 		
