@@ -29,6 +29,9 @@
     
     <!-- JSON -->
     <jackson.version>1.9.13</jackson.version>
+    
+    <!-- Jetty -->
+    <jetty.version>9.0.7.v20131107</jetty.version>
 
     <!-- Logging -->
     <slf4j.version>1.7.5</slf4j.version>
@@ -86,7 +89,7 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <version>${jackson.version}</version>
     </dependency>
-
+    
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -176,6 +179,11 @@
           <server>tomcat-server</server>
           <path>/middleware</path>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.version}</version>
       </plugin>
     </plugins>
   </build>
