@@ -15,6 +15,11 @@ import de.metalcon.autocompleteServer.Command;
 
 public class CreateServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8203320841384299096L;
+
 	private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<Object>(
 			1);
 
@@ -23,6 +28,7 @@ public class CreateServlet extends HttpServlet {
 	public CreateServlet() {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
@@ -45,19 +51,16 @@ public class CreateServlet extends HttpServlet {
 			// stack command
 			container.setRequestServlet(this);
 			this.commandQueue.add(container);
-			System.out.println("command stacked");
 
 			// wait for the command to be finished
 			try {
 				this.responseQueue.take();
-				System.out.println("command executed");
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 
 		try {
-			// response.setContentType("text/json");
 			response.getWriter().write(resp.getResponse().toJSONString());
 			response.getWriter().flush();
 			response.getWriter().close();

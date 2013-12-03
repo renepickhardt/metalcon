@@ -1,0 +1,13 @@
+<!-- input parameter:
+entry : list (list of news entries)
+entity: object (entity of the parent page which includes the template)-->
+<div class="tab" style="border:thin solid red;background-color:#FFFFAA;height:240;width:300;position:relative;top:20;left:20">
+	<h3>News for {entity.Name}</h3>
+	<ul>
+		<li><a href="entry[0].owner.url"><img src="{entry[0].owner.ProfileThumb}"></a><a href="{entry[0].url}">{entry[0].excerpt}</a></li>
+		<li><a href="entry[1].owner.url"><img src="{entry[1].owner.ProfileThumb}"></a><a href="{entry[1].url}">{entry[1].excerpt}</a></li>
+		<li><a href="entry[2].owner.url"><img src="{entry[2].owner.ProfileThumb}"></a><a href="{entry[2].url}">{entry[2].excerpt}</a></li>
+		<li><a href="entry[3].owner.url"><img src="{entry[3].owner.ProfileThumb}"></a><a href="{entry[3].url}">{entry[3].excerpt}</a></li>
+	</ul>
+	<a href="#news">>>more news</a>
+</div>

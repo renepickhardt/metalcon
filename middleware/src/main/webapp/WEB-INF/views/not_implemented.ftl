@@ -16,6 +16,12 @@
     <body>
       <h1>Not implemented</h1>
       <p>This view is not implemented yet.</p>
+                  include "newswidget/news.html
+      <#include "newswidget/news.html">
+      include "/newswidget/news.html
+      <#include "/newswidget/news.html">
+      #include "not_implemented.ftl"
+      <#include "not_implemented.ftl"> 
     </body>
   </#escape>
 </html>
