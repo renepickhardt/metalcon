@@ -1,6 +1,5 @@
 package de.metalcon.middleware.controller;
 
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
