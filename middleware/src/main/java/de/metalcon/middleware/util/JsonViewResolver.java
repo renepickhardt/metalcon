@@ -1,4 +1,4 @@
-package de.metalcon.middleware.config;
+package de.metalcon.middleware.util;
 
 import java.util.Locale;
 

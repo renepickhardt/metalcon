@@ -19,6 +19,8 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
+import de.metalcon.middleware.util.JsonViewResolver;
+
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = { "de.metalcon.middleware.controller" })
