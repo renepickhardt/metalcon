@@ -13,7 +13,7 @@
             content="application/xhtml+xml; charset=UTF-8"/>
       <title>Model</title>
       <link rel="stylesheet" type="text/css"
-            href="/middleware/resources/css/model.css"/>
+            href="resources/css/model.css"/>
     </head>
     <body>
       <#assign blacklist = ["springMacroRequestContext", "Request", "Session",
