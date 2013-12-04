@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -84,5 +87,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         RequestManager requestManager = new RequestManager();
         return requestManager;
     }
-
+    
+    @Bean
+    @Qualifier("requestManager")
+    public TaskExecutor requestManagerTaskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(5);
+        taskExecutor.setMaxPoolSize(10);
+        return taskExecutor;
+    }
+    
 }

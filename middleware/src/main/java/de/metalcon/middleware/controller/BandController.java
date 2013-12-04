@@ -28,12 +28,15 @@ public class BandController {
         RequestTransaction tx = requestManager.startTransaction();
         tx.request(new JsonRequest("http://headers.jsontest.com/"));
         tx.request(new JsonRequest("http://ip.jsontest.com/"));
+        tx.request(new JsonRequest("http://date.jsontest.com/"));
+        tx.request(new JsonRequest("http://echo.jsontest.com/metalcon/rocks"));
+        tx.request(new JsonRequest("http://md5.jsontest.com/?text=metalcon"));
 
         List<String> jsonAnswers = new LinkedList<String>();
 
-        String answer;
+        Object answer;
         while ((answer = tx.recieve()) != null) {
-            jsonAnswers.add(answer);
+            jsonAnswers.add((String) answer);
         }
 
         ModelAndView mv = new ModelAndView("model");
