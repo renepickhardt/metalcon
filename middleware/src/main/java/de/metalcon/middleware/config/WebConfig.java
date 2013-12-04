@@ -20,6 +20,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import de.metalcon.middleware.util.JsonViewResolver;
+import de.metalcon.middleware.util.request.RequestManager;
 
 @Configuration
 @EnableWebMvc
@@ -78,4 +79,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         return config;
     }
     
+    @Bean
+    public RequestManager requestManager() {
+        RequestManager requestManager = new RequestManager();
+        return requestManager;
+    }
+
 }
