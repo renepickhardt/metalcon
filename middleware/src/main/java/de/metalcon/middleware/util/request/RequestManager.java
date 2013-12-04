@@ -79,7 +79,6 @@ public class RequestManager {
             Object result = request.run();
             recieved.get(tx).add(result);
             requests.get(tx).remove(request);
-            System.out.println(result.toString());
         }
         
     }
