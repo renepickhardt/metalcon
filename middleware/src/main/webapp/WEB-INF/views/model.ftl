@@ -1,4 +1,5 @@
 <#ftl encoding="UTF-8" strict_syntax=true>
+<#import "/spring.ftl" as spring>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
@@ -13,7 +14,7 @@
             content="application/xhtml+xml; charset=UTF-8"/>
       <title>Model</title>
       <link rel="stylesheet" type="text/css"
-            href="resources/css/model.css"/>
+            href="<@spring.url "/resources/css/model.css"/>"/>
     </head>
     <body>
       <#assign blacklist = ["springMacroRequestContext", "Request", "Session",
