@@ -12,11 +12,12 @@ ul, li {
 
 h1 {
     margin: .5em 0;
-    padding: 0;
+    padding: .2em 0;
+    border-top: 1px solid black;
 }
 
 h2 {
-    margin: .5em 0;
+    margin: 1em 0 .5em 0;
     padding: 0;
 }
 
@@ -25,14 +26,48 @@ p {
     padding: 0;
 }
 
+form, .info, .body {
+    background: #EEE;
+    border-top: 1px solid black;
+    border-bottom: 5px solid #E8E8E8;
+}
+
+form {
+    margin: 0;
+    padding: .5em;
+    position:relative;
+}
+
+label {
+    margin-top: .5em;
+    display: block;
+    width: 15em;
+    float: left;
+    clear: left;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+input, textarea {
+    margin: .5em 0 0 0;
+    padding: .2em;
+    border: 1px solid black;
+    display: block;
+    width: 30em;
+    font: 1em sans-serif;
+    background: white;
+}
+
+#formSubmit {
+    width: 5em;
+}
+
 .info {
     padding: .5em;
     position: absolute;
     top: 1em;
     right: 1em;
     width: 15em;
-    border-top: 1px solid black;
-    background: #EEE;
     font-size: .8em;
 }
 
@@ -71,8 +106,6 @@ p {
 
 .body {
     padding: .5em;
-    border-top: 1px solid black;
-    background: #EEE;
 }
 
 .body_info {

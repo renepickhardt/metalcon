@@ -24,8 +24,16 @@
         <li><em>${ownUpdates?string("Showing", "Not showing")}</em> own updates</li>
       </ul>
       <h2>Post</h2>
+      <form id="post" action="<@spring.url "/news/${userId}/${posterId}/${ownUpdates?c}/post"/>" method="POST">
+        <label for="formStatusUpdateId">Status Update Identifier:</label>
+        <input id="formStatusUpdateId" name="formStatusUpdateId" type="text"/>
+        <label for="formMessage">Message:</label>
+        <textarea id="formMessage" name="formMessage" rows="5"></textarea>
+        <label for="formSubmit">Submit:</label>
+        <input id="formSubmit" name="formSubmit" type="submit" value="Post"/>
+      </form>
       <h2>News</h2>
-      <ul class="news">
+      <ul id="news">
         <#list news as item>
           <li class="item">
             <p class="head">

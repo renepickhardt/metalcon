@@ -37,7 +37,7 @@ public class NewsController {
     }
     
     @RequestMapping("{userId}/{posterId}/{ownUpdates}")
-    public ModelAndView newsList(
+    public ModelAndView listNews(
             @PathVariable("userId")     String  userId,
             @PathVariable("posterId")   String  posterId,
             @PathVariable("ownUpdates") Boolean ownUpdates)
@@ -88,6 +88,16 @@ public class NewsController {
         model.addAttribute("ownUpdates", ownUpdates);
         model.addAttribute("news",       modelNews);
         return new ModelAndView("news", model);
+    }
+    
+    @RequestMapping(value  = "{userId}/{posterId}/{ownUpdates}/post",
+                    method = RequestMethod.POST)
+    public String postNews(
+            @PathVariable("userId")     String  userId,
+            @PathVariable("posterId")   String  posterId,
+            @PathVariable("ownUpdates") Boolean ownUpdates) {
+        // TODO: post to graphity
+        return "redirect:/news/" + userId + "/" + posterId + "/" + ownUpdates.toString();
     }
     
 }
