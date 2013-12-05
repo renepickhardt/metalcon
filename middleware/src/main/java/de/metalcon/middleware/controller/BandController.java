@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import de.metalcon.middleware.domain.Band;
 import de.metalcon.middleware.util.request.JsonRequest;
-import de.metalcon.middleware.util.request.RequestManager;
 import de.metalcon.middleware.util.request.RequestTransaction;
 
 @Controller
@@ -22,11 +22,11 @@ import de.metalcon.middleware.util.request.RequestTransaction;
 public class BandController {
     
     @Autowired
-    private RequestManager requestManager;
-
+    BeanFactory beanFactory;
+    
     @RequestMapping("")
     public ModelAndView handleRequest() {
-        RequestTransaction tx = requestManager.startTransaction();
+        RequestTransaction tx = beanFactory.getBean(RequestTransaction.class);
         tx.request(new JsonRequest("http://headers.jsontest.com/"));
         tx.request(new JsonRequest("http://ip.jsontest.com/"));
         tx.request(new JsonRequest("http://date.jsontest.com/"));

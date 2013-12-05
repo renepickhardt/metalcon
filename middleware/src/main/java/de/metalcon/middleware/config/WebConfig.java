@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +22,10 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import de.metalcon.middleware.util.JsonViewResolver;
-import de.metalcon.middleware.util.request.RequestManager;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { "de.metalcon.middleware.controller" })
+@ComponentScan(basePackages = { "de.metalcon.middleware" })
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
@@ -83,14 +81,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     }
     
     @Bean
-    public RequestManager requestManager() {
-        RequestManager requestManager = new RequestManager();
-        return requestManager;
-    }
-    
-    @Bean
-    @Qualifier("requestManager")
-    public TaskExecutor requestManagerTaskExecutor() {
+    public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(5);
         taskExecutor.setMaxPoolSize(10);
