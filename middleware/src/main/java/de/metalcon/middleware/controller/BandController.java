@@ -22,7 +22,7 @@ import de.metalcon.middleware.util.request.RequestTransaction;
 public class BandController {
     
     @Autowired
-    BeanFactory beanFactory;
+    private BeanFactory beanFactory;
     
     @RequestMapping("")
     public ModelAndView handleRequest() {

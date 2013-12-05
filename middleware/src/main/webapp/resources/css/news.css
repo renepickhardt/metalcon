@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    padding: 1em;
+    font: 1em sans-serif;
+}
+
+ul, li {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+h1 {
+    margin: .5em 0;
+    padding: 0;
+}
+
+h2 {
+    margin: .5em 0;
+    padding: 0;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.info {
+    padding: .5em;
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    width: 15em;
+    border-top: 1px solid black;
+    background: #EEE;
+    font-size: .8em;
+}
+
+.info em {
+    font-style: normal;
+    font-weight: bold;
+}
+
+.head {
+    margin-top: 1em;
+    position: relative;
+}
+
+.head .verb {
+    font-weight: bold;
+    font-size: .6em;
+}
+
+.head .actor {
+    margin-left: .5em;
+    margin-right: .2em;
+    font-weight: bold;
+}
+
+.actor_info,
+.body_info {
+    font-size: .6em;
+}
+
+.head .published {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 1em;
+}
+
+.body {
+    padding: .5em;
+    border-top: 1px solid black;
+    background: #EEE;
+}
+
+.body_info {
+    display: block;
+}
