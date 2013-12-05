@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,9 +23,9 @@ public class HomeController {
 	    bands.add("Bolt Thrower");
 	    bands.add("another test");
 	    
-	    ModelAndView mv = new ModelAndView("home");
-	    mv.addObject("bands", bands);
-	    return mv;
+	    ModelMap model = new ModelMap();
+	    model.addAttribute("bands", bands);
+	    return new ModelAndView("home", model);
 	}
 	
 }

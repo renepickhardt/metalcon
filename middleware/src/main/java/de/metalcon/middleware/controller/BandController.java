@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,10 +39,10 @@ public class BandController {
         while ((answer = tx.recieve()) != null) {
             jsonAnswers.add((String) answer);
         }
-
-        ModelAndView mv = new ModelAndView("model");
-        mv.addObject("jsonAnswers", jsonAnswers);
-        return mv;
+        
+        ModelMap model = new ModelMap();
+        model.addAttribute("jsonAnswers", jsonAnswers);
+        return new ModelAndView("model", model);
     }
     
     @RequestMapping("{bandName}")
@@ -49,9 +50,9 @@ public class BandController {
             @PathVariable("bandName") String bandName) {
         Band band = new Band(bandName, Calendar.getInstance().getTime());
         
-        ModelAndView mv = new ModelAndView("band");
-        //mv.addObject("band", band);
-        return mv;
+        ModelMap model = new ModelMap();
+        //model.addAttribute("band", band);
+        return new ModelAndView("band", model);
     }
     
 }
