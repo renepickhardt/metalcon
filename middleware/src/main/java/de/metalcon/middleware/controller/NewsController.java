@@ -1,22 +1,38 @@
 package de.metalcon.middleware.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import de.metalcon.middleware.util.request.JsonRequest;
@@ -95,9 +111,53 @@ public class NewsController {
     public String postNews(
             @PathVariable("userId")     String  userId,
             @PathVariable("posterId")   String  posterId,
-            @PathVariable("ownUpdates") Boolean ownUpdates) {
-        // TODO: post to graphity
+            @PathVariable("ownUpdates") Boolean ownUpdates, 
+            @RequestParam("formMessage") String formMessage) throws IOException {
+    	//FIXME: make nice!
+    	String statusUpdateId = System.currentTimeMillis()+"";
+    	MultipartEntity mpe = new MultipartEntity();        
+    	mpe.addPart("user_id", new StringBody(userId));
+    	mpe.addPart("status_update_id",new StringBody(statusUpdateId));
+    	mpe.addPart("status_update_type", new StringBody("Plain"));
+    	mpe.addPart("message", new StringBody(formMessage));
+    	mpe.addPart("type", new StringBody("status_update"));
+
+    	String url = "http://localhost:8080/Graphity-Server-0.1/create";
+    	HttpClient httpclient = new DefaultHttpClient();
+    	HttpPost httpPost = new HttpPost(url);
+    	httpPost.setEntity(mpe);
+    	HttpResponse response = httpclient.execute(httpPost);
+    	BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+    	int i = 0;
+    	while ((i = br.read()) >= 0){
+    		System.out.print((char)i);
+    	}
+    	
+//    	rt.exchange(url, HttpMethod.POST, (HttpEntity<?>)mpe, String.class);
+//    	String resp = rt.postForObject(url, mvm, String.class,mvm );
+   // 	System.out.println("danach" + resp);
+
         return "redirect:/news/" + userId + "/" + posterId + "/" + ownUpdates.toString();
+    }
+    
+    public class FormData{
+    	/**
+		 * @return the formMessage
+		 */
+		public String getFormMessage() {
+			return formMessage;
+		}
+		public FormData(){
+			
+		}
+		/**
+		 * @param formMessage the formMessage to set
+		 */
+		public void setFormMessage(String formMessage) {
+			this.formMessage = formMessage;
+		}
+
+		private String formMessage;    	
     }
     
 }
