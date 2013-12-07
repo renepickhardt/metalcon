@@ -35,12 +35,13 @@
         <#list news as item>
           <li class="item">
             <p class="head">
-              <span class="verb">${item.verb.value}</span>
+              <span class="verb">${item.verb}</span>
               <span class="actor">${item.actor.displayName}</span>
-              <span class="actor_info">(${item.actor.id} - ${item.actor.objectType} )</span>
+              <span class="actor_info">(${item.actor.id} - ${item.actor.objectType})</span>
+              <span class="published">${item.published}</span>
             </p>
             <p class="body">
-              <span class="body_info">(${item.object.id} - ${item.object.objectType},${item.object.type} )</span>
+              <span class="body_info">(${item.object.id} - ${item.object.objectType},${item.object.type})</span>
               ${item.object.message}
             </p>
           </li>
