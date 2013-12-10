@@ -16,11 +16,11 @@
  # boilerplate code everytime.
  # 
  # Usage:
- # <@mtl.xhtml>
+ # <@mtl.html>
  #   Stuff inside <html> tag.
- # </@mtl.xhtml>
+ # </@mtl.html>
  #-->
-<#macro xhtml>
+<#macro html>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
