@@ -1,4 +1,4 @@
-package de.metalcon.middleware.controller;
+package de.metalcon.middleware.controller.test;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import de.metalcon.middleware.util.request.JsonRequest;
 import de.metalcon.middleware.util.request.RequestTransaction;
 
 @Controller
-@RequestMapping(value = "/news", method = RequestMethod.GET)
+@RequestMapping(value = "/test/news", method = RequestMethod.GET)
 public class NewsController {
     
     private static ObjectMapper mapper = new ObjectMapper();
@@ -90,7 +90,7 @@ public class NewsController {
         model.addAttribute("posterId",   posterId);
         model.addAttribute("ownUpdates", ownUpdates);
         model.addAttribute("news",       modelNews);
-        return new ModelAndView("news", model);
+        return new ModelAndView("test/news", model);
     }
     
     @RequestMapping(value  = "{userId}/{posterId}/{ownUpdates}/post",
@@ -114,7 +114,7 @@ public class NewsController {
     	httpPost.setEntity(entity);
     	new DefaultHttpClient().execute(httpPost);
     	
-        return "redirect:/news/" + userId + "/" + posterId + "/" + ownUpdates.toString();
+        return "redirect:/test/news/" + userId + "/" + posterId + "/" + ownUpdates.toString();
     }
     
 }

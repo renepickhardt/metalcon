@@ -24,7 +24,7 @@
         <li><em>${ownUpdates?string("Showing", "Not showing")}</em> own updates</li>
       </ul>
       <h2>Post</h2>
-      <form id="post" action="<@spring.url "/news/${userId}/${posterId}/${ownUpdates?c}/post"/>" method="POST">
+      <form id="post" action="<@spring.url "/test/news/${userId}/${posterId}/${ownUpdates?c}/post"/>" method="POST">
         <label for="formMessage">Message:</label>
         <textarea id="formMessage" name="formMessage" rows="5"></textarea>
         <label for="formSubmit">Submit:</label>

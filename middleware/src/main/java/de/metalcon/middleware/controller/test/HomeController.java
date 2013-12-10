@@ -1,4 +1,4 @@
-package de.metalcon.middleware.controller;
+package de.metalcon.middleware.controller.test;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@RequestMapping(value = "/test", method = RequestMethod.GET)
 public class HomeController {
 	
 	//private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping("")
 	public ModelAndView home() {
 	    List<String> bands = new LinkedList<String>();
 	    bands.add("Ensiferum");
@@ -25,7 +26,7 @@ public class HomeController {
 	    
 	    ModelMap model = new ModelMap();
 	    model.addAttribute("bands", bands);
-	    return new ModelAndView("home", model);
+	    return new ModelAndView("test/home", model);
 	}
 	
 }

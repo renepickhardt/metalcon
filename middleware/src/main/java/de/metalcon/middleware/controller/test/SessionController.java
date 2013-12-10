@@ -1,4 +1,4 @@
-package de.metalcon.middleware.controller;
+package de.metalcon.middleware.controller.test;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import de.metalcon.middleware.util.User;
 
 @Controller
-@RequestMapping(value = "/session", method = RequestMethod.GET)
+@RequestMapping(value = "/test/session", method = RequestMethod.GET)
 public class SessionController {
     
     @Autowired

@@ -1,4 +1,4 @@
-package de.metalcon.middleware.controller;
+package de.metalcon.middleware.controller.test;
 
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -18,7 +18,7 @@ import de.metalcon.middleware.util.request.JsonRequest;
 import de.metalcon.middleware.util.request.RequestTransaction;
 
 @Controller
-@RequestMapping(value = "/band", method = RequestMethod.GET)
+@RequestMapping(value = "/test/band", method = RequestMethod.GET)
 public class BandController {
     
     @Autowired
@@ -52,7 +52,7 @@ public class BandController {
         
         ModelMap model = new ModelMap();
         //model.addAttribute("band", band);
-        return new ModelAndView("band", model);
+        return new ModelAndView("test/band", model);
     }
     
 }
