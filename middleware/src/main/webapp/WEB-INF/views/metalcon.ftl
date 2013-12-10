@@ -1,6 +1,25 @@
 <#ftl encoding="UTF-8" strict_syntax=true>
+
+<#--
+ # metalcon.ftl
+ #
+ # Collections of macros to easy view development.
+ #
+ # Include in your view like this:
+ # <#import "/metalcon.ftl" as mtl>
+ #-->
+ 
 <#import "/spring.ftl" as spring>
 
+<#--
+ # Convenience macro to create a <html> tag. Saves us from writing XHTML-
+ # boilerplate code everytime.
+ # 
+ # Usage:
+ # <@mtl.xhtml>
+ #   Stuff inside <html> tag.
+ # </@mtl.xhtml>
+ #-->
 <#macro xhtml>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -16,6 +35,16 @@
 </html>
 </#macro>
 
+<#--
+ # Convenience macro to create a <head> tag.
+ #
+ # @param title  A string to be used for the <title> tag.
+ #
+ # Usage:
+ # <@mtl.head title="My Page Title">
+ #   Stuff inside <head> tag.
+ # </@mtl.head>
+ #-->
 <#macro head title>
 <head>
   <title>${title}</title>
@@ -24,12 +53,26 @@
 </head>
 </#macro>
 
+<#--
+ # Convenience macro to create a <body> tag.
+ #
+ # Usage:
+ # <@mtl.body>
+ #   Stuff inside <body> tag.
+ # </@mtl.body>
+ #-->
 <#macro body>
 <body>
   <#nested>
 </body>
 </#macro>
 
+<#--
+ # To be used in views that are not implemented yet.
+ #
+ # Usage:
+ # <@mtl.not_implemented/>
+ #-->
 <#macro not_implemented>
 <@xhtml>
   <@head title="Not implemented"/>

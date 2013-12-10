@@ -1,5 +1,5 @@
 <#ftl encoding="UTF-8" strict_syntax=true>
-<#import "../metalcon.ftl" as mtl>
+<#import "/metalcon.ftl" as mtl>
 <@mtl.xhtml>
   <@mtl.head title="Band" />
   <@mtl.body>
