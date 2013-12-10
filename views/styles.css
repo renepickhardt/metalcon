@@ -7,5 +7,12 @@
 .newsfeedEntry {border:thin solid red;background-color:#FFFFAA;width:750;height:80}
 .newsfeedEntryImage {width:68;float:left}
 .infoTab {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
-.tabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.BandsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.EventsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.PhotosTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.RecordsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.ReviewsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.TrackstabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.UsersTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
+.VenuesTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;position:relative;top:20;left:20}
 .tabPreviewContainer {float:left}
