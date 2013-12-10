@@ -3,7 +3,7 @@
 <#import "/spring.ftl" as spring>
 <@mtl.html>
   <@mtl.head title="News ${userId} - Metalcon Middleware">
-    <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/news.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/test/news.css"/>"/>
   </@mtl.head>
   <@mtl.body>
     <h1>Metalcon Newsstream</h1>

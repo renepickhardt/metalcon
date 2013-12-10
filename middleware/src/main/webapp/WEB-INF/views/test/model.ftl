@@ -3,7 +3,7 @@
 <#import "/spring.ftl" as spring>
 <@mtl.html>
   <@mtl.head title="Model">
-    <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/model.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/test/model.css"/>"/>
   </@mtl.head>
   <@mtl.body>
     <#assign blacklist = ["springMacroRequestContext", "Request", "Session",

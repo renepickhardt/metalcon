@@ -10,6 +10,7 @@
  #-->
  
 <#import "/spring.ftl" as spring>
+<#setting locale="de_DE">
 
 <#--
  # Convenience macro to create a <html> tag. Saves us from writing XHTML-
