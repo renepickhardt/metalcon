@@ -1,6 +1,5 @@
 package de.metalcon.middleware.controller.test;
 
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.metalcon.middleware.domain.Band;
 import de.metalcon.middleware.util.request.JsonRequest;
 import de.metalcon.middleware.util.request.RequestTransaction;
 
@@ -48,7 +46,7 @@ public class BandController {
     @RequestMapping("{bandName}")
     public ModelAndView handleRequestByBandName(
             @PathVariable("bandName") String bandName) {
-        Band band = new Band(bandName, Calendar.getInstance().getTime());
+        //Band band = new Band(bandName, Calendar.getInstance().getTime());
         
         ModelMap model = new ModelMap();
         //model.addAttribute("band", band);
