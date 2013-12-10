@@ -1,17 +1,28 @@
+<!-- input parameters:
+	a list of active filters
+	a list of possible sortings
+ -->
 	<div class="filterBox">
 
 		<div class="filter">
-		  also here checkboxes seem more intuitive than list items?
 			<ul>
-				<li><!--TODO: deselect-Button, name of active filter-->
+				<li>
+					filter[0].deselectButton filter[0].name 	<!-- deselect-Button is just a simple, clickable image -->
+				</li>
+				<li>
+					filter[1].deselectButton filter[1].name
 				</li>
 			</ul>
 		</div>
 
 		<div class="sort">
-		  Sure that you want to have a list for sorting criteria and not something like a drop down?
 			<ul>
-				<li><!-- TODO: name of active sorting, selection-item for sorting-->
+				<li>
+					<select name="sorting">
+						<option value="sortingCriteria[0].value">sortingCriteria[0].name</option>
+						<option value="sortingCriteria[1].value">sortingCriteria[1].name</option>
+						<option value="sortingCriteria[2].value">sortingCriteria[2].name</option>
+					</select>
 				</li>
 			</ul>
 		</div>
