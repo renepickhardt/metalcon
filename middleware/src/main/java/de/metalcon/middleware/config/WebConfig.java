@@ -18,7 +18,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import de.metalcon.middleware.core.JsonViewResolver;
@@ -70,14 +69,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         resolver.setViewResolvers(resolvers);
         resolver.setContentNegotiationManager(manager);
         return resolver;
-    }
-    
-    @Bean
-    public FreeMarkerConfigurer freemarkerConfig() {
-        FreeMarkerConfigurer config = new FreeMarkerConfigurer();
-        config.setDefaultEncoding("UTF-8");
-        config.setTemplateLoaderPath("/WEB-INF/views/");
-        return config;
     }
     
     @Bean
