@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.metalcon.middleware.util.UrlMapper;
+import de.metalcon.middleware.core.UrlMapper;
 
 @Controller
 @RequestMapping(value = UrlMapper.MUSIC_MAPPPING, method = RequestMethod.GET)

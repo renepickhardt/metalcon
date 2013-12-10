@@ -1,4 +1,4 @@
-package de.metalcon.middleware.util;
+package de.metalcon.middleware.core;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

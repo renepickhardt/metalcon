@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.metalcon.middleware.util.request.JsonRequest;
-import de.metalcon.middleware.util.request.RequestTransaction;
+import de.metalcon.middleware.core.request.JsonRequest;
+import de.metalcon.middleware.core.request.RequestTransaction;
 
 @Controller
 @RequestMapping(value = "/test/band", method = RequestMethod.GET)

@@ -1,4 +1,4 @@
-package de.metalcon.middleware.util.request;
+package de.metalcon.middleware.core.request;
 
 public interface Request {
     

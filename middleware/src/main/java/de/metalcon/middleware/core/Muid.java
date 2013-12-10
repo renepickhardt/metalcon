@@ -1,4 +1,4 @@
-package de.metalcon.middleware.util;
+package de.metalcon.middleware.core;
 
 public class Muid {
     
