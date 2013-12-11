@@ -1,13 +1,13 @@
 package de.metalcon.middleware.domain.entity;
 
-public class Band extends Entity {
+public class City extends Entity {
     
     @Override
     public EntityType getEntityType() {
-        return EntityType.BAND;
+        return EntityType.CITY;
     }
     
-    public Band(String name) {
+    public City(String name) {
         super(name);
     }
     
