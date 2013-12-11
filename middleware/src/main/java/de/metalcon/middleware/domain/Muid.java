@@ -1,4 +1,4 @@
-package de.metalcon.middleware.core;
+package de.metalcon.middleware.domain;
 
 public class Muid {
     
@@ -14,6 +14,11 @@ public class Muid {
     
     public void setMuid(long muid) {
         this.muid = muid;
+    }
+    
+    public EntityType getEntityType() {
+        // TODO: stub
+        return EntityType.BAND;
     }
 
 }

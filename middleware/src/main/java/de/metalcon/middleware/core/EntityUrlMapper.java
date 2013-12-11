@@ -2,22 +2,26 @@ package de.metalcon.middleware.core;
 
 import org.springframework.stereotype.Component;
 
+import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.exception.RedirectException;
 
 @Component
 public class EntityUrlMapper {
     
     // Controller Mappings
-    public static final String USER_MAPPING       = "/user/{pathUser}";
-    public static final String BAND_MAPPING       = "/music/{pathBand}";
-    public static final String RECORD_MAPPING     = BAND_MAPPING + "/{pathRecord}";
-    public static final String TRACK_MAPPING      = RECORD_MAPPING + "/{pathTrack}";
-    public static final String CITY_MAPPING       = "/city/{pathCity}";
-    public static final String VENUE_MAPPING      = "/venue/{pathVenue}";
-    public static final String EVENT_MAPPING      = "/event/{pathEvent}";
-    public static final String GENRE_MAPPING      = "/genre/{pathGenre}";
-    public static final String INSTRUMENT_MAPPING = "/instrument/{pathInstrument}";
-    public static final String TOUR_MAPPING       = "/tour/{pathTour}";
+    public static final String USER_MAPPING       = "/user/{path1}"                  + "{path2:}{path3:}";
+    public static final String BAND_MAPPING       = "/music/{path1}"                 + "{path2:}{path3:}";
+    public static final String RECORD_MAPPING     = "/music/{path1}/{path2}"                 + "{path3:}";
+    public static final String TRACK_MAPPING      = "/music/{path1}/{path2}/{path3}";
+    public static final String CITY_MAPPING       = "/city/{path1}"                  + "{path2:}{path3:}";
+    public static final String VENUE_MAPPING      = "/venue/{path1}"                 + "{path2:}{path3:}";
+    public static final String EVENT_MAPPING      = "/event/{path1}"                 + "{path2:}{path3:}";
+    public static final String GENRE_MAPPING      = "/genre/{path1}"                 + "{path2:}{path3:}";
+    public static final String INSTRUMENT_MAPPING = "/instrument/{path1}"            + "{path2:}{path3:}";
+    public static final String TOUR_MAPPING       = "/tour/{path1}"                  + "{path2:}{path3:}";
+    
+    // Tab Mappings
+    public static final String EMPTY_TAB_MAPPING = "";
     
     public Muid getUser(String pathUser)
     throws RedirectException {
