@@ -7,7 +7,18 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import de.metalcon.middleware.domain.Muid;
+import de.metalcon.middleware.domain.entity.Band;
+import de.metalcon.middleware.domain.entity.City;
+import de.metalcon.middleware.domain.entity.Entity;
 import de.metalcon.middleware.domain.entity.EntityType;
+import de.metalcon.middleware.domain.entity.Event;
+import de.metalcon.middleware.domain.entity.Genre;
+import de.metalcon.middleware.domain.entity.Instrument;
+import de.metalcon.middleware.domain.entity.Record;
+import de.metalcon.middleware.domain.entity.Tour;
+import de.metalcon.middleware.domain.entity.Track;
+import de.metalcon.middleware.domain.entity.User;
+import de.metalcon.middleware.domain.entity.Venue;
 import de.metalcon.middleware.exception.RedirectException;
 
 @Component
@@ -26,7 +37,18 @@ public class EntityUrlMapper {
     public static final String TOUR_MAPPING       = "/tour/{path1}"                  + "{path2:}{path3:}";
     
     // Tab Mappings
-    public static final String EMPTY_TAB_MAPPING = "";
+    public static final String EMPTY_TAB_MAPPING           = "";
+    public static final String INFO_TAB_MAPPING            = "/info";
+    public static final String NEWSFEED_TAB_MAPPING        = "/news";
+    public static final String BANDS_TAB_MAPPING           = "/bands";
+    public static final String RECORDS_TAB_MAPPING         = "/records";
+    public static final String TRACKS_TAB_MAPPING          = "/tracks";
+    public static final String REVIEW_TAB_MAPPING          = "/review";
+    public static final String VENUES_TAB_MAPPING          = "/venues";
+    public static final String EVENTS_TAB_MAPPING          = "/events";
+    public static final String USERS_TAB_MAPPING           = "/users";
+    public static final String PHOTOS_TAB_MAPPING          = "/photos";
+    public static final String RECOMMENDATIONS_TAB_MAPPING = "/recommendations";
     
     private Map<Muid, List<String>>      muidToMapping;
     
@@ -56,7 +78,24 @@ public class EntityUrlMapper {
         mappingToMuidTour       = new HashMap<String, Muid>();
     }
     
-    public void registerMuid(Muid muid) {
+    public void registerMuid(Entity entity) {
+        switch (entity.getEntityType()) {
+            case USER:       registerMuidUser((User) entity);
+            case BAND:       registerMuidBand((Band) entity);
+            case RECORD:     registerMuidRecord((Record) entity);
+            case TRACK:      registerMuidTrack((Track) entity);
+            case VENUE:      registerMuidVenue((Venue) entity);
+            case EVENT:      registerMuidEvent((Event) entity);
+            case CITY:       registerMuidCity((City) entity);
+            case GENRE:      registerMuidGenre((Genre) entity);
+            case INSTRUMENT: registerMuidInstrument((Instrument) entity);
+            case TOUR:       registerMuidTour((Tour) entity);
+            
+            default:
+                throw new IllegalStateException(
+                        "Unimplented EntityType in EntityUrlmapper.registerMuid(): "
+                                + entity.getEntityType().toString() + ".");
+        }
     }
 
     public Muid getMuid(
@@ -76,7 +115,8 @@ public class EntityUrlMapper {
 
             default:
                 throw new IllegalStateException(
-                        "Unimplemented EntityType for controller.");
+                        "Unimplemented EntityType in EntityUrlMapper.getMuid: "
+                                + entityType.toString() + ".");
         }
     }
     
@@ -87,9 +127,19 @@ public class EntityUrlMapper {
         return mappings.get(0);
     }
     
+    // User
+    
+    private void registerMuidUser(User user) {
+    }
+    
     private Muid getMuidUser(String pathUser)
     throws RedirectException {
         return mappingToMuidUser.get(pathUser);
+    }
+    
+    // Band
+    
+    private void registerMuidBand(Band band) {
     }
     
     private Muid getMuidBand(String pathBand)
@@ -97,10 +147,20 @@ public class EntityUrlMapper {
         return mappingToMuidBand.get(pathBand);
     }
     
+    // Record
+    
+    private void registerMuidRecord(Record record) {
+    }
+    
     private Muid getMuidRecord(String pathBand, String pathRecord)
     throws RedirectException {
         return mappingToMuidRecord.get(getMuidBand(pathBand))
                                   .get(pathRecord);
+    }
+    
+    // Track
+    
+    private void registerMuidTrack(Track track) {
     }
     
     private Muid getMuidTrack(String pathBand, String pathRecord,
@@ -111,9 +171,19 @@ public class EntityUrlMapper {
                 .get(pathTrack);
     }
     
+    // City
+    
+    private void registerMuidCity(City city) {
+    }
+    
     private Muid getMuidCity(String pathCity)
     throws RedirectException {
         return mappingToMuidCity.get(pathCity);
+    }
+    
+    // Venue
+    
+    private void registerMuidVenue(Venue venue) {
     }
     
     private Muid getMuidVenue(String pathVenue)
@@ -121,9 +191,19 @@ public class EntityUrlMapper {
         return mappingToMuidVenue.get(pathVenue);
     }
     
+    // Event
+    
+    private void registerMuidEvent(Event event) {
+    }
+    
     private Muid getMuidEvent(String pathEvent)
     throws RedirectException {
         return mappingToMuidEvent.get(pathEvent);
+    }
+    
+    // Genre
+    
+    private void registerMuidGenre(Genre genre) {
     }
     
     private Muid getMuidGenre(String pathGenre)
@@ -131,9 +211,19 @@ public class EntityUrlMapper {
         return mappingToMuidGenre.get(pathGenre);
     }
     
+    // Instrument
+    
+    private void registerMuidInstrument(Instrument instrument) {
+    }
+    
     private Muid getMuidInstrument(String pathInstrument)
     throws RedirectException {
         return mappingToMuidInstrument.get(pathInstrument);
+    }
+    
+    // Tour
+    
+    private void registerMuidTour(Tour tour) {
     }
     
     private Muid getMuidTour(String pathTour)
