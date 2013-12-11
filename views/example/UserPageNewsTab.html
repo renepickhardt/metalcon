@@ -7,13 +7,13 @@
 <div class="tab" style="float:left">
 
 	<div class="headline">
-		<h1>Thrudvangr Rising</h1>
+		<h1>{user.name}</h1>
 	</div>
 
 	<div class="filterOptionsBox">
 		<div class="filterSelection"> filter:
 			<ul>
-				<li>Thrudvangr Rising</li>
+				<li>{user.name}</li>
 			</ul>
 			
 		</div>
@@ -36,14 +36,14 @@
 			<img src="example2.png">
 		</div>
 		<div class="newsfeedEntryContent" style="float:left">
-			This is another example text this user might have posted.
+			{user.lastPost}
 		</div>
-	</div>
+	</div>
 
 <div class="tabPreviewContainer" style="float:left">
 
 	<div class="infoTab" >	
-		Thrudvangr is n years old and lives in some town.
+		{user.FirstName} is {user.age} years old and lives in {user.hometown}.
 	</div>
 
 	<div class="tabPreview">
