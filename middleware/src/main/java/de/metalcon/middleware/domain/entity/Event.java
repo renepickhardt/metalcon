@@ -2,6 +2,8 @@ package de.metalcon.middleware.domain.entity;
 
 import java.util.Date;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Event extends Entity {
 
     @Override
@@ -9,9 +11,9 @@ public class Event extends Entity {
         return EntityType.EVENT;
     }
     
-    private City city;
+    private Muid city;
     
-    private Venue venue;
+    private Muid venue;
     
     private Date date;
     
@@ -22,19 +24,19 @@ public class Event extends Entity {
         date  = null;
     }
     
-    public City getCity() {
+    public Muid getCity() {
         return city;
     }
     
-    public void setCity(City city) {
+    public void setCity(Muid city) {
         this.city = city;
     }
     
-    public Venue getVenue() {
+    public Muid getVenue() {
         return venue;
     }
     
-    public void setVenue(Venue venue) {
+    public void setVenue(Muid venue) {
         this.venue = venue;
     }
     

@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Venue extends Entity {
     
     @Override
@@ -7,18 +9,18 @@ public class Venue extends Entity {
         return EntityType.VENUE;
     }
     
-    private City city;
+    private Muid city;
     
     public Venue(String name) {
         super(name);
         city = null;
     }
     
-    public City getCity() {
+    public Muid getCity() {
         return city;
     }
     
-    public void setCity(City city) {
+    public void setCity(Muid city) {
         this.city = city;
     }
     

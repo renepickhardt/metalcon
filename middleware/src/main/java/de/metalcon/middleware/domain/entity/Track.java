@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Track extends Entity {
 
     @Override
@@ -7,9 +9,9 @@ public class Track extends Entity {
         return EntityType.TRACK;
     }
     
-    private Band band;
+    private Muid band;
     
-    private Record record;
+    private Muid record;
     
     public Track(String name) {
         super(name);
@@ -17,19 +19,19 @@ public class Track extends Entity {
         record = null;
     }
     
-    public Band getBand() {
+    public Muid getBand() {
         return band;
     }
     
-    public void setBand(Band band) {
+    public void setBand(Muid band) {
         this.band = band;
     }
     
-    public Record getRecord() {
+    public Muid getRecord() {
         return record;
     }
     
-    public void setRecord(Record record) {
+    public void setRecord(Muid record) {
         this.record = record;
     }
 

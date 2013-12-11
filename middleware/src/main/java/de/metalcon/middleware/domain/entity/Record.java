@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Record extends Entity {
 
     @Override
@@ -7,7 +9,7 @@ public class Record extends Entity {
         return EntityType.RECORD;
     }
     
-    private Band band;
+    private Muid band;
     
     private Integer releaseYear;
 
@@ -17,11 +19,11 @@ public class Record extends Entity {
         releaseYear = null;
     }
     
-    public Band getBand() {
+    public Muid getBand() {
         return band;
     }
     
-    public void setBand(Band band) {
+    public void setBand(Muid band) {
         this.band = band;
     }
     
