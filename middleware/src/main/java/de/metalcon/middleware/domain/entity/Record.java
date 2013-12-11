@@ -13,8 +13,8 @@ public class Record extends Entity {
     
     private Integer releaseYear;
 
-    public Record(String name) {
-        super(name);
+    public Record(Muid muid, String name) {
+        super(muid, name);
         band        = null;
         releaseYear = null;
     }

@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class User extends Entity {
 
     @Override
@@ -15,8 +17,8 @@ public class User extends Entity {
     
     private String lastName;
     
-    public User(String firstName, String lastName) {
-        super(concatNames(firstName, lastName));
+    public User(Muid muid, String firstName, String lastName) {
+        super(muid, concatNames(firstName, lastName));
         setFirstName(firstName);
         setLastName(lastName);
     }

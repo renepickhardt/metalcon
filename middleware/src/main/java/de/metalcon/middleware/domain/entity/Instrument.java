@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Instrument extends Entity {
     
     @Override
@@ -7,8 +9,8 @@ public class Instrument extends Entity {
         return EntityType.INSTRUMENT;
     }
     
-    public Instrument(String name) {
-        super(name);
+    public Instrument(Muid muid, String name) {
+        super(muid, name);
     }
     
 }

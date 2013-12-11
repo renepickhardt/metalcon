@@ -11,8 +11,8 @@ public class Venue extends Entity {
     
     private Muid city;
     
-    public Venue(String name) {
-        super(name);
+    public Venue(Muid muid, String name) {
+        super(muid, name);
         city = null;
     }
     

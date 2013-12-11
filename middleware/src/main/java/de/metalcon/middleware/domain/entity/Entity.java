@@ -1,12 +1,16 @@
 package de.metalcon.middleware.domain.entity;
 
-public abstract class Entity {
+import de.metalcon.middleware.domain.Identity;
+import de.metalcon.middleware.domain.Muid;
+
+public abstract class Entity extends Identity {
     
     public abstract EntityType getEntityType();
     
     private String name;
     
-    public Entity(String name) {
+    public Entity(Muid muid, String name) {
+        super(muid);
         setName(name);
     }
     

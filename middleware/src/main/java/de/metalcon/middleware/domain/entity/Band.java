@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Band extends Entity {
     
     @Override
@@ -7,8 +9,8 @@ public class Band extends Entity {
         return EntityType.BAND;
     }
     
-    public Band(String name) {
-        super(name);
+    public Band(Muid muid, String name) {
+        super(muid, name);
     }
     
 }

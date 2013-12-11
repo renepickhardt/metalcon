@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Genre extends Entity {
     
     @Override
@@ -7,8 +9,8 @@ public class Genre extends Entity {
         return EntityType.GENRE;
     }
     
-    public Genre(String name) {
-        super(name);
+    public Genre(Muid muid, String name) {
+        super(muid, name);
     }
     
 }

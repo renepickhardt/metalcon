@@ -17,8 +17,8 @@ public class Event extends Entity {
     
     private Date date;
     
-    public Event(String name) {
-        super(name);
+    public Event(Muid muid, String name) {
+        super(muid, name);
         city  = null;
         venue = null;
         date  = null;

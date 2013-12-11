@@ -13,8 +13,8 @@ public class Track extends Entity {
     
     private Muid record;
     
-    public Track(String name) {
-        super(name);
+    public Track(Muid muid, String name) {
+        super(muid, name);
         band   = null;
         record = null;
     }

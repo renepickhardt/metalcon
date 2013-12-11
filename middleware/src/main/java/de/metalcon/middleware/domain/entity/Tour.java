@@ -1,5 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
+import de.metalcon.middleware.domain.Muid;
+
 public class Tour extends Entity {
     
     @Override
@@ -9,8 +11,8 @@ public class Tour extends Entity {
     
     public Integer year;
     
-    public Tour(String name) {
-        super(name);
+    public Tour(Muid muid, String name) {
+        super(muid, name);
         year = null;
     }
     
