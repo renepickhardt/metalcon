@@ -25,7 +25,7 @@ public class FreeMarkerConfig extends FreeMarkerConfigurer {
     throws IOException, TemplateException {
         DefaultObjectWrapper wrapper = new DefaultObjectWrapper();
         wrapper.setExposeFields(false);
-        wrapper.setExposureLevel(DefaultObjectWrapper.EXPOSE_PROPERTIES_ONLY);
+        wrapper.setExposureLevel(DefaultObjectWrapper.EXPOSE_SAFE);
         config.setObjectWrapper(wrapper);
         config.setTemplateExceptionHandler(
                 TemplateExceptionHandler.RETHROW_HANDLER);

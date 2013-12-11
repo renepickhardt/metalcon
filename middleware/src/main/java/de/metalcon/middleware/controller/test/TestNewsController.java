@@ -10,10 +10,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.metalcon.middleware.core.request.JsonRequest;
 import de.metalcon.middleware.core.request.RequestTransaction;
@@ -67,21 +68,21 @@ public class TestNewsController {
             JsonNode published = item.get("published");
             
             Map<String, String> modelActor  = new HashMap<String, String>();
-            modelActor.put("id",          actor.get("id").getTextValue());
-            modelActor.put("objectType",  actor.get("objectType").getTextValue());
-            modelActor.put("displayName", actor.get("displayName").getTextValue());
+            modelActor.put("id",          actor.get("id").textValue());
+            modelActor.put("objectType",  actor.get("objectType").textValue());
+            modelActor.put("displayName", actor.get("displayName").textValue());
             
             Map<String, String> modelObject = new HashMap<String, String>();
-            modelObject.put("id",         object.get("id").getTextValue());
-            modelObject.put("objectType", object.get("objectType").getTextValue());
-            modelObject.put("message",    object.get("message").getTextValue());
-            modelObject.put("type",       object.get("type").getTextValue());
+            modelObject.put("id",         object.get("id").textValue());
+            modelObject.put("objectType", object.get("objectType").textValue());
+            modelObject.put("message",    object.get("message").textValue());
+            modelObject.put("type",       object.get("type").textValue());
             
             Map<String, Object> modelItem = new HashMap<String, Object>();
-            modelItem.put("verb",      verb.getTextValue());
+            modelItem.put("verb",      verb.textValue());
             modelItem.put("actor",     modelActor);
             modelItem.put("object",    modelObject);
-            modelItem.put("published", published.getTextValue());
+            modelItem.put("published", published.textValue());
             modelNews.add(modelItem);
         }
         
