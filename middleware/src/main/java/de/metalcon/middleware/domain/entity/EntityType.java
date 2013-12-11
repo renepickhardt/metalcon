@@ -1,4 +1,4 @@
-package de.metalcon.middleware.domain;
+package de.metalcon.middleware.domain.entity;
 
 public enum EntityType {
     USER,

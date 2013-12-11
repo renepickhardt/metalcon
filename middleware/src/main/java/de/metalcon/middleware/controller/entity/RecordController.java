@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.metalcon.middleware.core.EntityUrlMapper;
-import de.metalcon.middleware.domain.EntityType;
 import de.metalcon.middleware.domain.Muid;
+import de.metalcon.middleware.domain.entity.EntityType;
 
 @Controller
 @RequestMapping(value  = EntityUrlMapper.RECORD_MAPPING,
