@@ -5,26 +5,19 @@ import org.springframework.stereotype.Component;
 import de.metalcon.middleware.exception.RedirectException;
 
 @Component
-public class UrlMapper {
+public class EntityUrlMapper {
     
     // Controller Mappings
-    
-    public static final String USER_MAPPING       = "/user";
-    public static final String MUSIC_MAPPPING     = "/music";
-    public static final String CITY_MAPPING       = "/city";
-    public static final String VENUE_MAPPING      = "/venue";
-    public static final String EVENT_MAPPING      = "/event";
-    public static final String GENRE_MAPPING      = "/genre";
-    public static final String INSTRUMENT_MAPPING = "/instrument";
-    public static final String TOUR_MAPPING       = "/tour";
-    
-    // Controller Method Mappings
-    
-    // Music
-    public static final String BAND_MAPPING   = "/{pathBand}";
-    public static final String RECORD_MAPPING = BAND_MAPPING + "/{pathRecord}";
-    public static final String TRACK_MAPPING  = RECORD_MAPPING + "/{pathTrack}";
-    
+    public static final String USER_MAPPING       = "/user/{pathUser}";
+    public static final String BAND_MAPPING       = "/music/{pathBand}";
+    public static final String RECORD_MAPPING     = BAND_MAPPING + "/{pathRecord}";
+    public static final String TRACK_MAPPING      = RECORD_MAPPING + "/{pathTrack}";
+    public static final String CITY_MAPPING       = "/city/{pathCity}";
+    public static final String VENUE_MAPPING      = "/venue/{pathVenue}";
+    public static final String EVENT_MAPPING      = "/event/{pathEvent}";
+    public static final String GENRE_MAPPING      = "/genre/{pathGenre}";
+    public static final String INSTRUMENT_MAPPING = "/instrument/{pathInstrument}";
+    public static final String TOUR_MAPPING       = "/tour/{pathTour}";
     
     public Muid getUser(String pathUser)
     throws RedirectException {

@@ -29,7 +29,7 @@ import de.metalcon.middleware.core.request.RequestTransaction;
 
 @Controller
 @RequestMapping(value = "/test/news", method = RequestMethod.GET)
-public class NewsController {
+public class TestNewsController {
     
     private static ObjectMapper mapper = new ObjectMapper();
 

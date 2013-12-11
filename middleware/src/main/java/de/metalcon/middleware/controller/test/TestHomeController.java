@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/test", method = RequestMethod.GET)
-public class HomeController {
+public class TestHomeController {
 	
 	//private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	

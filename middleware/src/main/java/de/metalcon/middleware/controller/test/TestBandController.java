@@ -19,7 +19,7 @@ import de.metalcon.middleware.domain.Band;
 
 @Controller
 @RequestMapping(value = "/test/band", method = RequestMethod.GET)
-public class BandController {
+public class TestBandController {
     
     @Autowired
     private BeanFactory beanFactory;
