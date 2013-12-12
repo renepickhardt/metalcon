@@ -1,6 +1,7 @@
 package de.metalcon.middleware.domain.entity;
 
 public enum EntityType {
+    
     USER,
     BAND,
     RECORD,
@@ -11,4 +12,5 @@ public enum EntityType {
     GENRE,
     INSTRUMENT,
     TOUR;
+    
 }

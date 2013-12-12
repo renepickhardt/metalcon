@@ -1,7 +1,6 @@
 package de.metalcon.middleware.controller.entity;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -15,14 +14,63 @@ import de.metalcon.middleware.domain.entity.EntityType;
 public class BandController extends EntityController {
 
     @Override
-    protected EntityType getEntityType() {
+    public EntityType getEntityType() {
         return EntityType.BAND;
     }
-    
+
     @Override
-    protected ModelAndView handleEmptyTab(Muid muid) {
-        ModelMap model = new ModelMap();
-        return new ModelAndView("entity/band", model);
+    protected ModelAndView handleInfoTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleNewsfeedTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleBandsTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleRecordsTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleTracksTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleReviewsTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleVenuesTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleEventsTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleUsersTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handlePhotosTab(Muid muid) {
+        return null;
+    }
+
+    @Override
+    protected ModelAndView handleRecommendationsTab(Muid muid) {
+        return null;
     }
     
 }

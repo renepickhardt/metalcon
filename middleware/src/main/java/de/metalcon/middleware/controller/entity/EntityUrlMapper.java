@@ -43,7 +43,7 @@ public class EntityUrlMapper {
     public static final String BANDS_TAB_MAPPING           = "/bands";
     public static final String RECORDS_TAB_MAPPING         = "/records";
     public static final String TRACKS_TAB_MAPPING          = "/tracks";
-    public static final String REVIEW_TAB_MAPPING          = "/review";
+    public static final String REVIEWS_TAB_MAPPING         = "/reviews";
     public static final String VENUES_TAB_MAPPING          = "/venues";
     public static final String EVENTS_TAB_MAPPING          = "/events";
     public static final String USERS_TAB_MAPPING           = "/users";
@@ -93,7 +93,7 @@ public class EntityUrlMapper {
             
             default:
                 throw new IllegalStateException(
-                        "Unimplented EntityType in EntityUrlmapper.registerMuid(): "
+                        "Unimplented EntityType in EntityUrlMapper.registerMuid(): "
                                 + entity.getEntityType().toString() + ".");
         }
     }
