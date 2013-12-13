@@ -3,7 +3,7 @@
 <#import "/spring.ftl" as spring>
 <@mtl.html>
   <@mtl.head title="Model">
-    <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/test/model.css"/>"/>
+    <@mtl.stylesheet href="test/model.css"/>
   </@mtl.head>
   <@mtl.body>
     <#escape x as x?html>
