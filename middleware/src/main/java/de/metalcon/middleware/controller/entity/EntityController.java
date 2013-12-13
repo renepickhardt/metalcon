@@ -1,6 +1,8 @@
 package de.metalcon.middleware.controller.entity;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,33 +17,44 @@ import de.metalcon.middleware.controller.MetalconController;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.exception.RedirectException;
-import de.metalcon.middleware.views.tabs.entity.BandsTab;
-import de.metalcon.middleware.views.tabs.entity.EntityTab;
-import de.metalcon.middleware.views.tabs.entity.EntityTabType;
-import de.metalcon.middleware.views.tabs.entity.EventsTab;
-import de.metalcon.middleware.views.tabs.entity.InfoTab;
-import de.metalcon.middleware.views.tabs.entity.NewsfeedTab;
-import de.metalcon.middleware.views.tabs.entity.PhotosTab;
-import de.metalcon.middleware.views.tabs.entity.RecommendationsTab;
-import de.metalcon.middleware.views.tabs.entity.RecordsTab;
-import de.metalcon.middleware.views.tabs.entity.ReviewsTab;
-import de.metalcon.middleware.views.tabs.entity.TracksTab;
-import de.metalcon.middleware.views.tabs.entity.UsersTab;
-import de.metalcon.middleware.views.tabs.entity.VenuesTab;
+import de.metalcon.middleware.view.entity.tab.BandsTab;
+import de.metalcon.middleware.view.entity.tab.EntityTab;
+import de.metalcon.middleware.view.entity.tab.EntityTabType;
+import de.metalcon.middleware.view.entity.tab.EventsTab;
+import de.metalcon.middleware.view.entity.tab.InfoTab;
+import de.metalcon.middleware.view.entity.tab.NewsfeedTab;
+import de.metalcon.middleware.view.entity.tab.PhotosTab;
+import de.metalcon.middleware.view.entity.tab.RecommendationsTab;
+import de.metalcon.middleware.view.entity.tab.RecordsTab;
+import de.metalcon.middleware.view.entity.tab.ReviewsTab;
+import de.metalcon.middleware.view.entity.tab.TracksTab;
+import de.metalcon.middleware.view.entity.tab.UsersTab;
+import de.metalcon.middleware.view.entity.tab.VenuesTab;
+import de.metalcon.middleware.view.entity.tab.preview.BandsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.EventsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.InfoTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.NewsfeedTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.PhotosTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.RecommendationsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.RecordsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.ReviewsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.TracksTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.UsersTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.VenuesTabPreview;
 
 public abstract class EntityController extends MetalconController {
 
     @Autowired
     protected EntityUrlMapper urlMapper;
     
+    private Set<EntityTabType> entityTabs;
     
     public abstract EntityType getEntityType();
     
     protected EntityTabType getDefaultTab() {
         return EntityTabType.NEWSFEED_TAB;
     }
-    
-    private Set<EntityTabType> entityTabs;
     
     public EntityController() {
         entityTabs = new HashSet<EntityTabType>();
@@ -64,105 +77,220 @@ public abstract class EntityController extends MetalconController {
         if (!entityTabs.contains(entityTabType) || muid == null)
             throw new NoSuchRequestHandlingMethodException(request);
         
-        EntityTab entityTab;
+        Map<EntityTabType, EntityTabPreview> entityTabPreviews =
+                new HashMap<EntityTabType, EntityTabPreview>();
+        for (EntityTabType entityTabPreviewType : entityTabs) {
+            EntityTabPreview entityTabPreview =
+                    generateTabPreview(entityTabPreviewType, muid);
+            entityTabPreviews.put(entityTabPreviewType, entityTabPreview);
+        }
+        
+        EntityTab entityTab = generateTab(entityTabType, muid);
+                
+        return null;
+    }
+    
+    private EntityTab generateTab(
+            EntityTabType entityTabType, Muid muid) {
         switch (entityTabType) {
             case INFO_TAB:
                 InfoTab infoTab = new InfoTab();
-                handleInfoTab(infoTab, muid);
-                entityTab = infoTab;
-                break;
+                generateInfoTab(infoTab, muid);
+                return infoTab;
             case NEWSFEED_TAB:
                 NewsfeedTab newsfeedTab = new NewsfeedTab();
-                handleNewsfeedTab(newsfeedTab, muid);
-                entityTab = newsfeedTab;
-                break;
+                generateNewsfeedTab(newsfeedTab, muid);
+                return newsfeedTab;
             case BANDS_TAB:
                 BandsTab bandsTab = new BandsTab();
-                handleBandsTab(bandsTab, muid);
-                entityTab = bandsTab;
-                break;
+                generateBandsTab(bandsTab, muid);
+                return bandsTab;
             case RECORDS_TAB:
                 RecordsTab recordsTab = new RecordsTab();
-                handleRecordsTab(recordsTab, muid);
-                entityTab = recordsTab;
-                break;
+                generateRecordsTab(recordsTab, muid);
+                return recordsTab;
             case TRACKS_TAB:
                 TracksTab tracksTab = new TracksTab();
-                handleTracksTab(tracksTab, muid);
-                entityTab = tracksTab;
-                break;
+                generateTracksTab(tracksTab, muid);
+                return tracksTab;
             case REVIEWS_TAB:
                 ReviewsTab reviewsTab = new ReviewsTab();
-                handleReviewsTab(reviewsTab, muid);
-                entityTab = reviewsTab;
-                break;
+                generateReviewsTab(reviewsTab, muid);
+                return reviewsTab;
             case VENUES_TAB:
                 VenuesTab venuesTab = new VenuesTab();
-                handleVenuesTab(venuesTab, muid);
-                entityTab = venuesTab;
-                break;
+                generateVenuesTab(venuesTab, muid);
+                return venuesTab;
             case EVENTS_TAB:
                 EventsTab eventsTab = new EventsTab();
-                handleEventsTab(eventsTab, muid);
-                entityTab = eventsTab;
-                break;
+                generateEventsTab(eventsTab, muid);
+                return eventsTab;
             case USERS_TAB:
                 UsersTab usersTab = new UsersTab();
-                handleUsersTab(usersTab, muid);
-                entityTab = usersTab;
-                break;
+                generateUsersTab(usersTab, muid);
+                return usersTab;
             case PHOTOS_TAB:
                 PhotosTab photosTab = new PhotosTab();
-                handlePhotosTab(photosTab, muid);
-                entityTab = photosTab;
-                break;
+                generatePhotosTab(photosTab, muid);
+                return photosTab;
             case RECOMMENDATIONS_TAB:
                 RecommendationsTab recommendationsTab = new RecommendationsTab();
-                handleRecommendationsTab(recommendationsTab, muid);
-                entityTab = recommendationsTab;
-                break;
+                generateRecommendationsTab(recommendationsTab, muid);
+                return recommendationsTab;
 
             default:
                 throw new IllegalStateException(
                         "Unimplemented EntityTabType in EntityController.handleTab(): "
                                 + entityTabType.toString() + ".");
         }
-        
-        return null;
+    }
+
+    private EntityTabPreview generateTabPreview(
+            EntityTabType entityTabPreviewType, Muid muid) {
+        switch (entityTabPreviewType) {
+            case INFO_TAB:
+                InfoTabPreview infoTabPreview = new InfoTabPreview();
+                generateInfoTabPreview(infoTabPreview, muid);
+                return infoTabPreview;
+            case NEWSFEED_TAB:
+                NewsfeedTabPreview newsfeedTabPreview = new NewsfeedTabPreview();
+                generateNewsfeedTabPreview(newsfeedTabPreview, muid);
+                return newsfeedTabPreview;
+            case BANDS_TAB:
+                BandsTabPreview bandsTabPreview = new BandsTabPreview();
+                generateBandsTabPreview(bandsTabPreview, muid);
+                return bandsTabPreview;
+            case RECORDS_TAB:
+                RecordsTabPreview recordsTabPreview = new RecordsTabPreview();
+                generateRecordsTabPreview(recordsTabPreview, muid);
+                return recordsTabPreview;
+            case TRACKS_TAB:
+                TracksTabPreview tracksTabPreview = new TracksTabPreview();
+                generateTracksTabPreview(tracksTabPreview, muid);
+                return tracksTabPreview;
+            case REVIEWS_TAB:
+                ReviewsTabPreview reviewsTabPreview = new ReviewsTabPreview();
+                generateReviewsTabPreview(reviewsTabPreview, muid);
+                return reviewsTabPreview;
+            case VENUES_TAB:
+                VenuesTabPreview venuesTabPreview = new VenuesTabPreview();
+                generateVenuesTabPreview(venuesTabPreview, muid);
+                return venuesTabPreview;
+            case EVENTS_TAB:
+                EventsTabPreview eventsTabPreview = new EventsTabPreview();
+                generateEventsTabPreview(eventsTabPreview, muid);
+                return eventsTabPreview;
+            case USERS_TAB:
+                UsersTabPreview usersTabPreview = new UsersTabPreview();
+                generateUsersTabPreview(usersTabPreview, muid);
+                return usersTabPreview;
+            case PHOTOS_TAB:
+                PhotosTabPreview photosTabPreview = new PhotosTabPreview();
+                generatePhotosTabPreview(photosTabPreview, muid);
+                return photosTabPreview;
+            case RECOMMENDATIONS_TAB:
+                RecommendationsTabPreview recommendationsTabPreview = new RecommendationsTabPreview();
+                generateRecommendationsTabPreview(recommendationsTabPreview, muid);
+                return recommendationsTabPreview;
+                
+            default:
+                throw new IllegalStateException(
+                        "Unimplemented EntityTabType in EntityController.handleTab(): "
+                                + entityTabPreviewType.toString() + ".");
+        }
     }
     
-    protected void handleInfoTab(InfoTab tab, Muid muid) {
+    
+    // InfoTab
+    
+    protected void generateInfoTab(InfoTab tab, Muid muid) {
+    }
+      
+    protected void generateInfoTabPreview(InfoTabPreview tab, Muid muid) {
+    }
+      
+    // NewsfeedTab
+    
+    protected void generateNewsfeedTab(NewsfeedTab tab, Muid muid) {
     }
     
-    protected void handleNewsfeedTab(NewsfeedTab tab, Muid muid) {
+    protected void generateNewsfeedTabPreview(NewsfeedTabPreview tab, Muid muid) {
     }
     
-    protected void handleBandsTab(BandsTab tab, Muid muid) {
+    // BandsTab
+    
+    protected void generateBandsTab(BandsTab tab, Muid muid) {
     }
     
-    protected void handleRecordsTab(RecordsTab tab, Muid muid) {
+    protected void generateBandsTabPreview(BandsTabPreview tab, Muid muid) {
     }
     
-    protected void handleTracksTab(TracksTab tab, Muid muid) {
+    // RecordsTab
+    
+    protected void generateRecordsTab(RecordsTab tab, Muid muid) {
     }
     
-    protected void handleReviewsTab(ReviewsTab tab, Muid muid) {
+    protected void generateRecordsTabPreview(RecordsTabPreview tab, Muid muid) {
     }
     
-    protected void handleVenuesTab(VenuesTab tab, Muid muid) {
+    // TracksTab
+    
+    protected void generateTracksTab(TracksTab tab, Muid muid) {
     }
     
-    protected void handleEventsTab(EventsTab tab, Muid muid) {
+    protected void generateTracksTabPreview(TracksTabPreview tab, Muid muid) {
     }
     
-    protected void handleUsersTab(UsersTab tab, Muid muid) {
+    // ReviewsTab
+    
+    protected void generateReviewsTab(ReviewsTab tab, Muid muid) {
     }
+    
+    protected void generateReviewsTabPreview(ReviewsTabPreview tab, Muid muid) {
+    }
+    
+    // VenuesTab
+    
+    protected void generateVenuesTab(VenuesTab tab, Muid muid) {
+    }
+    
+    protected void generateVenuesTabPreview(VenuesTabPreview tab, Muid muid) {
+    }
+    
+    // EventsTab
+    
+    protected void generateEventsTab(EventsTab tab, Muid muid) {
+    }
+    
+    protected void generateEventsTabPreview(EventsTabPreview tab, Muid muid) {
+    }
+    
+    // UsersTab
+    
+    protected void generateUsersTab(UsersTab tab, Muid muid) {
+    }
+    
+    protected void generateUsersTabPreview(UsersTabPreview tab, Muid muid) {
+    }
+    
+    // PhotosTab
    
-    protected void handlePhotosTab(PhotosTab tab, Muid muid) {
+    protected void generatePhotosTab(PhotosTab tab, Muid muid) {
     }
     
-    protected void handleRecommendationsTab(RecommendationsTab tab, Muid muid) {
+    protected void generatePhotosTabPreview(PhotosTabPreview tab, Muid muid) {
     }
+    
+    // RecommendationsTab
+    
+    protected void generateRecommendationsTab(RecommendationsTab tab, Muid muid) {
+    }
+    
+    protected void generateRecommendationsTabPreview(RecommendationsTabPreview tab, Muid muid) {
+    }
+    
+    
+    // RequestMappings
     
     @RequestMapping(EntityUrlMapper.EMPTY_TAB_MAPPING)
     public final ModelAndView mappingEmptyTab(

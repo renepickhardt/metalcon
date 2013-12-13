@@ -1,4 +1,4 @@
-package de.metalcon.middleware.views.tabs.entity;
+package de.metalcon.middleware.view.entity.tab;
 
 public class RecordsTab extends EntityTab {
 

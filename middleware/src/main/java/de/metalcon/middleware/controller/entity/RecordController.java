@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.metalcon.middleware.domain.entity.EntityType;
-import de.metalcon.middleware.views.tabs.entity.EntityTabType;
+import de.metalcon.middleware.view.entity.tab.EntityTabType;
 
 @Controller
 @RequestMapping(value  = EntityUrlMapper.RECORD_MAPPING,
