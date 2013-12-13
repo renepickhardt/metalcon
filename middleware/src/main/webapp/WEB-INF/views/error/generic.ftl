@@ -14,6 +14,10 @@
       <h1>${statusCode} - ${statusMessage}</h1>
     </#escape>
     <#if exception??>
+      <p>
+        An error occured when trying to acces the request URI:
+        <span class="mono">${requestUri}</span>
+      </p>
       <p class="mono">
         ${exception?html
           ?replace("\n", "<br/>\n")

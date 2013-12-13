@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
+import static javax.servlet.RequestDispatcher.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -17,24 +18,29 @@ public class ErrorController extends MetalconController {
 
     @RequestMapping("")
     public ModelAndView handleError(HttpServletRequest request) {
-        int statusCode = (Integer)
-                request.getAttribute("javax.servlet.error.status_code");
-        Throwable exception = (Throwable)
-                request.getAttribute("javax.servlet.error.exception");
+        Throwable exception  = (Throwable) request.getAttribute(ERROR_EXCEPTION);
+        String    requestUri = (String)    request.getAttribute(ERROR_REQUEST_URI);
+        Integer   statusCode = (Integer)   request.getAttribute(ERROR_STATUS_CODE);
         
         switch (statusCode) {
-            case 404: return handleNotFoundError(exception);
-            default:  return handleGenericError(exception, statusCode);
+            case 404:
+                return handleNotFoundError(exception, requestUri);
+            default:
+                return handleGenericError(exception, requestUri, statusCode);
         }
     }
     
-    private ModelAndView handleNotFoundError(Throwable exception) {
+    private ModelAndView handleNotFoundError(
+            Throwable exception, String requestUri) {
         ModelMap model = new ModelMap();
+        model.addAttribute("requestUri", requestUri);
         return new ModelAndView("error/404", model);
     }
     
-    private ModelAndView handleGenericError(Throwable exception, Integer statusCode) {
+    private ModelAndView handleGenericError(
+            Throwable exception, String requestUri, Integer statusCode) {
         ModelMap model = new ModelMap();
+        model.addAttribute("requestUri",    requestUri);
         model.addAttribute("statusCode",    statusCode);
         model.addAttribute("statusMessage", getStatusMessage(statusCode));
         

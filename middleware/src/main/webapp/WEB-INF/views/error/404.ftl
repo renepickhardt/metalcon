@@ -7,6 +7,10 @@
   <@mtl.body>
     <#escape x as x?html>
       <h1>404 - Not Found</h1>
+      <p>
+        Unable to find the requested URI:
+        <span class="mono">${requestUri}</span>.
+      </p>
     </#escape>
   </@mtl.body>
 </@mtl.html>
