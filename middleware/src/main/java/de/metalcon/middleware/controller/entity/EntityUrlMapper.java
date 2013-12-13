@@ -154,8 +154,10 @@ public class EntityUrlMapper {
     
     private Muid getMuidRecord(String pathBand, String pathRecord)
     throws RedirectException {
-        return mappingToMuidRecord.get(getMuidBand(pathBand))
-                                  .get(pathRecord);
+        Map<String, Muid> band = mappingToMuidRecord.get(pathBand);
+        if (band == null)
+            return null;
+        return band.get(pathRecord);
     }
     
     // Track
@@ -166,9 +168,11 @@ public class EntityUrlMapper {
     private Muid getMuidTrack(String pathBand, String pathRecord,
             String pathTrack)
     throws RedirectException {
-        return mappingToMuidTrack
-                .get(getMuidRecord(pathBand, pathRecord))
-                .get(pathTrack);
+        Map<String, Muid> record =
+                mappingToMuidTrack.get(getMuidRecord(pathBand, pathRecord));
+        if (record == null)
+            return  null;
+        return record.get(pathTrack);
     }
     
     // City

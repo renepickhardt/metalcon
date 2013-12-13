@@ -3,10 +3,9 @@ package de.metalcon.middleware.controller.entity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
-import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
+import de.metalcon.middleware.views.tabs.entity.EntityTabType;
 
 @Controller
 @RequestMapping(value  = EntityUrlMapper.RECORD_MAPPING,
@@ -17,60 +16,15 @@ public class RecordController extends EntityController {
     public EntityType getEntityType() {
         return EntityType.RECORD;
     }
-
-    @Override
-    protected ModelAndView handleInfoTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleNewsfeedTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleBandsTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleRecordsTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleTracksTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleReviewsTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleVenuesTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleEventsTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleUsersTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handlePhotosTab(Muid muid) {
-        return null;
-    }
-
-    @Override
-    protected ModelAndView handleRecommendationsTab(Muid muid) {
-        return null;
+    
+    public RecordController() {
+        super();
+        registerTab(EntityTabType.INFO_TAB);
+        registerTab(EntityTabType.NEWSFEED_TAB);
+        registerTab(EntityTabType.TRACKS_TAB);
+        registerTab(EntityTabType.REVIEWS_TAB);
+        registerTab(EntityTabType.USERS_TAB);
+        registerTab(EntityTabType.RECOMMENDATIONS_TAB);
     }
     
 }
