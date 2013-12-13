@@ -1,14 +1,12 @@
 <#ftl encoding="UTF-8" strict_syntax=true>
 <#import "/metalcon.ftl" as mtl>
 <@mtl.html>
-  <@mtl.head title="Home - Metalcon Middleware"/>
+  <@mtl.head title="404 - Not found">
+    <@mtl.stylesheet href="error.css"/>
+  </@mtl.head>
   <@mtl.body>
     <#escape x as x?html>
-      <ul>
-        <#list bands as band>
-          <li>${band}</li>
-        </#list>
-      </ul>
+      <h1>404 - Not Found</h1>
     </#escape>
   </@mtl.body>
 </@mtl.html>

@@ -29,4 +29,9 @@ public class TestHomeController {
 	    return new ModelAndView("test/home", model);
 	}
 	
+    @RequestMapping("ftlerror")
+    public ModelAndView handleFtlError() {
+        return new ModelAndView("test/ftlerror");
+    }
+    
 }

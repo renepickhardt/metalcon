@@ -30,9 +30,7 @@
       xsi:schemaLocation="http://www.w3.org/1999/xhtml
                           http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd"
       lang="de" xml:lang="de">
-  <#escape x as x?html>
-    <#nested>
-  </#escape>
+  <#nested>
 </html>
 </#macro>
 
@@ -48,10 +46,20 @@
  #-->
 <#macro head title>
 <head>
-  <title>${title}</title>
+  <title>${title?html}</title>
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8"/>
   <#nested>
 </head>
+</#macro>
+
+<#--
+ # Convenience macro to inclue a CSS-file. Use inside <head> tag.
+ #
+ # Usage:
+ # <mtl.stylesheet href="myStyle.css"/>
+ #-->
+<#macro stylesheet href>
+<link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/${href}"/>"/>
 </#macro>
 
 <#--

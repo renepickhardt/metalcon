@@ -3,5 +3,7 @@
 <@mtl.html>
   <@mtl.head title="Band"/>
   <@mtl.body>
+    <#escape x as x?html>
+    </#escape>
   </@mtl.body>
 </@mtl.html>

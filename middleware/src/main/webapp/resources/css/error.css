@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 1em;
+  font: 1em sans-serif;
+}
+
+h1 {
+  margin: .5em 0;
+  padding: 0;
+}
+
+p {
+  margin: .5em 0;
+  padding: 1em;
+  background: #EEE;
+}
+
+.mono {
+  font-family: monospace;
+}
