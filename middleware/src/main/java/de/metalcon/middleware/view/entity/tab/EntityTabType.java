@@ -2,8 +2,8 @@ package de.metalcon.middleware.view.entity.tab;
 
 public enum EntityTabType {
 
+    ABOUT_TAB,
     EMPTY_TAB,
-    INFO_TAB,
     NEWSFEED_TAB,
     BANDS_TAB,
     RECORDS_TAB,

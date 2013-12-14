@@ -1,10 +1,10 @@
 package de.metalcon.middleware.view.entity.tab;
 
-public class InfoTab extends EntityTab {
+public class AboutTab extends EntityTab {
 
     @Override
     public EntityTabType getEntityTabType() {
-        return EntityTabType.INFO_TAB;
+        return EntityTabType.ABOUT_TAB;
     }
 
 }

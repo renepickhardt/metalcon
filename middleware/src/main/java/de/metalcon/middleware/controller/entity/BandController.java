@@ -19,7 +19,7 @@ public class BandController extends EntityController {
     
     public BandController() {
         super();
-        registerTab(EntityTabType.INFO_TAB);
+        registerTab(EntityTabType.ABOUT_TAB);
         registerTab(EntityTabType.NEWSFEED_TAB);
         registerTab(EntityTabType.RECORDS_TAB);
         registerTab(EntityTabType.TRACKS_TAB);

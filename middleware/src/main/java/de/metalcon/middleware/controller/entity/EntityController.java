@@ -7,21 +7,25 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
 import de.metalcon.middleware.controller.MetalconController;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.exception.RedirectException;
+import de.metalcon.middleware.view.entity.BandView;
+import de.metalcon.middleware.view.entity.EntityView;
+import de.metalcon.middleware.view.entity.RecordView;
+import de.metalcon.middleware.view.entity.TrackView;
 import de.metalcon.middleware.view.entity.tab.BandsTab;
 import de.metalcon.middleware.view.entity.tab.EntityTab;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
 import de.metalcon.middleware.view.entity.tab.EventsTab;
-import de.metalcon.middleware.view.entity.tab.InfoTab;
+import de.metalcon.middleware.view.entity.tab.AboutTab;
 import de.metalcon.middleware.view.entity.tab.NewsfeedTab;
 import de.metalcon.middleware.view.entity.tab.PhotosTab;
 import de.metalcon.middleware.view.entity.tab.RecommendationsTab;
@@ -33,7 +37,7 @@ import de.metalcon.middleware.view.entity.tab.VenuesTab;
 import de.metalcon.middleware.view.entity.tab.preview.BandsTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.EventsTabPreview;
-import de.metalcon.middleware.view.entity.tab.preview.InfoTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.AboutTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.NewsfeedTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.PhotosTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.RecommendationsTabPreview;
@@ -47,6 +51,9 @@ public abstract class EntityController extends MetalconController {
 
     @Autowired
     protected EntityUrlMapper urlMapper;
+    
+    @Autowired
+    private BeanFactory beanFactory;
     
     private Set<EntityTabType> entityTabs;
     
@@ -64,7 +71,7 @@ public abstract class EntityController extends MetalconController {
         entityTabs.add(entityTabType);
     }
     
-    private final ModelAndView handleTab(
+    private final EntityView handleTab(
             EntityTabType entityTabType,
             HttpServletRequest request,
             String path1, String path2, String path3)
@@ -86,17 +93,35 @@ public abstract class EntityController extends MetalconController {
         }
         
         EntityTab entityTab = generateTab(entityTabType, muid);
+        
+        EntityView entityView = createEntityView(getEntityType());
+        entityView.setMuid(muid);
+        entityView.setEntityTab(entityTab);
+        entityView.setEntityTabPreviews(entityTabPreviews);
+
+        return entityView;
+    }
+    
+    private EntityView createEntityView(EntityType entityType) {
+        switch(entityType) {
+            case BAND:   return beanFactory.getBean(BandView.class);
+            case RECORD: return beanFactory.getBean(RecordView.class);
+            case TRACK:  return beanFactory.getBean(TrackView.class);
                 
-        return null;
+            default:
+                throw new IllegalStateException(
+                        "Unimplemented EntityType in EntityController.createEntityView(): "
+                                + entityType.toString() + ".");
+        }
     }
     
     private EntityTab generateTab(
             EntityTabType entityTabType, Muid muid) {
         switch (entityTabType) {
-            case INFO_TAB:
-                InfoTab infoTab = new InfoTab();
-                generateInfoTab(infoTab, muid);
-                return infoTab;
+            case ABOUT_TAB:
+                AboutTab aboutTab = new AboutTab();
+                generateAboutTab(aboutTab, muid);
+                return aboutTab;
             case NEWSFEED_TAB:
                 NewsfeedTab newsfeedTab = new NewsfeedTab();
                 generateNewsfeedTab(newsfeedTab, muid);
@@ -148,10 +173,10 @@ public abstract class EntityController extends MetalconController {
     private EntityTabPreview generateTabPreview(
             EntityTabType entityTabPreviewType, Muid muid) {
         switch (entityTabPreviewType) {
-            case INFO_TAB:
-                InfoTabPreview infoTabPreview = new InfoTabPreview();
-                generateInfoTabPreview(infoTabPreview, muid);
-                return infoTabPreview;
+            case ABOUT_TAB:
+                AboutTabPreview aboutTabPreview = new AboutTabPreview();
+                generateAboutTabPreview(aboutTabPreview, muid);
+                return aboutTabPreview;
             case NEWSFEED_TAB:
                 NewsfeedTabPreview newsfeedTabPreview = new NewsfeedTabPreview();
                 generateNewsfeedTabPreview(newsfeedTabPreview, muid);
@@ -201,12 +226,12 @@ public abstract class EntityController extends MetalconController {
     }
     
     
-    // InfoTab
+    // AboutTab
     
-    protected void generateInfoTab(InfoTab tab, Muid muid) {
+    protected void generateAboutTab(AboutTab tab, Muid muid) {
     }
       
-    protected void generateInfoTabPreview(InfoTabPreview tab, Muid muid) {
+    protected void generateAboutTabPreview(AboutTabPreview tab, Muid muid) {
     }
       
     // NewsfeedTab
@@ -292,8 +317,8 @@ public abstract class EntityController extends MetalconController {
     
     // RequestMappings
     
-    @RequestMapping(EntityUrlMapper.EMPTY_TAB_MAPPING)
-    public final ModelAndView mappingEmptyTab(
+    @RequestMapping({"", "/"})
+    public final EntityView mappingEmptyTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -302,18 +327,18 @@ public abstract class EntityController extends MetalconController {
         return handleTab(EntityTabType.EMPTY_TAB, request, path1, path2, path3);
     }
    
-    @RequestMapping(EntityUrlMapper.INFO_TAB_MAPPING)
-    public final ModelAndView mappingInfoTab(
+    @RequestMapping(EntityUrlMapper.ABOUT_TAB_MAPPING)
+    public final EntityView mappingAboutTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
             @PathVariable("path3") String path3)
     throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.INFO_TAB, request, path1, path2, path3);
+        return handleTab(EntityTabType.ABOUT_TAB, request, path1, path2, path3);
     }
    
     @RequestMapping(EntityUrlMapper.NEWSFEED_TAB_MAPPING)
-    public final ModelAndView mappingNewsfeedTab(
+    public final EntityView mappingNewsfeedTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -323,7 +348,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.BANDS_TAB_MAPPING)
-    public final ModelAndView mappingBandsTab(
+    public final EntityView mappingBandsTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -333,7 +358,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.RECORDS_TAB_MAPPING)
-    public final ModelAndView mappingRecordsTab(
+    public final EntityView mappingRecordsTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -343,7 +368,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.TRACKS_TAB_MAPPING)
-    public final ModelAndView mappingTracksTab(
+    public final EntityView mappingTracksTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -353,7 +378,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.REVIEWS_TAB_MAPPING)
-    public final ModelAndView mappingReviewsTab(
+    public final EntityView mappingReviewsTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -363,7 +388,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.VENUES_TAB_MAPPING)
-    public final ModelAndView mappingVenuesTab(
+    public final EntityView mappingVenuesTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -373,7 +398,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.EVENTS_TAB_MAPPING)
-    public final ModelAndView mappingEventsTab(
+    public final EntityView mappingEventsTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -383,7 +408,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.USERS_TAB_MAPPING)
-    public final ModelAndView mappingUsersTab(
+    public final EntityView mappingUsersTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -393,7 +418,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.PHOTOS_TAB_MAPPING)
-    public final ModelAndView mappingPhotosTab(
+    public final EntityView mappingPhotosTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,
@@ -403,7 +428,7 @@ public abstract class EntityController extends MetalconController {
     }
    
     @RequestMapping(EntityUrlMapper.RECOMMENDATIONS_TAB_MAPPING)
-    public final ModelAndView mappingRecommendationsTab(
+    public final EntityView mappingRecommendationsTab(
             HttpServletRequest request,
             @PathVariable("path1") String path1,
             @PathVariable("path2") String path2,

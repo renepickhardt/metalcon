@@ -51,24 +51,28 @@ public class WebConfig extends WebMvcConfigurerAdapter {
             ContentNegotiationManager manager) {
         List<ViewResolver> resolvers = new ArrayList<ViewResolver>();
         
-        FreeMarkerViewResolver freeMarkerViewResolver =
-                new FreeMarkerViewResolver();
-        freeMarkerViewResolver
-                .setContentType(MediaType.APPLICATION_XHTML_XML_VALUE);
-        freeMarkerViewResolver.setCache(true);
-        freeMarkerViewResolver.setPrefix("");
-        freeMarkerViewResolver.setSuffix(".ftl");
-        resolvers.add(freeMarkerViewResolver);
-        
-        JsonViewResolver jsonResolver =
-                new JsonViewResolver();
-        resolvers.add(jsonResolver);
+        resolvers.add(freeMarkerViewResolver());
+        resolvers.add(jsonViewResolver());
         
         ContentNegotiatingViewResolver resolver =
                 new ContentNegotiatingViewResolver();
         resolver.setViewResolvers(resolvers);
         resolver.setContentNegotiationManager(manager);
         return resolver;
+    }
+    
+    public FreeMarkerViewResolver freeMarkerViewResolver() {
+        FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
+        viewResolver.setContentType(MediaType.APPLICATION_XHTML_XML_VALUE);
+        viewResolver.setCache(true);
+        viewResolver.setPrefix("");
+        viewResolver.setSuffix(".ftl");
+        return viewResolver;
+    }
+    
+    public JsonViewResolver jsonViewResolver() {
+        JsonViewResolver viewResolver = new JsonViewResolver();
+        return viewResolver;
     }
     
     @Bean

@@ -19,7 +19,7 @@ public class TrackController extends EntityController {
     
     public TrackController() {
         super();
-        registerTab(EntityTabType.INFO_TAB);
+        registerTab(EntityTabType.ABOUT_TAB);
         registerTab(EntityTabType.NEWSFEED_TAB);
         registerTab(EntityTabType.USERS_TAB);
         registerTab(EntityTabType.RECOMMENDATIONS_TAB);

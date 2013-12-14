@@ -37,8 +37,7 @@ public class EntityUrlMapper {
     public static final String TOUR_MAPPING       = "/tour/{path1}"                  + "{path2:}{path3:}";
     
     // Tab Mappings
-    public static final String EMPTY_TAB_MAPPING           = "";
-    public static final String INFO_TAB_MAPPING            = "/info";
+    public static final String ABOUT_TAB_MAPPING           = "/about";
     public static final String NEWSFEED_TAB_MAPPING        = "/news";
     public static final String BANDS_TAB_MAPPING           = "/bands";
     public static final String RECORDS_TAB_MAPPING         = "/records";
@@ -144,6 +143,7 @@ public class EntityUrlMapper {
     
     private Muid getMuidBand(String pathBand)
     throws RedirectException {
+        if (true) return new Muid(1); // TODO: just for testing
         return mappingToMuidBand.get(pathBand);
     }
     
@@ -154,6 +154,7 @@ public class EntityUrlMapper {
     
     private Muid getMuidRecord(String pathBand, String pathRecord)
     throws RedirectException {
+        if (true) return new Muid(1); // TODO: just for testing
         Map<String, Muid> band = mappingToMuidRecord.get(pathBand);
         if (band == null)
             return null;
@@ -168,6 +169,7 @@ public class EntityUrlMapper {
     private Muid getMuidTrack(String pathBand, String pathRecord,
             String pathTrack)
     throws RedirectException {
+        if (true) return new Muid(1); // TODO: just for testing
         Map<String, Muid> record =
                 mappingToMuidTrack.get(getMuidRecord(pathBand, pathRecord));
         if (record == null)
