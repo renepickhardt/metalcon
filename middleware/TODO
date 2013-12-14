@@ -1,3 +1,0 @@
-- Use this instead of the path1, path2, path3 hack in EntityController
-  to get Path variables:
-  Map<String, Object> pathVars = (Map<String, Object>) request.getAttribute(View.PATH_VARIABLES);

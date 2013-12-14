@@ -25,16 +25,16 @@ import de.metalcon.middleware.exception.RedirectException;
 public class EntityUrlMapper {
     
     // Controller Mappings
-    public static final String USER_MAPPING       = "/user/{path1}"                  + "{path2:}{path3:}";
-    public static final String BAND_MAPPING       = "/music/{path1}"                 + "{path2:}{path3:}";
-    public static final String RECORD_MAPPING     = "/music/{path1}/{path2}"                 + "{path3:}";
-    public static final String TRACK_MAPPING      = "/music/{path1}/{path2}/{path3}";
-    public static final String CITY_MAPPING       = "/city/{path1}"                  + "{path2:}{path3:}";
-    public static final String VENUE_MAPPING      = "/venue/{path1}"                 + "{path2:}{path3:}";
-    public static final String EVENT_MAPPING      = "/event/{path1}"                 + "{path2:}{path3:}";
-    public static final String GENRE_MAPPING      = "/genre/{path1}"                 + "{path2:}{path3:}";
-    public static final String INSTRUMENT_MAPPING = "/instrument/{path1}"            + "{path2:}{path3:}";
-    public static final String TOUR_MAPPING       = "/tour/{path1}"                  + "{path2:}{path3:}";
+    public static final String USER_MAPPING       = "/user/{pathUser}";
+    public static final String BAND_MAPPING       = "/music/{pathBand}";
+    public static final String RECORD_MAPPING     = BAND_MAPPING + "/{pathRecord}";
+    public static final String TRACK_MAPPING      = RECORD_MAPPING + "/{pathTrack}";
+    public static final String CITY_MAPPING       = "/city/{pathCity}";
+    public static final String VENUE_MAPPING      = "/venue/{pathVenue}";
+    public static final String EVENT_MAPPING      = "/event/{pathEvent}";
+    public static final String GENRE_MAPPING      = "/genre/{pathGenre}";
+    public static final String INSTRUMENT_MAPPING = "/instrument/{pathInstrument}";
+    public static final String TOUR_MAPPING       = "/tour/{pathTour}";
     
     // Tab Mappings
     public static final String ABOUT_TAB_MAPPING           = "/about";
@@ -98,19 +98,19 @@ public class EntityUrlMapper {
     }
 
     public Muid getMuid(
-            EntityType entityType, String path1, String path2, String path3)
+            EntityType entityType, Map<String, String> pathVars)
     throws RedirectException {
         switch (entityType) {
-            case USER:       return getMuidUser(path1);
-            case BAND:       return getMuidBand(path1);
-            case RECORD:     return getMuidRecord(path1, path2);
-            case TRACK:      return getMuidTrack(path1, path2, path3);
-            case VENUE:      return getMuidVenue(path1);
-            case EVENT:      return getMuidEvent(path1);
-            case CITY:       return getMuidCity(path1);
-            case GENRE:      return getMuidGenre(path1);
-            case INSTRUMENT: return getMuidInstrument(path1);
-            case TOUR:       return getMuidTour(path1);
+            case USER:       return getMuidUser(pathVars);
+            case BAND:       return getMuidBand(pathVars);
+            case RECORD:     return getMuidRecord(pathVars);
+            case TRACK:      return getMuidTrack(pathVars);
+            case VENUE:      return getMuidVenue(pathVars);
+            case EVENT:      return getMuidEvent(pathVars);
+            case CITY:       return getMuidCity(pathVars);
+            case GENRE:      return getMuidGenre(pathVars);
+            case INSTRUMENT: return getMuidInstrument(pathVars);
+            case TOUR:       return getMuidTour(pathVars);
 
             default:
                 throw new IllegalStateException(
@@ -126,13 +126,22 @@ public class EntityUrlMapper {
         return mappings.get(0);
     }
     
+    private String getPathVar(Map<String, String> pathVars, String var) {
+        String val = pathVars.get(var);
+        if (val == null)
+            throw new IllegalStateException("Missing path variable: " + var + ".");
+        return val;
+    }
+    
+    
     // User
     
     private void registerMuidUser(User user) {
     }
     
-    private Muid getMuidUser(String pathUser)
+    private Muid getMuidUser(Map<String, String> pathVars)
     throws RedirectException {
+        String pathUser = getPathVar(pathVars, "pathUser");
         return mappingToMuidUser.get(pathUser);
     }
     
@@ -141,9 +150,10 @@ public class EntityUrlMapper {
     private void registerMuidBand(Band band) {
     }
     
-    private Muid getMuidBand(String pathBand)
+    private Muid getMuidBand(Map<String, String> pathVars)
     throws RedirectException {
         if (true) return new Muid(1); // TODO: just for testing
+        String pathBand = getPathVar(pathVars, "pathBand");
         return mappingToMuidBand.get(pathBand);
     }
     
@@ -152,10 +162,11 @@ public class EntityUrlMapper {
     private void registerMuidRecord(Record record) {
     }
     
-    private Muid getMuidRecord(String pathBand, String pathRecord)
+    private Muid getMuidRecord(Map<String, String> pathVars)
     throws RedirectException {
         if (true) return new Muid(1); // TODO: just for testing
-        Map<String, Muid> band = mappingToMuidRecord.get(pathBand);
+        String pathRecord = getPathVar(pathVars, "pathRecord");
+        Map<String, Muid> band = mappingToMuidRecord.get(getMuidBand(pathVars));
         if (band == null)
             return null;
         return band.get(pathRecord);
@@ -166,12 +177,11 @@ public class EntityUrlMapper {
     private void registerMuidTrack(Track track) {
     }
     
-    private Muid getMuidTrack(String pathBand, String pathRecord,
-            String pathTrack)
+    private Muid getMuidTrack(Map<String, String> pathVars)
     throws RedirectException {
         if (true) return new Muid(1); // TODO: just for testing
-        Map<String, Muid> record =
-                mappingToMuidTrack.get(getMuidRecord(pathBand, pathRecord));
+        String pathTrack  = getPathVar(pathVars, "pathTrack");
+        Map<String, Muid> record = mappingToMuidTrack.get(getMuidRecord(pathVars));
         if (record == null)
             return  null;
         return record.get(pathTrack);
@@ -182,8 +192,9 @@ public class EntityUrlMapper {
     private void registerMuidCity(City city) {
     }
     
-    private Muid getMuidCity(String pathCity)
+    private Muid getMuidCity(Map<String, String> pathVars)
     throws RedirectException {
+        String pathCity = getPathVar(pathVars, "pathCity");
         return mappingToMuidCity.get(pathCity);
     }
     
@@ -192,8 +203,9 @@ public class EntityUrlMapper {
     private void registerMuidVenue(Venue venue) {
     }
     
-    private Muid getMuidVenue(String pathVenue)
+    private Muid getMuidVenue(Map<String, String> pathVars)
     throws RedirectException {
+        String pathVenue = getPathVar(pathVars, "path");
         return mappingToMuidVenue.get(pathVenue);
     }
     
@@ -202,8 +214,9 @@ public class EntityUrlMapper {
     private void registerMuidEvent(Event event) {
     }
     
-    private Muid getMuidEvent(String pathEvent)
+    private Muid getMuidEvent(Map<String, String> pathVars)
     throws RedirectException {
+        String pathEvent = getPathVar(pathVars, "pathEvent");
         return mappingToMuidEvent.get(pathEvent);
     }
     
@@ -212,8 +225,9 @@ public class EntityUrlMapper {
     private void registerMuidGenre(Genre genre) {
     }
     
-    private Muid getMuidGenre(String pathGenre)
+    private Muid getMuidGenre(Map<String, String> pathVars)
     throws RedirectException {
+        String pathGenre = getPathVar(pathVars, "pathGenre");
         return mappingToMuidGenre.get(pathGenre);
     }
     
@@ -222,8 +236,9 @@ public class EntityUrlMapper {
     private void registerMuidInstrument(Instrument instrument) {
     }
     
-    private Muid getMuidInstrument(String pathInstrument)
+    private Muid getMuidInstrument(Map<String, String> pathVars)
     throws RedirectException {
+        String pathInstrument = getPathVar(pathVars, "pathInstrument");
         return mappingToMuidInstrument.get(pathInstrument);
     }
     
@@ -232,8 +247,9 @@ public class EntityUrlMapper {
     private void registerMuidTour(Tour tour) {
     }
     
-    private Muid getMuidTour(String pathTour)
+    private Muid getMuidTour(Map<String, String> pathVars)
     throws RedirectException {
+        String pathTour = getPathVar(pathVars, "pathTour");
         return mappingToMuidTour.get(pathTour);
     }
     
