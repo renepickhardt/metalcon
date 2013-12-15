@@ -16,7 +16,6 @@ public class RecordView extends EntityView {
 
     public RecordView() throws Exception {
         super();
-        // TODO Auto-generated constructor stub
     }
     
 }
