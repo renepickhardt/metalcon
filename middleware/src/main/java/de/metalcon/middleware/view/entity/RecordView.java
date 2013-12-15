@@ -9,8 +9,4 @@ public class RecordView extends EntityView {
         return EntityType.RECORD;
     }
 
-    public RecordView() throws Exception {
-        super();
-    }
-    
 }

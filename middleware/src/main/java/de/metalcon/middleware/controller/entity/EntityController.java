@@ -17,6 +17,7 @@ import de.metalcon.middleware.controller.UrlMappings;
 import de.metalcon.middleware.core.EntityUrlMapppingManager;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
+import de.metalcon.middleware.exception.RedirectException;
 import de.metalcon.middleware.view.entity.EntityView;
 import de.metalcon.middleware.view.entity.EntityViewManager;
 import de.metalcon.middleware.view.entity.tab.BandsTab;
@@ -81,7 +82,7 @@ public abstract class EntityController extends MetalconController {
             EntityTabType entityTabType,
             HttpServletRequest request,
             Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         if (entityTabType == EntityTabType.EMPTY_TAB)
             entityTabType = getDefaultTab();
         
@@ -235,7 +236,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingEmptyTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.EMPTY_TAB, request, pathVars);
     }
    
@@ -243,7 +244,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingAboutTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.ABOUT_TAB, request, pathVars);
     }
    
@@ -251,7 +252,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingNewsfeedTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.NEWSFEED_TAB, request, pathVars);
     }
    
@@ -259,7 +260,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingBandsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.BANDS_TAB, request, pathVars);
     }
    
@@ -267,7 +268,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingRecordsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.RECORDS_TAB, request, pathVars);
     }
    
@@ -275,7 +276,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingTracksTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.TRACKS_TAB, request, pathVars);
     }
    
@@ -283,7 +284,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingReviewsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.REVIEWS_TAB, request, pathVars);
     }
    
@@ -291,7 +292,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingVenuesTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.VENUES_TAB, request, pathVars);
     }
    
@@ -299,7 +300,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingEventsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.EVENTS_TAB, request, pathVars);
     }
    
@@ -307,7 +308,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingUsersTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.USERS_TAB, request, pathVars);
     }
    
@@ -315,7 +316,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingPhotosTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.PHOTOS_TAB, request, pathVars);
     }
    
@@ -323,7 +324,7 @@ public abstract class EntityController extends MetalconController {
     public final EntityView mappingRecommendationsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
-    throws Exception {
+    throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.RECOMMENDATIONS_TAB, request, pathVars);
     }
    

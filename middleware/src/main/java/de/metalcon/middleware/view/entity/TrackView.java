@@ -9,8 +9,4 @@ public class TrackView extends EntityView {
         return EntityType.TRACK;
     }
     
-    public TrackView() throws Exception {
-        super();
-    }
-
 }

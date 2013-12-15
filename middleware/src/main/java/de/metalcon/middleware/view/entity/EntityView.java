@@ -33,8 +33,7 @@ public abstract class EntityView implements View {
     
     public abstract EntityType getEntityType();
     
-    public EntityView()
-    throws Exception {
+    public EntityView() {
         muid              = null;
         entityTab         = null;
         entityTabPreviews = null;
