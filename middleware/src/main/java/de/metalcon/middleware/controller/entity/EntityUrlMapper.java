@@ -57,6 +57,8 @@ public class EntityUrlMapper {
     
     public static final String WORD_SEPERATOR = "-";
     
+    public static final String EMPTY_ENTITY = "_";
+    
     private Map<Muid, List<String>>      muidToMapping;
     
     private Map<String, Muid>            mappingToMuidUser;
@@ -151,12 +153,14 @@ public class EntityUrlMapper {
     
     private void registerMappings(Map<String, Muid> mappingToMuid, Muid muid,
             List<String> mappings) {
-        for (String mapping : mappings)
+        for (String mapping : mappings) {
             mappingToMuid.put(mapping, muid);
+            System.out.println(mapping);
+        }
         mappingToMuid.put(
                 mappings.get(0) + WORD_SEPERATOR + muid.toString(), muid);
     }
-
+    
     private static String getPathVar(Map<String, String> pathVars, String var) {
         String val = pathVars.get(var);
         if (val == null)
@@ -211,18 +215,25 @@ public class EntityUrlMapper {
         registerMappings(mappingToMuid, muid, mappings);
     }
     
-    // TODO: think if track mapping is enough for empty records
     private void registerMuidTrack(Muid muid, Track track) {
         List<String> mappings = new LinkedList<String>();
         Map<String, Muid> mappingToMuid;
         
         Muid record = track.getRecord();
+        Muid band   = track.getBand();
         if (record != null) {
             if (mappingToMuidTrack.containsKey(record))
                 mappingToMuid = mappingToMuidTrack.get(record);
             else {
                 mappingToMuid = new HashMap<String, Muid>();
                 mappingToMuidTrack.put(record, mappingToMuid);
+            }
+        } else if (band != null) {
+            if (mappingToMuidTrack.containsKey(band))
+                mappingToMuid = mappingToMuidTrack.get(band);
+            else {
+                mappingToMuid = new HashMap<String, Muid>();
+                mappingToMuidTrack.put(band, mappingToMuid);
             }
         } else {
             mappingToMuid = new HashMap<String, Muid>();
@@ -318,12 +329,16 @@ public class EntityUrlMapper {
     private Muid getMuidBand(Map<String, String> pathVars)
     throws RedirectException {
         String pathBand = getPathVar(pathVars, "pathBand");
+        if (pathBand.equals(EMPTY_ENTITY))
+            return Muid.EMPTY_MUID;
         return mappingToMuidBand.get(pathBand);
     }
     
     private Muid getMuidRecord(Map<String, String> pathVars)
     throws RedirectException {
         String pathRecord = getPathVar(pathVars, "pathRecord");
+        if (pathRecord.equals(EMPTY_ENTITY))
+            return getMuidBand(pathVars);
         Map<String, Muid> band = mappingToMuidRecord.get(getMuidBand(pathVars));
         if (band == null)
             return null;
