@@ -4,10 +4,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +61,7 @@ public class EntityUrlMapper {
     
     public static final String EMPTY_ENTITY = "_";
     
-    private Map<Muid, List<String>>      muidToMapping;
+    private Map<Muid, Set<String>>      muidToMapping;
     
     private Map<String, Muid>            mappingToMuidUser;
     private Map<String, Muid>            mappingToMuidBand;
@@ -75,8 +77,10 @@ public class EntityUrlMapper {
     @Autowired
     private EntityManager entityManager;
     
+    private static final Logger logger = LoggerFactory.getLogger(EntityUrlMapper.class);
+    
     public EntityUrlMapper() {
-        muidToMapping           = new HashMap<Muid, List<String>>();
+        muidToMapping           = new HashMap<Muid, Set<String>>();
         
         mappingToMuidUser       = new HashMap<String, Muid>();
         mappingToMuidBand       = new HashMap<String, Muid>();
@@ -134,10 +138,10 @@ public class EntityUrlMapper {
     }
     
     public String getMapping(Muid muid) {
-        List<String> mappings = muidToMapping.get(muid);
+        Set<String> mappings = muidToMapping.get(muid);
         if (mappings == null || mappings.isEmpty())
             return null;
-        return mappings.get(0);
+        return mappings.iterator().next();
     }
     
     
@@ -152,13 +156,28 @@ public class EntityUrlMapper {
     }
     
     private void registerMappings(Map<String, Muid> mappingToMuid, Muid muid,
-            List<String> mappings) {
-        for (String mapping : mappings) {
-            mappingToMuid.put(mapping, muid);
-            System.out.println(mapping);
-        }
-        mappingToMuid.put(
-                mappings.get(0) + WORD_SEPERATOR + muid.toString(), muid);
+            Set<String> mappings) {
+        Set<String> muidMappings = muidToMapping.get(muid);
+        if (muidMappings == null)
+            muidMappings = new LinkedHashSet<String>();
+        
+        String muidMapping =
+                mappings.iterator().next() + WORD_SEPERATOR + muid.toString();
+        mappingToMuid.put(muidMapping, muid);
+        muidMappings.add(muidMapping);
+        logMapping(muidMapping, muid);
+        
+        for (String mapping : mappings)
+            if (!mappingToMuid.containsKey(mapping)) {
+                mappingToMuid.put(mapping, muid);
+                muidMappings.add(mapping);
+                logMapping(mapping, muid);
+            }
+    }
+    
+    private void logMapping(String mapping, Muid muid) {
+        logger.info("Mapped \"" + mapping + "\" to Entity \""
+                + muid.toString() + "\"");
     }
     
     private static String getPathVar(Map<String, String> pathVars, String var) {
@@ -172,7 +191,7 @@ public class EntityUrlMapper {
     // registerMuid<Entity>
     
     private void registerMuidUser(Muid muid, User user) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String firstName = toUrlText(user.getFirstName());
         String lastName  = toUrlText(user.getLastName());
         mappings.add(firstName + WORD_SEPERATOR + lastName);
@@ -180,14 +199,14 @@ public class EntityUrlMapper {
     }
      
     private void registerMuidBand(Muid muid, Band band) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(band.getName());
         mappings.add(name);
         registerMappings(mappingToMuidBand, muid, mappings);
     }
     
     private void registerMuidRecord(Muid muid, Record record) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         Map<String, Muid> mappingToMuid;
         
         Muid band = record.getBand();
@@ -216,7 +235,7 @@ public class EntityUrlMapper {
     }
     
     private void registerMuidTrack(Muid muid, Track track) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         Map<String, Muid> mappingToMuid;
         
         Muid record = track.getRecord();
@@ -253,14 +272,14 @@ public class EntityUrlMapper {
     }
     
     private void registerMuidCity(Muid muid, City city) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(city.getName());
         mappings.add(name);
         registerMappings(mappingToMuidCity, muid, mappings);
     }
     
     private void registerMuidVenue(Muid muid, Venue venue) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String venueName = toUrlText(venue.getName());
         mappings.add(venueName);
         
@@ -275,7 +294,7 @@ public class EntityUrlMapper {
     }
     
     private void registerMuidEvent(Muid muid, Event event) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(event.getName());
         mappings.add(name);
             
@@ -290,21 +309,21 @@ public class EntityUrlMapper {
     }
     
     private void registerMuidGenre(Muid muid, Genre genre) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(genre.getName());
         mappings.add(name);
         registerMappings(mappingToMuidGenre, muid, mappings);
     }
     
     private void registerMuidInstrument(Muid muid, Instrument instrument) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(instrument.getName());
         mappings.add(name);
         registerMappings(mappingToMuidInstrument, muid, mappings);
     }
     
     private void registerMuidTour(Muid muid, Tour tour) {
-        List<String> mappings = new LinkedList<String>();
+        Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(tour.getName());
         mappings.add(name);
         

@@ -37,15 +37,18 @@ public class EntityManager {
     private EntityUrlMapper entityUrlMapper;
     @PostConstruct
     private void fillWithTestData() {
-        Muid ensiferumMuid    = new Muid(1);
-        Muid victorySongsMuid = new Muid(2);
-        Muid ahtiMuid         = new Muid(3);
+        Muid ensiferumMuid    = new Muid(12);
+        Muid ensiferum2Muid   = new Muid(22);
+        Muid victorySongsMuid = new Muid(13);
+        Muid ahtiMuid         = new Muid(14);
         
-        Band ensiferum = new Band(ensiferumMuid, "Ensiferum");
+        Band   ensiferum    = new Band(ensiferumMuid, "Ensiferum");
+        Band   ensiferum2   = new Band(ensiferum2Muid, "Ensiferum");
         Record victorySongs = new Record(victorySongsMuid, "Victory Songs");
-        Track ahti = new Track(ahtiMuid, "Ahti");
+        Track ahti          = new Track(ahtiMuid, "Ahti");
         
         putEntity(ensiferum);
+        putEntity(ensiferum2);
         putEntity(victorySongs);
         putEntity(ahti);
         
@@ -56,6 +59,7 @@ public class EntityManager {
         ahti.setTrackNumber(4);
         
         entityUrlMapper.registerMuid(ensiferum);
+        entityUrlMapper.registerMuid(ensiferum2);
         entityUrlMapper.registerMuid(victorySongs);
         entityUrlMapper.registerMuid(ahti);
     }

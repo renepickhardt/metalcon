@@ -6,29 +6,43 @@ public class Muid {
     
     public static final Muid EMPTY_MUID = new Muid(0);
     
-    private long muid;
+    private long value;
     
-    public Muid(long muid) {
-        this.muid = muid;
+    public Muid(long value) {
+        this.value = value;
     }
     
-    public long getMuid() {
-        return muid;
+    public long getValue() {
+        return value;
     }
     
-    public void setMuid(long muid) {
-        this.muid = muid;
+    public void setValue(long value) {
+        this.value = value;
     }
     
     public EntityType getEntityType() {
-        // TODO: stub
-        long rem = muid % 10;
+        // TODO: stub implementation
+        long rem = value % 10;
         if (rem == 1)
-            return EntityType.BAND;
+            return EntityType.USER;
         else if (rem == 2)
-            return EntityType.RECORD;
+            return EntityType.BAND;
         else if (rem == 3)
+            return EntityType.RECORD;
+        else if (rem == 4)
             return EntityType.TRACK;
+        else if (rem == 5)
+            return EntityType.VENUE;
+        else if (rem == 6)
+            return EntityType.EVENT;
+        else if (rem == 7)
+            return EntityType.CITY;
+        else if (rem == 8)
+            return EntityType.GENRE;
+        else if (rem == 9)
+            return EntityType.INSTRUMENT;
+        else if (rem == 10)
+            return EntityType.TOUR;
         
         throw new UnsupportedOperationException(
                 "Muid.getEntityType() not implemented yet.");
@@ -36,7 +50,7 @@ public class Muid {
     
     @Override
     public String toString() {
-        return ((Long) muid).toString();
+        return ((Long) value).toString();
     }
     
     @Override
@@ -46,7 +60,7 @@ public class Muid {
         if (other == null || getClass() != other.getClass())
             return false;
         Muid o = (Muid) other;
-        return muid == o.muid;
+        return value == o.value;
     }
     
     @Override
@@ -54,7 +68,7 @@ public class Muid {
         int hash = 9823;
         int mult = 887;
         
-        hash = hash*mult + ((Long) muid).hashCode();
+        hash = hash*mult + ((Long) value).hashCode();
         
         return hash;
     }

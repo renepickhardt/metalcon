@@ -1,5 +1,6 @@
 package de.metalcon.middleware.view.entity;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -53,7 +54,9 @@ public abstract class EntityView implements View {
     public final void render(Map<String, ?> model,
             HttpServletRequest request, HttpServletResponse response)
     throws Exception {
-        view.render(model, request, response);
+        Map<String, Object> m = new HashMap<String, Object>(model);
+        m.put("view", this);
+        view.render(m, request, response);
     }
     
     public final Muid getMuid() {
