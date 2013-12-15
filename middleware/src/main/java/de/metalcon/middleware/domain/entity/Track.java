@@ -13,6 +13,8 @@ public class Track extends Entity {
     
     private Muid record;
     
+    private Integer trackNumber;
+    
     public Track(Muid muid, String name) {
         super(muid, name);
         band   = null;
@@ -33,6 +35,14 @@ public class Track extends Entity {
     
     public void setRecord(Muid record) {
         this.record = record;
+    }
+    
+    public Integer getTrackNumber() {
+        return trackNumber;
+    }
+    
+    public void setTrackNumber(Integer trackNumber) {
+        this.trackNumber = trackNumber;
     }
 
 }

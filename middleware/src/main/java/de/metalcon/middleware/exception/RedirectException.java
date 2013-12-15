@@ -28,7 +28,7 @@ public class RedirectException extends Exception {
         return permanent;
     }
     
-    public RedirectView getView()  {
+    public RedirectView getRedirectView()  {
         RedirectView view = new RedirectView(path, true);
         if (permanent)
             view.setStatusCode(HttpStatus.MOVED_PERMANENTLY);

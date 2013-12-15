@@ -4,6 +4,8 @@ import de.metalcon.middleware.domain.entity.EntityType;
 
 public class Muid {
     
+    public static final Muid EMPTY_MUID = new Muid(0);
+    
     private long muid;
     
     public Muid(long muid) {
@@ -30,6 +32,11 @@ public class Muid {
         
         throw new UnsupportedOperationException(
                 "Muid.getEntityType() not implemented yet.");
+    }
+    
+    @Override
+    public String toString() {
+        return ((Long) muid).toString();
     }
     
     @Override

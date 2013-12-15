@@ -11,7 +11,7 @@ public class ExceptionHandlerAdvice {
     
     @ExceptionHandler(RedirectException.class)
     public View handleRedirectException(RedirectException e) {
-        return e.getView();
+        return e.getRedirectView();
     }
     
 }

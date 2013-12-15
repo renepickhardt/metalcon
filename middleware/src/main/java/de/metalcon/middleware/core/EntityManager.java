@@ -53,6 +53,7 @@ public class EntityManager {
         victorySongs.setReleaseYear(2007);
         ahti.setBand(ensiferumMuid);
         ahti.setRecord(victorySongsMuid);
+        ahti.setTrackNumber(4);
         
         entityUrlMapper.registerMuid(ensiferum);
         entityUrlMapper.registerMuid(victorySongs);

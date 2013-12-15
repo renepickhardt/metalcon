@@ -226,87 +226,70 @@ public abstract class EntityController extends MetalconController {
     }
     
     
-    // AboutTab
+    // generate<Tab>
     
     protected void generateAboutTab(AboutTab tab, Muid muid) {
     }
       
-    protected void generateAboutTabPreview(AboutTabPreview tab, Muid muid) {
-    }
-      
-    // NewsfeedTab
-    
     protected void generateNewsfeedTab(NewsfeedTab tab, Muid muid) {
     }
     
-    protected void generateNewsfeedTabPreview(NewsfeedTabPreview tab, Muid muid) {
+    protected void generateBandsTab(BandsTab tab, Muid muid) {
     }
     
-    // BandsTab
+    protected void generateRecordsTab(RecordsTab tab, Muid muid) {
+    }
     
-    protected void generateBandsTab(BandsTab tab, Muid muid) {
+    protected void generateTracksTab(TracksTab tab, Muid muid) {
+    }
+    
+    protected void generateReviewsTab(ReviewsTab tab, Muid muid) {
+    }
+    
+    protected void generateVenuesTab(VenuesTab tab, Muid muid) {
+    }
+    
+    protected void generateEventsTab(EventsTab tab, Muid muid) {
+    }
+    
+    protected void generateUsersTab(UsersTab tab, Muid muid) {
+    }
+    
+    protected void generatePhotosTab(PhotosTab tab, Muid muid) {
+    }
+    
+    
+    // generate<Tab>Preview
+    
+    protected void generateAboutTabPreview(AboutTabPreview tab, Muid muid) {
+    }
+      
+    protected void generateNewsfeedTabPreview(NewsfeedTabPreview tab, Muid muid) {
     }
     
     protected void generateBandsTabPreview(BandsTabPreview tab, Muid muid) {
     }
     
-    // RecordsTab
-    
-    protected void generateRecordsTab(RecordsTab tab, Muid muid) {
-    }
-    
     protected void generateRecordsTabPreview(RecordsTabPreview tab, Muid muid) {
-    }
-    
-    // TracksTab
-    
-    protected void generateTracksTab(TracksTab tab, Muid muid) {
     }
     
     protected void generateTracksTabPreview(TracksTabPreview tab, Muid muid) {
     }
     
-    // ReviewsTab
-    
-    protected void generateReviewsTab(ReviewsTab tab, Muid muid) {
-    }
-    
     protected void generateReviewsTabPreview(ReviewsTabPreview tab, Muid muid) {
-    }
-    
-    // VenuesTab
-    
-    protected void generateVenuesTab(VenuesTab tab, Muid muid) {
     }
     
     protected void generateVenuesTabPreview(VenuesTabPreview tab, Muid muid) {
     }
     
-    // EventsTab
-    
-    protected void generateEventsTab(EventsTab tab, Muid muid) {
-    }
-    
     protected void generateEventsTabPreview(EventsTabPreview tab, Muid muid) {
-    }
-    
-    // UsersTab
-    
-    protected void generateUsersTab(UsersTab tab, Muid muid) {
     }
     
     protected void generateUsersTabPreview(UsersTabPreview tab, Muid muid) {
     }
     
-    // PhotosTab
-   
-    protected void generatePhotosTab(PhotosTab tab, Muid muid) {
-    }
-    
     protected void generatePhotosTabPreview(PhotosTabPreview tab, Muid muid) {
     }
-    
-    // RecommendationsTab
     
     protected void generateRecommendationsTab(RecommendationsTab tab, Muid muid) {
     }
@@ -315,7 +298,7 @@ public abstract class EntityController extends MetalconController {
     }
     
     
-    // RequestMappings
+    // mapping<Tab>
     
     @RequestMapping({"", "/"})
     public final EntityView mappingEmptyTab(

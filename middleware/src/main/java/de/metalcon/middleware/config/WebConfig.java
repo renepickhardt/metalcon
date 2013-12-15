@@ -24,7 +24,7 @@ import de.metalcon.middleware.core.JsonViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { "de.metalcon.middleware" })
+@ComponentScan("de.metalcon.middleware")
 public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
