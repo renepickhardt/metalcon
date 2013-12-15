@@ -34,7 +34,7 @@ public class ErrorController extends MetalconController {
             Throwable exception, String requestUri) {
         ModelMap model = new ModelMap();
         model.addAttribute("requestUri", requestUri);
-        return new ModelAndView("error/404", model);
+        return new ModelAndView("error/error404", model);
     }
     
     private ModelAndView handleGenericError(
@@ -51,7 +51,7 @@ public class ErrorController extends MetalconController {
             model.addAttribute("exception", exceptionTrace.toString());
         }
         
-        return new ModelAndView("error/generic", model);
+        return new ModelAndView("error/error", model);
     }
     
     private String getStatusMessage(int statusCode) {
