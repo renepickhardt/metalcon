@@ -4,11 +4,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import de.metalcon.middleware.controller.UrlMappings;
 import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
 
 @Controller
-@RequestMapping(value  = EntityUrlMapper.BAND_MAPPING,
+@RequestMapping(value  = UrlMappings.BAND_MAPPING,
                 method = RequestMethod.GET)
 public class BandController extends EntityController {
 

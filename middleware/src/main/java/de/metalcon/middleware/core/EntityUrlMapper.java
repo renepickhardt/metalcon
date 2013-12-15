@@ -1,4 +1,4 @@
-package de.metalcon.middleware.controller.entity;
+package de.metalcon.middleware.core;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.metalcon.middleware.core.EntityManager;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.Band;
 import de.metalcon.middleware.domain.entity.City;
@@ -32,36 +31,17 @@ import de.metalcon.middleware.exception.RedirectException;
 @Component
 public class EntityUrlMapper {
     
-    // Controller Mappings
-    public static final String USER_MAPPING       = "/user/{pathUser}";
-    public static final String BAND_MAPPING       = "/music/{pathBand}";
-    public static final String RECORD_MAPPING     = BAND_MAPPING + "/{pathRecord}";
-    public static final String TRACK_MAPPING      = RECORD_MAPPING + "/{pathTrack}";
-    public static final String CITY_MAPPING       = "/city/{pathCity}";
-    public static final String VENUE_MAPPING      = "/venue/{pathVenue}";
-    public static final String EVENT_MAPPING      = "/event/{pathEvent}";
-    public static final String GENRE_MAPPING      = "/genre/{pathGenre}";
-    public static final String INSTRUMENT_MAPPING = "/instrument/{pathInstrument}";
-    public static final String TOUR_MAPPING       = "/tour/{pathTour}";
-    
-    // Tab Mappings
-    public static final String ABOUT_TAB_MAPPING           = "/about";
-    public static final String NEWSFEED_TAB_MAPPING        = "/news";
-    public static final String BANDS_TAB_MAPPING           = "/bands";
-    public static final String RECORDS_TAB_MAPPING         = "/records";
-    public static final String TRACKS_TAB_MAPPING          = "/tracks";
-    public static final String REVIEWS_TAB_MAPPING         = "/reviews";
-    public static final String VENUES_TAB_MAPPING          = "/venues";
-    public static final String EVENTS_TAB_MAPPING          = "/events";
-    public static final String USERS_TAB_MAPPING           = "/users";
-    public static final String PHOTOS_TAB_MAPPING          = "/photos";
-    public static final String RECOMMENDATIONS_TAB_MAPPING = "/recommendations";
-    
     public static final String WORD_SEPERATOR = "-";
     
-    public static final String EMPTY_ENTITY = "_";
+    public static final String EMPTY_ENTITY   = "_";
     
-    private Map<Muid, Set<String>>      muidToMapping;
+    private static final Logger logger =
+            LoggerFactory.getLogger(EntityUrlMapper.class);
+    
+    @Autowired
+    private EntityManager entityManager;
+    
+    private Map<Muid, Set<String>>       muidToMapping;
     
     private Map<String, Muid>            mappingToMuidUser;
     private Map<String, Muid>            mappingToMuidBand;
@@ -73,11 +53,6 @@ public class EntityUrlMapper {
     private Map<String, Muid>            mappingToMuidGenre;
     private Map<String, Muid>            mappingToMuidInstrument;
     private Map<String, Muid>            mappingToMuidTour;
-    
-    @Autowired
-    private EntityManager entityManager;
-    
-    private static final Logger logger = LoggerFactory.getLogger(EntityUrlMapper.class);
     
     public EntityUrlMapper() {
         muidToMapping           = new HashMap<Muid, Set<String>>();
@@ -94,24 +69,23 @@ public class EntityUrlMapper {
         mappingToMuidTour       = new HashMap<String, Muid>();
     }
     
-    public void registerMuid(Entity entity) {
-        Muid muid = entity.getMuid();
+    public void registerMuid(Muid muid) {
+        Entity entity = entityManager.getEntity(muid);
         switch (entity.getEntityType()) {
-            case USER:       registerMuidUser(muid, (User) entity);             break;
-            case BAND:       registerMuidBand(muid, (Band) entity);             break;
-            case RECORD:     registerMuidRecord(muid, (Record) entity);         break;
-            case TRACK:      registerMuidTrack(muid, (Track) entity);           break;
-            case VENUE:      registerMuidVenue(muid, (Venue) entity);           break;
-            case EVENT:      registerMuidEvent(muid, (Event) entity);           break;
-            case CITY:       registerMuidCity(muid, (City) entity);             break;
-            case GENRE:      registerMuidGenre(muid, (Genre) entity);           break;
+            case USER:       registerMuidUser      (muid, (User)       entity); break;
+            case BAND:       registerMuidBand      (muid, (Band)       entity); break;
+            case RECORD:     registerMuidRecord    (muid, (Record)     entity); break;
+            case TRACK:      registerMuidTrack     (muid, (Track)      entity); break;
+            case VENUE:      registerMuidVenue     (muid, (Venue)      entity); break;
+            case EVENT:      registerMuidEvent     (muid, (Event)      entity); break;
+            case CITY:       registerMuidCity      (muid, (City)       entity); break;
+            case GENRE:      registerMuidGenre     (muid, (Genre)      entity); break;
             case INSTRUMENT: registerMuidInstrument(muid, (Instrument) entity); break;
-            case TOUR:       registerMuidTour(muid, (Tour) entity);             break;
+            case TOUR:       registerMuidTour      (muid, (Tour)       entity); break;
             
             default:
-                throw new IllegalStateException(
-                        "Unimplented EntityType in EntityUrlMapper.registerMuid(): "
-                                + entity.getEntityType().toString() + ".");
+                throw new IllegalStateException("Unimplented EntityType: "
+                        + entity.getEntityType().toString() + ".");
         }
     }
     
@@ -119,21 +93,20 @@ public class EntityUrlMapper {
             EntityType entityType, Map<String, String> pathVars)
     throws RedirectException {
         switch (entityType) {
-            case USER:       return getMuidUser(pathVars);
-            case BAND:       return getMuidBand(pathVars);
-            case RECORD:     return getMuidRecord(pathVars);
-            case TRACK:      return getMuidTrack(pathVars);
-            case VENUE:      return getMuidVenue(pathVars);
-            case EVENT:      return getMuidEvent(pathVars);
-            case CITY:       return getMuidCity(pathVars);
-            case GENRE:      return getMuidGenre(pathVars);
+            case USER:       return getMuidUser      (pathVars);
+            case BAND:       return getMuidBand      (pathVars);
+            case RECORD:     return getMuidRecord    (pathVars);
+            case TRACK:      return getMuidTrack     (pathVars);
+            case VENUE:      return getMuidVenue     (pathVars);
+            case EVENT:      return getMuidEvent     (pathVars);
+            case CITY:       return getMuidCity      (pathVars);
+            case GENRE:      return getMuidGenre     (pathVars);
             case INSTRUMENT: return getMuidInstrument(pathVars);
-            case TOUR:       return getMuidTour(pathVars);
+            case TOUR:       return getMuidTour      (pathVars);
 
             default:
-                throw new IllegalStateException(
-                        "Unimplemented EntityType in EntityUrlMapper.getMuid: "
-                                + entityType.toString() + ".");
+                throw new IllegalStateException("Unimplemented EntityType: "
+                        + entityType.toString() + ".");
         }
     }
     

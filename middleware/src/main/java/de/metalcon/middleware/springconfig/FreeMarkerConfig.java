@@ -1,4 +1,4 @@
-package de.metalcon.middleware.config;
+package de.metalcon.middleware.springconfig;
 
 import java.io.IOException;
 
