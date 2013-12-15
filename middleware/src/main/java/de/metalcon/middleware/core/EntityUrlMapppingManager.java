@@ -29,14 +29,14 @@ import de.metalcon.middleware.domain.entity.Venue;
 import de.metalcon.middleware.exception.RedirectException;
 
 @Component
-public class EntityUrlMapper {
+public class EntityUrlMapppingManager {
     
     public static final String WORD_SEPERATOR = "-";
     
     public static final String EMPTY_ENTITY   = "_";
     
     private static final Logger logger =
-            LoggerFactory.getLogger(EntityUrlMapper.class);
+            LoggerFactory.getLogger(EntityUrlMapppingManager.class);
     
     @Autowired
     private EntityManager entityManager;
@@ -54,7 +54,7 @@ public class EntityUrlMapper {
     private Map<String, Muid>            mappingToMuidInstrument;
     private Map<String, Muid>            mappingToMuidTour;
     
-    public EntityUrlMapper() {
+    public EntityUrlMapppingManager() {
         muidToMapping           = new HashMap<Muid, Set<String>>();
         
         mappingToMuidUser       = new HashMap<String, Muid>();

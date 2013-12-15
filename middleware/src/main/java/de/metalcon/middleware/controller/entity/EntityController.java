@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
 
 import de.metalcon.middleware.controller.MetalconController;
 import de.metalcon.middleware.controller.UrlMappings;
-import de.metalcon.middleware.core.EntityUrlMapper;
+import de.metalcon.middleware.core.EntityUrlMapppingManager;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.view.entity.EntityView;
@@ -50,7 +50,7 @@ import de.metalcon.middleware.view.entity.tab.preview.VenuesTabPreview;
 public abstract class EntityController extends MetalconController {
 
     @Autowired
-    protected EntityUrlMapper urlMapper;
+    protected EntityUrlMapppingManager entityUrlMappingManager;
     
     @Autowired
     private EntityViewManager entityViewManager;
@@ -85,7 +85,7 @@ public abstract class EntityController extends MetalconController {
         if (entityTabType == EntityTabType.EMPTY_TAB)
             entityTabType = getDefaultTab();
         
-        Muid muid = urlMapper.getMuid(getEntityType(), pathVars);
+        Muid muid = entityUrlMappingManager.getMuid(getEntityType(), pathVars);
         
         if (!entityTabs.contains(entityTabType) || muid == null)
             throw new NoSuchRequestHandlingMethodException(request);

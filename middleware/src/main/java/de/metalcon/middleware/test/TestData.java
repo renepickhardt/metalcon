@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.metalcon.middleware.core.EntityManager;
-import de.metalcon.middleware.core.EntityUrlMapper;
+import de.metalcon.middleware.core.EntityUrlMapppingManager;
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.Band;
 import de.metalcon.middleware.domain.entity.Record;
@@ -19,7 +19,7 @@ public class TestData {
     private EntityManager entityManager;
     
     @Autowired
-    private EntityUrlMapper entityUrlMapper;
+    private EntityUrlMapppingManager entityUrlMappingManager;
     
     @PostConstruct
     private void init() {
@@ -44,10 +44,10 @@ public class TestData {
         ahti.setRecord(victorySongsMuid);
         ahti.setTrackNumber(4);
       
-        entityUrlMapper.registerMuid(ensiferumMuid);
-        entityUrlMapper.registerMuid(ensiferum2Muid);
-        entityUrlMapper.registerMuid(victorySongsMuid);
-        entityUrlMapper.registerMuid(ahtiMuid);
+        entityUrlMappingManager.registerMuid(ensiferumMuid);
+        entityUrlMappingManager.registerMuid(ensiferum2Muid);
+        entityUrlMappingManager.registerMuid(victorySongsMuid);
+        entityUrlMappingManager.registerMuid(ahtiMuid);
     }
     
 }
