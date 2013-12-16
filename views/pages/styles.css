@@ -1,0 +1,21 @@
+#bandName {}
+.content {float: left; border:thin solid red; background-color:#FFFFAA; min-width: 60%;height:80}
+.filterBox {border:thin solid red; background-color:#FFFFAA; width:70%;}
+.filterOptionsBox {border:thin solid red;background-color:#FFFFAA;width:70%;}
+.filterSelection {float:left}
+.footer {border:thin solid red;background-color:#FFFFAA;height:80;}
+.header {}
+.sortSelection {float:right}
+.newsfeedEntry {border:thin solid red;background-color:#FFFFAA;}
+.newsfeedEntryImage {width:68;float:left}
+.infoTab {border:thin solid red;background-color:#FFFFAA;}
+.BandsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.EventsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.PhotosTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.RecordsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.ReviewsTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.TrackstabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.UsersTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.VenuesTabPreview {border:thin solid red;background-color:#FFFFAA;height:80;}
+.tab {}
+.tabPreviewContainer {}

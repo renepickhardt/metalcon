@@ -1,0 +1,80 @@
+<html>
+<title>{band.name} - {site.title}</title>
+<link rel="stylesheet" type="text/css" href="./styles.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+
+<body>
+<div class="navbar-wrapper navbar-default navbar-fixed-top" role="navigation">
+<div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="{site.url}">{site.title}</a>
+          </div>
+        </div>
+</div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-8">
+			<div class="tab">
+				<div class="headline">
+				<img src="{band.img}" />
+				<h1 id="bandName">{band.name}</h1> aus <a href="{band.city.url}">{band.city}</a>
+			</div>
+			<div class="filterBox">
+				<div class="filter">
+				filterbox
+					<ul>
+						<li>
+							filter[0].deselectButton filter[0].name 	<!-- deselect-Button is just a simple, clickable image -->
+						</li>
+						<li>
+							filter[1].deselectButton filter[1].name
+						</li>
+					</ul>
+				</div>
+				<div class="sort">
+					sortbox
+					<ul>
+						<li>
+							<select name="sorting">
+								<option value="{sortingCriteria[0].value}">{sortingCriteria[0].name}</option>
+								<option value="{sortingCriteria[1].value}">{sortingCriteria[1].name}</option>
+								<option value="{sortingCriteria[2].value}">{sortingCriteria[2].name}</option>
+							</select>
+						</li>
+					</ul>
+				</div>
+			</div>
+		<!-- individual content -->
+
+			<div class="col-md-8 content">
+				<div class="left">
+					<div class="description">{band.description}</div>
+				</div>
+				<div class="right">
+					<div class="newsfeedContainer">{newsfeed}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<div class="col-md-4 tabPreviewContainer">
+
+	<div class="infoTab">	<!-- displays static information --> <!--TODO: also make an own file for this area-->
+	</div>
+
+	{include tabPreviews/News}
+	{include tabPreviews/Users}
+	{include tabPreviews/Photos}
+	{include tabPreviews/Events}
+	{include tabPreviews/Venues}
+	{include tabPreviews/Reviews}
+	{include tabPreviews/Bands}
+	{include tabPreviews/Records}
+	{include tabPreviews/Tracks}			
+
+</div>
+</div>
+</div>
+</body>
+</html>
