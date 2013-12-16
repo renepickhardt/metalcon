@@ -41,7 +41,7 @@ public class Muid {
             return EntityType.GENRE;
         else if (rem == 9)
             return EntityType.INSTRUMENT;
-        else if (rem == 10)
+        else if (rem == 0)
             return EntityType.TOUR;
         
         throw new UnsupportedOperationException(
