@@ -14,15 +14,15 @@ import org.springframework.web.servlet.ViewResolver;
 
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
-import de.metalcon.middleware.view.entity.tab.EntityTab;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
+import de.metalcon.middleware.view.entity.tab.content.EntityTabContent;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
 
 public abstract class EntityView implements View {
     
     private Muid muid;
     
-    private EntityTab entityTab;
+    private EntityTabContent entityTabContent;
     
     private Map<EntityTabType, EntityTabPreview> entityTabPreviews;
     
@@ -35,7 +35,7 @@ public abstract class EntityView implements View {
     
     public EntityView() {
         muid              = null;
-        entityTab         = null;
+        entityTabContent  = null;
         entityTabPreviews = null;
         view              = null;
     }
@@ -47,10 +47,12 @@ public abstract class EntityView implements View {
                 Locale.GERMANY);
     }
     
+    @Override
     public final String getContentType() {
         return view.getContentType();
     }
     
+    @Override
     public final void render(Map<String, ?> model,
             HttpServletRequest request, HttpServletResponse response)
     throws Exception {
@@ -67,12 +69,12 @@ public abstract class EntityView implements View {
         this.muid = muid;
     }
     
-    public final EntityTab getEntityTab() {
-        return entityTab;
+    public final EntityTabContent getEntityTabContent() {
+        return entityTabContent;
     }
     
-    public final void setEntityTab(EntityTab entityTab) {
-        this.entityTab = entityTab;
+    public final void setEntityTabContent(EntityTabContent entityTab) {
+        this.entityTabContent = entityTab;
     }
     
     public final EntityTabPreview getEntityTabPreview(EntityTabType entityTabType) {

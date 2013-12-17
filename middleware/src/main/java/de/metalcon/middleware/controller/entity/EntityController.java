@@ -20,20 +20,20 @@ import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.exception.RedirectException;
 import de.metalcon.middleware.view.entity.EntityView;
 import de.metalcon.middleware.view.entity.EntityViewManager;
-import de.metalcon.middleware.view.entity.tab.BandsTab;
-import de.metalcon.middleware.view.entity.tab.EntityTab;
-import de.metalcon.middleware.view.entity.tab.EntityTabManager;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
-import de.metalcon.middleware.view.entity.tab.EventsTab;
-import de.metalcon.middleware.view.entity.tab.AboutTab;
-import de.metalcon.middleware.view.entity.tab.NewsfeedTab;
-import de.metalcon.middleware.view.entity.tab.PhotosTab;
-import de.metalcon.middleware.view.entity.tab.RecommendationsTab;
-import de.metalcon.middleware.view.entity.tab.RecordsTab;
-import de.metalcon.middleware.view.entity.tab.ReviewsTab;
-import de.metalcon.middleware.view.entity.tab.TracksTab;
-import de.metalcon.middleware.view.entity.tab.UsersTab;
-import de.metalcon.middleware.view.entity.tab.VenuesTab;
+import de.metalcon.middleware.view.entity.tab.content.AboutContentTab;
+import de.metalcon.middleware.view.entity.tab.content.BandsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.EntityTabContent;
+import de.metalcon.middleware.view.entity.tab.content.EntityTabContentManager;
+import de.metalcon.middleware.view.entity.tab.content.EventsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.NewsfeedContentTab;
+import de.metalcon.middleware.view.entity.tab.content.PhotosContentTab;
+import de.metalcon.middleware.view.entity.tab.content.RecommendationsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.RecordsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.ReviewsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.TracksContentTab;
+import de.metalcon.middleware.view.entity.tab.content.UsersContentTab;
+import de.metalcon.middleware.view.entity.tab.content.VenuesContentTab;
 import de.metalcon.middleware.view.entity.tab.preview.BandsTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreviewManager;
@@ -57,7 +57,7 @@ public abstract class EntityController extends MetalconController {
     private EntityViewManager entityViewManager;
     
     @Autowired
-    private EntityTabManager entityTabManager;
+    private EntityTabContentManager entityTabContentManager;
     
     @Autowired
     private EntityTabPreviewManager entityTabPreviewManager;
@@ -99,34 +99,35 @@ public abstract class EntityController extends MetalconController {
             entityTabPreviews.put(entityTabPreviewType, entityTabPreview);
         }
         
-        EntityTab entityTab = generateTab(entityTabType, muid);
+        EntityTabContent entityTabContent =
+                generateTabContent(entityTabType, muid);
         
         EntityView entityView = entityViewManager.createView(getEntityType());
         entityView.setMuid(muid);
-        entityView.setEntityTab(entityTab);
+        entityView.setEntityTabContent(entityTabContent);
         entityView.setEntityTabPreviews(entityTabPreviews);
 
         return entityView;
     }
     
     
-    // generate<Tab>
+    // generate<Tab>Content
     
-    private EntityTab generateTab(
+    private EntityTabContent generateTabContent(
             EntityTabType entityTabType, Muid muid) {
-        EntityTab entityTab = entityTabManager.createTab(entityTabType);
+        EntityTabContent entityTab = entityTabContentManager.createTab(entityTabType);
         switch (entityTabType) {
-            case ABOUT_TAB:           generateAboutTab          ((AboutTab)           entityTab, muid); break;
-            case NEWSFEED_TAB:        generateNewsfeedTab       ((NewsfeedTab)        entityTab, muid); break;
-            case BANDS_TAB:           generateBandsTab          ((BandsTab)           entityTab, muid); break;
-            case RECORDS_TAB:         generateRecordsTab        ((RecordsTab)         entityTab, muid); break;
-            case TRACKS_TAB:          generateTracksTab         ((TracksTab)          entityTab, muid); break;
-            case REVIEWS_TAB:         generateReviewsTab        ((ReviewsTab)         entityTab, muid); break;
-            case VENUES_TAB:          generateVenuesTab         ((VenuesTab)          entityTab, muid); break;
-            case EVENTS_TAB:          generateEventsTab         ((EventsTab)          entityTab, muid); break;
-            case USERS_TAB:           generateUsersTab          ((UsersTab)           entityTab, muid); break;
-            case PHOTOS_TAB:          generatePhotosTab         ((PhotosTab)          entityTab, muid); break;
-            case RECOMMENDATIONS_TAB: generateRecommendationsTab((RecommendationsTab) entityTab, muid); break;
+            case ABOUT_TAB:           generateAboutTabContent          ((AboutContentTab)           entityTab, muid); break;
+            case NEWSFEED_TAB:        generateNewsfeedTabContent       ((NewsfeedContentTab)        entityTab, muid); break;
+            case BANDS_TAB:           generateBandsTabContent          ((BandsContentTab)           entityTab, muid); break;
+            case RECORDS_TAB:         generateRecordsTabContent        ((RecordsContentTab)         entityTab, muid); break;
+            case TRACKS_TAB:          generateTracksTabContent         ((TracksContentTab)          entityTab, muid); break;
+            case REVIEWS_TAB:         generateReviewsTabContent        ((ReviewsContentTab)         entityTab, muid); break;
+            case VENUES_TAB:          generateVenuesTabContent         ((VenuesContentTab)          entityTab, muid); break;
+            case EVENTS_TAB:          generateEventsTabContent         ((EventsContentTab)          entityTab, muid); break;
+            case USERS_TAB:           generateUsersTabContent          ((UsersContentTab)           entityTab, muid); break;
+            case PHOTOS_TAB:          generatePhotosTabContent         ((PhotosContentTab)          entityTab, muid); break;
+            case RECOMMENDATIONS_TAB: generateRecommendationsTabContent((RecommendationsContentTab) entityTab, muid); break;
 
             default:
                 throw new IllegalStateException(
@@ -136,34 +137,34 @@ public abstract class EntityController extends MetalconController {
         return entityTab;
     }
     
-    protected void generateAboutTab(AboutTab tab, Muid muid) {
+    protected void generateAboutTabContent(AboutContentTab tab, Muid muid) {
     }
       
-    protected void generateNewsfeedTab(NewsfeedTab tab, Muid muid) {
+    protected void generateNewsfeedTabContent(NewsfeedContentTab tab, Muid muid) {
     }
     
-    protected void generateBandsTab(BandsTab tab, Muid muid) {
+    protected void generateBandsTabContent(BandsContentTab tab, Muid muid) {
     }
     
-    protected void generateRecordsTab(RecordsTab tab, Muid muid) {
+    protected void generateRecordsTabContent(RecordsContentTab tab, Muid muid) {
     }
     
-    protected void generateTracksTab(TracksTab tab, Muid muid) {
+    protected void generateTracksTabContent(TracksContentTab tab, Muid muid) {
     }
     
-    protected void generateReviewsTab(ReviewsTab tab, Muid muid) {
+    protected void generateReviewsTabContent(ReviewsContentTab tab, Muid muid) {
     }
     
-    protected void generateVenuesTab(VenuesTab tab, Muid muid) {
+    protected void generateVenuesTabContent(VenuesContentTab tab, Muid muid) {
     }
     
-    protected void generateEventsTab(EventsTab tab, Muid muid) {
+    protected void generateEventsTabContent(EventsContentTab tab, Muid muid) {
     }
     
-    protected void generateUsersTab(UsersTab tab, Muid muid) {
+    protected void generateUsersTabContent(UsersContentTab tab, Muid muid) {
     }
     
-    protected void generatePhotosTab(PhotosTab tab, Muid muid) {
+    protected void generatePhotosTabContent(PhotosContentTab tab, Muid muid) {
     }
     
     
@@ -223,7 +224,7 @@ public abstract class EntityController extends MetalconController {
     protected void generatePhotosTabPreview(PhotosTabPreview tab, Muid muid) {
     }
     
-    protected void generateRecommendationsTab(RecommendationsTab tab, Muid muid) {
+    protected void generateRecommendationsTabContent(RecommendationsContentTab tab, Muid muid) {
     }
     
     protected void generateRecommendationsTabPreview(RecommendationsTabPreview tab, Muid muid) {

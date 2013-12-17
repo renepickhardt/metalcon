@@ -1,8 +1,10 @@
-package de.metalcon.middleware.view.entity.tab;
+package de.metalcon.middleware.view.entity.tab.content;
 
-public abstract class EntityTabManager {
+import de.metalcon.middleware.view.entity.tab.EntityTabType;
 
-    public EntityTab createTab(EntityTabType entityTabType) {
+public abstract class EntityTabContentManager {
+
+    public EntityTabContent createTab(EntityTabType entityTabType) {
         switch (entityTabType) {
             case ABOUT_TAB:           return createAboutTab();
             case NEWSFEED_TAB:        return createNewsfeedTab();
@@ -22,26 +24,26 @@ public abstract class EntityTabManager {
         }
     }
     
-    public abstract AboutTab createAboutTab();
+    public abstract AboutContentTab createAboutTab();
     
-    public abstract NewsfeedTab createNewsfeedTab();
+    public abstract NewsfeedContentTab createNewsfeedTab();
     
-    public abstract BandsTab createBandsTab();
+    public abstract BandsContentTab createBandsTab();
     
-    public abstract RecordsTab createRecordsTab();
+    public abstract RecordsContentTab createRecordsTab();
     
-    public abstract TracksTab createTracksTab();
+    public abstract TracksContentTab createTracksTab();
     
-    public abstract ReviewsTab createReviewsTab();
+    public abstract ReviewsContentTab createReviewsTab();
     
-    public abstract VenuesTab createVenuesTab();
+    public abstract VenuesContentTab createVenuesTab();
    
-    public abstract EventsTab createEventsTab();
+    public abstract EventsContentTab createEventsTab();
     
-    public abstract UsersTab createUsersTab();
+    public abstract UsersContentTab createUsersTab();
     
-    public abstract PhotosTab createPhotosTab();
+    public abstract PhotosContentTab createPhotosTab();
     
-    public abstract RecommendationsTab createRecomendationsTab();
+    public abstract RecommendationsContentTab createRecomendationsTab();
     
 }
