@@ -4,6 +4,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
+import de.metalcon.middleware.view.entity.tab.preview.impl.AboutTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.BandsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.EventsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.NewsfeedTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.PhotosTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.RecommendationsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.RecordsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.ReviewsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.TracksTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.UsersTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.VenuesTabPreview;
+
 @Configuration
 public class EntityTabPreviewConfig {
 

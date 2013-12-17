@@ -1,6 +1,17 @@
 package de.metalcon.middleware.view.entity.tab.content;
 
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
+import de.metalcon.middleware.view.entity.tab.content.impl.AboutContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.BandsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.EventsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.NewsfeedContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.PhotosContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecommendationsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecordsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.ReviewsContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.TracksContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.UsersContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.VenuesContentTab;
 
 public abstract class EntityTabContentManager {
 

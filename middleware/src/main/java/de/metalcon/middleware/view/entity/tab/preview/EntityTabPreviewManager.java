@@ -1,6 +1,17 @@
 package de.metalcon.middleware.view.entity.tab.preview;
 
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
+import de.metalcon.middleware.view.entity.tab.preview.impl.AboutTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.BandsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.EventsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.NewsfeedTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.PhotosTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.RecommendationsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.RecordsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.ReviewsTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.TracksTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.UsersTabPreview;
+import de.metalcon.middleware.view.entity.tab.preview.impl.VenuesTabPreview;
 
 public abstract class EntityTabPreviewManager {
 
