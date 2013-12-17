@@ -29,38 +29,37 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/resources/**")
-                .addResourceLocations("/resources/");
+        registry.addResourceHandler("/resources/**").addResourceLocations(
+                "/resources/");
     }
-    
+
     @Override
     public void configureContentNegotiation(
             ContentNegotiationConfigurer configurer) {
         Map<String, MediaType> mediaTypes = new HashMap<String, MediaType>();
         mediaTypes.put("html", MediaType.APPLICATION_XHTML_XML);
         mediaTypes.put("json", MediaType.APPLICATION_JSON);
-        
-        configurer.replaceMediaTypes(mediaTypes)
-                  .favorPathExtension(true)
-                  .useJaf(false)
-                  .defaultContentType(MediaType.APPLICATION_XHTML_XML);
+
+        configurer.replaceMediaTypes(mediaTypes).favorPathExtension(true)
+                .useJaf(false)
+                .defaultContentType(MediaType.APPLICATION_XHTML_XML);
     }
-    
+
     @Bean
     public ViewResolver contentNegotiatingViewResolver(
             ContentNegotiationManager manager) {
         List<ViewResolver> resolvers = new ArrayList<ViewResolver>();
-        
+
         resolvers.add(freeMarkerViewResolver());
         resolvers.add(jsonViewResolver());
-        
+
         ContentNegotiatingViewResolver resolver =
                 new ContentNegotiatingViewResolver();
         resolver.setViewResolvers(resolvers);
         resolver.setContentNegotiationManager(manager);
         return resolver;
     }
-    
+
     public FreeMarkerViewResolver freeMarkerViewResolver() {
         FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
         viewResolver.setContentType(MediaType.APPLICATION_XHTML_XML_VALUE);
@@ -69,12 +68,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         viewResolver.setSuffix(".ftl");
         return viewResolver;
     }
-    
+
     public JsonViewResolver jsonViewResolver() {
         JsonViewResolver viewResolver = new JsonViewResolver();
         return viewResolver;
     }
-    
+
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
@@ -82,5 +81,5 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         taskExecutor.setMaxPoolSize(10);
         return taskExecutor;
     }
-    
+
 }

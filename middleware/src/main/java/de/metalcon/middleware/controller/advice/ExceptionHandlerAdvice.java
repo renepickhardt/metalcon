@@ -8,10 +8,10 @@ import de.metalcon.middleware.exception.RedirectException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
-    
+
     @ExceptionHandler(RedirectException.class)
     public View handleRedirectException(RedirectException e) {
         return e.getRedirectView();
     }
-    
+
 }

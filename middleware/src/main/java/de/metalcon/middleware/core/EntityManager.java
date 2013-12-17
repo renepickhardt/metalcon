@@ -12,17 +12,17 @@ import de.metalcon.middleware.domain.entity.Entity;
 public class EntityManager {
 
     private Map<Muid, Entity> entities;
-    
+
     public EntityManager() {
         entities = new HashMap<Muid, Entity>();
     }
-    
+
     public Entity getEntity(Muid muid) {
         return entities.get(muid);
     }
-    
+
     public void putEntity(Entity entity) {
         entities.put(entity.getMuid(), entity);
     }
-    
+
 }

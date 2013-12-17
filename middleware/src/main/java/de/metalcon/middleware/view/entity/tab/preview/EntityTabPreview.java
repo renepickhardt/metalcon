@@ -5,5 +5,5 @@ import de.metalcon.middleware.view.entity.tab.EntityTabType;
 public abstract class EntityTabPreview {
 
     public abstract EntityTabType getEntityTabType();
-    
+
 }

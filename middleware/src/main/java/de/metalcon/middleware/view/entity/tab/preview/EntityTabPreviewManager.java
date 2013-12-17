@@ -6,6 +6,7 @@ public abstract class EntityTabPreviewManager {
 
     public EntityTabPreview createTabPreview(EntityTabType entityTabType) {
         switch (entityTabType) {
+        // @formatter:off
             case ABOUT_TAB:           return createAboutTabPreview();
             case NEWSFEED_TAB:        return createNewsfeedTabPreview();
             case BANDS_TAB:           return createBandsTabPreview();
@@ -17,33 +18,35 @@ public abstract class EntityTabPreviewManager {
             case USERS_TAB:           return createUsersTabPreview();
             case PHOTOS_TAB:          return createPhotosTabPreview();
             case RECOMMENDATIONS_TAB: return createRecomendationsTabPreview();
-            
+            // @formatter:on
+
             default:
-                throw new IllegalStateException("Unimplemented EntityTabPreviewType:"
-                        + entityTabType.toString() + ".");
+                throw new IllegalStateException(
+                        "Unimplemented EntityTabPreviewType:"
+                                + entityTabType.toString() + ".");
         }
     }
-    
+
     public abstract AboutTabPreview createAboutTabPreview();
-    
+
     public abstract NewsfeedTabPreview createNewsfeedTabPreview();
-    
+
     public abstract BandsTabPreview createBandsTabPreview();
-    
+
     public abstract RecordsTabPreview createRecordsTabPreview();
-    
+
     public abstract TracksTabPreview createTracksTabPreview();
-    
+
     public abstract ReviewsTabPreview createReviewsTabPreview();
-    
+
     public abstract VenuesTabPreview createVenuesTabPreview();
-   
+
     public abstract EventsTabPreview createEventsTabPreview();
-    
+
     public abstract UsersTabPreview createUsersTabPreview();
-    
+
     public abstract PhotosTabPreview createPhotosTabPreview();
-    
+
     public abstract RecommendationsTabPreview createRecomendationsTabPreview();
-    
+
 }

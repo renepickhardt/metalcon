@@ -8,33 +8,36 @@ public class User extends Entity {
     public EntityType getEntityType() {
         return EntityType.USER;
     }
-    
+
     public static String concatNames(String firstName, String lastName) {
         return firstName + " " + lastName;
     }
-    
+
     private String firstName;
-    
+
     private String lastName;
-    
-    public User(Muid muid, String firstName, String lastName) {
+
+    public User(
+            Muid muid,
+            String firstName,
+            String lastName) {
         super(muid, concatNames(firstName, lastName));
         setFirstName(firstName);
         setLastName(lastName);
     }
-    
+
     public String getFirstName() {
         return firstName;
     }
-    
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-    
+
     public String getLastName() {
         return lastName;
     }
-    
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }

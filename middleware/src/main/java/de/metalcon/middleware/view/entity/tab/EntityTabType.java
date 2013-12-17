@@ -14,5 +14,5 @@ public enum EntityTabType {
     USERS_TAB,
     PHOTOS_TAB,
     RECOMMENDATIONS_TAB;
-    
+
 }

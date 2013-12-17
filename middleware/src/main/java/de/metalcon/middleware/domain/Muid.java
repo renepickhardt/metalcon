@@ -3,23 +3,24 @@ package de.metalcon.middleware.domain;
 import de.metalcon.middleware.domain.entity.EntityType;
 
 public class Muid {
-    
+
     public static final Muid EMPTY_MUID = new Muid(0);
-    
+
     private long value;
-    
-    public Muid(long value) {
+
+    public Muid(
+            long value) {
         this.value = value;
     }
-    
+
     public long getValue() {
         return value;
     }
-    
+
     public void setValue(long value) {
         this.value = value;
     }
-    
+
     public EntityType getEntityType() {
         // TODO: stub implementation
         long rem = value % 10;
@@ -43,16 +44,16 @@ public class Muid {
             return EntityType.INSTRUMENT;
         else if (rem == 0)
             return EntityType.TOUR;
-        
+
         throw new UnsupportedOperationException(
                 "Muid.getEntityType() not implemented yet.");
     }
-    
+
     @Override
     public String toString() {
         return ((Long) value).toString();
     }
-    
+
     @Override
     public boolean equals(Object other) {
         if (other == this)
@@ -62,14 +63,14 @@ public class Muid {
         Muid o = (Muid) other;
         return value == o.value;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 9823;
         int mult = 887;
-        
-        hash = hash*mult + ((Long) value).hashCode();
-        
+
+        hash = hash * mult + ((Long) value).hashCode();
+
         return hash;
     }
 

@@ -1,6 +1,8 @@
 package de.metalcon.middleware.controller;
 
 public class UrlMappings {
+
+    // @formatter:off
     
     // Entity Mappings
     public static final String USER_MAPPING       = "/user/{pathUser}";
@@ -26,5 +28,7 @@ public class UrlMappings {
     public static final String USERS_TAB_MAPPING           = "/users";
     public static final String PHOTOS_TAB_MAPPING          = "/photos";
     public static final String RECOMMENDATIONS_TAB_MAPPING = "/recommendations";
+    
+    // @formatter:on
 
 }

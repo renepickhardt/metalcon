@@ -13,7 +13,7 @@ public class JsonViewResolver implements ViewResolver {
 
     @Override
     public View resolveViewName(String viewName, Locale locale)
-    throws Exception {
+            throws Exception {
         MappingJackson2JsonView view = new MappingJackson2JsonView();
         view.setContentType(MediaType.APPLICATION_JSON_VALUE);
         view.setEncoding(JsonEncoding.UTF8);
@@ -22,5 +22,5 @@ public class JsonViewResolver implements ViewResolver {
         //view.setExtractValueFromSingleKeyModel(true);
         return view;
     }
-    
+
 }

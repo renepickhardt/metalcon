@@ -13,22 +13,21 @@ import freemarker.template.Version;
 
 @Component
 public class FreeMarkerConfig extends FreeMarkerConfigurer {
-    
+
     public FreeMarkerConfig() {
         super();
         setDefaultEncoding("UTF-8");
         setTemplateLoaderPath("/WEB-INF/views/");
     }
-    
+
     @Override
     protected void postProcessConfiguration(Configuration config)
-    throws IOException, TemplateException {
+            throws IOException, TemplateException {
         DefaultObjectWrapper wrapper = new DefaultObjectWrapper();
         wrapper.setExposeFields(false);
         wrapper.setExposureLevel(DefaultObjectWrapper.EXPOSE_SAFE);
         config.setObjectWrapper(wrapper);
-        config.setTemplateExceptionHandler(
-                TemplateExceptionHandler.RETHROW_HANDLER);
+        config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         config.setIncompatibleImprovements(new Version(2, 3, 20));
         config.setOutputEncoding("UTF-8");
     }
