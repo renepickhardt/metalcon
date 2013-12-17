@@ -1,6 +1,8 @@
-package de.metalcon.middleware.domain.entity;
+package de.metalcon.middleware.domain.entity.impl;
 
 import de.metalcon.middleware.domain.Muid;
+import de.metalcon.middleware.domain.entity.Entity;
+import de.metalcon.middleware.domain.entity.EntityType;
 
 public class User extends Entity {
 

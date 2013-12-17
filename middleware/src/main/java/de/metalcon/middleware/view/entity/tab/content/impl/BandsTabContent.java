@@ -3,11 +3,11 @@ package de.metalcon.middleware.view.entity.tab.content.impl;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
 import de.metalcon.middleware.view.entity.tab.content.EntityTabContent;
 
-public class RecommendationsContentTab extends EntityTabContent {
+public class BandsTabContent extends EntityTabContent {
 
     @Override
     public EntityTabType getEntityTabType() {
-        return EntityTabType.RECOMMENDATIONS_TAB;
+        return EntityTabType.BANDS_TAB;
     }
 
 }

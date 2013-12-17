@@ -4,85 +4,85 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import de.metalcon.middleware.view.entity.tab.content.impl.AboutContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.BandsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.EventsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.NewsfeedContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.PhotosContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.RecommendationsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.RecordsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.ReviewsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.TracksContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.UsersContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.VenuesContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.AboutTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.BandsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.EventsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.NewsfeedTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.PhotosTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecommendationsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecordsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.ReviewsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.TracksTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.UsersTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.VenuesTabContent;
 
 @Configuration
 public class EntityTabContentConfig {
 
     @Bean
     @Scope("prototype")
-    public AboutContentTab aboutTab() {
-        return new AboutContentTab();
+    public AboutTabContent aboutTab() {
+        return new AboutTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public NewsfeedContentTab newsfeedTab() {
-        return new NewsfeedContentTab();
+    public BandsTabContent bandsTab() {
+        return new BandsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public BandsContentTab bandsTab() {
-        return new BandsContentTab();
+    public EventsTabContent eventsTab() {
+        return new EventsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public RecordsContentTab recordsTab() {
-        return new RecordsContentTab();
+    public NewsfeedTabContent newsfeedTab() {
+        return new NewsfeedTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public TracksContentTab tracksTab() {
-        return new TracksContentTab();
+    public PhotosTabContent photosTab() {
+        return new PhotosTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public ReviewsContentTab reviewsTab() {
-        return new ReviewsContentTab();
+    public RecommendationsTabContent recommendationsTab() {
+        return new RecommendationsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public VenuesContentTab venuesTab() {
-        return new VenuesContentTab();
+    public RecordsTabContent recordsTab() {
+        return new RecordsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public EventsContentTab eventsTab() {
-        return new EventsContentTab();
+    public ReviewsTabContent reviewsTab() {
+        return new ReviewsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public UsersContentTab usersTab() {
-        return new UsersContentTab();
+    public TracksTabContent tracksTab() {
+        return new TracksTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public PhotosContentTab photosTab() {
-        return new PhotosContentTab();
+    public UsersTabContent usersTab() {
+        return new UsersTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public RecommendationsContentTab recommendationsTab() {
-        return new RecommendationsContentTab();
+    public VenuesTabContent venuesTab() {
+        return new VenuesTabContent();
     }
 
     @Bean
@@ -90,58 +90,58 @@ public class EntityTabContentConfig {
         return new EntityTabContentManager() {
 
             @Override
-            public AboutContentTab createAboutTab() {
+            public AboutTabContent createAboutTab() {
                 return aboutTab();
             }
 
             @Override
-            public NewsfeedContentTab createNewsfeedTab() {
-                return newsfeedTab();
-            }
-
-            @Override
-            public BandsContentTab createBandsTab() {
+            public BandsTabContent createBandsTab() {
                 return bandsTab();
             }
 
             @Override
-            public RecordsContentTab createRecordsTab() {
-                return recordsTab();
-            }
-
-            @Override
-            public TracksContentTab createTracksTab() {
-                return tracksTab();
-            }
-
-            @Override
-            public ReviewsContentTab createReviewsTab() {
-                return reviewsTab();
-            }
-
-            @Override
-            public VenuesContentTab createVenuesTab() {
-                return venuesTab();
-            }
-
-            @Override
-            public EventsContentTab createEventsTab() {
+            public EventsTabContent createEventsTab() {
                 return eventsTab();
             }
 
             @Override
-            public UsersContentTab createUsersTab() {
-                return usersTab();
+            public NewsfeedTabContent createNewsfeedTab() {
+                return newsfeedTab();
             }
 
             @Override
-            public PhotosContentTab createPhotosTab() {
+            public PhotosTabContent createPhotosTab() {
                 return photosTab();
             }
 
             @Override
-            public RecommendationsContentTab createRecomendationsTab() {
+            public RecommendationsTabContent createRecomendationsTab() {
                 return recommendationsTab();
+            }
+
+            @Override
+            public RecordsTabContent createRecordsTab() {
+                return recordsTab();
+            }
+
+            @Override
+            public ReviewsTabContent createReviewsTab() {
+                return reviewsTab();
+            }
+
+            @Override
+            public TracksTabContent createTracksTab() {
+                return tracksTab();
+            }
+
+            @Override
+            public UsersTabContent createUsersTab() {
+                return usersTab();
+            }
+
+            @Override
+            public VenuesTabContent createVenuesTab() {
+                return venuesTab();
             }
 
         };

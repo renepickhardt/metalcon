@@ -1,34 +1,34 @@
 package de.metalcon.middleware.view.entity.tab.content;
 
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
-import de.metalcon.middleware.view.entity.tab.content.impl.AboutContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.BandsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.EventsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.NewsfeedContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.PhotosContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.RecommendationsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.RecordsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.ReviewsContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.TracksContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.UsersContentTab;
-import de.metalcon.middleware.view.entity.tab.content.impl.VenuesContentTab;
+import de.metalcon.middleware.view.entity.tab.content.impl.AboutTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.BandsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.EventsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.NewsfeedTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.PhotosTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecommendationsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.RecordsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.ReviewsTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.TracksTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.UsersTabContent;
+import de.metalcon.middleware.view.entity.tab.content.impl.VenuesTabContent;
 
 public abstract class EntityTabContentManager {
 
-    public EntityTabContent createTab(EntityTabType entityTabType) {
+    public EntityTabContent createTabContent(EntityTabType entityTabType) {
         switch (entityTabType) {
         // @formatter:off
             case ABOUT_TAB:           return createAboutTab();
-            case NEWSFEED_TAB:        return createNewsfeedTab();
             case BANDS_TAB:           return createBandsTab();
-            case RECORDS_TAB:         return createRecordsTab();
-            case TRACKS_TAB:          return createTracksTab();
-            case REVIEWS_TAB:         return createReviewsTab();
-            case VENUES_TAB:          return createVenuesTab();
             case EVENTS_TAB:          return createEventsTab();
-            case USERS_TAB:           return createUsersTab();
+            case NEWSFEED_TAB:        return createNewsfeedTab();
             case PHOTOS_TAB:          return createPhotosTab();
             case RECOMMENDATIONS_TAB: return createRecomendationsTab();
+            case RECORDS_TAB:         return createRecordsTab();
+            case REVIEWS_TAB:         return createReviewsTab();
+            case TRACKS_TAB:          return createTracksTab();
+            case USERS_TAB:           return createUsersTab();
+            case VENUES_TAB:          return createVenuesTab();
             // @formatter:on
 
             default:
@@ -37,26 +37,26 @@ public abstract class EntityTabContentManager {
         }
     }
 
-    public abstract AboutContentTab createAboutTab();
+    public abstract AboutTabContent createAboutTab();
 
-    public abstract NewsfeedContentTab createNewsfeedTab();
+    public abstract BandsTabContent createBandsTab();
 
-    public abstract BandsContentTab createBandsTab();
+    public abstract EventsTabContent createEventsTab();
 
-    public abstract RecordsContentTab createRecordsTab();
+    public abstract NewsfeedTabContent createNewsfeedTab();
 
-    public abstract TracksContentTab createTracksTab();
+    public abstract PhotosTabContent createPhotosTab();
 
-    public abstract ReviewsContentTab createReviewsTab();
+    public abstract RecommendationsTabContent createRecomendationsTab();
 
-    public abstract VenuesContentTab createVenuesTab();
+    public abstract RecordsTabContent createRecordsTab();
 
-    public abstract EventsContentTab createEventsTab();
+    public abstract ReviewsTabContent createReviewsTab();
 
-    public abstract UsersContentTab createUsersTab();
+    public abstract TracksTabContent createTracksTab();
 
-    public abstract PhotosContentTab createPhotosTab();
+    public abstract UsersTabContent createUsersTab();
 
-    public abstract RecommendationsContentTab createRecomendationsTab();
+    public abstract VenuesTabContent createVenuesTab();
 
 }

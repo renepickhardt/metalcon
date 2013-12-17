@@ -18,46 +18,45 @@ public abstract class EntityTabPreviewManager {
     public EntityTabPreview createTabPreview(EntityTabType entityTabType) {
         switch (entityTabType) {
         // @formatter:off
-            case ABOUT_TAB:           return createAboutTabPreview();
-            case NEWSFEED_TAB:        return createNewsfeedTabPreview();
-            case BANDS_TAB:           return createBandsTabPreview();
-            case RECORDS_TAB:         return createRecordsTabPreview();
-            case TRACKS_TAB:          return createTracksTabPreview();
-            case REVIEWS_TAB:         return createReviewsTabPreview();
-            case VENUES_TAB:          return createVenuesTabPreview();
-            case EVENTS_TAB:          return createEventsTabPreview();
-            case USERS_TAB:           return createUsersTabPreview();
-            case PHOTOS_TAB:          return createPhotosTabPreview();
-            case RECOMMENDATIONS_TAB: return createRecomendationsTabPreview();
+            case ABOUT_TAB:           return createAboutTab();
+            case BANDS_TAB:           return createBandsTab();
+            case EVENTS_TAB:          return createEventsTab();
+            case NEWSFEED_TAB:        return createNewsfeedTab();
+            case PHOTOS_TAB:          return createPhotosTab();
+            case RECOMMENDATIONS_TAB: return createRecomendationsTab();
+            case RECORDS_TAB:         return createRecordsTab();
+            case REVIEWS_TAB:         return createReviewsTab();
+            case TRACKS_TAB:          return createTracksTab();
+            case USERS_TAB:           return createUsersTab();
+            case VENUES_TAB:          return createVenuesTab();
             // @formatter:on
 
             default:
-                throw new IllegalStateException(
-                        "Unimplemented EntityTabPreviewType:"
-                                + entityTabType.toString() + ".");
+                throw new IllegalStateException("Unimplemented EntityTabType:"
+                        + entityTabType.toString() + ".");
         }
     }
 
-    public abstract AboutTabPreview createAboutTabPreview();
+    public abstract AboutTabPreview createAboutTab();
 
-    public abstract NewsfeedTabPreview createNewsfeedTabPreview();
+    public abstract BandsTabPreview createBandsTab();
 
-    public abstract BandsTabPreview createBandsTabPreview();
+    public abstract EventsTabPreview createEventsTab();
 
-    public abstract RecordsTabPreview createRecordsTabPreview();
+    public abstract NewsfeedTabPreview createNewsfeedTab();
 
-    public abstract TracksTabPreview createTracksTabPreview();
+    public abstract PhotosTabPreview createPhotosTab();
 
-    public abstract ReviewsTabPreview createReviewsTabPreview();
+    public abstract RecommendationsTabPreview createRecomendationsTab();
 
-    public abstract VenuesTabPreview createVenuesTabPreview();
+    public abstract RecordsTabPreview createRecordsTab();
 
-    public abstract EventsTabPreview createEventsTabPreview();
+    public abstract ReviewsTabPreview createReviewsTab();
 
-    public abstract UsersTabPreview createUsersTabPreview();
+    public abstract TracksTabPreview createTracksTab();
 
-    public abstract PhotosTabPreview createPhotosTabPreview();
+    public abstract UsersTabPreview createUsersTab();
 
-    public abstract RecommendationsTabPreview createRecomendationsTabPreview();
+    public abstract VenuesTabPreview createVenuesTab();
 
 }

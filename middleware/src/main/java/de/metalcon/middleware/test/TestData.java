@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import de.metalcon.middleware.core.EntityManager;
 import de.metalcon.middleware.core.EntityUrlMapppingManager;
 import de.metalcon.middleware.domain.Muid;
-import de.metalcon.middleware.domain.entity.Band;
-import de.metalcon.middleware.domain.entity.Record;
-import de.metalcon.middleware.domain.entity.Track;
+import de.metalcon.middleware.domain.entity.impl.Band;
+import de.metalcon.middleware.domain.entity.impl.Record;
+import de.metalcon.middleware.domain.entity.impl.Track;
 
 @Component
 public class TestData {

@@ -14,18 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.metalcon.middleware.domain.Muid;
-import de.metalcon.middleware.domain.entity.Band;
-import de.metalcon.middleware.domain.entity.City;
 import de.metalcon.middleware.domain.entity.Entity;
 import de.metalcon.middleware.domain.entity.EntityType;
-import de.metalcon.middleware.domain.entity.Event;
-import de.metalcon.middleware.domain.entity.Genre;
-import de.metalcon.middleware.domain.entity.Instrument;
-import de.metalcon.middleware.domain.entity.Record;
-import de.metalcon.middleware.domain.entity.Tour;
-import de.metalcon.middleware.domain.entity.Track;
-import de.metalcon.middleware.domain.entity.User;
-import de.metalcon.middleware.domain.entity.Venue;
+import de.metalcon.middleware.domain.entity.impl.Band;
+import de.metalcon.middleware.domain.entity.impl.City;
+import de.metalcon.middleware.domain.entity.impl.Event;
+import de.metalcon.middleware.domain.entity.impl.Genre;
+import de.metalcon.middleware.domain.entity.impl.Instrument;
+import de.metalcon.middleware.domain.entity.impl.Record;
+import de.metalcon.middleware.domain.entity.impl.Tour;
+import de.metalcon.middleware.domain.entity.impl.Track;
+import de.metalcon.middleware.domain.entity.impl.User;
+import de.metalcon.middleware.domain.entity.impl.Venue;
 import de.metalcon.middleware.exception.RedirectException;
 
 @Component
@@ -43,17 +43,9 @@ public class EntityUrlMapppingManager {
 
     private Map<Muid, Set<String>> muidToMapping;
 
-    private Map<String, Muid> mappingToMuidUser;
-
     private Map<String, Muid> mappingToMuidBand;
 
-    private Map<Muid, Map<String, Muid>> mappingToMuidRecord;
-
-    private Map<Muid, Map<String, Muid>> mappingToMuidTrack;
-
     private Map<String, Muid> mappingToMuidCity;
-
-    private Map<String, Muid> mappingToMuidVenue;
 
     private Map<String, Muid> mappingToMuidEvent;
 
@@ -61,37 +53,45 @@ public class EntityUrlMapppingManager {
 
     private Map<String, Muid> mappingToMuidInstrument;
 
+    private Map<Muid, Map<String, Muid>> mappingToMuidRecord;
+
     private Map<String, Muid> mappingToMuidTour;
+
+    private Map<Muid, Map<String, Muid>> mappingToMuidTrack;
+
+    private Map<String, Muid> mappingToMuidUser;
+
+    private Map<String, Muid> mappingToMuidVenue;
 
     public EntityUrlMapppingManager() {
         muidToMapping = new HashMap<Muid, Set<String>>();
 
-        mappingToMuidUser = new HashMap<String, Muid>();
         mappingToMuidBand = new HashMap<String, Muid>();
-        mappingToMuidRecord = new HashMap<Muid, Map<String, Muid>>();
-        mappingToMuidTrack = new HashMap<Muid, Map<String, Muid>>();
         mappingToMuidCity = new HashMap<String, Muid>();
-        mappingToMuidVenue = new HashMap<String, Muid>();
         mappingToMuidEvent = new HashMap<String, Muid>();
         mappingToMuidGenre = new HashMap<String, Muid>();
         mappingToMuidInstrument = new HashMap<String, Muid>();
+        mappingToMuidRecord = new HashMap<Muid, Map<String, Muid>>();
         mappingToMuidTour = new HashMap<String, Muid>();
+        mappingToMuidTrack = new HashMap<Muid, Map<String, Muid>>();
+        mappingToMuidUser = new HashMap<String, Muid>();
+        mappingToMuidVenue = new HashMap<String, Muid>();
     }
 
     public void registerMuid(Muid muid) {
         Entity entity = entityManager.getEntity(muid);
         switch (entity.getEntityType()) {
         // @formatter:off
-            case USER:       registerMuidUser      (muid, (User)       entity); break;
             case BAND:       registerMuidBand      (muid, (Band)       entity); break;
-            case RECORD:     registerMuidRecord    (muid, (Record)     entity); break;
-            case TRACK:      registerMuidTrack     (muid, (Track)      entity); break;
-            case VENUE:      registerMuidVenue     (muid, (Venue)      entity); break;
-            case EVENT:      registerMuidEvent     (muid, (Event)      entity); break;
             case CITY:       registerMuidCity      (muid, (City)       entity); break;
+            case EVENT:      registerMuidEvent     (muid, (Event)      entity); break;
             case GENRE:      registerMuidGenre     (muid, (Genre)      entity); break;
             case INSTRUMENT: registerMuidInstrument(muid, (Instrument) entity); break;
+            case RECORD:     registerMuidRecord    (muid, (Record)     entity); break;
             case TOUR:       registerMuidTour      (muid, (Tour)       entity); break;
+            case TRACK:      registerMuidTrack     (muid, (Track)      entity); break;
+            case USER:       registerMuidUser      (muid, (User)       entity); break;
+            case VENUE:      registerMuidVenue     (muid, (Venue)      entity); break;
             // @formatter:on
 
             default:
@@ -104,16 +104,16 @@ public class EntityUrlMapppingManager {
             throws RedirectException {
         switch (entityType) {
         // @formatter:off
-            case USER:       return getMuidUser      (pathVars);
             case BAND:       return getMuidBand      (pathVars);
-            case RECORD:     return getMuidRecord    (pathVars);
-            case TRACK:      return getMuidTrack     (pathVars);
-            case VENUE:      return getMuidVenue     (pathVars);
-            case EVENT:      return getMuidEvent     (pathVars);
             case CITY:       return getMuidCity      (pathVars);
+            case EVENT:      return getMuidEvent     (pathVars);
             case GENRE:      return getMuidGenre     (pathVars);
             case INSTRUMENT: return getMuidInstrument(pathVars);
+            case RECORD:     return getMuidRecord    (pathVars);
             case TOUR:       return getMuidTour      (pathVars);
+            case TRACK:      return getMuidTrack     (pathVars);
+            case USER:       return getMuidUser      (pathVars);
+            case VENUE:      return getMuidVenue     (pathVars);
             // @formatter:on
 
             default:
@@ -176,19 +176,47 @@ public class EntityUrlMapppingManager {
 
     // registerMuid<Entity>
 
-    private void registerMuidUser(Muid muid, User user) {
-        Set<String> mappings = new LinkedHashSet<String>();
-        String firstName = toUrlText(user.getFirstName());
-        String lastName = toUrlText(user.getLastName());
-        mappings.add(firstName + WORD_SEPERATOR + lastName);
-        registerMappings(mappingToMuidUser, muid, mappings);
-    }
-
     private void registerMuidBand(Muid muid, Band band) {
         Set<String> mappings = new LinkedHashSet<String>();
         String name = toUrlText(band.getName());
         mappings.add(name);
         registerMappings(mappingToMuidBand, muid, mappings);
+    }
+
+    private void registerMuidCity(Muid muid, City city) {
+        Set<String> mappings = new LinkedHashSet<String>();
+        String name = toUrlText(city.getName());
+        mappings.add(name);
+        registerMappings(mappingToMuidCity, muid, mappings);
+    }
+
+    private void registerMuidEvent(Muid muid, Event event) {
+        Set<String> mappings = new LinkedHashSet<String>();
+        String name = toUrlText(event.getName());
+        mappings.add(name);
+
+        Date date = event.getDate();
+        if (date != null) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateFormatted = dateFormat.format(date);
+            mappings.add(dateFormatted + WORD_SEPERATOR + name);
+        }
+
+        registerMappings(mappingToMuidEvent, muid, mappings);
+    }
+
+    private void registerMuidGenre(Muid muid, Genre genre) {
+        Set<String> mappings = new LinkedHashSet<String>();
+        String name = toUrlText(genre.getName());
+        mappings.add(name);
+        registerMappings(mappingToMuidGenre, muid, mappings);
+    }
+
+    private void registerMuidInstrument(Muid muid, Instrument instrument) {
+        Set<String> mappings = new LinkedHashSet<String>();
+        String name = toUrlText(instrument.getName());
+        mappings.add(name);
+        registerMappings(mappingToMuidInstrument, muid, mappings);
     }
 
     private void registerMuidRecord(Muid muid, Record record) {
@@ -218,6 +246,20 @@ public class EntityUrlMapppingManager {
         }
 
         registerMappings(mappingToMuid, muid, mappings);
+    }
+
+    private void registerMuidTour(Muid muid, Tour tour) {
+        Set<String> mappings = new LinkedHashSet<String>();
+        String name = toUrlText(tour.getName());
+        mappings.add(name);
+
+        Integer year = tour.getYear();
+        if (year != null) {
+            String yearFormatted = year.toString();
+            mappings.add(yearFormatted + WORD_SEPERATOR + name);
+        }
+
+        registerMappings(mappingToMuidTour, muid, mappings);
     }
 
     private void registerMuidTrack(Muid muid, Track track) {
@@ -257,11 +299,12 @@ public class EntityUrlMapppingManager {
         registerMappings(mappingToMuid, muid, mappings);
     }
 
-    private void registerMuidCity(Muid muid, City city) {
+    private void registerMuidUser(Muid muid, User user) {
         Set<String> mappings = new LinkedHashSet<String>();
-        String name = toUrlText(city.getName());
-        mappings.add(name);
-        registerMappings(mappingToMuidCity, muid, mappings);
+        String firstName = toUrlText(user.getFirstName());
+        String lastName = toUrlText(user.getLastName());
+        mappings.add(firstName + WORD_SEPERATOR + lastName);
+        registerMappings(mappingToMuidUser, muid, mappings);
     }
 
     private void registerMuidVenue(Muid muid, Venue venue) {
@@ -279,56 +322,7 @@ public class EntityUrlMapppingManager {
         registerMappings(mappingToMuidVenue, cityMuid, mappings);
     }
 
-    private void registerMuidEvent(Muid muid, Event event) {
-        Set<String> mappings = new LinkedHashSet<String>();
-        String name = toUrlText(event.getName());
-        mappings.add(name);
-
-        Date date = event.getDate();
-        if (date != null) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String dateFormatted = dateFormat.format(date);
-            mappings.add(dateFormatted + WORD_SEPERATOR + name);
-        }
-
-        registerMappings(mappingToMuidEvent, muid, mappings);
-    }
-
-    private void registerMuidGenre(Muid muid, Genre genre) {
-        Set<String> mappings = new LinkedHashSet<String>();
-        String name = toUrlText(genre.getName());
-        mappings.add(name);
-        registerMappings(mappingToMuidGenre, muid, mappings);
-    }
-
-    private void registerMuidInstrument(Muid muid, Instrument instrument) {
-        Set<String> mappings = new LinkedHashSet<String>();
-        String name = toUrlText(instrument.getName());
-        mappings.add(name);
-        registerMappings(mappingToMuidInstrument, muid, mappings);
-    }
-
-    private void registerMuidTour(Muid muid, Tour tour) {
-        Set<String> mappings = new LinkedHashSet<String>();
-        String name = toUrlText(tour.getName());
-        mappings.add(name);
-
-        Integer year = tour.getYear();
-        if (year != null) {
-            String yearFormatted = year.toString();
-            mappings.add(yearFormatted + WORD_SEPERATOR + name);
-        }
-
-        registerMappings(mappingToMuidTour, muid, mappings);
-    }
-
     // getMuid<Entity>
-
-    private Muid getMuidUser(Map<String, String> pathVars)
-            throws RedirectException {
-        String pathUser = getPathVar(pathVars, "pathUser");
-        return mappingToMuidUser.get(pathUser);
-    }
 
     private Muid getMuidBand(Map<String, String> pathVars)
             throws RedirectException {
@@ -338,37 +332,10 @@ public class EntityUrlMapppingManager {
         return mappingToMuidBand.get(pathBand);
     }
 
-    private Muid getMuidRecord(Map<String, String> pathVars)
-            throws RedirectException {
-        String pathRecord = getPathVar(pathVars, "pathRecord");
-        if (pathRecord.equals(EMPTY_ENTITY))
-            return getMuidBand(pathVars);
-        Map<String, Muid> band = mappingToMuidRecord.get(getMuidBand(pathVars));
-        if (band == null)
-            return null;
-        return band.get(pathRecord);
-    }
-
-    private Muid getMuidTrack(Map<String, String> pathVars)
-            throws RedirectException {
-        String pathTrack = getPathVar(pathVars, "pathTrack");
-        Map<String, Muid> record =
-                mappingToMuidTrack.get(getMuidRecord(pathVars));
-        if (record == null)
-            return null;
-        return record.get(pathTrack);
-    }
-
     private Muid getMuidCity(Map<String, String> pathVars)
             throws RedirectException {
         String pathCity = getPathVar(pathVars, "pathCity");
         return mappingToMuidCity.get(pathCity);
-    }
-
-    private Muid getMuidVenue(Map<String, String> pathVars)
-            throws RedirectException {
-        String pathVenue = getPathVar(pathVars, "path");
-        return mappingToMuidVenue.get(pathVenue);
     }
 
     private Muid getMuidEvent(Map<String, String> pathVars)
@@ -389,10 +356,43 @@ public class EntityUrlMapppingManager {
         return mappingToMuidInstrument.get(pathInstrument);
     }
 
+    private Muid getMuidRecord(Map<String, String> pathVars)
+            throws RedirectException {
+        String pathRecord = getPathVar(pathVars, "pathRecord");
+        if (pathRecord.equals(EMPTY_ENTITY))
+            return getMuidBand(pathVars);
+        Map<String, Muid> band = mappingToMuidRecord.get(getMuidBand(pathVars));
+        if (band == null)
+            return null;
+        return band.get(pathRecord);
+    }
+
     private Muid getMuidTour(Map<String, String> pathVars)
             throws RedirectException {
         String pathTour = getPathVar(pathVars, "pathTour");
         return mappingToMuidTour.get(pathTour);
+    }
+
+    private Muid getMuidTrack(Map<String, String> pathVars)
+            throws RedirectException {
+        String pathTrack = getPathVar(pathVars, "pathTrack");
+        Map<String, Muid> record =
+                mappingToMuidTrack.get(getMuidRecord(pathVars));
+        if (record == null)
+            return null;
+        return record.get(pathTrack);
+    }
+
+    private Muid getMuidUser(Map<String, String> pathVars)
+            throws RedirectException {
+        String pathUser = getPathVar(pathVars, "pathUser");
+        return mappingToMuidUser.get(pathUser);
+    }
+
+    private Muid getMuidVenue(Map<String, String> pathVars)
+            throws RedirectException {
+        String pathVenue = getPathVar(pathVars, "path");
+        return mappingToMuidVenue.get(pathVenue);
     }
 
 }

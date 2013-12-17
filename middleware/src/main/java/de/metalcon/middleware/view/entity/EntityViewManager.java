@@ -17,16 +17,16 @@ public abstract class EntityViewManager {
     public EntityView createView(EntityType entityType) {
         switch (entityType) {
         // @formatter:off
-            case USER:       return createUserView();
             case BAND:       return createBandView();
-            case RECORD:     return createRecordView();
-            case TRACK:      return createTrackView();
-            case VENUE:      return createVenueView();
-            case EVENT:      return createEventView();
             case CITY:       return createCityView();
+            case EVENT:      return createEventView();
             case GENRE:      return createGenreView();
             case INSTRUMENT: return createInstrumentView();
+            case RECORD:     return createRecordView();
             case TOUR:       return createTourView();
+            case TRACK:      return createTrackView();
+            case USER:       return createUserView();
+            case VENUE:      return createVenueView();
             // @formatter:on
 
             default:
@@ -35,24 +35,24 @@ public abstract class EntityViewManager {
         }
     }
 
-    public abstract UserView createUserView();
-
     public abstract BandView createBandView();
 
-    public abstract RecordView createRecordView();
-
-    public abstract TrackView createTrackView();
-
-    public abstract VenueView createVenueView();
+    public abstract CityView createCityView();
 
     public abstract EventView createEventView();
-
-    public abstract CityView createCityView();
 
     public abstract GenreView createGenreView();
 
     public abstract InstrumentView createInstrumentView();
 
+    public abstract RecordView createRecordView();
+
     public abstract TourView createTourView();
+
+    public abstract TrackView createTrackView();
+
+    public abstract UserView createUserView();
+
+    public abstract VenueView createVenueView();
 
 }

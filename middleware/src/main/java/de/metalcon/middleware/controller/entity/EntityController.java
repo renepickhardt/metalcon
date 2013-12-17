@@ -110,7 +110,7 @@ public abstract class EntityController extends MetalconController {
         }
 
         EntityTabContent entityTabContent =
-                entityTabContentManager.createTab(entityTabType);
+                entityTabContentManager.createTabContent(entityTabType);
         entityTabsGenerators.get(entityTabType).generateTabContent(
                 entityTabContent, muid);
 
@@ -121,140 +121,6 @@ public abstract class EntityController extends MetalconController {
 
         return entityView;
     }
-
-    // generate<Tab>Content
-
-    //    private EntityTabContent generateTabContent(
-    //            EntityTabType entityTabType,
-    //            Muid muid) {
-    //        EntityTabContent entityTab =
-    //                entityTabContentManager.createTab(entityTabType);
-    //        switch (entityTabType) {
-//        // @formatter:off
-//            case ABOUT_TAB:           generateAboutTabContent          ((AboutContentTab)           entityTab, muid); break;
-//            case NEWSFEED_TAB:        generateNewsfeedTabContent       ((NewsfeedContentTab)        entityTab, muid); break;
-//            case BANDS_TAB:           generateBandsTabContent          ((BandsContentTab)           entityTab, muid); break;
-//            case RECORDS_TAB:         generateRecordsTabContent        ((RecordsContentTab)         entityTab, muid); break;
-//            case TRACKS_TAB:          generateTracksTabContent         ((TracksContentTab)          entityTab, muid); break;
-//            case REVIEWS_TAB:         generateReviewsTabContent        ((ReviewsContentTab)         entityTab, muid); break;
-//            case VENUES_TAB:          generateVenuesTabContent         ((VenuesContentTab)          entityTab, muid); break;
-//            case EVENTS_TAB:          generateEventsTabContent         ((EventsContentTab)          entityTab, muid); break;
-//            case USERS_TAB:           generateUsersTabContent          ((UsersContentTab)           entityTab, muid); break;
-//            case PHOTOS_TAB:          generatePhotosTabContent         ((PhotosContentTab)          entityTab, muid); break;
-//            case RECOMMENDATIONS_TAB: generateRecommendationsTabContent((RecommendationsContentTab) entityTab, muid); break;
-//            // @formatter:on
-    //
-    //            default:
-    //                throw new IllegalStateException(
-    //                        "Unimplemented EntityTabType in EntityController.handleTab(): "
-    //                                + entityTabType.toString() + ".");
-    //        }
-    //        return entityTab;
-    //    }
-    //
-    //    protected void generateAboutTabContent(AboutContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void
-    //        generateNewsfeedTabContent(NewsfeedContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateBandsTabContent(BandsContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateRecordsTabContent(RecordsContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateTracksTabContent(TracksContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateReviewsTabContent(ReviewsContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateVenuesTabContent(VenuesContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateEventsTabContent(EventsContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateUsersTabContent(UsersContentTab tab, Muid muid) {
-    //    }
-    //
-    //    protected void generatePhotosTabContent(PhotosContentTab tab, Muid muid) {
-    //    }
-
-    // generate<Tab>Preview
-
-    //    private EntityTabPreview generateTabPreview(
-    //            EntityTabType entityTabPreviewType,
-    //            Muid muid) {
-    //        EntityTabPreview entityTabPreview =
-    //                entityTabPreviewManager.createTabPreview(entityTabPreviewType);
-    //        switch (entityTabPreviewType) {
-//        // @formatter:off
-//            case ABOUT_TAB:           generateAboutTabPreview          ((AboutTabPreview)           entityTabPreview, muid); break;
-//            case NEWSFEED_TAB:        generateNewsfeedTabPreview       ((NewsfeedTabPreview)        entityTabPreview, muid); break;
-//            case BANDS_TAB:           generateBandsTabPreview          ((BandsTabPreview)           entityTabPreview, muid); break;
-//            case RECORDS_TAB:         generateRecordsTabPreview        ((RecordsTabPreview)         entityTabPreview, muid); break;
-//            case TRACKS_TAB:          generateTracksTabPreview         ((TracksTabPreview)          entityTabPreview, muid); break;
-//            case REVIEWS_TAB:         generateReviewsTabPreview        ((ReviewsTabPreview)         entityTabPreview, muid); break;
-//            case VENUES_TAB:          generateVenuesTabPreview         ((VenuesTabPreview)          entityTabPreview, muid); break;
-//            case EVENTS_TAB:          generateEventsTabPreview         ((EventsTabPreview)          entityTabPreview, muid); break;
-//            case USERS_TAB:           generateUsersTabPreview          ((UsersTabPreview)           entityTabPreview, muid); break;
-//            case PHOTOS_TAB:          generatePhotosTabPreview         ((PhotosTabPreview)          entityTabPreview, muid); break;
-//            case RECOMMENDATIONS_TAB: generateRecommendationsTabPreview((RecommendationsTabPreview) entityTabPreview, muid); break;
-//            // @formatter:on
-    //
-    //            default:
-    //                throw new IllegalStateException(
-    //                        "Unimplemented EntityTabType in EntityController.handleTabPreview(): "
-    //                                + entityTabPreviewType.toString() + ".");
-    //        }
-    //        return entityTabPreview;
-    //    }
-    //
-    //    protected void generateAboutTabPreview(AboutTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void
-    //        generateNewsfeedTabPreview(NewsfeedTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateBandsTabPreview(BandsTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateRecordsTabPreview(RecordsTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateTracksTabPreview(TracksTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateReviewsTabPreview(ReviewsTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateVenuesTabPreview(VenuesTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateEventsTabPreview(EventsTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateUsersTabPreview(UsersTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generatePhotosTabPreview(PhotosTabPreview tab, Muid muid) {
-    //    }
-    //
-    //    protected void generateRecommendationsTabContent(
-    //            RecommendationsContentTab tab,
-    //            Muid muid) {
-    //    }
-    //
-    //    protected void generateRecommendationsTabPreview(
-    //            RecommendationsTabPreview tab,
-    //            Muid muid) {
-    //    }
-
-    // mapping<Tab>
 
     @RequestMapping({
         "", "/"
@@ -274,52 +140,12 @@ public abstract class EntityController extends MetalconController {
         return handleTab(EntityTabType.ABOUT_TAB, request, pathVars);
     }
 
-    @RequestMapping(UrlMappings.NEWSFEED_TAB_MAPPING)
-    public final EntityView mappingNewsfeedTab(
-            HttpServletRequest request,
-            @PathVariable Map<String, String> pathVars)
-            throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.NEWSFEED_TAB, request, pathVars);
-    }
-
     @RequestMapping(UrlMappings.BANDS_TAB_MAPPING)
     public final EntityView mappingBandsTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
             throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.BANDS_TAB, request, pathVars);
-    }
-
-    @RequestMapping(UrlMappings.RECORDS_TAB_MAPPING)
-    public final EntityView mappingRecordsTab(
-            HttpServletRequest request,
-            @PathVariable Map<String, String> pathVars)
-            throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.RECORDS_TAB, request, pathVars);
-    }
-
-    @RequestMapping(UrlMappings.TRACKS_TAB_MAPPING)
-    public final EntityView mappingTracksTab(
-            HttpServletRequest request,
-            @PathVariable Map<String, String> pathVars)
-            throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.TRACKS_TAB, request, pathVars);
-    }
-
-    @RequestMapping(UrlMappings.REVIEWS_TAB_MAPPING)
-    public final EntityView mappingReviewsTab(
-            HttpServletRequest request,
-            @PathVariable Map<String, String> pathVars)
-            throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.REVIEWS_TAB, request, pathVars);
-    }
-
-    @RequestMapping(UrlMappings.VENUES_TAB_MAPPING)
-    public final EntityView mappingVenuesTab(
-            HttpServletRequest request,
-            @PathVariable Map<String, String> pathVars)
-            throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.VENUES_TAB, request, pathVars);
     }
 
     @RequestMapping(UrlMappings.EVENTS_TAB_MAPPING)
@@ -330,12 +156,12 @@ public abstract class EntityController extends MetalconController {
         return handleTab(EntityTabType.EVENTS_TAB, request, pathVars);
     }
 
-    @RequestMapping(UrlMappings.USERS_TAB_MAPPING)
-    public final EntityView mappingUsersTab(
+    @RequestMapping(UrlMappings.NEWSFEED_TAB_MAPPING)
+    public final EntityView mappingNewsfeedTab(
             HttpServletRequest request,
             @PathVariable Map<String, String> pathVars)
             throws RedirectException, NoSuchRequestHandlingMethodException {
-        return handleTab(EntityTabType.USERS_TAB, request, pathVars);
+        return handleTab(EntityTabType.NEWSFEED_TAB, request, pathVars);
     }
 
     @RequestMapping(UrlMappings.PHOTOS_TAB_MAPPING)
@@ -352,6 +178,46 @@ public abstract class EntityController extends MetalconController {
             @PathVariable Map<String, String> pathVars)
             throws RedirectException, NoSuchRequestHandlingMethodException {
         return handleTab(EntityTabType.RECOMMENDATIONS_TAB, request, pathVars);
+    }
+
+    @RequestMapping(UrlMappings.RECORDS_TAB_MAPPING)
+    public final EntityView mappingRecordsTab(
+            HttpServletRequest request,
+            @PathVariable Map<String, String> pathVars)
+            throws RedirectException, NoSuchRequestHandlingMethodException {
+        return handleTab(EntityTabType.RECORDS_TAB, request, pathVars);
+    }
+
+    @RequestMapping(UrlMappings.REVIEWS_TAB_MAPPING)
+    public final EntityView mappingReviewsTab(
+            HttpServletRequest request,
+            @PathVariable Map<String, String> pathVars)
+            throws RedirectException, NoSuchRequestHandlingMethodException {
+        return handleTab(EntityTabType.REVIEWS_TAB, request, pathVars);
+    }
+
+    @RequestMapping(UrlMappings.TRACKS_TAB_MAPPING)
+    public final EntityView mappingTracksTab(
+            HttpServletRequest request,
+            @PathVariable Map<String, String> pathVars)
+            throws RedirectException, NoSuchRequestHandlingMethodException {
+        return handleTab(EntityTabType.TRACKS_TAB, request, pathVars);
+    }
+
+    @RequestMapping(UrlMappings.USERS_TAB_MAPPING)
+    public final EntityView mappingUsersTab(
+            HttpServletRequest request,
+            @PathVariable Map<String, String> pathVars)
+            throws RedirectException, NoSuchRequestHandlingMethodException {
+        return handleTab(EntityTabType.USERS_TAB, request, pathVars);
+    }
+
+    @RequestMapping(UrlMappings.VENUES_TAB_MAPPING)
+    public final EntityView mappingVenuesTab(
+            HttpServletRequest request,
+            @PathVariable Map<String, String> pathVars)
+            throws RedirectException, NoSuchRequestHandlingMethodException {
+        return handleTab(EntityTabType.VENUES_TAB, request, pathVars);
     }
 
 }
