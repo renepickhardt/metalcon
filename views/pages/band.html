@@ -75,6 +75,31 @@
 
 </div>
 </div>
+<div class="footer">footer
+<div class="row">
+	<div class="col-md-4">
+	<ul>
+		<#list item as footerItemsLeft>
+			<li><a href="{item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+	<div class="col-md-4">
+		<ul>
+		<#list item as footerItemsMiddle>
+			<li><a href="{item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+	<div class="col-md-4">
+		<ul>
+		<#list item as footerItemsRight>
+			<li><a href="{item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+</div>
+</div>
 </div>
 </body>
 </html>
