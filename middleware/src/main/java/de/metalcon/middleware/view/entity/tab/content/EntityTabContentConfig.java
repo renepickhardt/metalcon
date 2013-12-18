@@ -16,6 +16,12 @@ import de.metalcon.middleware.view.entity.tab.content.impl.TracksTabContent;
 import de.metalcon.middleware.view.entity.tab.content.impl.UsersTabContent;
 import de.metalcon.middleware.view.entity.tab.content.impl.VenuesTabContent;
 
+/**
+ * Together with EntityTabContentFactory, this file is used to provide access to
+ * prototype access to EntityTabContents inside singleton beans. See:
+ * http://docs.spring.io/spring/docs/current/spring-framework-reference/html/
+ * beans.html#beans-java-method-injection
+ */
 @Configuration
 public class EntityTabContentConfig {
 

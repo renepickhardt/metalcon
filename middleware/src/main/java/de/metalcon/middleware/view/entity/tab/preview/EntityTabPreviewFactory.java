@@ -13,6 +13,12 @@ import de.metalcon.middleware.view.entity.tab.preview.impl.TracksTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.impl.UsersTabPreview;
 import de.metalcon.middleware.view.entity.tab.preview.impl.VenuesTabPreview;
 
+/**
+ * Together with EntityTabPreviewConfig, this file is used to provide access to
+ * prototype access to EntityTabPreviews inside singleton beans. See:
+ * http://docs.spring.io/spring/docs/current/spring-framework-reference/html/
+ * beans.html#beans-java-method-injection
+ */
 public abstract class EntityTabPreviewFactory {
 
     public EntityTabPreview createTabPreview(EntityTabType entityTabType) {

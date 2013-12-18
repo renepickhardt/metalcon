@@ -15,6 +15,12 @@ import de.metalcon.middleware.view.entity.impl.TrackView;
 import de.metalcon.middleware.view.entity.impl.UserView;
 import de.metalcon.middleware.view.entity.impl.VenueView;
 
+/**
+ * Together with EntityViewFactory, this file is used to provide access to
+ * prototype access to EntityViews inside singleton beans. See:
+ * http://docs.spring.io/spring/docs/current/spring-framework-reference/html/
+ * beans.html#beans-java-method-injection
+ */
 @Configuration
 public class EntityViewConfig {
 
