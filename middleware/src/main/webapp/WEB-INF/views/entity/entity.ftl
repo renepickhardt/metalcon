@@ -33,6 +33,8 @@
 <#--
  # Will include the corrrect entityType subtemplate.
  # For example, if view.entityType is "BAND" this will include "impl/band.ftl"
+ # These are expected to set the foloowing variables:
+ # entity_tabPreviews - HTML string containing the rendered tabPreviews. 
  #-->
 <#include "impl/" + view.entityType?lower_case + ".ftl">
 
