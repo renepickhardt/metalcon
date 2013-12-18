@@ -391,7 +391,7 @@ public class EntityUrlMapppingManager {
 
     private Muid getMuidVenue(Map<String, String> pathVars)
             throws RedirectException {
-        String pathVenue = getPathVar(pathVars, "path");
+        String pathVenue = getPathVar(pathVars, "pathVenue");
         return mappingToMuidVenue.get(pathVenue);
     }
 
