@@ -21,127 +21,127 @@ public class EntityTabContentConfig {
 
     @Bean
     @Scope("prototype")
-    public AboutTabContent aboutTab() {
+    public AboutTabContent aboutTabContent() {
         return new AboutTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public BandsTabContent bandsTab() {
+    public BandsTabContent bandsTabContent() {
         return new BandsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public EventsTabContent eventsTab() {
+    public EventsTabContent eventsTabContent() {
         return new EventsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public NewsfeedTabContent newsfeedTab() {
+    public NewsfeedTabContent newsfeedTabContent() {
         return new NewsfeedTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public PhotosTabContent photosTab() {
+    public PhotosTabContent photosTabContent() {
         return new PhotosTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public RecommendationsTabContent recommendationsTab() {
+    public RecommendationsTabContent recommendationsTabContent() {
         return new RecommendationsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public RecordsTabContent recordsTab() {
+    public RecordsTabContent recordsTabContent() {
         return new RecordsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public ReviewsTabContent reviewsTab() {
+    public ReviewsTabContent reviewsTabContent() {
         return new ReviewsTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public TracksTabContent tracksTab() {
+    public TracksTabContent tracksTabContent() {
         return new TracksTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public UsersTabContent usersTab() {
+    public UsersTabContent usersTabContent() {
         return new UsersTabContent();
     }
 
     @Bean
     @Scope("prototype")
-    public VenuesTabContent venuesTab() {
+    public VenuesTabContent venuesTabContent() {
         return new VenuesTabContent();
     }
 
     @Bean
-    public EntityTabContentManager entityTabManager() {
-        return new EntityTabContentManager() {
+    public EntityTabContentFactory entityTabContentFactory() {
+        return new EntityTabContentFactory() {
 
             @Override
-            public AboutTabContent createAboutTab() {
-                return aboutTab();
+            public AboutTabContent createAboutTabContent() {
+                return aboutTabContent();
             }
 
             @Override
-            public BandsTabContent createBandsTab() {
-                return bandsTab();
+            public BandsTabContent createBandsTabContent() {
+                return bandsTabContent();
             }
 
             @Override
-            public EventsTabContent createEventsTab() {
-                return eventsTab();
+            public EventsTabContent createEventsTabContent() {
+                return eventsTabContent();
             }
 
             @Override
-            public NewsfeedTabContent createNewsfeedTab() {
-                return newsfeedTab();
+            public NewsfeedTabContent createNewsfeedTabContent() {
+                return newsfeedTabContent();
             }
 
             @Override
-            public PhotosTabContent createPhotosTab() {
-                return photosTab();
+            public PhotosTabContent createPhotosTabContent() {
+                return photosTabContent();
             }
 
             @Override
-            public RecommendationsTabContent createRecomendationsTab() {
-                return recommendationsTab();
+            public RecommendationsTabContent createRecomendationsTabContent() {
+                return recommendationsTabContent();
             }
 
             @Override
-            public RecordsTabContent createRecordsTab() {
-                return recordsTab();
+            public RecordsTabContent createRecordsTabContent() {
+                return recordsTabContent();
             }
 
             @Override
-            public ReviewsTabContent createReviewsTab() {
-                return reviewsTab();
+            public ReviewsTabContent createReviewsTabContent() {
+                return reviewsTabContent();
             }
 
             @Override
-            public TracksTabContent createTracksTab() {
-                return tracksTab();
+            public TracksTabContent createTracksTabContent() {
+                return tracksTabContent();
             }
 
             @Override
-            public UsersTabContent createUsersTab() {
-                return usersTab();
+            public UsersTabContent createUsersTabContent() {
+                return usersTabContent();
             }
 
             @Override
-            public VenuesTabContent createVenuesTab() {
-                return venuesTab();
+            public VenuesTabContent createVenuesTabContent() {
+                return venuesTabContent();
             }
 
         };

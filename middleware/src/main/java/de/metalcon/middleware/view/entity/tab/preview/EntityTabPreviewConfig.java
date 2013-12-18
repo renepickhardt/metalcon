@@ -21,127 +21,127 @@ public class EntityTabPreviewConfig {
 
     @Bean
     @Scope("prototype")
-    public AboutTabPreview aboutTab() {
+    public AboutTabPreview aboutTabPreview() {
         return new AboutTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public BandsTabPreview bandsTab() {
+    public BandsTabPreview bandsTabPreview() {
         return new BandsTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public EventsTabPreview eventsTab() {
+    public EventsTabPreview eventsTabPreview() {
         return new EventsTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public NewsfeedTabPreview newsfeedTab() {
+    public NewsfeedTabPreview newsfeedTabPreview() {
         return new NewsfeedTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public PhotosTabPreview photosTab() {
+    public PhotosTabPreview photosTabPreview() {
         return new PhotosTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public RecommendationsTabPreview recommendationsTab() {
+    public RecommendationsTabPreview recommendationsTabPreview() {
         return new RecommendationsTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public RecordsTabPreview recordsTab() {
+    public RecordsTabPreview recordsTabPreview() {
         return new RecordsTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public ReviewsTabPreview reviewsTab() {
+    public ReviewsTabPreview reviewsTabPreview() {
         return new ReviewsTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public TracksTabPreview tracksTab() {
+    public TracksTabPreview tracksTabPreview() {
         return new TracksTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public UsersTabPreview usersTab() {
+    public UsersTabPreview usersTabPreview() {
         return new UsersTabPreview();
     }
 
     @Bean
     @Scope("prototype")
-    public VenuesTabPreview venuesTab() {
+    public VenuesTabPreview venuesTabPreview() {
         return new VenuesTabPreview();
     }
 
     @Bean
-    public EntityTabPreviewManager entityTabManager() {
-        return new EntityTabPreviewManager() {
+    public EntityTabPreviewFactory entityTabPreviewFactory() {
+        return new EntityTabPreviewFactory() {
 
             @Override
-            public AboutTabPreview createAboutTab() {
-                return aboutTab();
+            public AboutTabPreview createAboutTabPreview() {
+                return aboutTabPreview();
             }
 
             @Override
-            public BandsTabPreview createBandsTab() {
-                return bandsTab();
+            public BandsTabPreview createBandsTabPreview() {
+                return bandsTabPreview();
             }
 
             @Override
-            public EventsTabPreview createEventsTab() {
-                return eventsTab();
+            public EventsTabPreview createEventsTabPreview() {
+                return eventsTabPreview();
             }
 
             @Override
-            public NewsfeedTabPreview createNewsfeedTab() {
-                return newsfeedTab();
+            public NewsfeedTabPreview createNewsfeedTabPreview() {
+                return newsfeedTabPreview();
             }
 
             @Override
-            public PhotosTabPreview createPhotosTab() {
-                return photosTab();
+            public PhotosTabPreview createPhotosTabPreview() {
+                return photosTabPreview();
             }
 
             @Override
-            public RecommendationsTabPreview createRecomendationsTab() {
-                return recommendationsTab();
+            public RecommendationsTabPreview createRecomendationsTabPreview() {
+                return recommendationsTabPreview();
             }
 
             @Override
-            public RecordsTabPreview createRecordsTab() {
-                return recordsTab();
+            public RecordsTabPreview createRecordsTabPreview() {
+                return recordsTabPreview();
             }
 
             @Override
-            public ReviewsTabPreview createReviewsTab() {
-                return reviewsTab();
+            public ReviewsTabPreview createReviewsTabPreview() {
+                return reviewsTabPreview();
             }
 
             @Override
-            public TracksTabPreview createTracksTab() {
-                return tracksTab();
+            public TracksTabPreview createTracksTabPreview() {
+                return tracksTabPreview();
             }
 
             @Override
-            public UsersTabPreview createUsersTab() {
-                return usersTab();
+            public UsersTabPreview createUsersTabPreview() {
+                return usersTabPreview();
             }
 
             @Override
-            public VenuesTabPreview createVenuesTab() {
-                return venuesTab();
+            public VenuesTabPreview createVenuesTabPreview() {
+                return venuesTabPreview();
             }
 
         };

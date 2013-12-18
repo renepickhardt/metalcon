@@ -12,7 +12,7 @@ import de.metalcon.middleware.view.entity.impl.TrackView;
 import de.metalcon.middleware.view.entity.impl.UserView;
 import de.metalcon.middleware.view.entity.impl.VenueView;
 
-public abstract class EntityViewManager {
+public abstract class EntityViewFactory {
 
     public EntityView createView(EntityType entityType) {
         switch (entityType) {

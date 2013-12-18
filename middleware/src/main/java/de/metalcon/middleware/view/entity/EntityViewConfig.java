@@ -79,8 +79,8 @@ public class EntityViewConfig {
     }
 
     @Bean
-    public EntityViewManager entityViewManager() {
-        return new EntityViewManager() {
+    public EntityViewFactory entityViewFactory() {
+        return new EntityViewFactory() {
 
             @Override
             public BandView createBandView() {

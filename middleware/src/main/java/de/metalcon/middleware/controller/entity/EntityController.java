@@ -25,31 +25,36 @@ import de.metalcon.middleware.controller.entity.generating.TracksTabGenerating;
 import de.metalcon.middleware.controller.entity.generating.UsersTabGenerating;
 import de.metalcon.middleware.controller.entity.generating.VenuesTabGenerating;
 import de.metalcon.middleware.controller.entity.generator.EntityTabGenerator;
+import de.metalcon.middleware.core.EntityManager;
 import de.metalcon.middleware.core.EntityUrlMapppingManager;
 import de.metalcon.middleware.domain.Muid;
+import de.metalcon.middleware.domain.entity.Entity;
 import de.metalcon.middleware.domain.entity.EntityType;
 import de.metalcon.middleware.exception.RedirectException;
 import de.metalcon.middleware.view.entity.EntityView;
-import de.metalcon.middleware.view.entity.EntityViewManager;
+import de.metalcon.middleware.view.entity.EntityViewFactory;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
 import de.metalcon.middleware.view.entity.tab.content.EntityTabContent;
-import de.metalcon.middleware.view.entity.tab.content.EntityTabContentManager;
+import de.metalcon.middleware.view.entity.tab.content.EntityTabContentFactory;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
-import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreviewManager;
+import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreviewFactory;
 
 public abstract class EntityController extends MetalconController {
+
+    @Autowired
+    private EntityViewFactory entityViewFactory;
+
+    @Autowired
+    private EntityTabContentFactory entityTabContentFactory;
+
+    @Autowired
+    private EntityTabPreviewFactory entityTabPreviewFactory;
 
     @Autowired
     protected EntityUrlMapppingManager entityUrlMappingManager;
 
     @Autowired
-    private EntityViewManager entityViewManager;
-
-    @Autowired
-    private EntityTabContentManager entityTabContentManager;
-
-    @Autowired
-    private EntityTabPreviewManager entityTabPreviewManager;
+    private EntityManager entityManager;
 
     private Map<EntityTabType, EntityTabGenerator> entityTabsGenerators;
 
@@ -94,6 +99,8 @@ public abstract class EntityController extends MetalconController {
         if (!entityTabsGenerators.containsKey(entityTabType) || muid == null)
             throw new NoSuchRequestHandlingMethodException(request);
 
+        Entity entity = entityManager.getEntity(muid);
+
         Map<EntityTabType, EntityTabPreview> entityTabPreviews =
                 new HashMap<EntityTabType, EntityTabPreview>();
         for (Map.Entry<EntityTabType, EntityTabGenerator> entry : entityTabsGenerators
@@ -102,19 +109,19 @@ public abstract class EntityController extends MetalconController {
             EntityTabGenerator entityTabPreviewGenerator = entry.getValue();
 
             EntityTabPreview entityTabPreview =
-                    entityTabPreviewManager
+                    entityTabPreviewFactory
                             .createTabPreview(entityTabPreviewType);
-            entityTabPreviewGenerator
-                    .genereteTabPreview(entityTabPreview, muid);
+            entityTabPreviewGenerator.genereteTabPreview(entityTabPreview,
+                    entity);
             entityTabPreviews.put(entityTabPreviewType, entityTabPreview);
         }
 
         EntityTabContent entityTabContent =
-                entityTabContentManager.createTabContent(entityTabType);
+                entityTabContentFactory.createTabContent(entityTabType);
         entityTabsGenerators.get(entityTabType).generateTabContent(
-                entityTabContent, muid);
+                entityTabContent, entity);
 
-        EntityView entityView = entityViewManager.createView(getEntityType());
+        EntityView entityView = entityViewFactory.createView(getEntityType());
         entityView.setMuid(muid);
         entityView.setEntityTabContent(entityTabContent);
         entityView.setEntityTabPreviews(entityTabPreviews);
