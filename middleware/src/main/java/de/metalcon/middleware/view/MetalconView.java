@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
-import de.metalcon.middleware.view.entity.EntityView;
-
 public abstract class MetalconView implements View {
 
     @Autowired
@@ -21,15 +19,8 @@ public abstract class MetalconView implements View {
 
     private View view;
 
-    private String type;
-
     public MetalconView() {
         view = null;
-
-        if (this instanceof EntityView)
-            type = "entity";
-        else
-            throw new IllegalStateException("Unkown view type.");
     }
 
     @PostConstruct
@@ -53,7 +44,7 @@ public abstract class MetalconView implements View {
     }
 
     public String getType() {
-        return type;
+        return "page";
     }
 
 }

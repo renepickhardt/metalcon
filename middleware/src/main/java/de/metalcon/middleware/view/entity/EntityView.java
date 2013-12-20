@@ -27,6 +27,11 @@ public abstract class EntityView extends MetalconView {
         entityTabPreviews = null;
     }
 
+    @Override
+    public String getType() {
+        return "entity";
+    }
+
     public final long getMuid() {
         return muid.getValue();
     }

@@ -40,7 +40,7 @@ public class EntityManager {
     }
 
     /**
-     * Get a certain entity. And make sure it's of correct type.
+     * Get a certain entity and make sure it's of correct type.
      * 
      * @param muid
      *            Entity identifier.
@@ -59,6 +59,7 @@ public class EntityManager {
 
     /**
      * Add an entity to be accessed using the manager later.
+     * 
      * TODO: Remove this method. Entities should not have to be stored inside
      * the manager. Rather newly created entities are automatically stored, and
      * old ones are cached or accessed by talking to backend components.
