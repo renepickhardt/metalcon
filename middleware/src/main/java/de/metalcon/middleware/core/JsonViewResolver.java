@@ -11,6 +11,9 @@ import com.fasterxml.jackson.core.JsonEncoding;
 
 public class JsonViewResolver implements ViewResolver {
 
+    /**
+     * @return View for JSON output.
+     */
     @Override
     public View resolveViewName(String viewName, Locale locale)
             throws Exception {

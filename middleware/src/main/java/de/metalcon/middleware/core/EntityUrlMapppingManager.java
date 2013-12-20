@@ -78,6 +78,21 @@ public class EntityUrlMapppingManager {
         mappingToMuidVenue = new HashMap<String, Muid>();
     }
 
+    /*
+     * private ? mappings = new LinkedList<EntityType, HashMap<String,
+     * Muid>>(10*2);
+     * // TODO: talk to Lukas to reduce switch blocks - solution for
+     * albums/records pending
+     * public void registerMuid(Muid muid) {
+     * Entity entity = this.entityManager.getEntity(muid);
+     * Set<String> mappings = new LinkedHashSet<String>();
+     * String name = toUrlText(entity.getName());
+     * mappings.add(name);
+     * this.registerMappings(this.mappings.get(muid.getEntityType()), muid,
+     * mappings);
+     * }
+     */
+
     public void registerMuid(Muid muid) {
         Entity entity = entityManager.getEntity(muid);
         switch (entity.getEntityType()) {
@@ -139,20 +154,35 @@ public class EntityUrlMapppingManager {
         return urlText;
     }
 
+    /**
+     * Add and register URL mappings to a Muid.
+     * 
+     * @param mappingToMuid
+     *            mappingToMuid container for that entity type.
+     * @param muid
+     *            Muid being referred to.
+     * @param mappings
+     *            URL mappings to the Muid.
+     */
     private void registerMappings(
             Map<String, Muid> mappingToMuid,
             Muid muid,
             Set<String> mappings) {
+        // get mappings of muid
         Set<String> muidMappings = muidToMapping.get(muid);
         if (muidMappings == null)
             muidMappings = new LinkedHashSet<String>();
 
+        // add first mapping including the muid
+        // e.g. /Ensiferum-12
         String muidMapping =
                 mappings.iterator().next() + WORD_SEPERATOR + muid.toString();
         mappingToMuid.put(muidMapping, muid);
         muidMappings.add(muidMapping);
         logMapping(muidMapping, muid);
 
+        // add further mappings without muid if not in use yet
+        // e.g. /Ensiferum
         for (String mapping : mappings)
             if (!mappingToMuid.containsKey(mapping)) {
                 mappingToMuid.put(mapping, muid);
@@ -161,6 +191,14 @@ public class EntityUrlMapppingManager {
             }
     }
 
+    /**
+     * Log new mappings.
+     * 
+     * @param mapping
+     *            New URL mapping
+     * @param muid
+     *            Muid the mapping refers to.
+     */
     private void logMapping(String mapping, Muid muid) {
         logger.info("Mapped \"" + mapping + "\" to Entity \"" + muid.toString()
                 + "\"");
