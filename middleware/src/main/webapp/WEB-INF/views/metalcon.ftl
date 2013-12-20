@@ -37,12 +37,12 @@
 <#--
  # Convenience macro to create a <head> tag.
  #
- # @param title  A string to be used for the <title> tag.
- #
- # Usage:
- # <@mtl.head title="My Page Title">
- #   Stuff inside <head> tag.
- # </@mtl.head>
+ # @param title
+ #        A string to be used for the <title> tag.
+ # @example
+ #   <@mtl.head title="My Page Title">
+ #     Stuff inside <head> tag.
+ #   </@mtl.head>
  #-->
 <#macro head title>
 <head>
@@ -55,8 +55,8 @@
 <#--
  # Convenience macro to inclue a CSS-file. Use inside <head> tag.
  #
- # Usage:
- # <mtl.stylesheet href="myStyle.css"/>
+ # @example
+ #   <mtl.stylesheet href="myStyle.css"/>
  #-->
 <#macro stylesheet href>
 <link rel="stylesheet" type="text/css" href="<@spring.url "/resources/css/${href}"/>"/>
@@ -65,10 +65,10 @@
 <#--
  # Convenience macro to create a <body> tag.
  #
- # Usage:
- # <@mtl.body>
- #   Stuff inside <body> tag.
- # </@mtl.body>
+ # @example
+ #   <@mtl.body>
+ #     Stuff inside <body> tag.
+ #   </@mtl.body>
  #-->
 <#macro body>
 <body>
@@ -79,8 +79,8 @@
 <#--
  # To be used in views that are not implemented yet.
  #
- # Usage:
- # <@mtl.not_implemented/>
+ # @example
+ #   <@mtl.not_implemented/>
  #-->
 <#macro not_implemented>
 <@xhtml>

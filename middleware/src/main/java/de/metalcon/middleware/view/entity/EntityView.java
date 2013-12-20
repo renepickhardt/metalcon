@@ -1,24 +1,16 @@
 package de.metalcon.middleware.view.entity;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.ViewResolver;
 
 import de.metalcon.middleware.domain.Muid;
 import de.metalcon.middleware.domain.entity.EntityType;
+import de.metalcon.middleware.view.MetalconView;
 import de.metalcon.middleware.view.entity.tab.EntityTabType;
 import de.metalcon.middleware.view.entity.tab.content.EntityTabContent;
 import de.metalcon.middleware.view.entity.tab.preview.EntityTabPreview;
 
-public abstract class EntityView implements View {
+public abstract class EntityView extends MetalconView {
 
     private Muid muid;
 
@@ -26,45 +18,17 @@ public abstract class EntityView implements View {
 
     private Map<EntityTabType, EntityTabPreview> entityTabPreviews;
 
-    private View view;
-
-    @Autowired
-    private ViewResolver viewResolver;
-
     public abstract EntityType getEntityType();
 
     public EntityView() {
+        super();
         muid = null;
         entityTabContent = null;
         entityTabPreviews = null;
-        view = null;
     }
 
-    @PostConstruct
-    private void init() throws Exception {
-        view =
-                viewResolver.resolveViewName("entity/"
-                        + getEntityType().toString().toLowerCase(),
-                        Locale.GERMANY);
-    }
-
-    @Override
-    public final String getContentType() {
-        return view.getContentType();
-    }
-
-    @Override
-    public final void render(
-            Map<String, ?> model,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        Map<String, Object> m = new HashMap<String, Object>(model);
-        m.put("view", this);
-        view.render(m, request, response);
-    }
-
-    public final Muid getMuid() {
-        return muid;
+    public final long getMuid() {
+        return muid.getValue();
     }
 
     public final void setMuid(Muid muid) {
@@ -79,13 +43,14 @@ public abstract class EntityView implements View {
         entityTabContent = entityTab;
     }
 
-    public final EntityTabPreview getEntityTabPreview(
-            EntityTabType entityTabType) {
-        return entityTabPreviews.get(entityTabType);
-    }
-
-    public final Map<EntityTabType, EntityTabPreview> getEntityTabPreviews() {
-        return entityTabPreviews;
+    public final Map<String, EntityTabPreview> getEntityTabPreviews() {
+        Map<String, EntityTabPreview> m =
+                new HashMap<String, EntityTabPreview>();
+        for (Map.Entry<EntityTabType, EntityTabPreview> entityTabPreview : entityTabPreviews
+                .entrySet())
+            m.put(entityTabPreview.getKey().toString(),
+                    entityTabPreview.getValue());
+        return m;
     }
 
     public final void setEntityTabPreviews(

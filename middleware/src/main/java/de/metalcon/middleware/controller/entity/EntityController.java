@@ -58,13 +58,16 @@ public abstract class EntityController extends MetalconController {
 
     private Map<EntityTabType, EntityTabGenerator> entityTabsGenerators;
 
+    public EntityController() {
+        entityTabsGenerators = new HashMap<EntityTabType, EntityTabGenerator>();
+    }
+
     @PostConstruct
     public void init() {
         fillEntityTabGenerators();
     }
 
     private void fillEntityTabGenerators() {
-        entityTabsGenerators = new HashMap<EntityTabType, EntityTabGenerator>();
         // @formatter:off
         if (this instanceof AboutTabGenerating)           entityTabsGenerators.put(EntityTabType.ABOUT_TAB,           ((AboutTabGenerating)           this).getAboutTabGenerator());
         if (this instanceof BandsTabGenerating)           entityTabsGenerators.put(EntityTabType.BANDS_TAB,           ((BandsTabGenerating)           this).getBandsTabGenerator());
