@@ -49,7 +49,7 @@ public class TestData {
         Band ensiferum2 = new Band(ensiferum2Muid, "Ensiferum");
         Record victorySongs = new Record(victorySongsMuid, "Victory Songs");
         Track ahti = new Track(ahtiMuid, "Ahti");
-        Venue druckkammer = new Venue(druckkammerMuid, "Druckkammer");
+        Venue druckkammer = new Venue(druckkammerMuid, "Druckluftkammer");
         Event wacken = new Event(wackenMuid, "Wacken");
         City koblenz = new City(koblenzMuid, "Koblenz");
         Genre blackMetal = new Genre(blackMetalMuid, "Black Metal");
