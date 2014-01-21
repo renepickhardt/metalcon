@@ -82,9 +82,9 @@
       <li>
         <strong>Venue</strong>
         <ul>
-          <li><a href="<@spring.url "/venue/Druckkammer"/>"><code>/venue/Druckkammer</code></a></li>
-          <li><a href="<@spring.url "/venue/Druckkammer-17"/>"><code>/venue/Druckkammer-17</code></a></li>
-          <li><a href="<@spring.url "/venue/Druckkammer-Koblenz"/>"><code>/venue/Druckkammer-Koblenz</code></a></li>
+          <li><a href="<@spring.url "/venue/Druckluftkammer"/>"><code>/venue/Druckluftkammer</code></a></li>
+          <li><a href="<@spring.url "/venue/Druckluftkammer-17"/>"><code>/venue/Druckluftkammer-17</code></a></li>
+          <li><a href="<@spring.url "/venue/Druckluftkammer-Koblenz"/>"><code>/venue/Druckluftkammer-Koblenz</code></a></li>
         </ul>
       </li>
     </ul>
