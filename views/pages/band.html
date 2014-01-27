@@ -24,12 +24,8 @@
 				<div class="filter">
 				filterbox
 					<ul>
-						<li>
-							<img src="${filter[0].deselectButton.url}" /> ${filter[0].name} 	<!-- deselect-Button is just a simple, clickable image -->
-						</li>
-						<li>
-							<img src="${filter[1].deselectButton.url}" /> ${filter[1].name}
-						</li>
+						<#list filters as filter>
+							<img src="${filter.deselectButton.url}" /> ${filter.name} 	<!-- deselect-Button is just a simple, clickable image -->
 					</ul>
 				</div>
 				<div class="sort">
@@ -89,21 +85,21 @@
 <div class="row">
 	<div class="col-md-4">
 	<ul>
-		<#list item as footerItemsLeft>
+		<#list footerItemsLeft as item>
 			<li><a href="{item.url}">{item.name}</a></li>
 		</#list>
 	</ul>
 	</div>
 	<div class="col-md-4">
 		<ul>
-		<#list item as footerItemsMiddle>
+		<#list footerItemsMiddle as item>
 			<li><a href="{item.url}">{item.name}</a></li>
 		</#list>
 	</ul>
 	</div>
 	<div class="col-md-4">
 		<ul>
-		<#list item as footerItemsRight>
+		<#list footerItemsRight as item>
 			<li><a href="{item.url}">{item.name}</a></li>
 		</#list>
 	</ul>
