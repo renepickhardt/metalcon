@@ -37,10 +37,9 @@
 					<ul>
 						<li>
 							<select name="sorting">
-							<!--TODO: use iterator for sortingCriteria -->
-								<option value="${sortingCriteria[0].value}">${sortingCriteria[0].name}</option>
-								<option value="${sortingCriteria[1].value}">${sortingCriteria[1].name}</option>
-								<option value="${sortingCriteria[2].value}">${sortingCriteria[2].name}</option>
+							<#foreach sortingCriteria in sortingCriterias>
+								<option value="${sortingCriteria.value}">${sortingCriteria.name}</option>
+							</#foreach>
 							</select>
 						</li>
 					</ul>
