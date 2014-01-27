@@ -1,5 +1,5 @@
 <html>
-<title>{band.name} - {site.title}</title>
+<title>${band.name} - ${site.title}</title>
 <link rel="stylesheet" type="text/css" href="./styles.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -8,7 +8,7 @@
 <div class="navbar-wrapper navbar-default navbar-fixed-top" role="navigation">
 <div class="container">
           <div class="navbar-header">
-            <a class="navbar-brand" href="{site.url}">{site.title}</a>
+            <a class="navbar-brand" href="{site.url}">${site.title}</a>
           </div>
         </div>
 </div>
@@ -18,17 +18,17 @@
 			<div class="tab">
 				<div class="headline">
 				<img src="{band.img}" />
-				<h1 id="bandName">{band.name}</h1> aus <a href="{band.city.url}">{band.city}</a>
+				<h1 id="bandName">${band.name}</h1> aus <a href="${band.city.url}">${band.city}</a>
 			</div>
 			<div class="filterBox">
 				<div class="filter">
 				filterbox
 					<ul>
 						<li>
-							<img src="{filter[0].deselectButton.url}" /> {filter[0].name} 	<!-- deselect-Button is just a simple, clickable image -->
+							<img src="${filter[0].deselectButton.url}" /> ${filter[0].name} 	<!-- deselect-Button is just a simple, clickable image -->
 						</li>
 						<li>
-							<img src="{filter[1].deselectButton.url}" /> {filter[1].name}
+							<img src="${filter[1].deselectButton.url}" /> ${filter[1].name}
 						</li>
 					</ul>
 				</div>
@@ -37,9 +37,10 @@
 					<ul>
 						<li>
 							<select name="sorting">
-								<option value="{sortingCriteria[0].value}">{sortingCriteria[0].name}</option>
-								<option value="{sortingCriteria[1].value}">{sortingCriteria[1].name}</option>
-								<option value="{sortingCriteria[2].value}">{sortingCriteria[2].name}</option>
+							<!--TODO: use iterator for sortingCriteria -->
+								<option value="${sortingCriteria[0].value}">${sortingCriteria[0].name}</option>
+								<option value="${sortingCriteria[1].value}">${sortingCriteria[1].name}</option>
+								<option value="${sortingCriteria[2].value}">${sortingCriteria[2].name}</option>
 							</select>
 						</li>
 					</ul>
@@ -49,10 +50,10 @@
 
 			<div class="col-md-8 content">
 				<div class="left">
-					<div class="description">{band.description}</div>
+					<div class="description">${band.description}</div>
 				</div>
 				<div class="right">
-					<div class="newsfeedContainer">{newsfeed}</div>
+					<div class="newsfeedContainer">${newsfeed}</div>
 				</div>
 			</div>
 		</div>
@@ -62,7 +63,8 @@
 
 	<div class="infoTab">	<!-- displays static information --> <!--TODO: also make an own file for this area-->
 	</div>
-
+	<!--All these elements get processed by the middleware-->
+	<!--
 	{include tabPreviews/News}
 	{include tabPreviews/Users}
 	{include tabPreviews/Photos}
@@ -72,7 +74,16 @@
 	{include tabPreviews/Bands}
 	{include tabPreviews/Records}
 	{include tabPreviews/Tracks}			
-
+	-->
+	<div>${tabPreviews-News}</div>
+	<div>${tabPreviews-Users}</div>
+	<div>${tabPreviews-Photos}</div>
+	<div>${tabPreviews-Events}</div>
+	<div>${tabPreviews-Venues}</div>
+	<div>${tabPreviews-Reviews}</div>
+	<div>${tabPreviews-Bands}</div>
+	<div>${tabPreviews-Records}</div>
+	<div>${tabPreviews-Tracks}</div>
 </div>
 </div>
 <div class="footer">footer
