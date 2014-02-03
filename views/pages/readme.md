@@ -4,7 +4,7 @@ All files in this folder will serve as templates for the `Freemarker` template e
 
 # Pages
 
-| Name | Description | Further ressources |
-| --- | --- | --- |
-| `band.html` | This page lists all information to a certain band | |
-
+| Name        | Description                                       | Further ressources |
+| ---         | ---                                               | ---                |
+| `band.html` | This page lists all information to a certain band |                    |
+| `user.html` | This page lists all information to a single user  |                    |
