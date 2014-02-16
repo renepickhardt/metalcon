@@ -1,0 +1,138 @@
+<html>
+<title>${band.name} - ${site.title}</title>
+<link rel="stylesheet" type="text/css" href="./styles.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+
+<body>
+<div class="navbar-wrapper navbar-default navbar-fixed-top" role="navigation">
+<div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="${site.url}">${site.title}</a>
+          </div>
+        </div>
+</div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-8">
+			<div class="tab">
+				<div class="headline">
+				<img src="{band.img}" />
+				<h1 id="bandName">${band.name}</h1> aus <a href="${band.city.url}">${band.city}</a>
+			</div>
+			<div class="filterBox">
+				<div class="filter">
+				filterbox
+					<ul>
+						<#list filters as filter>
+							<img src="${filter.deselectButton.url}" /> ${filter.name} 	<!-- deselect-Button is just a simple, clickable image -->
+					</ul>
+				</div>
+				<div class="sort">
+					sortbox
+					<ul>
+						<li>
+							<select name="sorting">
+							<#foreach sortingCriteria in sortingCriterias>
+								<option value="${sortingCriteria.value}">${sortingCriteria.name}</option>
+							</#foreach>
+							</select>
+						</li>
+					</ul>
+				</div>
+			</div>
+		<!-- individual content -->
+
+			<div class="col-md-8 content">
+                <!-- iterating over all bandEntries associated within the current page -->
+                <#foreach band in bands>
+                    <ul>
+                        <!-- list all descriptive items stored for each band item -->
+                        <#list band as bandItem>
+                            <!-- type checking to ensure that all content types are displayed properly -->
+                            <#if bandItem.type = "image">
+                                <img src="${bandItem.photo.url}" alt="${bandItem.name}" />
+                            </#if>
+                            <#if bandItem.type = "bandName">
+                                <div class ="listEnumeration"><a href="${bandItem.url}">${bandItem.bandName}</a></div>
+                            </#if>
+                            <!-- additionaly check wether optional entity-data actually holds data and has to be rendered -->
+                            <#if bandItem.type = "city" && (bandItem.city)?has_content>
+                                <div class ="listEnumeration"><a href="${bandItem.city.url"}>${bandItem.city}</a></div>
+                            </#if>
+                            <!-- list small fraction of fans -->
+                            <#if bandItem.type = "fans" && (bandItem.fans)?has_content>
+                                <ul>
+                                    <#list bandItem.fans as fan>
+                                        <div class="fanPhoto"><img src="${fan.photo.url}" alt="${fan.name}"></div>
+                                        <div class="fanName"><a href="${fan.url}">${fan.name}</a></div>
+                                    </#list>    
+                                </ul>
+                            </#if>
+                            <#if>
+                            
+                            </#if>
+                        </#list>
+                    </ul>
+                </#foreach>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<div class="col-md-4 tabPreviewContainer">
+
+	<div class="infoTab">	<!-- displays static information --> <!--TODO: also make an own file for this area-->
+	</div>
+	<!--All these elements get processed by the middleware-->
+	<!--
+	{include tabPreviews/News}
+	{include tabPreviews/Users}
+	{include tabPreviews/Photos}
+	{include tabPreviews/Events}
+	{include tabPreviews/Venues}
+	{include tabPreviews/Reviews}
+	{include tabPreviews/Bands}
+	{include tabPreviews/Records}
+	{include tabPreviews/Tracks}			
+	-->
+	<div>${tabPreviews-News}</div>
+	<div>${tabPreviews-Users}</div>
+	<div>${tabPreviews-Photos}</div>
+	<div>${tabPreviews-Events}</div>
+	<div>${tabPreviews-Venues}</div>
+	<div>${tabPreviews-Reviews}</div>
+	
+    <!--<div>${tabPreviews-Bands}</div>-->
+	<div>${tabPreviews-Records}</div>
+	<div>${tabPreviews-Tracks}</div>
+</div>
+</div>
+<div class="footer">footer
+<div class="row">
+	<div class="col-md-4">
+	<ul>
+		<#list footerItemsLeft as item>
+			<li><a href="${item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+	<div class="col-md-4">
+		<ul>
+		<#list footerItemsMiddle as item>
+			<li><a href="${item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+	<div class="col-md-4">
+		<ul>
+		<#list footerItemsRight as item>
+			<li><a href="${item.url}">{item.name}</a></li>
+		</#list>
+	</ul>
+	</div>
+</div>
+</div>
+</div>
+</body>
+</html>
