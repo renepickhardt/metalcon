@@ -13,7 +13,7 @@ import de.metalcon.autocompleteServer.Search;
 /**
  * Servlet implementation class TestServlet
  */
-// @WebServlet("/suggest")
+//@WebServlet("/suggest")
 public class RetrieveServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
