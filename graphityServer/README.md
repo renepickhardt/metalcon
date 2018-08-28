@@ -44,7 +44,7 @@ The Graphity server should start up succesfully after the deployment.
 Congratulations!
 
 You now own a working news stream server. 
-Read the [Protocol Specifications of the servers REST API](PROTOCOL-OF-REST-API.MD) to lear how to store status updates and friendships and how to retrieve activity streams.
+Read the [Protocol Specifications of the servers REST API](PROTOCOL-OF-REST-API.MD) to learn how to store status updates and friendships and how to retrieve activity streams.
 
 To test this manually feel free to use the following test files:
 * [create a user](newswidget/createUser.html)
